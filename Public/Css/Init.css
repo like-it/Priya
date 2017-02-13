@@ -1,0 +1,71 @@
+body {
+    font-family: "Open Sans",sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+}
+h1 {
+    font-size: 48px;
+    font-weight: 300;
+    margin-left: -4px;
+}
+h2 {
+    font-size: 32px;
+    font-weight: 300;
+}
+h3 {
+    font-size: 24px;
+    font-weight: 400;
+}
+h4 {
+    font-size: 24px;
+    font-style: italic;
+    font-weight: 300;
+}
+h5 {
+    font-size: 20px;
+    font-weight: 400;
+}
+h6 {
+    font-size: 16px;
+    font-style: italic;
+    font-weight: 400;
+}
+small {
+    font-size: 13px;
+    font-weight: 300;
+}
+input[type="text"],
+input[type="password"],
+input[type="color"],
+input[type="submit"],
+button,
+textarea,
+select {
+    font-family: "Open Sans",sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    box-sizing: border-box;
+    min-height: 26px;
+    margin: 0;
+    vertical-align: middle;
+    border: 1px solid #dbdbdb;
+}
+
+input[type="color"],
+input[type="submit"] {
+
+}
+
+
+.button-default {
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(224, 224, 224, 1) 100%);
+    background-repeat: repeat-x;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    padding: 5px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.button-default:hover {
+    background-color: rgba(224, 224, 224, 1);
+    background-position: 0 -15px;
+}

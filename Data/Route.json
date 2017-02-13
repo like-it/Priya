@@ -1,0 +1,15 @@
+{
+    "Indent": {
+        "path": "Priya/Module/Indent/Public/Css/Indent.css",
+        "default": {
+            "controller": "Priya.Module.Indent.css",
+            "format": "html",
+            "language": "en"
+        },
+        "method": [
+            "GET",
+            "POST"
+        ],
+        "translate": false
+    }
+}

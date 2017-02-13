@@ -1,0 +1,28 @@
+{
+"Route/Detail": {
+    "path": "Route\/Detail\/",
+    "default": {
+        "controller": "Priya:Module:Route:Detail:run",
+        "format": "html",
+        "language": "en"
+    },
+    "method": [
+        "GET",
+        "POST"
+    ],
+    "translate": false
+},
+"Route/Process": {
+    "path": "Route\/Process\/",
+    "default": {
+        "controller": "Priya:Module:Route:Process:run",
+        "format": "html",
+        "language": "en"
+    },
+    "method": [
+        "GET",
+        "POST"
+    ],
+    "translate": false
+}
+}

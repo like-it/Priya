@@ -1,0 +1,51 @@
+{
+"title":"Start",
+"keywords":"Start",
+"description":"Start",
+"author":"Remco van der Velde",
+"distibrution":"Global",
+"icon":"fav.ico",
+"rating":"General",
+"revisit":"1 Week",
+"version":"0.0.1",
+"update":"2015-02-12 22:03:30",
+"link":"<link rel=\"stylesheet\" href=\"{$web.module.css | default:\"{$web.root}{$module}/Css/\"}{$module}.css?{$revision | default:\"{$version}\"}\">",
+"script":"<script type=\"text/javascript\" src=\"{$web.module.js | default:\"{$web.root}{$module}/Js/\"}{$module}.js?{$revision | default:\"{$version}\"}\" data-require-once=\"true\"></script>",
+"authors":[{
+	"name":"Remco van der Velde",
+	"email":"remco.pc@outlook.com"
+}],
+"support":{
+    "email":"remco.pc@outlook.com"
+},
+"contentType": { 
+	"text/html":{
+		"template" : [			
+			"Main.tpl",			
+			"Process.tpl"
+		],
+		"link":[
+			"<link rel=\"stylesheet\" href=\"{$web.root | default: \"/\"}Css/priya.css?{$revision | default:\"{$version}\"}\" data-require-once=\"true\">",			
+			"{$link}"
+		],
+		"script": [
+			"<script type=\"text/javascript\" src=\"{$web.root | default: \"/\"}Js/Jquery/2.1.4/jquery-2.1.4.min.js?{$revision | default:\"{$version}\"}\" data-require-once=\"true\"></script>",
+			"<script type=\"text/javascript\" src=\"{$web.root | default: \"/\"}Js/Jqueryui/1.11.4/jquery-ui.min.js?{$revision | default:\"{$version}\"}\" data-require-once=\"true\"></script>",
+			"<script type=\"text/javascript\" src=\"{$web.root | default: \"/\"}Js/Priya/priya.js?{$revision | default:\"{$version}\"}\" data-require-once=\"true\"></script>",
+			"{$script}"			
+		]
+	},
+	"application/json":{
+		"template" : [			
+			"Process.tpl"
+		],
+		"script": [
+			"<script type=\"text/javascript\" src=\"{$web.root | default: \"/\"}Js/Jquery/2.1.4/jquery-2.1.4.min.js?{$revision | default:\"{$version}\"}\" data-require-once=\"true\"></script>",
+			"<script type=\"text/javascript\" src=\"{$web.root | default: \"/\"}Js/Jqueryui/1.11.4/jquery-ui.min.js?{$revision | default:\"{$version}\"}\" data-require-once=\"true\"></script>",
+			"<script type=\"text/javascript\" src=\"{$web.root | default: \"/\"}Js/Priya/priya.js?{$revision | default:\"{$version}\"}\" data-require-once=\"true\"></script>",
+			"{$script}",
+			"<script type=\"text/javascript\" > console.log('its happening'); </script>"		
+		]
+	}
+}
+}
