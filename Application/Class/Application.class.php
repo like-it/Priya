@@ -83,7 +83,7 @@ class Application extends Parser {
             $autoload->addPrefix('Priya',  dirname(Application::DIR) . Application::DS);
             $autoload->register();
         }
-        $autoload->environment($this->data('enironment'));
+        $autoload->environment($this->data('environment'));
         $this->autoload($autoload);
         $this->autoload()->addPrefix('Vendor', $this->data('dir.vendor'));
 
