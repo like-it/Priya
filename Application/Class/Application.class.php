@@ -110,7 +110,9 @@ class Application extends Parser {
     }
 
     public function run(){
-        header('Last-Modified: '. $this->request('Last-Modified'));
+        if(!headers_sent()){
+            header('Last-Modified: '. $this->request('Last-Modified'));
+        }
         $request = $this->request('request');
         $tmp = explode('.', $request);
         $ext = strtolower(end($tmp));
