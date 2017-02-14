@@ -187,7 +187,6 @@ class Application extends Parser {
             var_dump($result);
             var_dump($item);
         }
-
     }
 
     public function autoload($autoload=null){

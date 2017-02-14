@@ -152,7 +152,16 @@ class Result extends Parser {
                 }
             }
         } else {
-            $template_list = (array) $this->locateTemplate($template);
+            if(is_array($template)){
+                foreach($template as $tpl){
+                    $url = $this->locateTemplate($tpl);
+                    if(!empty($url)){
+                        $template_list[] = $url;
+                    }
+                }
+            } else {
+                $template_list = (array) $this->locateTemplate($template);
+            }
         }
         $url = array_shift($template_list);
         if(empty($url)){
