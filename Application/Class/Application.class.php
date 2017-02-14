@@ -73,7 +73,6 @@ class Application extends Parser {
             $this->data('public_html', Application::PUBLIC_HTML);
             $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);
         }
-
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
