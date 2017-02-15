@@ -257,7 +257,7 @@ class Data extends Core {
         }
     }
 
-    public function sort($list, $attribute, $order='ASC', $sort=null, $case=false){
+    public function sort($list, $attribute='sort', $order='ASC', $sort=null, $case=false){
         $useData = true;
         $output = 'array';
         if(is_string($list)){
@@ -302,7 +302,8 @@ class Data extends Core {
             }
         }
         if(empty($useData)){
-            return $this->object($data, $output);
+            $res = $this->object($data, $output);
+            return $res;
         } else {
             $this->data('delete', $list);
             return $this->data($list, $this->object($data, $output));
@@ -462,11 +463,11 @@ class Data extends Core {
         return false;
     }
 
-    public function recursive_sort($list='', $attribute='', $order='ASC', $children='nodeList', $sort=null, $case=false){
-        $nodeList = $this->sort($list, $attribute, $order, $sort=null, $case=false);
+    public function recursive_sort($list='', $attribute='sort', $order='ASC', $children='nodeList', $sort=null, $case=false){
+        $nodeList = $this->sort($list, $attribute, $order, $sort, $case);
         foreach($nodeList as $key => $node){
             if(is_object($node) && !empty($node->{$children})){
-                $node->{$children} = $this->recursive_sort($node->{$children}, $attribute, $order, $children, $sort=null, $case=false);
+                $node->{$children} = $this->recursive_sort($node->{$children}, $attribute, $order, $children, $sort, $case);
             }
         }
         return $nodeList;
