@@ -225,7 +225,7 @@ class Route extends Parser{
             }
         }
         if(empty($found)){
-            trigger_error('Route not found for ('. $name.')');
+//             trigger_error('Route not found for ('. $name.')');
         } else {
             $route_path = explode('/', trim(strtolower($route->path), '/'));
             foreach($route_path as $part_nr => $part){
