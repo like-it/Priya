@@ -190,6 +190,10 @@ class Result extends Parser {
         require_once $dir_smarty . 'Smarty.class.php';
         $smarty = new \Smarty();
 
+        $functions = spl_autoload_functions();
+        if(empty($functions)){
+            \Smarty_Autoloader::register();
+        }
         $dir_template = '';
         $class = get_called_class();
         if($class::DIR){
@@ -283,6 +287,12 @@ class Result extends Parser {
         }
         $smarty->assign('fetch', $url);
         $fetch = $smarty->fetch($url);
+
+        $func = spl_autoload_functions();
+
+        foreach($func as $function){
+            spl_autoload_unregister($function);
+        }
         foreach($functions as $function) {
             spl_autoload_register($function);
         }

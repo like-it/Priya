@@ -17,6 +17,16 @@ class Autoload{
 
     public function register($method='load', $prepend=false){
         $this->environment('development');
+        $functions = spl_autoload_functions();
+        if(is_array($functions)){
+            foreach($functions as $function){
+                $object = reset($function);
+                if(is_object($object) && get_class($object) == get_class($this)){
+                    return; //register once...
+                }
+
+            }
+        }
         spl_autoload_register(array($this, $method), true, $prepend);
     }
 
