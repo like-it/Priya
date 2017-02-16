@@ -30,8 +30,9 @@ class Data extends Core {
                 if($attribute=='delete'){
                     return $this->deleteData($value);
                 } else {
-                    $this->deleteData($attribute); //for sorting an object
+                    $this->object_delete($attribute, $this->data()); //for sorting an object
                     $this->object_set($attribute, $value, $this->data());
+                    return $this->object_get($attribute, $this->data());
                 }
             } else {
                 if(is_string($attribute)){

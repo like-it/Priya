@@ -23,6 +23,26 @@ class Core {
     public function __construct($handler=null, $route=null){
         $this->handler($handler);
         $this->route($route);
+
+        set_exception_handler(array(__CLASS__,'handler_exception'));
+        set_error_handler(array(__CLASS__,'handler_error'));
+
+    }
+
+    public static function handler_exception($exception){
+        var_dump($exception);
+        die;
+    }
+
+
+    public static function handler_error($number, $message, $file='', $line=null, $context=array()){
+        $error = array();
+        $error['number'] = $number;
+        $error['message'] = $message;
+        $error['file'] = $file;
+        $error['line'] = $line;
+        $error['context'] = $context;
+        var_dump($error);
     }
 
     public function handler($handler=null){
