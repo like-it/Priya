@@ -32,7 +32,7 @@ class Application extends Parser {
     private $autoload;
 
     public function __construct($autoload=null, $data=null){
-        $this->data($data);
+        $this->data($this->object($data));
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.priya.application',
