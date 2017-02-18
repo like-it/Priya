@@ -158,13 +158,9 @@ class Handler extends Data{
 
         $node = array();
         $input = htmlspecialchars(htmlspecialchars_decode(implode('', file('php://input')), ENT_NOQUOTES), ENT_NOQUOTES, "UTF-8");
-
         if(empty($input) && !empty($_REQUEST)){
             $input = htmlspecialchars(json_encode(array('nodeList' => array(0 => $_REQUEST))), ENT_NOQUOTES, "UTF-8");
         }
-//         var_dump($input);
-//         var_dump($_REQUEST);
-//         die;
         elseif(!empty($input) && !empty($_REQUEST)){
             $old = json_decode($input);
             if(!isset($old->nodeList)){

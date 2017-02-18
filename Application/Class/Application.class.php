@@ -31,7 +31,8 @@ class Application extends Parser {
 
     private $autoload;
 
-    public function __construct($autoload=null){
+    public function __construct($autoload=null, $data=null){
+        $this->data($this->object($data));
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.priya.application',
@@ -45,35 +46,35 @@ class Application extends Parser {
                 Application::DS
         );
         $this->data('dir.priya.data',
-                $this->data('dir.priya.application') .
-                Application::DATA .
-                Application::DS
+            $this->data('dir.priya.application') .
+            Application::DATA .
+            Application::DS
         );
         $this->data('dir.priya.backup',
-                $this->data('dir.priya.data') .
-                Application::BACKUP .
-                Application::DS
+            $this->data('dir.priya.data') .
+            Application::BACKUP .
+            Application::DS
         );
         $this->data('dir.vendor',
-                dirname(dirname($this->data('dir.priya.application'))) .
-                Application::DS
+            dirname(dirname($this->data('dir.priya.application'))) .
+            Application::DS
         );
         $this->data('dir.root',
-                dirname($this->data('dir.vendor')) .
-                Application::DS
+            dirname($this->data('dir.vendor')) .
+            Application::DS
         );
-        $this->data('dir.data',
+        if(empty($this->data('dir.data'))){
+            $this->data('dir.data',
                 $this->data('dir.root') .
                 Application::DATA .
                 Application::DS
-        );
+           );
+        }
         $this->read($this->data('dir.data') . Application::CONFIG);
-
         if(empty($this->data('public_html'))){
             $this->data('public_html', Application::PUBLIC_HTML);
             $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);
         }
-
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
@@ -111,7 +112,9 @@ class Application extends Parser {
     }
 
     public function run(){
-        header('Last-Modified: '. $this->request('Last-Modified'));
+        if(!headers_sent()){
+            header('Last-Modified: '. $this->request('Last-Modified'));
+        }
         $request = $this->request('request');
         $tmp = explode('.', $request);
         $ext = strtolower(end($tmp));
@@ -187,7 +190,6 @@ class Application extends Parser {
             var_dump($result);
             var_dump($item);
         }
-
     }
 
     public function autoload($autoload=null){
