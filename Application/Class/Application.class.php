@@ -107,11 +107,11 @@ class Application extends Parser {
         $this->route()->create('Application.Help');
         $this->route()->create('Application.Error');
         $this->route()->create('Application.Route');
-        $this->route()->create('Application.Install');
-        $this->route()->create('Application.Update');
         $this->route()->create('Application.Restore');
-        $this->route()->create('Application.Config');
-        $this->route()->create('Application.User');
+//         $this->route()->create('Application.Install');
+//         $this->route()->create('Application.Update');
+//         $this->route()->create('Application.Config');
+//         $this->route()->create('Application.User');
     }
 
     public function run(){

@@ -7,10 +7,15 @@
  * 	-	all
  * @note
  *  - In Smarty bash coloring isn't working.
- */ 
+ */
 namespace Priya;
 
 echo "\t" . 'Options:' ."\n";
+echo "\t" . 'restore --list             (this will show available restore points)' ."\n";
+echo "\t" . 'route --list               (this will show available cli routes)' ."\n";
+echo "\t" . 'route --list-all           (this will show all available routes)' ."\n";
+/*
+
 echo "\t" . 'route --list             (this will show available routes)' ."\n";
 echo "\t" . 'config list              (this will show the configuration list)' ."\n";
 echo "\t" . 'config set $var $value   (this will set the variable in the configuration)' ."\n";
@@ -21,4 +26,6 @@ echo "\t" . 'install --local          (this will install Priya from the local ba
 echo "\t" . 'install --options        (this will show tagged versions available)' ."\n";
 echo "\t" . 'restore                  (this will restore the installation from Application/Data/Backup/Restore)' ."\n";
 echo "\t" . 'update                   (this will update the installation with the newest Priya)' ."\n";
+*/
+
 ?>

@@ -44,6 +44,52 @@ class Route extends Parser{
         }
     }
 
+    private function parsePath($path='', $route=''){
+        $found = true;
+        $route_path = explode('/', trim(strtolower($route->path), '/'));
+        $attributeList = array();
+        $valueList = $path;
+        foreach($route_path as $part_nr => $part){
+            if(substr($part,0,1) == '{' && substr($part,-1) == '}'){
+                $attributeList[$part_nr] = $part;
+                continue;
+            }
+            if(!isset($path[$part_nr])){
+                $found = false;
+                break;
+            }
+            if($part != $path[$part_nr]){
+                $found = false;
+                break;
+            }
+            unset($route_path[$part_nr]);
+            unset($valueList[$part_nr]);
+        }
+        if(empty($found)){
+            return false;
+        }
+        if(!empty($valueList) && empty($attributeList)){
+            return false;
+        }
+        if(!empty($attributeList)){
+            $itemList = array();
+            foreach($attributeList as $attribute_nr => $attribute){
+                if(isset($valueList[$attribute_nr])){
+                    $record = $this->parseAttributeList($attribute, $valueList[$attribute_nr]);
+                    foreach($record as $record_nr => $item){
+                        $itemList[] = $item;
+                    }
+                }
+            }
+            foreach($itemList as $request){
+                if(isset($request->name) && isset($request->value)){
+                    $this->request($request->name, $request->value);
+                }
+            }
+        }
+        return $route;
+    }
+
     public function run($path=''){
         return $this->parseRequest($path);
     }
@@ -73,47 +119,9 @@ class Route extends Parser{
             if(!isset($route->path)){
                 continue;
             }
-            $found = true;
-            $route_path = explode('/', trim(strtolower($route->path), '/'));
-            $attributeList = array();
-            $valueList = $path;
-            foreach($route_path as $part_nr => $part){
-                if(substr($part,0,1) == '{' && substr($part,-1) == '}'){
-                    $attributeList[$part_nr] = $part;
-                    continue;
-                }
-                if(!isset($path[$part_nr])){
-                    $found = false;
-                    break;
-                }
-                if($part != $path[$part_nr]){
-                    $found = false;
-                    break;
-                }
-                unset($route_path[$part_nr]);
-                unset($valueList[$part_nr]);
-            }
-            if(empty($found)){
+            $node = $this->parsePath($path, $route);
+            if(empty($node)){
                 continue;
-            }
-            if(!empty($valueList) && empty($attributeList)){
-                continue;
-            }
-            if(!empty($attributeList)){
-                $itemList = array();
-                foreach($attributeList as $attribute_nr => $attribute){
-                    if(isset($valueList[$attribute_nr])){
-                        $record = $this->parseAttributeList($attribute, $valueList[$attribute_nr]);
-                        foreach($record as $record_nr => $item){
-                            $itemList[] = $item;
-                        }
-                    }
-                }
-                foreach($itemList as $request){
-                    if(isset($request->name) && isset($request->value)){
-                        $this->request($request->name, $request->value);
-                    }
-                }
             }
             if(isset($route->default) && isset($route->default->controller)){
                 $controller = '\\' . trim(str_replace(array(':', '.'), array('\\','\\'), $route->default->controller), ':\\');
@@ -123,26 +131,6 @@ class Route extends Parser{
                 $object->controller = implode('\\', $tmp);
                 return $this->item($object);
             }
-            //route path can contain {$id}
-            /*
-            $alternative = array();
-            if(isset($route->alternative)){
-                foreach($route->alternative as $key => $value){
-                    $alternative[$key] = strtolower(trim($value, '/')) . '/';
-                }
-
-            }
-            if($route_path == $path || in_array($path, $alternative)){
-                if(isset($route->default) && isset($route->default->controller)){
-                    $controller = '\\' . trim(str_replace(':', '\\', $route->default->controller), ':\\');
-                    $tmp = explode('\\', $controller);
-                    $object = new stdClass();
-                    $object->function = array_pop($tmp);
-                    $object->controller = implode('\\', $tmp);
-                    return $this->item($object);
-                }
-            }
-            */
         }
         $this->error('route', true);
     }
@@ -170,12 +158,14 @@ class Route extends Parser{
         $name = $this->explode_multi(array(':', '.', '/', '\\'), trim($name, '.:/\\'));
         $object = new stdClass();
         $object->path = implode('/', $name) . '/';
-        $object->alternative = array(end($name) . '/');
         $object->default = new stdClass();
         $object->default->controller = 'Priya:Module:' . $module . ':'. implode(':', $name) . ':' .  $method;
         $object->method = array('CLI');
         $object->translate = false;
         $this->data(strtolower(implode('-',$name)) . '/', $object);
+        $object = $this->copy($object);
+        $object->path = end($name);
+        $this->data(strtolower(implode('-',$name) . '-shorthand') . '/', $object);
     }
 
     public function parseAttributeList($attribute='', $value=''){

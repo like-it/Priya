@@ -7,6 +7,10 @@ use Priya\Module\Core\Data;
 use stdClass;
 
 class Handler extends Data{
+    const CONTENT_TYPE_CSS = 'text/css';
+    const CONTENT_TYPE_HTML = 'text/html';
+    const CONTENT_TYPE_JSON = 'application/json';
+    const CONTENT_TYPE_CLI = 'text/cli';
 
     private $request;
     private $contentType;
@@ -128,14 +132,18 @@ class Handler extends Data{
 
     private function createContentType(){
         $contentType = 'text/html';
-        if(isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == 'application/json'){
-            $contentType = 'application/json';
+        if(isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == Handler::CONTENT_TYPE_JSON){
+            $contentType = Handler::CONTENT_TYPE_JSON;
         }
         if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
-            $contentType = 'application/json';
+            $contentType = Handler::CONTENT_TYPE_JSON;
         }
         if(isset($_SERVER['HTTP_ACCEPT']) && stristr($_SERVER['HTTP_ACCEPT'], 'text/css')){
-            $contentType = 'text/css';
+            $contentType = Handler::CONTENT_TYPE_CSS;
+        }
+        $host = $this->host();
+        if(empty($host)){
+            $contentType = Handler::CONTENT_TYPE_CLI;
         }
         $request = $this->request('request');
         $tmp = explode('.', $request);
@@ -216,7 +224,6 @@ class Handler extends Data{
             $data->nodeList[] = $object;
             $object = new stdClass();
             $object->file =  Application::DIR . Application::DS . basename(array_shift($argv));
-            $this->request('Content-Type', 'text/cli');
             $data->nodeList[] = $object;
             if(count($argv) >= 1){
                 $object = new stdClass();
