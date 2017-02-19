@@ -11,6 +11,8 @@ use Priya\Module\Core\Cli;
 use Priya\Module\File\Dir;
 use Priya\Module\File;
 use Priya\Module\Core\Data;
+use ZipArchive;
+use Priya\Application;
 
 class Restore extends Cli {
     const DIR = __DIR__;
@@ -53,13 +55,33 @@ class Restore extends Cli {
             $read = $this->explode_multi(array("\n", "\r\n"), $read);
         }
         $ignore = array();
+        $ignore[] = '.git';
         foreach($read as $location){
             $location = trim($location);
             $ignore[] = $location;
         }
         $dir->ignore('list', $ignore);
         $read = $dir->read($url, true);
-        var_dump(count($read));
+
+        if(is_dir($this->data('dir.restore'))===false){
+            mkdir($this->data('dir.restore'), 0744, true);
+        }
+        $target = $this->data('dir.restore') . $this->data('version') . '.zip';
+        if(file_exists($target)){
+            unlink($target);
+        }
+        $zip = new ZipArchive();
+        $res = $zip->open($target, ZipArchive::CREATE);
+        foreach($read as $node){
+            if($node->url == $target){
+                continue;
+            }
+            $filename= str_replace(Application::DS, '/', $node->url);
+            $location = explode($this->data('dir.root'), $filename, 2);
+            $location = implode('', $location);
+            $zip->addFile($filename, $location);
+        }
+        $zip->close();
     }
 
     private function createList(){
