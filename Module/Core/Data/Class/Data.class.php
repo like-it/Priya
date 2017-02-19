@@ -123,9 +123,6 @@ class Data extends Core {
                     foreach($read as $attribute => $value){
                         $this->object_set($attribute, $value, $data);
                     }
-                } else {
-                    var_dump($read);
-                    die;
                 }
             }
             return $this->data($data);
