@@ -25,6 +25,63 @@ class Route extends Parser{
         $this->parseRoute();
     }
 
+    public function run($path=''){
+        return $this->parseRequest($path);
+    }
+
+    public function parseRequest($path=''){
+        $handler = $this->handler();
+        $data = $this->data();
+        if(empty($path)){
+            $path = trim($handler->request('request'), '/') . '/';
+        }
+        foreach($data as $name => $route){
+            if(isset($route->resource) && !isset($route->read)){
+                $route->resource = $this->compile($route->resource, $this->data());
+                if(file_exists($route->resource)){
+                    $object = new Data();
+                    $this->data($object->read($route->resource));
+                    $route->read = true;
+                    return $this->parseRequest($path);
+                } else {
+                    $route->read = false;
+                }
+            }
+        }
+        $path = explode('/', trim(strtolower($path), '/'));
+
+        foreach($data as $name => $route){
+            if(!isset($route->path)){
+                continue;
+            }
+            $node = $this->parsePath($path, $route);
+            if(empty($node)){
+                continue;
+            }
+            if(isset($route->method)){
+                if(!is_array($route->method)){
+                    $route->method = (array) $route->method;
+                }
+                foreach($route->method as $key => $method){
+                    $route->method[$key] = strtoupper($method);
+                }
+                $contentType = $this->handler()->contentType();
+                if($contentType == handler::CONTENT_TYPE_CLI && !in_array('CLI', $route->method)){
+                    continue; //skip based on wrong content
+                }
+            }
+            if(isset($route->default) && isset($route->default->controller)){
+                $controller = '\\' . trim(str_replace(array(':', '.'), array('\\','\\'), $route->default->controller), ':\\');
+                $tmp = explode('\\', $controller);
+                $object = new stdClass();
+                $object->function = array_pop($tmp);
+                $object->controller = implode('\\', $tmp);
+                return $this->item($object);
+            }
+        }
+        $this->error('route', true);
+    }
+
     private function parseRoute(){
         $data = $this->data();
         if(is_array($data) || is_object($data)){
@@ -88,51 +145,6 @@ class Route extends Parser{
             }
         }
         return $route;
-    }
-
-    public function run($path=''){
-        return $this->parseRequest($path);
-    }
-
-    public function parseRequest($path=''){
-        $handler = $this->handler();
-        $data = $this->data();
-        if(empty($path)){
-            $path = trim($handler->request('request'), '/') . '/';
-        }
-        foreach($data as $name => $route){
-            if(isset($route->resource) && !isset($route->read)){
-                $route->resource = $this->compile($route->resource, $this->data());
-                if(file_exists($route->resource)){
-                    $object = new Data();
-                    $this->data($object->read($route->resource));
-                    $route->read = true;
-                    return $this->parseRequest($path);
-                } else {
-                    $route->read = false;
-                }
-            }
-        }
-        $path = explode('/', trim(strtolower($path), '/'));
-
-        foreach($data as $name => $route){
-            if(!isset($route->path)){
-                continue;
-            }
-            $node = $this->parsePath($path, $route);
-            if(empty($node)){
-                continue;
-            }
-            if(isset($route->default) && isset($route->default->controller)){
-                $controller = '\\' . trim(str_replace(array(':', '.'), array('\\','\\'), $route->default->controller), ':\\');
-                $tmp = explode('\\', $controller);
-                $object = new stdClass();
-                $object->function = array_pop($tmp);
-                $object->controller = implode('\\', $tmp);
-                return $this->item($object);
-            }
-        }
-        $this->error('route', true);
     }
 
     public function item($item=null){
