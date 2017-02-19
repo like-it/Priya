@@ -24,8 +24,8 @@ class Application extends Parser {
     const MODULE = 'Module';
     const DATA = 'Data';
     const BACKUP = 'Backup';
+    const RESTORE = 'Restore';
     const PUBLIC_HTML = 'Public';
-    const TAG = '0.0.3';
     const CONFIG = 'Config.json';
     const ROUTE = 'Route.json';
 
@@ -39,14 +39,18 @@ class Application extends Parser {
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.priya.application',
-                dirname(Application::DIR) .
-                Application::DS
+            dirname(Application::DIR) .
+            Application::DS
+        );
+        $this->data('dir.priya.root',
+            dirname($this->data('dir.priya.application')) .
+               Application::DS
         );
         $this->data('dir.priya.module',
-                dirname($this->data('dir.priya.application')) .
-                Application::DS .
-                Application::MODULE .
-                Application::DS
+            dirname($this->data('dir.priya.application')) .
+            Application::DS .
+            Application::MODULE .
+            Application::DS
         );
         $this->data('dir.priya.data',
             $this->data('dir.priya.application') .
@@ -72,6 +76,13 @@ class Application extends Parser {
                 Application::DATA .
                 Application::DS
            );
+        }
+        if(empty($this->data('dir.restore'))){
+            $this->data('dir.restore',
+                $this->data('dir.priya.data') .
+                Application::RESTORE .
+                Application::DS
+               );
         }
         $this->read($this->data('dir.data') . Application::CONFIG);
         if(empty($this->data('public_html'))){
