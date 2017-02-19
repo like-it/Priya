@@ -440,12 +440,17 @@ class Handler extends Data{
     }
 
     public function host(){
-        $host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/';
-        return $host;
+        if(isset($_SERVER['REQUEST_SCHEME']) && isset($_SERVER['SERVER_NAME'])){
+            $host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/';
+            return $host;
+        }
     }
 
     public function removeHost($value=''){
         $host = $this->host();
+        if(empty($host)){
+            return $value;
+        }
         $value = explode($host, $value, 2);
         $value = implode('', $value);
         return $value;
