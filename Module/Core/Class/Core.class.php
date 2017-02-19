@@ -23,10 +23,6 @@ class Core {
     public function __construct($handler=null, $route=null){
         $this->handler($handler);
         $this->route($route);
-
-        set_exception_handler(array(__CLASS__,'handler_exception'));
-        set_error_handler(array(__CLASS__,'handler_error'));
-
     }
 
     public static function handler_exception($exception){

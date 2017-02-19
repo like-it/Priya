@@ -177,6 +177,9 @@ class Result extends Parser {
         foreach($functions as $function) {
             spl_autoload_unregister($function);
         }
+        restore_error_handler();
+        restore_exception_handler();
+
         $dir_priya = dirname(dirname(Application::DIR)) . Application::DS;
         $dir_vendor = dirname($dir_priya) . Application::DS;
 
@@ -288,14 +291,17 @@ class Result extends Parser {
         $smarty->assign('fetch', $url);
         $fetch = $smarty->fetch($url);
 
-        $func = spl_autoload_functions();
+        set_exception_handler(array('Priya\Module\Core','handler_exception'));
+        set_error_handler(array('Priya\Module\Core','handler_error'));
 
+        $func = spl_autoload_functions();
         foreach($func as $function){
             spl_autoload_unregister($function);
         }
         foreach($functions as $function) {
             spl_autoload_register($function);
         }
+
         if($contentType == 'application/json'){
             $object = new stdClass();
             $object->html = $fetch;
