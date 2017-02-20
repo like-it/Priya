@@ -212,6 +212,9 @@ class Data extends Core {
             foreach($data as $key => $node){
                 $search = '';
                 if(is_array($attribute)){
+                    if(is_array($node)){
+                        $node = $this->object($node);
+                    }
                     foreach($attribute as $value){
                         $selector = trim($value);
                         $select = $this->object_get($selector, $node);
@@ -275,10 +278,15 @@ class Data extends Core {
         if(is_array($data) || is_object($data)){
             foreach($data as $key => $node){
                 $sorter = '';
-                foreach($attribute as $value){
-                    $selector = trim($value);
-                    $select = $this->object_get($selector, $node);
-                    $sorter .= $select;
+                if(is_array($attribute)){
+                    if(is_array($node)){
+                        $node = $this->object($node);
+                    }
+                    foreach($attribute as $value){
+                        $selector = trim($value);
+                        $select = $this->object_get($selector, $node);
+                        $sorter .= $select;
+                    }
                 }
                 if(empty($case)){
                     $sorter = strtolower($sorter);
@@ -336,31 +344,36 @@ class Data extends Core {
         }
         if(is_array($data) || is_object($data)){
             foreach($data as $key => $node){
-                foreach($attribute as $value){
-                    $selector = trim($value);
-                    $select = $this->object_get($selector, $node);
-                    if($action == 'remove'){
-                        if(!empty($select)){
-                            $remove[$key] = true;
-                        }
-                        $result[$key] = $node;
-                    }
-                    elseif($action == 'keep' && !empty($select)){
-                        if(empty($values)){
+                if(is_array($node)){
+                    $node = $this->object($node);
+                }
+                if(is_array($attribute)){
+                    foreach($attribute as $value){
+                        $selector = trim($value);
+                        $select = $this->object_get($selector, $node);
+                        if($action == 'remove'){
+                            if(!empty($select)){
+                                $remove[$key] = true;
+                            }
                             $result[$key] = $node;
-                        } else {
-                            if(is_array($select)){
-                                foreach($values as $val){
-                                    if(in_array($val, $select)){
-                                        $result[$key] = $node;
-                                        break;
-                                    }
-                                }
+                        }
+                        elseif($action == 'keep' && !empty($select)){
+                            if(empty($values)){
+                                $result[$key] = $node;
                             } else {
-                                foreach($values as $val){
-                                    if($val == $select){
-                                        $result[$key] = $node;
-                                        break;
+                                if(is_array($select)){
+                                    foreach($values as $val){
+                                        if(in_array($val, $select)){
+                                            $result[$key] = $node;
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    foreach($values as $val){
+                                        if($val == $select){
+                                            $result[$key] = $node;
+                                            break;
+                                        }
                                     }
                                 }
                             }

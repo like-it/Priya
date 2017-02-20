@@ -12,6 +12,7 @@ use Priya\Application;
 use stdClass;
 
 class Dir {
+    const CHMOD = 0740;
     private $node;
 
     public function ignore($ignore=null, $attribute=null){
