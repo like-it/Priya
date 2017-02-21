@@ -34,8 +34,8 @@ class Application extends Parser {
     public function __construct($autoload=null, $data=null){
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
-
         $this->data($this->object($data));
+        $this->cli();
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.priya.application',
@@ -219,5 +219,29 @@ class Application extends Parser {
 
     private function getAutoload(){
         return $this->autoload;
+    }
+
+    private function cli(){
+        $request = $this->request('data');
+        if(!empty($request)){
+            if(is_array($request) || is_object($request)){
+                $key = false;
+                $value = null;
+                foreach($request as $attribute){
+                    if(!empty($key)){
+                        $value = $attribute;
+                    }
+                    switch($attribute){
+                        case 'dir.data':
+                            $key = $attribute;
+                            continue;
+                            break;
+                    }
+                    if(!empty($key) && isset($value)){
+                        $this->data($key, $value);
+                    }
+                }
+            }
+        }
     }
 }

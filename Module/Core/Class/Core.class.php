@@ -79,10 +79,37 @@ class Core {
     }
 
     public function request($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler());
+        }
         return $this->handler()->request($attribute, $value);
     }
 
+    public function parameter($parameter){
+        $data = $this->request('data');
+        foreach($data as $key => $param){
+            $param = ltrim($param,'-');
+            $tmp = explode('=', $param);
+            if(count($tmp) > 1){
+                $param = array_shift($tmp);
+                $value = implode('=', $tmp);
+            }
+            if(strtolower($param) == strtolower($parameter)){
+                if(isset($value)){
+                    return $value;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function session($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler());
+        }
         return $this->handler()->session($attribute, $value);
     }
 

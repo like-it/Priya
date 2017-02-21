@@ -46,6 +46,10 @@ class Restore extends Cli {
     }
 
     private function createPoint(){
+        $version = $this->data('version');
+        if(empty($version)){
+            return false;
+        }
         $file = new File();
         $read = $file->read($this->data('dir.priya.root') . '.gitignore');
         $url = $this->data('dir.root');
@@ -65,7 +69,7 @@ class Restore extends Cli {
         if(is_dir($this->data('dir.restore'))===false){
             mkdir($this->data('dir.restore'), Dir::CHMOD, true);
         }
-        $target = $this->data('dir.restore') . $this->data('version') . '.zip';
+        $target = $this->data('dir.restore') . $version . '.zip';
         if(file_exists($target)){
             unlink($target);
         }
@@ -101,9 +105,18 @@ class Restore extends Cli {
         $collect = false;
         $parameters = array();
         $data = $this->request('data');
+        $skip = false;
         foreach($data as $key => $parameter){
+            if(!empty($skip)){
+                $skip = false;
+                continue;
+            }
             if($parameter == 'point'){
                 $collect = true;
+                continue;
+            }
+            if($parameter == 'dir.data'){
+                $skip = true;
                 continue;
             }
             if($parameter == 'update'){

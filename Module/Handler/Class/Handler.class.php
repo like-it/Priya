@@ -217,17 +217,18 @@ class Handler extends Data{
         }
         $data = json_decode($input);
         if(empty($data) && !empty($argv)){
+            $attribute= $argv;
             $data = new stdClass();
             $data->nodeList = array();
             $object = new stdClass();
             $object->data =  $argv;
             $data->nodeList[] = $object;
             $object = new stdClass();
-            $object->file =  Application::DIR . Application::DS . basename(array_shift($argv));
+            $object->file =  Application::DIR . Application::DS . basename(array_shift($attribute));
             $data->nodeList[] = $object;
             if(count($argv) >= 1){
                 $object = new stdClass();
-                $object->request =  str_replace('\\','/',array_shift($argv));
+                $object->request =  str_replace('\\','/',array_shift($attribute));
                 $data->nodeList[] = $object;
             }
         }

@@ -11,6 +11,7 @@ namespace Priya\Module\Core;
 use Priya\Module\Core;
 use Priya\Application;
 use Priya\Module\File;
+use Priya\Module\Handler;
 use stdClass;
 
 class Data extends Core {
@@ -583,5 +584,21 @@ class Data extends Core {
 
     public function copy($copy=null){
         return unserialize(serialize($copy));
+    }
+
+    public function request($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler($this->data()));
+        }
+        return parent::request($attribute, $value);
+    }
+
+    public function session($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler($this->data()));
+        }
+        return parent::session($attribute, $value);
     }
 }
