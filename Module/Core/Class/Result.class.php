@@ -171,6 +171,7 @@ class Result extends Parser {
                 $url = array_shift($template_list);
             }
         }
+        $this->url($url);
         $dir = dirname($url);
         chdir($dir);
         $functions = spl_autoload_functions();

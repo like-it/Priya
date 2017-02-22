@@ -111,9 +111,9 @@ class Data extends Core {
         if(empty($url)){
             $url = get_called_class();
         }
-        if(file_exists($this->url($url))){
+        if(file_exists($url)){
             $file = new File();
-            $read = $file->read($url);
+            $read = $file->read($this->url($url));
             $read = $this->object($read);
             $data = $this->data();
             if(empty($data)){
