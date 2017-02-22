@@ -1,4 +1,32 @@
 {
+    "pull": {
+        "path": "Pull",
+        "default": {
+            "controller": "Priya.Module.Cli.Application.Pull.run",
+            "format": "html",
+            "language": "en"
+        },
+        "method": [
+            "GET",
+            "POST",
+            "CLI"
+        ],
+        "translate": false
+    },
+    "pull": {
+        "path": "Push",
+        "default": {
+            "controller": "Priya.Module.Cli.Application.Push.run",
+            "format": "html",
+            "language": "en"
+        },
+        "method": [
+            "GET",
+            "POST",
+            "CLI"
+        ],
+        "translate": false
+    },
     "Indent": {
         "path": "Priya/Module/Indent/Public/Css/Indent.css",
         "default": {
