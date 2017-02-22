@@ -17,11 +17,11 @@ use Priya\Module\Core\Object;
 function smarty_function_text_time($params, $template)
 {
     $result = '';
-    $time = '';
+    $now  = time();
+    $time = $now;
     if(isset($params['time'])){
         $time = $params['time'];
     }
-    $now  = time();
     $current = $now - $time;
     $hour  = 60 * 60;
     $day = $hour * 24;

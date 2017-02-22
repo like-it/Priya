@@ -220,10 +220,20 @@ class Result extends Parser {
         $smarty->setCompileDir($dir_cache . 'Compile' .	Application::DS);
         $smarty->setCacheDir($dir_cache . 'Cache' .	Application::DS);
         $smarty->setConfigDir('');
-        $smarty->addPluginsDir($dir_module_smarty . 'Plugin'. Application::DS);	//own plugins...
+        $smarty->addPluginsDir($dir_module_smarty . 'Plugin'. Application::DS);	//priya plugins...
         $smarty->assign('class', str_replace('\\', '-', strtolower($class)));
         $smarty->assign('template_list', $template_list);
 
+        $plugin_dir = $this->data('smarty.dir.plugin');
+        if(!is_array($plugin_dir)){
+            $plugin_dir = (array) $plugin_dir;
+        }
+        foreach($plugin_dir as $location){
+            $location = str_replace(array('\\', '/'), Application::DS, rtrim($location,'\\/')) . Application::DS;
+            if(is_dir($location)){
+                $smarty->addPluginsDir($location);	//own plugins...
+            }
+        }
         $data = $this->object($this->data(), 'array');
 
         $ignore = $this->object($this->data('ignore'), 'array');
