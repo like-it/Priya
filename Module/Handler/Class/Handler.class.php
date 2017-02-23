@@ -19,6 +19,7 @@ class Handler extends Data{
         $this->data($handler);
         $this->input('create');
         $this->contentType('create');
+        $this->method('create');
         $this->lastModified('create');
         $this->referer('create');
     }
@@ -159,6 +160,38 @@ class Handler extends Data{
         $this->request('contentType',$contentType);
         $this->request('Content-Type',$contentType);
         return $this->contentType($contentType);
+    }
+
+    public function method($method=null){
+        if($method !== null){
+            if($method == 'create'){
+                return $this->createMethod();
+            } else {
+                $this->setMethod($method);
+            }
+        }
+        return $this->getMethod();
+    }
+
+    private function setMethod($method=''){
+        $this->method = $method;
+    }
+
+    private function getMethod(){
+        return $this->method;
+    }
+
+    private function createMethod(){
+        if(isset($_SERVER['REQUEST_METHOD'])){
+            $method = $_SERVER['REQUEST_METHOD'];
+        } else{
+            $contentType = $this->contentType();
+            if(stristr($contentType, 'cli')){
+                $method = 'CLI';
+            }
+        }
+        $this->request('method', $method);
+        return $this->method($method);
     }
 
     public function input(){
