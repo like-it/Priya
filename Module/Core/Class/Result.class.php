@@ -194,8 +194,8 @@ class Result extends Parser {
         require_once $dir_smarty . 'Smarty.class.php';
         $smarty = new \Smarty();
 
-        $functions = spl_autoload_functions();
-        if(empty($functions)){
+        $func = spl_autoload_functions();
+        if(empty($func)){
             \Smarty_Autoloader::register();
         }
         $dir_template = '';
@@ -300,7 +300,7 @@ class Result extends Parser {
             $smarty->assign('method', $method);
         }
         $smarty->assign('fetch', $url);
-        $fetch = $smarty->fetch($url);
+        $fetch = trim($smarty->fetch($url));
 
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));

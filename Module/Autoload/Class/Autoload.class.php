@@ -34,6 +34,19 @@ class Autoload{
         return spl_autoload_unregister(array($this, $method));
     }
 
+    public function priority(){
+        $functions = spl_autoload_functions();
+        $priority = false;
+        foreach($functions as $nr => $function){
+            $object = reset($function);
+            if(is_object($object) && get_class($object) == get_class($this) && $nr > 0){
+                $priority = $function;
+                spl_autoload_unregister($function);
+                spl_autoload_register($function, null, true); //prepend (prioritize)
+            }
+        }
+    }
+
     private function setEnvironment($environment='production'){
         $this->environment = $environment;
     }
@@ -122,7 +135,7 @@ class Autoload{
         $data[] = $item['directory'] . $item['baseName'] . '.trait.php';
         $data[] = $item['directory'] . $item['baseName'] . '.php';
         $data[] = '[---]';
-
+//         var_dump($data);
         return $data;
     }
 
