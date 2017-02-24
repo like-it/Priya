@@ -190,7 +190,6 @@ class Handler extends Data{
                 $method = 'CLI';
             }
         }
-        $this->request('method', $method);
         return $this->method($method);
     }
 
