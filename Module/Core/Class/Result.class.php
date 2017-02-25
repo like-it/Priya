@@ -304,15 +304,6 @@ class Result extends Parser {
 
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
-
-        $func = spl_autoload_functions();
-        foreach($func as $function){
-            spl_autoload_unregister($function);
-        }
-        foreach($functions as $function) {
-            spl_autoload_register($function);
-        }
-
         if($contentType == 'application/json'){
             $object = new stdClass();
             $object->html = $fetch;
@@ -342,10 +333,18 @@ class Result extends Parser {
             if(isset($variable['refresh'])){
                 $object->refresh = $variable['refresh'];
             }
-            return $this->template($object);
+            $result = $this->template($object);
         } else {
-            return $this->template($fetch);
+            $result = $this->template($fetch);
         }
+        $func = spl_autoload_functions();
+        foreach($func as $function){
+            spl_autoload_unregister($function);
+        }
+        foreach($functions as $function) {
+            spl_autoload_register($function);
+        }
+        return $result;
     }
 
     public function locateTemplate($template='', $extension='tpl', $caller=''){
