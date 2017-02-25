@@ -1,27 +1,25 @@
 {
     "priya-pull": {
-        "path": "Priya\/Pull",
+        "path": "Application\/Pull",
         "default": {
             "controller": "Priya.Module.Cli.Application.Pull.run",
             "format": "html",
             "language": "en"
         },
         "method": [
-            "CLI"
+            "POST"
         ],
         "translate": false
     },
     "priya-push": {
-        "path": "Priya\/Push",
+        "path": "Application\/Push",
         "default": {
             "controller": "Priya.Module.Cli.Application.Push.run",
             "format": "html",
             "language": "en"
         },
         "method": [
-            "GET",
-            "POST",
-            "CLI"
+            "POST"
         ],
         "translate": false
     },

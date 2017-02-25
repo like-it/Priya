@@ -136,7 +136,7 @@ class Core {
         if(!empty($post)){
             $this->session('post', $post);
         }
-        $contentType = $this->request('Content-Type');
+        $contentType = $this->request('contentType');
         if($contentType == 'application/json'){
             $output = new stdClass();
             $output->refresh = $url;
@@ -457,9 +457,17 @@ class Core {
         }
     }
 
-    private function read_permission($counter=3){
+    private function read_permission($counter=5){
         $call = explode('\\', get_called_class());
-        if(count($call) > 3 && $counter > 2){
+        if(count($call) > 5 && $counter > 4){
+            $count = 5;
+            $class = array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . 'Permission';
+        }
+        elseif(count($call) > 4 && $counter > 3){
+            $count = 4;
+            $class = array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . 'Permission';
+        }
+        elseif(count($call) > 3 && $counter > 2){
             $count = 3;
             $class = array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . 'Permission';
         }
@@ -471,6 +479,9 @@ class Core {
             $count = 1;
             $class = array_shift($call) . '\\' . 'Permission';
         } else {
+            return false;
+        }
+        if($counter < 1){
             return false;
         }
         $selector = implode('.', $call);

@@ -139,7 +139,7 @@ class Result extends Parser {
     }
 
     public function createTemplate($template=''){
-        $contentType = $this->request('Content-Type');
+        $contentType = $this->request('contentType');
 
         $data = $this->data();
         if(empty($template) && isset($data->contentType) && isset($data->contentType->{$contentType}) && isset($data->contentType->{$contentType}->template)){

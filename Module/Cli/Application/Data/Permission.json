@@ -1,0 +1,12 @@
+{
+    "permission": {
+        "pull": {
+            "rule": [
+                "Priya.Module.Cli.Application.Pull"
+            ],
+            "group": [
+                "Administrator"
+            ]
+        }
+    }
+}

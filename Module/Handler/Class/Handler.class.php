@@ -12,6 +12,11 @@ class Handler extends Data{
     const CONTENT_TYPE_JSON = 'application/json';
     const CONTENT_TYPE_CLI = 'text/cli';
 
+    const METHOD_CLI = 'CLI';
+    const METHOD_GET = 'GET';
+    const METHOD_POST = 'POST';
+    const METHOD_PUT = 'PUT';
+
     private $request;
     private $contentType;
 
@@ -109,7 +114,7 @@ class Handler extends Data{
     }
 
     public function lastModified(){
-        $this->request('Last-Modified: '. gmdate('D, d M Y H:i:s T'));
+        $this->request('lastModified: '. gmdate('D, d M Y H:i:s T'));
     }
 
     public function contentType($contentType=null){
@@ -151,14 +156,10 @@ class Handler extends Data{
         $ext = strtolower(end($tmp));
 
         $allowed_contentType = $this->data('contentType');
-        if(empty($allowed_contentType)){
-            $allowed_contentType = $this->data('Content-Type');
-        }
         if(isset($allowed_contentType->{$ext})){
             $contentType = $allowed_contentType->{$ext};
         }
         $this->request('contentType',$contentType);
-        $this->request('Content-Type',$contentType);
         return $this->contentType($contentType);
     }
 

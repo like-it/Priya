@@ -25,9 +25,11 @@ class Application extends Parser {
     const DATA = 'Data';
     const BACKUP = 'Backup';
     const RESTORE = 'Restore';
+    const UPDATE = 'Update';
     const PUBLIC_HTML = 'Public';
     const CONFIG = 'Config.json';
     const ROUTE = 'Route.json';
+    const CREDENTIAL = 'Credential.json';
 
     private $autoload;
 
@@ -77,12 +79,19 @@ class Application extends Parser {
                 Application::DS
            );
         }
-        if(empty($this->data('dir.restore'))){
-            $this->data('dir.restore',
+        if(empty($this->data('dir.priya.restore'))){
+            $this->data('dir.priya.restore',
                 $this->data('dir.priya.data') .
                 Application::RESTORE .
                 Application::DS
-               );
+           );
+        }
+        if(empty($this->data('dir.priya.update'))){
+            $this->data('dir.priya.update',
+                $this->data('dir.priya.data') .
+                Application::UPDATE .
+                Application::DS
+            );
         }
         $this->read($this->data('dir.data') . Application::CONFIG);
         if(empty($this->data('public_html'))){
@@ -119,6 +128,7 @@ class Application extends Parser {
         $this->route()->create('Application.Error');
         $this->route()->create('Application.Route');
         $this->route()->create('Application.Restore');
+        $this->route()->create('Application.Pull');
 //         $this->route()->create('Application.Install');
 //         $this->route()->create('Application.Update');
 //         $this->route()->create('Application.Config');
@@ -127,7 +137,7 @@ class Application extends Parser {
 
     public function run(){
         if(!headers_sent()){
-            header('Last-Modified: '. $this->request('Last-Modified'));
+            header('Last-Modified: '. $this->request('lastModified'));
         }
         $request = $this->request('request');
         $tmp = explode('.', $request);
@@ -135,9 +145,6 @@ class Application extends Parser {
         $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $request);
 
         $allowed_contentType = $this->data('contentType');
-        if(empty($allowed_contentType)){
-            $allowed_contentType = $this->data('Content-Type');
-        }
         if(isset($allowed_contentType->{$ext})){
             $contentType = $allowed_contentType->{$ext};
             header('Content-Type: ' . $contentType);
@@ -159,7 +166,7 @@ class Application extends Parser {
         }
         $item = $this->route()->run();
         $handler = $this->handler();
-        $contentType = $handler->request('Content-Type');
+        $contentType = $handler->request('contentType');
         $result = '';
         if(!empty($item->controller)){
             $controller = new $item->controller($this->handler(), $this->route(), $this->data());

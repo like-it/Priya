@@ -21,14 +21,14 @@ class Restore extends Cli {
 
     public function run(){
         if($this->parameter('create')){
-            $this->createPoint();
+            $this->create();
         }
         if($this->parameter('list')){
-            $this->createList();
+            $this->nodeList('create');
             $this->cli('create', 'List');
         }
         if($this->parameter('point')){
-            $this->restorePoint();
+            $this->point();
         }
         $this->data('step', 'download');
         $this->cli('create', 'Restore');
@@ -45,10 +45,13 @@ class Restore extends Cli {
         return $this->result('cli');
     }
 
-    private function createPoint(){
-        $version = $this->data('version');
-        if(empty($version)){
-            return false;
+    public function create($filename=''){
+        if(empty($filename)){
+            $version = $this->data('version');
+            if(empty($version)){
+                return false;
+            }
+            $filename = $version . '.zip';
         }
         $file = new File();
         $read = $file->read($this->data('dir.priya.root') . '.gitignore');
@@ -61,15 +64,15 @@ class Restore extends Cli {
         $ignore[] = '.git';
         foreach($read as $location){
             $location = trim($location);
-            $ignore[] = $location;
+            $ignore[] = str_replace('/', Application::DS, $location);
         }
         $dir->ignore('list', $ignore);
         $read = $dir->read($url, true);
 
-        if(is_dir($this->data('dir.restore'))===false){
-            mkdir($this->data('dir.restore'), Dir::CHMOD, true);
+        if(is_dir($this->data('dir.priya.restore')) === false){
+            mkdir($this->data('dir.priya.restore'), Dir::CHMOD, true);
         }
-        $target = $this->data('dir.restore') . $version . '.zip';
+        $target = $this->data('dir.priya.restore') . $filename;
         if(file_exists($target)){
             unlink($target);
         }
@@ -79,16 +82,28 @@ class Restore extends Cli {
             if($node->url == $target){
                 continue;
             }
-            $filename= str_replace(Application::DS, '/', $node->url);
-            $location = explode($this->data('dir.root'), $filename, 2);
+            if($node->type != 'file'){
+                continue;
+            }
+            $location = explode($this->data('dir.root'), $node->url, 2);
             $location = implode('', $location);
-            $zip->addFile($filename, $location);
+//             $zip->addFile($filename, $location);
+            $zip->addFromString($location, file_get_contents($node->url));
         }
         $zip->close();
+        return $target;
     }
 
-    private function createList(){
-        $url = $this->data('dir.restore');
+    public function nodeList($nodeList=null){
+        if($nodeList !== null){
+            if($nodeList == 'create'){
+                return $this->createNodeList();
+            }
+        }
+    }
+
+    private function createNodeList(){
+        $url = $this->data('dir.priya.restore');
         $dir = new Dir();
         $read = $dir->read($url);
         if(is_array($read) || is_object($read)){
@@ -101,7 +116,7 @@ class Restore extends Cli {
         return $this->data('nodeList');
     }
 
-    private function restorePoint(){
+    private function point(){
         $collect = false;
         $parameters = array();
         $data = $this->request('data');
@@ -126,7 +141,7 @@ class Restore extends Cli {
                 $parameters[] = $parameter;
             }
         }
-        $nodeList = $this->createList();
+        $nodeList = $this->nodeList('create');
         $count = count($parameters);
         $restore_path = '';
         $restore_point = '';
