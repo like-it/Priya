@@ -207,7 +207,7 @@ class Application extends Parser {
                 return $result;
             }
         } else {
-            trigger_error('unknown result');
+//             trigger_error('unknown result');
             var_dump($result);
             var_dump($item);
         }

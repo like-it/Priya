@@ -10,8 +10,26 @@
  */
 namespace Priya;
 
+use Priya\Module\Handler;
+
 if($this->data('options')){
-    echo "\t" . 'restore                  (this will restore the installation from ' . $this->data('dir.priya.data') . 'Restore/' . "\n";
+    echo "\t" . 'restore                  (this will restore the installation from ' . $this->data('dir.priya.data') . 'Restore/' . PHP_EOL;
 }
-echo 'pull';
+if($this->error() && $this->handler()->method() == Handler::METHOD_POST){
+    echo json_encode($this->object(array('error' => $this->error())));
+} else {
+    if($this->error('permission')){
+        echo 'permission denied...' . PHP_EOL;
+    } else {
+        if($this->data('step') == 'download'){
+            echo 'Downloading server (' . $this->data('server.url') . ')...' . PHP_EOL;
+        }
+        if($this->data('step') == 'extract'){
+            echo 'Extracting archive...' . PHP_EOL;
+        }
+        if($this->data('step') == 'finish'){
+            echo 'Succesfully pulled the server...' . PHP_EOL;
+        }
+    }
+}
 ?>

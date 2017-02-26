@@ -64,7 +64,7 @@ class Restore extends Cli {
         $ignore[] = '.git';
         foreach($read as $location){
             $location = trim($location);
-            $ignore[] = str_replace('/', Application::DS, $location);
+            $ignore[] = str_replace(array('/', '\\'), Application::DS, $location);
         }
         $dir->ignore('list', $ignore);
         $read = $dir->read($url, true);
@@ -145,11 +145,15 @@ class Restore extends Cli {
         $count = count($parameters);
         $restore_path = '';
         $restore_point = '';
+        $url = '';
         switch ($count){
             case 0 :
                 $search = $this->data('nodeList');
                 $restore_path = $this->data('dir.root');
                 $restore_point = $this->object(reset($search));
+                if(isset($restore_point->url)){
+                    $url = $restore_point->url;
+                }
                 break;
             case 1 :
                 $search = $this->search($this->data('nodeList'), reset($parameters), 'name');
@@ -160,6 +164,9 @@ class Restore extends Cli {
                     $restore_path = $this->data('dir.root');
                 }
                 $restore_point = $this->object(reset($search));
+                if(isset($restore_point->url)){
+                    $url = $restore_point->url;
+                }
                 break;
             case 2 :
                 $search = $this->search($nodeList, reset($parameters), 'name');
@@ -172,24 +179,27 @@ class Restore extends Cli {
                     trigger_error('Bad parameter', E_USER_ERROR);
                 }
                 $restore_point = $this->object(reset($search));
+                if(isset($restore_point->url)){
+                    $url = $restore_point->url;
+                }
                 break;
         }
-        $this->restore($restore_path, $restore_point);
+        $this->extract($url, $restore_path, $this->parameter('update'));
     }
 
-    private function restore($path='', $archive=array()){
-        if(empty($archive->url)){
+    public function extract($url='', $path='', $update=false){
+        if(empty($url)){
             return false;
         }
         if(empty($path)){
             return false;
         }
-        if(file_exists($archive->url) === false){
+        if(file_exists($url) === false){
             return false;
         }
         $path = rtrim(str_replace(array('\\', '/'), '/', $path), '/') . '/';
         $zip = new ZipArchive();
-        $zip->open($archive->url);
+        $zip->open($url);
         $dirList = array();
         $fileList = array();
         for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -202,7 +212,7 @@ class Restore extends Cli {
                 $node->type = 'file';
             }
             $node->index = $i;
-            $node->url = $path . $node->name;
+            $node->url = $path . str_replace(array('/', '\\'), Application::DS, $node->name);
             if($node->type == 'dir'){
                 $dirList[] = $node;
             } else {
@@ -214,25 +224,30 @@ class Restore extends Cli {
                 mkdir($dir->url, Dir::CHMOD, true);
             }
         }
-        $update = $this->parameter('update');
+        $skip = 0;
+        $error = array();
         foreach($fileList as $node){
             $stats = $zip->statIndex($node->index);
             if(!empty($update)){
                 if(file_exists($node->url)){
                     $mtime = filemtime($node->url);
                     if($stats['mtime'] <= $mtime){
+                        $skip++;
                         continue;
                     }
-                    var_dump($node->url);
                 }
             }
+
             if(file_exists($node->url)){
                 unlink($node->url);
             }
             $file = new File();
-            $file->write($node->url, $zip->getFromIndex($node->index));
-            chmod($node->url, File::CHMOD);
-            touch($node->url, $stats['mtime']);
+            $write = $file->write($node->url, $zip->getFromIndex($node->index));
+            if($write !== false){
+                chmod($node->url, File::CHMOD);
+                touch($node->url, $stats['mtime']);
+            }
         }
+        echo 'skipped: ' . $skip . PHP_EOL;
     }
 }

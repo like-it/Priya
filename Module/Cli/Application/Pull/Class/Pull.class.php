@@ -20,7 +20,18 @@ class Pull extends Cli {
 
     public function run(){
         if($this->handler()->method() == Handler::METHOD_CLI){
-            $this->createPull();
+            $this->data('step', 'download');
+            $this->cli('create', 'Pull');
+            $url = $this->createPull();
+            $restore = new Restore($this->handler(), $this->route(), $this->data());
+            $this->data('step', 'extract');
+            $this->cli('create', 'Pull');
+            $restore->extract($url, $this->data('dir.root'), true);
+            if(file_exists($url)){
+                unlink($url);
+            }
+            $this->data('step', 'finish');
+            return $this->result('cli');
         }
         elseif($this->handler()->method() == Handler::METHOD_POST) {
             set_time_limit($this->data('server.timeout') ? $this->data('server.timeout') : 600);
@@ -33,41 +44,18 @@ class Pull extends Cli {
                 if(file_exists($file)){
                     header("Content-Type: application/zip");
                     header("Content-Transfer-Encoding: Binary");
-                    header("Content-Length: ".filesize($file));
-                    header("Content-Disposition: attachment; filename=\"".basename($file)."\"");
+                    header("Content-Length: " . filesize($file));
+                    header("Content-Disposition: attachment; filename=\"" . basename($file) . "\"");
                     readfile($file);
                     die;
+                } else {
+                    $this->error('write', true);
                 }
             } else {
                 $this->error('permission', true);
             }
+            return $this->result('cli');
         }
-        //post to the server
-        /*
-        if($this->parameter('create')){
-            $this->createPoint();
-        }
-        if($this->parameter('list')){
-            $this->createList();
-            $this->cli('create', 'List');
-        }
-        if($this->parameter('point')){
-            $this->restorePoint();
-        }
-        $this->data('step', 'download');
-        $this->cli('create', 'Restore');
-        $this->data('step', 'download-complete');
-        $this->data('tag', '0.0.4');
-        $this->cli('create', 'Restore');
-        $this->data('step', 'download-failure');
-        $this->cli('create', 'Restore');
-        $this->data('step', 'tag');
-        $this->cli('create', 'Restore');
-        $this->data('step', 'install');
-        $this->cli('create', 'Restore');
-        $this->data('step', 'install-complete');
-        */
-        return $this->result('cli');
     }
 
     private function createPull(){
@@ -81,10 +69,10 @@ class Pull extends Cli {
             $password = $request['3'];
         }
         if(empty($user)){
-            return;
+            return false;
         }
         if(empty($password)){
-            return;
+            return false;
         }
         $url = $this->data('server.url') . $this->route('priya-pull');
         $data = array('user' => $user, 'password' => $password);
@@ -93,17 +81,27 @@ class Pull extends Cli {
               'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
               'method'  => 'POST',
               'content' => http_build_query($data),
-              'timeout' => $this->data('server.timeout') ? $this->data('server.timeout') : 5
+              'timeout' => $this->data('server.timeout') ? $this->data('server.timeout') : 600
              )
         );
         $context  = stream_context_create($options);
         $result = file_get_contents($url, false, $context);
-
-        if(is_dir($this->data('dir.priya.update')) === false){
-            mkdir($this->data('dir.priya.update'), Dir::CHMOD, true);
+        $data = false;
+        if(substr($result, 0, 1) == '{' && substr($result, -1) == '}'){
+            $data = json_decode($result);
         }
-        $url = $this->data('dir.priya.update') . $this->data('version') . '.zip';
-        $file = new File();
-        $file->write($url, $result);
+        if(empty($data)){
+            if(is_dir($this->data('dir.priya.update')) === false){
+                mkdir($this->data('dir.priya.update'), Dir::CHMOD, true);
+            }
+            $url = $this->data('dir.priya.update') . $this->data('version') . '.zip';
+            $file = new File();
+            $file->write($url, $result);
+            return $url;
+        } else {
+            if(isset($data->error)){
+                $this->error($data->error);
+            }
+        }
     }
 }
