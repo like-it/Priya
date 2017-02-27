@@ -61,7 +61,7 @@ class Restore extends Cli {
             $read = $this->explode_multi(array("\n", "\r\n"), $read);
         }
         $ignore = array();
-        $ignore[] = '.git';
+        $ignore[] = '.git';	//move to $this->data('dir.data') . '.ignore' and read .ignore as well
         foreach($read as $location){
             $location = trim($location);
             $ignore[] = str_replace(array('/', '\\'), Application::DS, $location);
@@ -71,6 +71,37 @@ class Restore extends Cli {
 
         if(is_dir($this->data('dir.priya.restore')) === false){
             mkdir($this->data('dir.priya.restore'), Dir::CHMOD, true);
+        }
+        if(is_dir($this->data('dir.priya.restore') . 'Temp' . Application::DS) === false){
+            mkdir($this->data('dir.priya.restore') . 'Temp' . Application::DS, Dir::CHMOD, true);
+        } else {
+            $temp = $dir->read($this->data('dir.priya.restore') . 'Temp' . Application::DS, true);
+            foreach($temp as $node){
+                if($node->type != 'file'){
+                    continue;
+                }
+                unlink($node->url);
+            }
+            rsort($temp);
+            foreach($temp as $node){
+                if($node->type != 'dir'){
+                    continue;
+                }
+                rmdir($node->url);
+            }
+        }
+        foreach($read as $node){
+            $node->target = explode($url, $node->url, 2);
+            $node->target = $this->data('dir.priya.restore') . 'Temp' . Application::DS . implode('', $node->target);
+            if($node->type == 'dir'){
+                mkdir($node->target, DIR::CHMOD, true);
+            }
+            elseif($node->type == 'file'){
+                copy($node->url, $node->target);
+            } else {
+                continue;
+            }
+            touch($node->target, filemtime($node->url));
         }
         $target = $this->data('dir.priya.restore') . $filename;
         if(file_exists($target)){
@@ -82,15 +113,33 @@ class Restore extends Cli {
             if($node->url == $target){
                 continue;
             }
+            if($node->target == $target){
+                continue;
+            }
             if($node->type != 'file'){
                 continue;
             }
             $location = explode($this->data('dir.root'), $node->url, 2);
             $location = implode('', $location);
-//             $zip->addFile($filename, $location);
-            $zip->addFromString($location, file_get_contents($node->url));
+            $zip->addFile($node->target, $location);
+//             $zip->addFromString($location, file_get_contents($node->url));
         }
         $zip->close();
+        foreach($read as $node){
+            if($node->type != 'file'){
+                continue;
+            }
+            unlink($node->target);
+
+        }
+        rsort($read);
+        foreach($read as $node){
+            if($node->type != 'dir'){
+                continue;
+            }
+            rmdir($node->target);
+        }
+        rmdir($this->data('dir.priya.restore') . 'Temp' . Application::DS);
         return $target;
     }
 
