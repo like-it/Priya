@@ -22,7 +22,7 @@ if($this->error() && $this->handler()->method() == Handler::METHOD_POST){
         echo 'permission denied...' . PHP_EOL;
     }
     elseif($this->error('exists')){
-        echo 'Patch already exists, first pull the server...' . PHP_EOL;
+        echo 'Patch already exists, first pull the server... (cannot push to localhost)' . PHP_EOL;
     } else {
         if($this->data('step') == 'create'){
             echo 'Creating restore point patch (' . $this->data('patch') . ') for version (' . $this->data('version') . ')...' . PHP_EOL;

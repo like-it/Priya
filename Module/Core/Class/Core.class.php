@@ -86,7 +86,7 @@ class Core {
         return $this->handler()->request($attribute, $value);
     }
 
-    public function file($attribute=null, $value=null){
+    public function upload($attribute=null, $value=null){
         $handler = $this->handler();
         if(empty($handler)){
             $this->handler(new Handler());

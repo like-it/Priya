@@ -46,19 +46,22 @@ class Push extends Cli {
             $user = new User($this->handler(), $this->route(), $this->data());
             $this->session('user', $user->validate($this->request('user'), $this->request('password')));
             if ($this->permission('has', $this->permission('read'))){
-                $file = $this->file();
-                foreach ($file as $upload_file){
-                    $target = $this->data('dir.priya.restore') . $upload_file['name'];
-                    if(file_exists($target)){
-                        $this->error('exists', true);
-                        continue;
-                        //return json failure, should patch first pull the current version maybe only php & json
+                $upload = $this->upload();
+                if(is_array($upload) || is_object($upload)){
+                    foreach ($upload as $upload_file){
+                        $target = $this->data('dir.priya.restore') . $upload_file['name'];
+                        if(file_exists($target)){
+                            $this->error('exists', true);
+                            continue;
+                            //return json failure, should patch first pull the current version maybe only php & json
+                        }
+                        move_uploaded_file($upload_file['tmp_name'], $target);
+                        $restore = new Restore($this->handler(), $this->route(), $this->data());
+                        $restore->extract($target, $this->data('dir.root'), true);
+                        $this->data('step', 'extract');
                     }
-                    move_uploaded_file($upload_file['tmp_name'], $target);
-                    $restore = new Restore($this->handler(), $this->route(), $this->data());
-                    $restore->extract($target, $this->data('dir.root'), true);
-                    $this->data('step', 'extract');
                 }
+
             } else {
                 $this->error('permission', true);
             }
