@@ -338,11 +338,14 @@ class Handler extends Data{
         }
         $data = json_decode($input);
         if(empty($data) && !empty($argv)){
-            $attribute= $argv;
+            $attribute = $argv;
+            foreach($attribute as $nr => $value){
+                $attribute[$nr] = trim(escapeshellarg($value), '\'');
+            }
             $data = new stdClass();
             $data->nodeList = array();
             $object = new stdClass();
-            $object->data =  $argv;
+            $object->data =  $attribute;
             $data->nodeList[] = $object;
             $object = new stdClass();
             $object->file =  Application::DIR . Application::DS . basename(array_shift($attribute));
