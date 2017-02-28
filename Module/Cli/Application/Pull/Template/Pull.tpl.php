@@ -20,6 +20,15 @@ if($this->error() && $this->handler()->method() == Handler::METHOD_POST){
 } else {
     if($this->error('permission')){
         echo 'permission denied...' . PHP_EOL;
+    }
+    elseif($this->error('user')){
+        echo 'user required...' . PHP_EOL;
+    }
+    elseif($this->error('password')){
+        echo 'password required...' . PHP_EOL;
+    }
+    elseif($this->error('server')){
+        echo 'server required...' . PHP_EOL;
     } else {
         if($this->data('step') == 'download'){
             echo 'Downloading server (' . $this->data('server.url') . ')...' . PHP_EOL;

@@ -188,6 +188,9 @@ class Data extends Core {
             $this->url($url);
         }
         $url = $this->url();
+        if(empty($url)){
+            return false;
+        }
         $file = new File();
         $write = $file->write($url, $this->object($this->data(), 'json'));
         return $write;

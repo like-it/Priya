@@ -23,14 +23,16 @@ class Pull extends Cli {
             $this->data('step', 'download');
             $this->cli('create', 'Pull');
             $url = $this->createPull();
-            $restore = new Restore($this->handler(), $this->route(), $this->data());
-            $this->data('step', 'extract');
-            $this->cli('create', 'Pull');
-            $restore->extract($url, $this->data('dir.root'), true);
-            if(file_exists($url)){
-                unlink($url);
+            if(!empty($url)){
+                $restore = new Restore($this->handler(), $this->route(), $this->data());
+                $this->data('step', 'extract');
+                $this->cli('create', 'Pull');
+                $restore->extract($url, $this->data('dir.root'), true);
+                if(file_exists($url)){
+                    unlink($url);
+                }
+                $this->data('step', 'finish');
             }
-            $this->data('step', 'finish');
             return $this->result('cli');
         }
         elseif($this->handler()->method() == Handler::METHOD_POST) {
@@ -69,12 +71,19 @@ class Pull extends Cli {
             $password = $request['3'];
         }
         if(empty($user)){
+            $this->error('user', true);
             return false;
         }
         if(empty($password)){
+            $this->error('password', true);
             return false;
         }
-        $url = $this->data('server.url') . $this->route('priya-pull');
+        $server = $this->data('server.url');
+        if(empty($server)){
+            $this->error('server', true);
+            return false;
+        }
+        $url = $server . $this->route('priya-pull');
         $data = array('user' => $user, 'password' => $password);
         $options = array(
             'http' => array(
@@ -103,5 +112,6 @@ class Pull extends Cli {
                 $this->error($data->error);
             }
         }
+        return false;
     }
 }

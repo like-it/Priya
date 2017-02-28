@@ -21,13 +21,18 @@ class Push extends Cli {
 
     public function run(){
         if($this->handler()->method() == Handler::METHOD_CLI){
-
             $data = new Data();
             $data->read($this->data('dir.data') . Application::CONFIG);
-            $patch = $data->data('patch');
+            $major = $data->data('major') ? $data->data('major') : 0;
+            $minor = $data->data('minor') ? $data->data('minor') : 0;
+            $patch = $data->data('patch') ? $data->data('patch') : -1;
             $patch++;
+            $this->data('major', $major);
+            $this->data('minor', $minor);
             $this->data('patch', $patch);
             $this->data('version', $this->data('major') . '.' . $this->data('minor') . '.' . $this->data('patch'));
+            $data->data('major', $major);
+            $data->data('minor', $minor);
             $data->data('patch', $patch);
             $data->write();
             $this->data('step', 'create');
@@ -80,13 +85,24 @@ class Push extends Cli {
             $password = $request['3'];
         }
         if(empty($user)){
+            $this->error('user', true);
             return false;
         }
         if(empty($password)){
+            $this->error('password', true);
+            return false;
+        }
+        $server = $this->data('server.url');
+        if(empty($server)){
+            $this->error('server', true);
             return false;
         }
         $filename = $this->data('version') . '.zip';
-        $url = $this->data('server.url') . $this->route('priya-push');
+        if(file_exists($this->data('dir.priya.restore') . $filename) === false){
+            $this->error('point', true);
+            return false;
+        }
+        $url = $server . $this->route('priya-push');
         $boundary = 'Priya-boundary-' . md5(time() . '-' . microtime());
         $eol = "\r\n";
         $data = '';

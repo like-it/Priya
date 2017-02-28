@@ -21,6 +21,18 @@ if($this->error() && $this->handler()->method() == Handler::METHOD_POST){
     if($this->error('permission')){
         echo 'permission denied...' . PHP_EOL;
     }
+    elseif($this->error('user')){
+        echo 'user required...' . PHP_EOL;
+    }
+    elseif($this->error('password')){
+        echo 'password required...' . PHP_EOL;
+    }
+    elseif($this->error('server')){
+        echo 'server required...' . PHP_EOL;
+    }
+    elseif($this->error('point')){
+        echo 'restore point not found...' . PHP_EOL;
+    }
     elseif($this->error('exists')){
         echo 'Patch already exists, first pull the server... (cannot push to localhost)' . PHP_EOL;
     } else {
