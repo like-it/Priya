@@ -34,7 +34,11 @@ class Push extends Cli {
             $data->data('major', $major);
             $data->data('minor', $minor);
             $data->data('patch', $patch);
-            $data->write();
+            $write = $data->write();
+            if($write === false){
+                $this->error('patch', true);
+                return $this->result('cli');
+            }
             $this->data('step', 'create');
             $this->cli('create', 'Push');
             $restore = new Restore($this->handler(), $this->route(), $this->data());

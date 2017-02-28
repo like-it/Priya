@@ -51,6 +51,9 @@ class Restore extends Cli {
             if(empty($version)){
                 return false;
             }
+            if($version == '0.0.0'){
+                return false;
+            }
             $filename = $version . '.zip';
         }
         if(empty($this->data('dir.priya.restore'))){
