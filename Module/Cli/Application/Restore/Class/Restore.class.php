@@ -53,6 +53,10 @@ class Restore extends Cli {
             }
             $filename = $version . '.zip';
         }
+        if(empty($this->data('dir.priya.restore'))){
+            return false;
+        }
+
         $file = new File();
         $read = $file->read($this->data('dir.priya.root') . '.gitignore');
         $url = $this->data('dir.root');
@@ -75,6 +79,7 @@ class Restore extends Cli {
         if(is_dir($this->data('dir.priya.restore') . 'Temp' . Application::DS) === false){
             mkdir($this->data('dir.priya.restore') . 'Temp' . Application::DS, Dir::CHMOD, true);
         } else {
+            $dir->ignore('list', array());
             $temp = $dir->read($this->data('dir.priya.restore') . 'Temp' . Application::DS, true);
             foreach($temp as $node){
                 if($node->type != 'file'){
@@ -82,7 +87,7 @@ class Restore extends Cli {
                 }
                 unlink($node->url);
             }
-            rsort($temp);
+            krsort($temp);
             foreach($temp as $node){
                 if($node->type != 'dir'){
                     continue;
@@ -130,9 +135,8 @@ class Restore extends Cli {
                 continue;
             }
             unlink($node->target);
-
         }
-        rsort($read);
+        krsort($read);
         foreach($read as $node){
             if($node->type != 'dir'){
                 continue;

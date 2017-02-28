@@ -239,14 +239,27 @@ class Application extends Parser {
                     if(!empty($key)){
                         $value = $attribute;
                     }
-                    switch($attribute){
-                        case 'dir.data':
-                            $key = $attribute;
-                            continue;
+                    $attribute = explode('=', $attribute, 2);
+                    if(count($attribute) == 2){
+                        switch($attribute[0]){
+                            case 'dir.data':
+                                $key = $attribute[0];
+                                $value = $attribute[1];
                             break;
+                        }
+                    } else {
+                        switch($attribute[0]){
+                            case 'dir.data':
+                                $key = $attribute[0];
+                                continue;
+                            break;
+                        }
                     }
+
                     if(!empty($key) && isset($value)){
                         $this->data($key, $value);
+                        unset($key);
+                        unset($value);
                     }
                 }
             }
