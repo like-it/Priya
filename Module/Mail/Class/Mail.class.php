@@ -35,7 +35,7 @@ class Mail extends Data{
     }
 
     private function createMailer(){
-        $debug = $this->data('mail.debug') ? $this->data('mail.debug') : false;
+        $debug = $this->data('mail.debug');
         $host = $this->data('mail.host');
         $port = $this->data('mail.port');
         $secure = $this->data('mail.secure');
@@ -60,8 +60,9 @@ class Mail extends Data{
         $this->setMailer(new PHPMailer());
         $this->mailer()->isSMTP();
         $this->mailer()->isHTML(true);
-        if($debug !== false){
+        if($debug !== false && $debug !== null){
             $this->mailer()->SMTPDebug = $debug;
+            var_dump('doing');
         }
         $this->mailer()->Host = $host;
         $this->mailer()->Port = $port;
