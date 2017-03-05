@@ -14,6 +14,7 @@ use stdClass;
 class Core {
     use Core\Object;
 
+    private $mail;
     private $handler;
     private $route;
     private $post;
@@ -542,5 +543,12 @@ class Core {
             }
         }
         return false;
+    }
+
+    public function mail(){
+        if(get_class($this->mail) != 'Priya\Module\Mail'){
+            $this->mail = new Mail($this->data());
+        }
+        return $this->mail;
     }
 }
