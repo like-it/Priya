@@ -382,10 +382,11 @@ class Handler extends Data{
             return false;
         }
         return
-        $scheme .
-        '://' .
-        $_SERVER['HTTP_HOST'] .
-        '/';
+               $scheme .
+            '://' .
+            $_SERVER['HTTP_HOST'] .
+            '/'
+        ;
     }
 
     public function url($url=null){
@@ -410,26 +411,36 @@ class Handler extends Data{
         return parent::url($url);
     }
 
+    public function csrf(){
+        $session = $this->session();
+        if(!empty($session['csrf'])){
+            return $session['csrf'];
+        }
+    }
     public function session($attribute=null, $value=null){
         if(!isset($_SESSION)){
-            if($attribute !== null){
-                session_start();
-                $_SESSION['id'] = session_id();
-                $post = $this->session('post');
-                $this->session('delete', 'post');
-                if(is_array($post)){
-                    foreach($post as $key => $value){
-                        if(is_array($value)){
-                            foreach ($value as $k => $v){
-                                $this->request($key . '.' . $k, $v);
-                            }
-                        } else {
-                            $this->request($key, $value);
+            session_start();
+            $_SESSION['id'] = session_id();
+            if(empty($_SESSION['csrf'])){
+                $_SESSION['csrf'] =
+                    rand(1000,9999) . '-' .
+                    rand(1000,9999) . '-' .
+                    rand(1000,9999) . '-' .
+                    rand(1000,9999)
+                ;
+            }
+            $post = $this->session('post');
+            $this->session('delete', 'post');
+            if(is_array($post)){
+                foreach($post as $key => $value){
+                   if(is_array($value)){
+                        foreach ($value as $k => $v){
+                            $this->request($key . '.' . $k, $v);
                         }
+                    } else {
+                        $this->request($key, $value);
                     }
                 }
-            } else {
-                return array();
             }
         }
         if($attribute !== null){

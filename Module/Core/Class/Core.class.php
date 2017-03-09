@@ -115,6 +115,14 @@ class Core {
         return false;
     }
 
+    public function csrf(){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler());
+        }
+        return $this->handler()->csrf();
+    }
+
     public function session($attribute=null, $value=null){
         $handler = $this->handler();
         if(empty($handler)){
