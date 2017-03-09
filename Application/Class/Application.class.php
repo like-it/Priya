@@ -141,6 +141,7 @@ class Application extends Parser {
             header('Last-Modified: '. $this->request('lastModified'));
         }
         $request = $this->request('request');
+
         $tmp = explode('.', $request);
         $ext = strtolower(end($tmp));
         $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $request);
@@ -178,12 +179,14 @@ class Application extends Parser {
             }
         } else {
             if($contentType == 'text/cli'){
+                if($request == 'Application/Error/'){
+                    trigger_error('cannot route to Application/Error/', E_USER_ERROR);
+                }
                 if($this->route()->error('read')){
                     $handler->request('request', 'Application/Error/');
                     $handler->request('id', 2);
                     $this->run();
                 } else {
-                    $request =  $handler->request('request');
                     if(empty($request)){
                         $handler->request('request', 'Application/Help/');
                         $this->run();

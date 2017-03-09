@@ -69,9 +69,11 @@ class Route extends Parser{
                 if($contentType == handler::CONTENT_TYPE_CLI && !in_array('CLI', $route->method)){
                     continue; //skip based on wrong content
                 }
-                $method = $this->handler()->method();
-                if(!in_array($method, $route->method)){
-                    continue; //skip based on wrong method
+                if($contentType !== handler::CONTENT_TYPE_CLI){
+                    $method = $this->handler()->method();
+                    if(!in_array($method, $route->method)){
+                        continue; //skip based on wrong method
+                    }
                 }
             }
             if(isset($route->default) && isset($route->default->controller)){

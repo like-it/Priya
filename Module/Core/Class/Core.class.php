@@ -40,6 +40,7 @@ class Core {
         $error['line'] = $line;
         $error['context'] = $context;
         var_dump($error);
+        die;
     }
 
     public function handler($handler=null){

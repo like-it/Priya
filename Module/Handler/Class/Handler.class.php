@@ -368,14 +368,21 @@ class Handler extends Data{
     }
 
     public function web(){
-        if(empty($_SERVER['REQUEST_SCHEME'])){
-            return false;
+        if(!empty($_SERVER['REQUEST_SCHEME'])){
+            $scheme = $_SERVER['REQUEST_SCHEME'];
+        } else {
+            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
+                $scheme = 'https';
+            } else {
+                $scheme = 'http';
+            }
+
         }
         if(empty($_SERVER['HTTP_HOST'])){
             return false;
         }
         return
-        $_SERVER['REQUEST_SCHEME'] .
+        $scheme .
         '://' .
         $_SERVER['HTTP_HOST'] .
         '/';
@@ -574,6 +581,14 @@ class Handler extends Data{
     public function host(){
         if(isset($_SERVER['REQUEST_SCHEME']) && isset($_SERVER['SERVER_NAME'])){
             $host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/';
+            return $host;
+        }
+        if(isset($_SERVER['SERVER_NAME'])){
+            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
+                $host = 'https://' . $_SERVER['SERVER_NAME'];
+            } else {
+                $host = 'http://' . $_SERVER['SERVER_NAME'];
+            }
             return $host;
         }
     }
