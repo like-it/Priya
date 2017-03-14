@@ -20,6 +20,7 @@ class Core {
     private $post;
     private $error;
     private $message;
+    private $autoload;
 
     public function __construct($handler=null, $route=null){
         $this->handler($handler);
@@ -560,4 +561,20 @@ class Core {
         }
         return $this->mail;
     }
+
+    public function autoload($autoload=null){
+        if($autoload !== null){
+            $this->setAutoload($autoload);
+        }
+        return $this->getAutoload();
+    }
+
+    private function setAutoload($autoload=''){
+        $this->autoload = $autoload;
+    }
+
+    private function getAutoload(){
+        return $this->autoload;
+    }
+
 }

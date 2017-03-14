@@ -21,8 +21,14 @@ class Data extends Core {
     private $data;
 
     public function __construct($handler=null, $route=null, $data=null){
+        if(stristr(get_class($handler), 'autoload') !== false){
+            $this->autoload($handler);
+            parent::__construct(null, $route);
+        } else {
+            parent::__construct($handler, $route);
+        }
         $this->data($this->object_merge($this->data(), $data));
-        parent::__construct($handler, $route);
+
     }
 
     public function data($attribute=null, $value=null){
@@ -130,30 +136,34 @@ class Data extends Core {
         } else {
             $module = $url;
         }
-        $tmp = explode('\\', trim(str_replace(Application::DS, '\\',$url),'\\'));
-        $class = array_pop($tmp);
-        $namespace = implode('\\', $tmp);
-        $directory = explode(Application::DS, Application::DIR);
-        array_pop($directory);
-        array_pop($directory);
-        $priya = array_pop($directory);
-        $directory = implode(Application::DS, $directory) . Application::DS;
-        if(empty($namespace)){
-            $namespace = $priya . '\\' . Application::MODULE;
+        $autoload = $this->autoload();
+        if(empty($autoload)){
+            $tmp = explode('\\', trim(str_replace(Application::DS, '\\',$url),'\\'));
+            $class = array_pop($tmp);
+            $namespace = implode('\\', $tmp);
+            $directory = explode(Application::DS, Application::DIR);
+            array_pop($directory);
+            array_pop($directory);
+            $priya = array_pop($directory);
+            $directory = implode(Application::DS, $directory) . Application::DS;
+            if(empty($namespace)){
+                $namespace = $priya . '\\' . Application::MODULE;
+            }
+            $directory .= str_replace('\\', Application::DS, $namespace) . Application::DS;
+            $data = new \Priya\Module\Autoload\Data();
+            $environment = $this->data('environment');
+            if(!empty($environment)){
+                //             $data->environment($environment);
+            }
+            $class = get_called_class();
+            if($class::DIR){
+                $dir = dirname($class::DIR) . Application::DS;// . 'Data' . Application::DS;
+                $data->addPrefix('none', $dir);
+            }
+            $data->addPrefix($namespace, $directory);
+            $autoload = $this->autoload($data);
         }
-        $directory .= str_replace('\\', Application::DS, $namespace) . Application::DS;
-        $data = new \Priya\Module\Autoload\Data();
-        $environment = $this->data('environment');
-        if(!empty($environment)){
-//             $data->environment($environment);
-        }
-        $class = get_called_class();
-        if($class::DIR){
-            $dir = dirname($class::DIR) . Application::DS;// . 'Data' . Application::DS;
-            $data->addPrefix('none', $dir);
-        }
-        $data->addPrefix($namespace, $directory);
-        $url = $data->data_load($url);
+        $url = $autoload->data_load($url);
         if($url !== false){
             $this->url($url);
         }

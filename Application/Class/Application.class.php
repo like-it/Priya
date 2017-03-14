@@ -31,8 +31,6 @@ class Application extends Parser {
     const ROUTE = 'Route.json';
     const CREDENTIAL = 'Credential.json';
 
-    private $autoload;
-
     public function __construct($autoload=null, $data=null){
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
@@ -215,21 +213,6 @@ class Application extends Parser {
             var_dump($result);
             var_dump($item);
         }
-    }
-
-    public function autoload($autoload=null){
-        if($autoload !== null){
-            $this->setAutoload($autoload);
-        }
-        return $this->getAutoload();
-    }
-
-    private function setAutoload($autoload=''){
-        $this->autoload = $autoload;
-    }
-
-    private function getAutoload(){
-        return $this->autoload;
     }
 
     private function cli(){
