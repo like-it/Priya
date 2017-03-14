@@ -7,16 +7,31 @@ use Priya\Module\Core\Data;
 use stdClass;
 
 class Handler extends Data{
+    const CONTENT_TYPE_CSS = 'text/css';
+    const CONTENT_TYPE_HTML = 'text/html';
+    const CONTENT_TYPE_JSON = 'application/json';
+    const CONTENT_TYPE_CLI = 'text/cli';
+
+    const METHOD_CLI = 'CLI';
+    const METHOD_HEAD = 'HEAD';
+    const METHOD_GET = 'GET';
+    const METHOD_POST = 'POST';
+    const METHOD_PUT = 'PUT';
+    const METHOD_DELETE = 'DELETE';
 
     private $request;
+    private $file;
     private $contentType;
+    private $method;
 
     public function __construct($handler=null, $route=null, $data=null){
         $this->data($handler);
         $this->input('create');
         $this->contentType('create');
+        $this->method('create');
         $this->lastModified('create');
         $this->referer('create');
+        $this->file('create');
     }
 
     public function request($attribute=null, $value=null){
@@ -68,7 +83,11 @@ class Handler extends Data{
         }
         if(isset($this->request[$attribute])){
             return $this->request[$attribute];
-        } else {
+        }
+        elseif(isset($this->request->{$attribute})){
+            return $this->request->{$attribute};
+        }
+        else {
             return false;
         }
     }
@@ -103,8 +122,87 @@ class Handler extends Data{
         return $this->object_delete($attribute, $this->request());
     }
 
+    public function file($attribute=null, $value=null){
+        if($attribute !== null){
+            if($attribute == 'create'){
+                return $this->createFile($value);
+            }
+            if($value !== null){
+                if($attribute=='delete'){
+                    return $this->deleteFile($value);
+                }
+                else {
+                    $this->object_set($attribute, $value, $this->file());
+                }
+            } else {
+                if(is_string($attribute)){
+                    return $this->object_get($attribute, $this->file());
+                } else {
+                    $this->setFile($attribute);
+                    return $this->getFile();
+                }
+            }
+        }
+        return $this->getFile();
+    }
+
+    private function setFile($attribute='', $value=null){
+        if(is_array($attribute) || is_object($attribute)){
+            $this->file = $attribute;
+        } else {
+            if(is_object($this->file)){
+                $this->file->{$attribute} = $value;
+            } else {
+                $this->file[$attribute] = $value;
+            }
+
+        }
+    }
+
+    private function getFile($attribute=null){
+        if($attribute === null){
+            if(is_null($this->file)){
+                $this->file = new stdClass();
+            }
+            return $this->file;
+        }
+        if(isset($this->file[$attribute])){
+            return $this->file[$attribute];
+        }
+        elseif(isset($this->file->{$attribute})){
+            return $this->file->{$attribute};
+        } else {
+            return false;
+        }
+    }
+
+    private function deleteFile($attribute=''){
+        return $this->object_delete($attribute, $this->file());
+    }
+
+    private function createFile(){
+        $nodeList = array();
+        if(isset($_FILES)){
+            foreach ($_FILES as $category => $list){
+                if(is_array($list)){
+                    foreach($list as $attribute => $subList){
+                        if(is_array($subList)){
+                            foreach ($subList as $nr => $value){
+                                $nodeList[$nr][$attribute] = $value;
+                            }
+                        } else {
+                            $nodeList[] = $list;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return $this->file($nodeList);
+    }
+
     public function lastModified(){
-        $this->request('Last-Modified: '. gmdate('D, d M Y H:i:s T'));
+        $this->request('lastModified: '. gmdate('D, d M Y H:i:s T'));
     }
 
     public function contentType($contentType=null){
@@ -128,29 +226,60 @@ class Handler extends Data{
 
     private function createContentType(){
         $contentType = 'text/html';
-        if(isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == 'application/json'){
-            $contentType = 'application/json';
+        if(isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == Handler::CONTENT_TYPE_JSON){
+            $contentType = Handler::CONTENT_TYPE_JSON;
         }
         if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
-            $contentType = 'application/json';
+            $contentType = Handler::CONTENT_TYPE_JSON;
         }
         if(isset($_SERVER['HTTP_ACCEPT']) && stristr($_SERVER['HTTP_ACCEPT'], 'text/css')){
-            $contentType = 'text/css';
+            $contentType = Handler::CONTENT_TYPE_CSS;
+        }
+        $host = $this->host();
+        if(empty($host)){
+            $contentType = Handler::CONTENT_TYPE_CLI;
         }
         $request = $this->request('request');
         $tmp = explode('.', $request);
         $ext = strtolower(end($tmp));
 
         $allowed_contentType = $this->data('contentType');
-        if(empty($allowed_contentType)){
-            $allowed_contentType = $this->data('Content-Type');
-        }
         if(isset($allowed_contentType->{$ext})){
             $contentType = $allowed_contentType->{$ext};
         }
         $this->request('contentType',$contentType);
-        $this->request('Content-Type',$contentType);
         return $this->contentType($contentType);
+    }
+
+    public function method($method=null){
+        if($method !== null){
+            if($method == 'create'){
+                return $this->createMethod();
+            } else {
+                $this->setMethod($method);
+            }
+        }
+        return $this->getMethod();
+    }
+
+    private function setMethod($method=''){
+        $this->method = $method;
+    }
+
+    private function getMethod(){
+        return $this->method;
+    }
+
+    private function createMethod(){
+        if(isset($_SERVER['REQUEST_METHOD'])){
+            $method = $_SERVER['REQUEST_METHOD'];
+        } else{
+            $contentType = $this->contentType();
+            if(stristr($contentType, 'cli')){
+                $method = 'CLI';
+            }
+        }
+        return $this->method($method);
     }
 
     public function input(){
@@ -209,18 +338,21 @@ class Handler extends Data{
         }
         $data = json_decode($input);
         if(empty($data) && !empty($argv)){
+            $attribute = $argv;
+            foreach($attribute as $nr => $value){
+                $attribute[$nr] = trim(escapeshellarg($value), '\'');
+            }
             $data = new stdClass();
             $data->nodeList = array();
             $object = new stdClass();
-            $object->data =  $argv;
+            $object->data =  $attribute;
             $data->nodeList[] = $object;
             $object = new stdClass();
-            $object->file =  Application::DIR . Application::DS . basename(array_shift($argv));
-            $this->request('Content-Type', 'text/cli');
+            $object->file =  Application::DIR . Application::DS . basename(array_shift($attribute));
             $data->nodeList[] = $object;
             if(count($argv) >= 1){
                 $object = new stdClass();
-                $object->request =  str_replace('\\','/',array_shift($argv));
+                $object->request =  str_replace('\\','/',array_shift($attribute));
                 $data->nodeList[] = $object;
             }
         }
@@ -236,17 +368,25 @@ class Handler extends Data{
     }
 
     public function web(){
-        if(empty($_SERVER['REQUEST_SCHEME'])){
-            return false;
+        if(!empty($_SERVER['REQUEST_SCHEME'])){
+            $scheme = $_SERVER['REQUEST_SCHEME'];
+        } else {
+            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
+                $scheme = 'https';
+            } else {
+                $scheme = 'http';
+            }
+
         }
         if(empty($_SERVER['HTTP_HOST'])){
             return false;
         }
         return
-        $_SERVER['REQUEST_SCHEME'] .
-        '://' .
-        $_SERVER['HTTP_HOST'] .
-        '/';
+               $scheme .
+            '://' .
+            $_SERVER['HTTP_HOST'] .
+            '/'
+        ;
     }
 
     public function url($url=null){
@@ -271,26 +411,36 @@ class Handler extends Data{
         return parent::url($url);
     }
 
+    public function csrf(){
+        $session = $this->session();
+        if(!empty($session['csrf'])){
+            return $session['csrf'];
+        }
+    }
     public function session($attribute=null, $value=null){
         if(!isset($_SESSION)){
-            if($attribute !== null){
-                session_start();
-                $_SESSION['id'] = session_id();
-                $post = $this->session('post');
-                $this->session('delete', 'post');
-                if(is_array($post)){
-                    foreach($post as $key => $value){
-                        if(is_array($value)){
-                            foreach ($value as $k => $v){
-                                $this->request($key . '.' . $k, $v);
-                            }
-                        } else {
-                            $this->request($key, $value);
+            session_start();
+            $_SESSION['id'] = session_id();
+            if(empty($_SESSION['csrf'])){
+                $_SESSION['csrf'] =
+                    rand(1000,9999) . '-' .
+                    rand(1000,9999) . '-' .
+                    rand(1000,9999) . '-' .
+                    rand(1000,9999)
+                ;
+            }
+            $post = $this->session('post');
+            $this->session('delete', 'post');
+            if(is_array($post)){
+                foreach($post as $key => $value){
+                   if(is_array($value)){
+                        foreach ($value as $k => $v){
+                            $this->request($key . '.' . $k, $v);
                         }
+                    } else {
+                        $this->request($key, $value);
                     }
                 }
-            } else {
-                return array();
             }
         }
         if($attribute !== null){
@@ -440,12 +590,25 @@ class Handler extends Data{
     }
 
     public function host(){
-        $host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/';
-        return $host;
+        if(isset($_SERVER['REQUEST_SCHEME']) && isset($_SERVER['SERVER_NAME'])){
+            $host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/';
+            return $host;
+        }
+        if(isset($_SERVER['SERVER_NAME'])){
+            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
+                $host = 'https://' . $_SERVER['SERVER_NAME'];
+            } else {
+                $host = 'http://' . $_SERVER['SERVER_NAME'];
+            }
+            return $host;
+        }
     }
 
     public function removeHost($value=''){
         $host = $this->host();
+        if(empty($host)){
+            return $value;
+        }
         $value = explode($host, $value, 2);
         $value = implode('', $value);
         return $value;

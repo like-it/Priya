@@ -11,6 +11,7 @@ namespace Priya\Module\Core;
 use Priya\Module\Core;
 use Priya\Application;
 use Priya\Module\File;
+use Priya\Module\Handler;
 use stdClass;
 
 class Data extends Core {
@@ -20,8 +21,14 @@ class Data extends Core {
     private $data;
 
     public function __construct($handler=null, $route=null, $data=null){
+        if(stristr(get_class($handler), 'autoload') !== false){
+            $this->autoload($handler);
+            parent::__construct(null, $route);
+        } else {
+            parent::__construct($handler, $route);
+        }
         $this->data($this->object_merge($this->data(), $data));
-        parent::__construct($handler, $route);
+
     }
 
     public function data($attribute=null, $value=null){
@@ -110,9 +117,9 @@ class Data extends Core {
         if(empty($url)){
             $url = get_called_class();
         }
-        if(file_exists($this->url($url))){
+        if(file_exists($url)){
             $file = new File();
-            $read = $file->read($url);
+            $read = $file->read($this->url($url));
             $read = $this->object($read);
             $data = $this->data();
             if(empty($data)){
@@ -123,39 +130,40 @@ class Data extends Core {
                     foreach($read as $attribute => $value){
                         $this->object_set($attribute, $value, $data);
                     }
-                } else {
-                    var_dump($read);
-                    die;
                 }
             }
             return $this->data($data);
         } else {
             $module = $url;
         }
-        $tmp = explode('\\', trim(str_replace(Application::DS, '\\',$url),'\\'));
-        $class = array_pop($tmp);
-        $namespace = implode('\\', $tmp);
-        $directory = explode(Application::DS, Application::DIR);
-        array_pop($directory);
-        array_pop($directory);
-        $priya = array_pop($directory);
-        $directory = implode(Application::DS, $directory) . Application::DS;
-        if(empty($namespace)){
-            $namespace = $priya . '\\' . Application::MODULE;
+        $autoload = $this->autoload();
+        if(empty($autoload)){
+            $tmp = explode('\\', trim(str_replace(Application::DS, '\\',$url),'\\'));
+            $class = array_pop($tmp);
+            $namespace = implode('\\', $tmp);
+            $directory = explode(Application::DS, Application::DIR);
+            array_pop($directory);
+            array_pop($directory);
+            $priya = array_pop($directory);
+            $directory = implode(Application::DS, $directory) . Application::DS;
+            if(empty($namespace)){
+                $namespace = $priya . '\\' . Application::MODULE;
+            }
+            $directory .= str_replace('\\', Application::DS, $namespace) . Application::DS;
+            $data = new \Priya\Module\Autoload\Data();
+            $environment = $this->data('environment');
+            if(!empty($environment)){
+                //             $data->environment($environment);
+            }
+            $class = get_called_class();
+            if($class::DIR){
+                $dir = dirname($class::DIR) . Application::DS;// . 'Data' . Application::DS;
+                $data->addPrefix('none', $dir);
+            }
+            $data->addPrefix($namespace, $directory);
+            $autoload = $this->autoload($data);
         }
-        $directory .= str_replace('\\', Application::DS, $namespace) . Application::DS;
-        $data = new \Priya\Module\Autoload\Data();
-        $environment = $this->data('environment');
-        if(!empty($environment)){
-//             $data->environment($environment);
-        }
-        $class = get_called_class();
-        if($class::DIR){
-            $dir = dirname($class::DIR) . Application::DS;// . 'Data' . Application::DS;
-            $data->addPrefix('none', $dir);
-        }
-        $data->addPrefix($namespace, $directory);
-        $url = $data->data_load($url);
+        $url = $autoload->data_load($url);
         if($url !== false){
             $this->url($url);
         }
@@ -190,6 +198,9 @@ class Data extends Core {
             $this->url($url);
         }
         $url = $this->url();
+        if(empty($url)){
+            return false;
+        }
         $file = new File();
         $write = $file->write($url, $this->object($this->data(), 'json'));
         return $write;
@@ -214,7 +225,24 @@ class Data extends Core {
         if(is_array($data) || is_object($data)){
             foreach($data as $key => $node){
                 $search = '';
-                if(is_array($attribute)){
+                if(is_null($attribute)){
+                    if(is_array($node)){
+                        $node = $this->object($node);
+                    }
+                    foreach($node as $attr => $value){
+                        if(is_array($value)){
+                            continue;
+                        }
+                        elseif(is_object($value)){
+                            continue;
+                        }
+                        $search .= $value . ' ';
+                    }
+                }
+                elseif(is_array($attribute)){
+                    if(is_array($node)){
+                        $node = $this->object($node);
+                    }
                     foreach($attribute as $value){
                         $selector = trim($value);
                         $select = $this->object_get($selector, $node);
@@ -227,7 +255,7 @@ class Data extends Core {
                 }
                 $search = trim($search);
                 $find = trim($find);
-                $levenshtein = levenshtein($search, $find, 5, 2, 5);
+                $levenshtein = levenshtein(substr($search, 0, 255), substr($find, 0, 255), 5, 2, 5);
                 if(!empty($not)){
                     if(strstr($search, $find) === false){
                         $result[$levenshtein][$key] = $node;
@@ -278,10 +306,15 @@ class Data extends Core {
         if(is_array($data) || is_object($data)){
             foreach($data as $key => $node){
                 $sorter = '';
-                foreach($attribute as $value){
-                    $selector = trim($value);
-                    $select = $this->object_get($selector, $node);
-                    $sorter .= $select;
+                if(is_array($attribute)){
+                    if(is_array($node)){
+                        $node = $this->object($node);
+                    }
+                    foreach($attribute as $value){
+                        $selector = trim($value);
+                        $select = $this->object_get($selector, $node);
+                        $sorter .= $select;
+                    }
                 }
                 if(empty($case)){
                     $sorter = strtolower($sorter);
@@ -339,31 +372,36 @@ class Data extends Core {
         }
         if(is_array($data) || is_object($data)){
             foreach($data as $key => $node){
-                foreach($attribute as $value){
-                    $selector = trim($value);
-                    $select = $this->object_get($selector, $node);
-                    if($action == 'remove'){
-                        if(!empty($select)){
-                            $remove[$key] = true;
-                        }
-                        $result[$key] = $node;
-                    }
-                    elseif($action == 'keep' && !empty($select)){
-                        if(empty($values)){
+                if(is_array($node)){
+                    $node = $this->object($node);
+                }
+                if(is_array($attribute)){
+                    foreach($attribute as $value){
+                        $selector = trim($value);
+                        $select = $this->object_get($selector, $node);
+                        if($action == 'remove'){
+                            if(!empty($select)){
+                                $remove[$key] = true;
+                            }
                             $result[$key] = $node;
-                        } else {
-                            if(is_array($select)){
-                                foreach($values as $val){
-                                    if(in_array($val, $select)){
-                                        $result[$key] = $node;
-                                        break;
-                                    }
-                                }
+                        }
+                        elseif($action == 'keep' && !empty($select)){
+                            if(empty($values)){
+                                $result[$key] = $node;
                             } else {
-                                foreach($values as $val){
-                                    if($val == $select){
-                                        $result[$key] = $node;
-                                        break;
+                                if(is_array($select)){
+                                    foreach($values as $val){
+                                        if(in_array($val, $select)){
+                                            $result[$key] = $node;
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    foreach($values as $val){
+                                        if($val == $select){
+                                            $result[$key] = $node;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -573,5 +611,21 @@ class Data extends Core {
 
     public function copy($copy=null){
         return unserialize(serialize($copy));
+    }
+
+    public function request($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler($this->data()));
+        }
+        return parent::request($attribute, $value);
+    }
+
+    public function session($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler($this->data()));
+        }
+        return parent::session($attribute, $value);
     }
 }

@@ -124,7 +124,7 @@ class Install extends Cli {
                 if(is_link($this->data('dir.public') . $node->module)){
                     unlink($this->data('dir.public') . $node->module);
                 }
-                exec('ln -s ' . $node->url . ' ' . $this->data('dir.public') . $node->module);
+//                 exec('ln -s ' . $node->url . ' ' . $this->data('dir.public') . $node->module);
                 $this->data('step', 'symlink-create');
                 $this->cli('create', 'Install');
             } else {

@@ -1,12 +1,1 @@
-{
-"Module/Update":{
-	"path" :"module/cli/",
-	"default": {
-		"controller":"Priya:Module:Cli:Module:Update:run",
-		"format":"html",
-		"language":"en"		
-	},
-	"method":["CLI"],
-	"translate": false
-}
-}
+{}

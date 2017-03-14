@@ -24,26 +24,33 @@ class Application extends Parser {
     const MODULE = 'Module';
     const DATA = 'Data';
     const BACKUP = 'Backup';
+    const RESTORE = 'Restore';
+    const UPDATE = 'Update';
     const PUBLIC_HTML = 'Public';
-    const TAG = '0.0.3';
     const CONFIG = 'Config.json';
     const ROUTE = 'Route.json';
-
-    private $autoload;
+    const CREDENTIAL = 'Credential.json';
 
     public function __construct($autoload=null, $data=null){
+        set_exception_handler(array('Priya\Module\Core','handler_exception'));
+        set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->data($this->object($data));
+        $this->cli();
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.priya.application',
-                dirname(Application::DIR) .
-                Application::DS
+            dirname(Application::DIR) .
+            Application::DS
+        );
+        $this->data('dir.priya.root',
+            dirname($this->data('dir.priya.application')) .
+               Application::DS
         );
         $this->data('dir.priya.module',
-                dirname($this->data('dir.priya.application')) .
-                Application::DS .
-                Application::MODULE .
-                Application::DS
+            dirname($this->data('dir.priya.application')) .
+            Application::DS .
+            Application::MODULE .
+            Application::DS
         );
         $this->data('dir.priya.data',
             $this->data('dir.priya.application') .
@@ -69,6 +76,20 @@ class Application extends Parser {
                 Application::DATA .
                 Application::DS
            );
+        }
+        if(empty($this->data('dir.priya.restore'))){
+            $this->data('dir.priya.restore',
+                $this->data('dir.priya.data') .
+                Application::RESTORE .
+                Application::DS
+           );
+        }
+        if(empty($this->data('dir.priya.update'))){
+            $this->data('dir.priya.update',
+                $this->data('dir.priya.data') .
+                Application::UPDATE .
+                Application::DS
+            );
         }
         $this->read($this->data('dir.data') . Application::CONFIG);
         if(empty($this->data('public_html'))){
@@ -104,26 +125,26 @@ class Application extends Parser {
         $this->route()->create('Application.Help');
         $this->route()->create('Application.Error');
         $this->route()->create('Application.Route');
-        $this->route()->create('Application.Install');
-        $this->route()->create('Application.Update');
         $this->route()->create('Application.Restore');
-        $this->route()->create('Application.Config');
-        $this->route()->create('Application.User');
+        $this->route()->create('Application.Pull');
+        $this->route()->create('Application.Push');
+//         $this->route()->create('Application.Install');
+//         $this->route()->create('Application.Update');
+//         $this->route()->create('Application.Config');
+//         $this->route()->create('Application.User');
     }
 
     public function run(){
         if(!headers_sent()){
-            header('Last-Modified: '. $this->request('Last-Modified'));
+            header('Last-Modified: '. $this->request('lastModified'));
         }
         $request = $this->request('request');
+
         $tmp = explode('.', $request);
         $ext = strtolower(end($tmp));
         $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $request);
 
         $allowed_contentType = $this->data('contentType');
-        if(empty($allowed_contentType)){
-            $allowed_contentType = $this->data('Content-Type');
-        }
         if(isset($allowed_contentType->{$ext})){
             $contentType = $allowed_contentType->{$ext};
             header('Content-Type: ' . $contentType);
@@ -145,7 +166,7 @@ class Application extends Parser {
         }
         $item = $this->route()->run();
         $handler = $this->handler();
-        $contentType = $handler->request('Content-Type');
+        $contentType = $handler->request('contentType');
         $result = '';
         if(!empty($item->controller)){
             $controller = new $item->controller($this->handler(), $this->route(), $this->data());
@@ -156,12 +177,14 @@ class Application extends Parser {
             }
         } else {
             if($contentType == 'text/cli'){
+                if($request == 'Application/Error/'){
+                    trigger_error('cannot route to Application/Error/', E_USER_ERROR);
+                }
                 if($this->route()->error('read')){
                     $handler->request('request', 'Application/Error/');
                     $handler->request('id', 2);
                     $this->run();
                 } else {
-                    $request =  $handler->request('request');
                     if(empty($request)){
                         $handler->request('request', 'Application/Help/');
                         $this->run();
@@ -186,24 +209,46 @@ class Application extends Parser {
                 return $result;
             }
         } else {
-            trigger_error('unknown result');
+//             trigger_error('unknown result');
             var_dump($result);
             var_dump($item);
         }
     }
 
-    public function autoload($autoload=null){
-        if($autoload !== null){
-            $this->setAutoload($autoload);
+    private function cli(){
+        $request = $this->request('data');
+        if(!empty($request)){
+            if(is_array($request) || is_object($request)){
+                $key = false;
+                $value = null;
+                foreach($request as $attribute){
+                    if(!empty($key)){
+                        $value = $attribute;
+                    }
+                    $attribute = explode('=', $attribute, 2);
+                    if(count($attribute) == 2){
+                        switch($attribute[0]){
+                            case 'dir.data':
+                                $key = $attribute[0];
+                                $value = $attribute[1];
+                            break;
+                        }
+                    } else {
+                        switch($attribute[0]){
+                            case 'dir.data':
+                                $key = $attribute[0];
+                                continue;
+                            break;
+                        }
+                    }
+
+                    if(!empty($key) && isset($value)){
+                        $this->data($key, $value);
+                        unset($key);
+                        unset($value);
+                    }
+                }
+            }
         }
-        return $this->getAutoload();
-    }
-
-    private function setAutoload($autoload=''){
-        $this->autoload = $autoload;
-    }
-
-    private function getAutoload(){
-        return $this->autoload;
     }
 }

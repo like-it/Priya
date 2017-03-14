@@ -139,7 +139,7 @@ class Result extends Parser {
     }
 
     public function createTemplate($template=''){
-        $contentType = $this->request('Content-Type');
+        $contentType = $this->request('contentType');
 
         $data = $this->data();
         if(empty($template) && isset($data->contentType) && isset($data->contentType->{$contentType}) && isset($data->contentType->{$contentType}->template)){
@@ -171,12 +171,16 @@ class Result extends Parser {
                 $url = array_shift($template_list);
             }
         }
+        $this->url($url);
         $dir = dirname($url);
         chdir($dir);
         $functions = spl_autoload_functions();
         foreach($functions as $function) {
             spl_autoload_unregister($function);
         }
+        restore_error_handler();
+        restore_exception_handler();
+
         $dir_priya = dirname(dirname(Application::DIR)) . Application::DS;
         $dir_vendor = dirname($dir_priya) . Application::DS;
 
@@ -190,8 +194,8 @@ class Result extends Parser {
         require_once $dir_smarty . 'Smarty.class.php';
         $smarty = new \Smarty();
 
-        $functions = spl_autoload_functions();
-        if(empty($functions)){
+        $func = spl_autoload_functions();
+        if(empty($func)){
             \Smarty_Autoloader::register();
         }
         $dir_template = '';
@@ -216,10 +220,20 @@ class Result extends Parser {
         $smarty->setCompileDir($dir_cache . 'Compile' .	Application::DS);
         $smarty->setCacheDir($dir_cache . 'Cache' .	Application::DS);
         $smarty->setConfigDir('');
-        $smarty->addPluginsDir($dir_module_smarty . 'Plugin'. Application::DS);	//own plugins...
+        $smarty->addPluginsDir($dir_module_smarty . 'Plugin'. Application::DS);	//priya plugins...
         $smarty->assign('class', str_replace('\\', '-', strtolower($class)));
         $smarty->assign('template_list', $template_list);
 
+        $plugin_dir = $this->data('smarty.dir.plugin');
+        if(!is_array($plugin_dir)){
+            $plugin_dir = (array) $plugin_dir;
+        }
+        foreach($plugin_dir as $location){
+            $location = str_replace(array('\\', '/'), Application::DS, rtrim($location,'\\/')) . Application::DS;
+            if(is_dir($location)){
+                $smarty->addPluginsDir($location);	//own plugins...
+            }
+        }
         $data = $this->object($this->data(), 'array');
 
         $ignore = $this->object($this->data('ignore'), 'array');
@@ -286,16 +300,10 @@ class Result extends Parser {
             $smarty->assign('method', $method);
         }
         $smarty->assign('fetch', $url);
-        $fetch = $smarty->fetch($url);
+        $fetch = trim($smarty->fetch($url));
 
-        $func = spl_autoload_functions();
-
-        foreach($func as $function){
-            spl_autoload_unregister($function);
-        }
-        foreach($functions as $function) {
-            spl_autoload_register($function);
-        }
+        set_exception_handler(array('Priya\Module\Core','handler_exception'));
+        set_error_handler(array('Priya\Module\Core','handler_error'));
         if($contentType == 'application/json'){
             $object = new stdClass();
             $object->html = $fetch;
@@ -325,10 +333,18 @@ class Result extends Parser {
             if(isset($variable['refresh'])){
                 $object->refresh = $variable['refresh'];
             }
-            return $this->template($object);
+            $result = $this->template($object);
         } else {
-            return $this->template($fetch);
+            $result = $this->template($fetch);
         }
+        $func = spl_autoload_functions();
+        foreach($func as $function){
+            spl_autoload_unregister($function);
+        }
+        foreach($functions as $function) {
+            spl_autoload_register($function);
+        }
+        return $result;
     }
 
     public function locateTemplate($template='', $extension='tpl', $caller=''){

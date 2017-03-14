@@ -36,7 +36,7 @@ function smarty_function_route($params, $template)
             if(!isset($route['path'])){
                 continue;
             }
-            if(strtolower($name) == strtolower($routeName)){
+            if(strtolower(str_replace(array('/', '\\'),'', $name)) == strtolower(str_replace(array('/', '\\'),'', $routeName))){
                 $found = $route;
                 break;
             }

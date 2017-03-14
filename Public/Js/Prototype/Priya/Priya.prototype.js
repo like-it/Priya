@@ -23,6 +23,8 @@ var priya = function (id){
 };
 
 priya.prototype.run = function (data){
+    //.dom
+    //.request
 }
 
 priya.prototype.dom = function(data){

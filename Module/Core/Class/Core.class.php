@@ -14,19 +14,17 @@ use stdClass;
 class Core {
     use Core\Object;
 
+    private $mail;
     private $handler;
     private $route;
     private $post;
     private $error;
     private $message;
+    private $autoload;
 
     public function __construct($handler=null, $route=null){
         $this->handler($handler);
         $this->route($route);
-
-        set_exception_handler(array(__CLASS__,'handler_exception'));
-        set_error_handler(array(__CLASS__,'handler_error'));
-
     }
 
     public static function handler_exception($exception){
@@ -43,6 +41,7 @@ class Core {
         $error['line'] = $line;
         $error['context'] = $context;
         var_dump($error);
+        die;
     }
 
     public function handler($handler=null){
@@ -83,10 +82,53 @@ class Core {
     }
 
     public function request($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler());
+        }
         return $this->handler()->request($attribute, $value);
     }
 
+    public function upload($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler());
+        }
+        return $this->handler()->file($attribute, $value);
+    }
+
+    public function parameter($parameter){
+        $data = $this->request('data');
+        foreach($data as $key => $param){
+            $param = ltrim($param,'-');
+            $tmp = explode('=', $param);
+            if(count($tmp) > 1){
+                $param = array_shift($tmp);
+                $value = implode('=', $tmp);
+            }
+            if(strtolower($param) == strtolower($parameter)){
+                if(isset($value)){
+                    return $value;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function csrf(){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler());
+        }
+        return $this->handler()->csrf();
+    }
+
     public function session($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler());
+        }
         return $this->handler()->session($attribute, $value);
     }
 
@@ -113,7 +155,7 @@ class Core {
         if(!empty($post)){
             $this->session('post', $post);
         }
-        $contentType = $this->request('Content-Type');
+        $contentType = $this->request('contentType');
         if($contentType == 'application/json'){
             $output = new stdClass();
             $output->refresh = $url;
@@ -434,9 +476,17 @@ class Core {
         }
     }
 
-    private function read_permission($counter=3){
+    private function read_permission($counter=5){
         $call = explode('\\', get_called_class());
-        if(count($call) > 3 && $counter > 2){
+        if(count($call) > 5 && $counter > 4){
+            $count = 5;
+            $class = array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . 'Permission';
+        }
+        elseif(count($call) > 4 && $counter > 3){
+            $count = 4;
+            $class = array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . 'Permission';
+        }
+        elseif(count($call) > 3 && $counter > 2){
             $count = 3;
             $class = array_shift($call) . '\\' . array_shift($call) . '\\' . array_shift($call) . '\\' . 'Permission';
         }
@@ -448,6 +498,9 @@ class Core {
             $count = 1;
             $class = array_shift($call) . '\\' . 'Permission';
         } else {
+            return false;
+        }
+        if($counter < 1){
             return false;
         }
         $selector = implode('.', $call);
@@ -501,4 +554,27 @@ class Core {
         }
         return false;
     }
+
+    public function mail(){
+        if(get_class($this->mail) != 'Priya\Module\Mail'){
+            $this->mail = new Mail($this->data());
+        }
+        return $this->mail;
+    }
+
+    public function autoload($autoload=null){
+        if($autoload !== null){
+            $this->setAutoload($autoload);
+        }
+        return $this->getAutoload();
+    }
+
+    private function setAutoload($autoload=''){
+        $this->autoload = $autoload;
+    }
+
+    private function getAutoload(){
+        return $this->autoload;
+    }
+
 }
