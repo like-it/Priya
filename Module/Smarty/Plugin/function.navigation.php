@@ -54,15 +54,20 @@ function build($class='', $nodeList=array(), $request=array(), Smarty_Internal_T
                 $node['href'] = smarty_function_route($params, $template);
             }
             if(isset($node['href']) && !empty($node['name']) && !empty($node['title'])){
+                if(!empty($node['method']) && !empty($node['target'])){
+                    $tag_a = '<a href="#" data-request="' . $node['href'] . '" data-method="' . $node['method'] .'" data-target="' . $node['target'] .'">';
+                } else {
+                    $tag_a = '<a href="' . $node['href'] . '">';
+                }
                 if (!empty($request) && !empty($request['name']) && $request['name'] == $node['name']){
                     $class_active = $class . ' active';
                     $class_active = ltrim($class_active, ' ');
-                    $html .= '<li class="' . $class_active . '"><a href="' . $node['href'] . '"><p>' . $node['title'] .'</p></a></li>';
+                    $html .= '<li class="' . $class_active . '">' . $tag_a . '<p>' . $node['title'] .'</p></a></li>';
                 } else {
                     if(empty($class)){
-                        $html .= '<li><a href="' . $node['href'] . '"><p>' . $node['title'] .'</p></a></li>';
+                        $html .= '<li>' . $tag_a . '<p>' . $node['title'] .'</p></a></li>';
                     } else {
-                        $html .= '<li class="' . $class . '"><a href="' . $node['href'] . '"><p>' . $node['title'] .'</p></a></li>';
+                        $html .= '<li class="' . $class . '">' . $tag_a . '<p>' . $node['title'] .'</p></a></li>';
                     }
                 }
             }

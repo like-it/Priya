@@ -215,7 +215,21 @@ class Data extends Core {
         if(is_array($data) || is_object($data)){
             foreach($data as $key => $node){
                 $search = '';
-                if(is_array($attribute)){
+                if(is_null($attribute)){
+                    if(is_array($node)){
+                        $node = $this->object($node);
+                    }
+                    foreach($node as $attr => $value){
+                        if(is_array($value)){
+                            continue;
+                        }
+                        elseif(is_object($value)){
+                            continue;
+                        }
+                        $search .= $value . ' ';
+                    }
+                }
+                elseif(is_array($attribute)){
                     if(is_array($node)){
                         $node = $this->object($node);
                     }
@@ -231,7 +245,7 @@ class Data extends Core {
                 }
                 $search = trim($search);
                 $find = trim($find);
-                $levenshtein = levenshtein($search, $find, 5, 2, 5);
+                $levenshtein = levenshtein(substr($search, 0, 255), substr($find, 0, 255), 5, 2, 5);
                 if(!empty($not)){
                     if(strstr($search, $find) === false){
                         $result[$levenshtein][$key] = $node;
