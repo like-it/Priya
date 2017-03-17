@@ -451,12 +451,20 @@ priya.prototype.toggleClass = function(className){
 
 priya.prototype.hasClass = function (className){
     var className = this.str_replace('&&', ' ', className);
-    //classname classname = &&
-    //classname && classname = &&
-    //classname || classname = ||
-    //add later () sets
-    console.log('dom.hasClass: ' + className);
+    var list = className.split(' ');
+    var index;
+    for(index = 0; index < list.length; index++){
+        var name = this.trim(list[index]);
+        if(this.empty(name)){
+            continue;
+        }
+        if(this.stristr(this.className, name) !== false){
+            return true;
+        }
+    }
+    return false;
 }
+
 
 priya.prototype.css = function(attribute, value){
     //write and read to .style.property
