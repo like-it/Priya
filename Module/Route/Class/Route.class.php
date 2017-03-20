@@ -48,7 +48,7 @@ class Route extends Parser{
                 }
             }
         }
-        $path = explode('/', trim(strtolower($path), '/'));
+        $path = explode('/', trim($path, '/'));
 
         foreach($data as $name => $route){
             if(!isset($route->path)){
