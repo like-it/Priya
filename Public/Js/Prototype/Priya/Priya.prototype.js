@@ -721,7 +721,6 @@ priya.prototype.request = function (url, data, script){
     } else {
         xhttp.open("POST", url, true);
         xhttp.setRequestHeader("Content-Type", "application/json");
-        console.log(data);
         var send = JSON.stringify(data);
         xhttp.send(send);
     }
@@ -792,7 +791,6 @@ priya.prototype.exception = function (data){
         "html":"<pre>"+ JSON.stringify(data, null, 4) +"</pre>"
     }
     exception.content(content);
-    console.log(exception);
 }
 
 priya.prototype.addScriptSrc = function (data){
