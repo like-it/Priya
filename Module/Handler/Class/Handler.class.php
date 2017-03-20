@@ -46,8 +46,10 @@ class Handler extends Data{
                 elseif($attribute=='request'){
                     $value = $this->removeHost($value);
                     $this->object_set($attribute, $value, $this->request());
+                    return $value;
                 } else {
                     $this->object_set($attribute, $value, $this->request());
+                    return $value;
                 }
             } else {
                 if(is_string($attribute)){
