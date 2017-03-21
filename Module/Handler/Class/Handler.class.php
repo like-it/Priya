@@ -32,6 +32,9 @@ class Handler extends Data{
         $this->lastModified('create');
         $this->referer('create');
         $this->file('create');
+        if(isset($_SERVER['REQUEST_URI'])){
+            $this->request('url', $_SERVER['REQUEST_URI']);
+        }
     }
 
     public function request($attribute=null, $value=null){
