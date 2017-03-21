@@ -97,10 +97,24 @@ class Data extends Core {
         return $this->object_delete($attribute, $this->data());
     }
 
-    public function url($url=null){
+    public function url($url=null, $attribute=null){
         if($url !== null){
-            $this->setUrl($url);
+            if($attribute !== null){
+                switch($url){
+                    case 'encode':
+                        return $this->encodeUrl($attribute);
+                    break;
+                    case 'decode':
+                        return $this->decodeUrl($attribute);
+                    break;
+                    default:
+                        trigger_error('unknown attribute (' . $url . ') in url');
+                }
+            } else {
+                $this->setUrl($url);
+            }
         }
+
         return $this->getUrl();
     }
 
@@ -110,6 +124,30 @@ class Data extends Core {
 
     private function getUrl(){
         return $this->url;
+    }
+
+    private function encodeUrl($url=''){
+        $temp = explode('/', $url);
+        foreach($temp as $nr => $part){
+            if($part == 'http:'){
+                continue;
+            }
+            $temp[$nr] = rawurlencode($part);
+        }
+        $url = implode('/', $temp);
+        return $url;
+    }
+
+    private function decodeUrl($url=''){
+        $temp = explode('/', $url);
+        foreach($temp as $nr => $part){
+            if($part == 'http:'){
+                continue;
+            }
+            $temp[$nr] = rawurldecode($part);
+        }
+        $url = implode('/', $temp);
+        return $url;
     }
 
     public function read($url=''){

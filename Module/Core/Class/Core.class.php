@@ -142,6 +142,12 @@ class Core {
         return $module;
     }
 
+    public function class($class=''){
+        $class = strtolower($class);
+        $class = str_replace(array('\\', '/'), '-', $class);
+        return $class;
+    }
+
     public function refresh($url=''){
         $error = $this->error();
         if(!empty($error)){

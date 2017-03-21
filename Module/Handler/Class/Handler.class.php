@@ -391,8 +391,8 @@ class Handler extends Data{
         ;
     }
 
-    public function url($url=null){
-        $url = parent::url($url);
+    public function url($url=null, $attribute=null){
+        $url = parent::url($url, $attribute);
         if($url === null){
             if(empty($_SERVER['REQUEST_SCHEME'])){
                 return false;
@@ -410,7 +410,7 @@ class Handler extends Data{
             $_SERVER['REQUEST_URI']
             ;
         }
-        return parent::url($url);
+        return parent::url($url, $attribute);
     }
 
     public function csrf(){
