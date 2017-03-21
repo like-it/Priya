@@ -139,12 +139,12 @@ class Application extends Parser {
             header('Last-Modified: '. $this->request('lastModified'));
         }
         $request = $this->request('request');
-        $url = $this->request('url');
+        $url = $this->handler()->url();
         $tmp = explode('?', $url, 2);
         $url = reset($tmp);
         $tmp = explode('.', $url);
         $ext = strtolower(end($tmp));
-        $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->url('decode', $url));
+        $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
         $allowed_contentType = $this->data('contentType');
         if(isset($allowed_contentType->{$ext})){
             $contentType = $allowed_contentType->{$ext};
