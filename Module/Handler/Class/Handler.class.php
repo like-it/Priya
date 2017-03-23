@@ -370,16 +370,7 @@ class Handler extends Data{
     }
 
     public function web(){
-        if(!empty($_SERVER['REQUEST_SCHEME'])){
-            $scheme = $_SERVER['REQUEST_SCHEME'];
-        } else {
-            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
-                $scheme = 'https';
-            } else {
-                $scheme = 'http';
-            }
-
-        }
+        $scheme = $this->scheme();
         if(empty($_SERVER['HTTP_HOST'])){
             return false;
         }
@@ -391,12 +382,25 @@ class Handler extends Data{
         ;
     }
 
+    public function scheme(){
+        $scheme = 'http';
+        if(!empty($_SERVER['REQUEST_SCHEME'])){
+            $scheme = $_SERVER['REQUEST_SCHEME'];
+        } else {
+            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
+                $scheme = 'https';
+            }
+        }
+        return $scheme;
+    }
+
     public function url($url=null, $attribute=null){
+        $scheme = $this->scheme();
+        if(empty($scheme)){
+            return false;
+        }
         $url = parent::url($url, $attribute);
         if($url === null){
-            if(empty($_SERVER['REQUEST_SCHEME'])){
-                return false;
-            }
             if(empty($_SERVER['HTTP_HOST'])){
                 return false;
             }
@@ -404,7 +408,7 @@ class Handler extends Data{
                 return false;
             }
             $url =
-            $_SERVER['REQUEST_SCHEME'] .
+            $scheme .
             '://' .
             $_SERVER['HTTP_HOST'] .
             $_SERVER['REQUEST_URI']
