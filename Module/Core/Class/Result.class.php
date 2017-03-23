@@ -8,6 +8,7 @@
  */
 namespace Priya\Module\Core;
 
+use Priya\Module\File\Dir;
 use Priya\Module\Core\Parser;
 use Priya\Module\Autoload\Tpl;
 use Priya\Module\Route;
@@ -216,9 +217,25 @@ class Result extends Parser {
             'Data' .
             Application::DS;
 
+        $dir_compile = $dir_cache . 'Compile' .	Application::DS;
+        $dir_cache .=  'Cache' .	Application::DS;
+
+        if(is_dir($dir_compile) === false){
+            mkdir($dir_compile, Dir::CHMOD, true);
+        }
+        if(is_dir($dir_cache) === false){
+            mkdir($dir_cache, Dir::CHMOD, true);
+        }
+        if(is_dir($dir_compile) === false){
+            trigger_error('unable to create compile dir', E_USER_ERROR);
+        }
+        if(is_dir($dir_cache) === false){
+            trigger_error('unable to create cache dir', E_USER_ERROR);
+        }
+
         $smarty->setTemplateDir($dir_template);
-        $smarty->setCompileDir($dir_cache . 'Compile' .	Application::DS);
-        $smarty->setCacheDir($dir_cache . 'Cache' .	Application::DS);
+        $smarty->setCompileDir($dir_compile);
+        $smarty->setCacheDir($dir_cache);
         $smarty->setConfigDir('');
         $smarty->addPluginsDir($dir_module_smarty . 'Plugin'. Application::DS);	//priya plugins...
         $smarty->assign('class', str_replace('\\', '-', strtolower($class)));
