@@ -602,14 +602,7 @@ class Handler extends Data{
         elseif(isset($_SERVER['SERVER_NAME'])){
             $domain = $_SERVER['SERVER_NAME'];
         }
-        if(isset($_SERVER['REQUEST_SCHEME'])){
-            $scheme = $_SERVER['REQUEST_SCHEME'];
-        }
-        elseif(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
-            $scheme = 'https';
-        } else {
-            $scheme = 'http';
-        }
+        $scheme = $this->scheme();
         $host = '';
         if(isset($scheme) && isset($domain)){
             $host = $scheme . '://' . $domain . '/';
