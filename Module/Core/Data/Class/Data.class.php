@@ -28,7 +28,6 @@ class Data extends Core {
             parent::__construct($handler, $route);
         }
         $this->data($this->object_merge($this->data(), $data));
-
     }
 
     public function data($attribute=null, $value=null){
@@ -191,7 +190,7 @@ class Data extends Core {
             $data = new \Priya\Module\Autoload\Data();
             $environment = $this->data('environment');
             if(!empty($environment)){
-                //             $data->environment($environment);
+//              $data->environment('development');
             }
             $class = get_called_class();
             if($class::DIR){
@@ -199,6 +198,12 @@ class Data extends Core {
                 $data->addPrefix('none', $dir);
             }
             $data->addPrefix($namespace, $directory);
+            $autoload = $this->data('autoload');
+            if(is_object($autoload)){
+                foreach($autoload as $prefix => $directory){
+                    $data->addPrefix($prefix, $directory);
+                }
+            }
             $autoload = $this->autoload($data);
         }
         $url = $autoload->data_load($url);

@@ -850,12 +850,27 @@ priya.prototype.addScriptText = function (data){
 }
 
 priya.prototype.readTag = function (data){
-    temp = this.explode(' ', this.trim(data));
+    var temp = this.explode(' ', this.trim(data));
     var index;
     var tag = {
         "tagName": temp[0].substr(1)
     };
-    for (index in temp){
+    var temp = this.explode('="', data);
+    var previous;
+    for (index = 0; index < temp.length; index++){
+        if(index >= 1){
+            previous = temp[index-1];
+        }
+        if(!this.empty(previous)){
+            var key = this.explode(' ', previous);
+            key = key.pop();
+            var value = this.explode('"', temp[index]);
+            value.pop();
+            value = this.implode('"', value);
+            tag[key] = value;
+        }
+    }
+    /*
         var key = this.explode('="', temp[index]);
         var value = this.explode('"',key[1]);
         key = key[0];
@@ -866,6 +881,7 @@ priya.prototype.readTag = function (data){
         value = this.implode('"', value);
         tag[key] = value;
     }
+    */
     return tag;
 }
 
