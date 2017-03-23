@@ -142,7 +142,7 @@ class Core {
         return $module;
     }
 
-    public function class($class=''){
+    public function dom_class($class=''){
         $class = strtolower($class);
         $class = str_replace(array('\\', '/'), '-', $class);
         return $class;

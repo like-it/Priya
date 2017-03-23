@@ -172,6 +172,36 @@ class Result extends Parser {
                 $url = array_shift($template_list);
             }
         }
+        $dir_priya = dirname(dirname(Application::DIR)) . Application::DS;
+        $dir_module_smarty =
+            $dir_priya .
+            'Module' .
+            Application::DS .
+            'Smarty' .
+            Application::DS
+        ;
+
+        $dir_cache =
+            $dir_module_smarty  .
+            'Data' .
+            Application::DS
+        ;
+
+        $dir_compile = $dir_cache . 'Compile' .	Application::DS;
+        $dir_cache .=  'Cache' .	Application::DS;
+
+        if(is_dir($dir_compile) === false){
+            mkdir($dir_compile, Dir::CHMOD, true);
+        }
+        if(is_dir($dir_cache) === false){
+            mkdir($dir_cache, Dir::CHMOD, true);
+        }
+        if(is_dir($dir_compile) === false){
+            trigger_error('unable to create compile dir', E_USER_ERROR);
+        }
+        if(is_dir($dir_cache) === false){
+            trigger_error('unable to create cache dir', E_USER_ERROR);
+        }
         $this->url($url);
         $dir = dirname($url);
         chdir($dir);
@@ -182,7 +212,6 @@ class Result extends Parser {
         restore_error_handler();
         restore_exception_handler();
 
-        $dir_priya = dirname(dirname(Application::DIR)) . Application::DS;
         $dir_vendor = dirname($dir_priya) . Application::DS;
 
         $dir_smarty =
@@ -204,41 +233,12 @@ class Result extends Parser {
         if($class::DIR){
             $dir_template = dirname($class::DIR) . Application::DS . 'Template' . Application::DS;
         }
-
-        $dir_module_smarty =
-            $dir_priya .
-            'Module' .
-            Application::DS .
-            'Smarty' .
-            Application::DS;
-
-        $dir_cache =
-            $dir_module_smarty  .
-            'Data' .
-            Application::DS;
-
-        $dir_compile = $dir_cache . 'Compile' .	Application::DS;
-        $dir_cache .=  'Cache' .	Application::DS;
-
-        if(is_dir($dir_compile) === false){
-            mkdir($dir_compile, Dir::CHMOD, true);
-        }
-        if(is_dir($dir_cache) === false){
-            mkdir($dir_cache, Dir::CHMOD, true);
-        }
-        if(is_dir($dir_compile) === false){
-            trigger_error('unable to create compile dir', E_USER_ERROR);
-        }
-        if(is_dir($dir_cache) === false){
-            trigger_error('unable to create cache dir', E_USER_ERROR);
-        }
-
         $smarty->setTemplateDir($dir_template);
         $smarty->setCompileDir($dir_compile);
         $smarty->setCacheDir($dir_cache);
         $smarty->setConfigDir('');
         $smarty->addPluginsDir($dir_module_smarty . 'Plugin'. Application::DS);	//priya plugins...
-        $smarty->assign('class', str_replace('\\', '-', strtolower($class)));
+        $smarty->assign('class', $this->dom_class($class));
         $smarty->assign('template_list', $template_list);
 
         $plugin_dir = $this->data('smarty.dir.plugin');
