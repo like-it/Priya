@@ -48,6 +48,10 @@ class Core {
         if($handler !== null){
             $this->setHandler($handler);
         }
+        $handler = $this->getHandler();
+        if($handler === null){
+            $this->setHandler(new Handler());
+        }
         return $this->getHandler();
     }
 

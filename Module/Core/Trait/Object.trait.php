@@ -56,6 +56,15 @@ trait Object {
 
     public function explode_multi($delimiter=array(), $string='', $limit=array()){
         $result = array();
+        if(!is_array($limit)){
+            $limit = explode(',', $limit);
+            $value = reset($limit);
+            if(count($delimiter) > count($limit)){
+                for($i = count($limit); $i < count($delimiter); $i++){
+                    $limit[$i] = $value;
+                }
+            }
+        }
         foreach($delimiter as $nr => $delim){
             if(isset($limit[$nr])){
                 $tmp = explode($delim, $string, $limit[$nr]);

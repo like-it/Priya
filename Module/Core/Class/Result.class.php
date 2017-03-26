@@ -21,7 +21,7 @@ class Result extends Parser {
 
     private $result;
 
-    public function __construct(\Priya\Module\Handler $handler, $route=null, $data=null){
+    public function __construct($handler=null, $route=null, $data=null){
         parent::__construct($handler, $route, $data);
         $this->data('module', $this->module());
         $this->data('web.root', $this->handler()->web());
@@ -325,6 +325,7 @@ class Result extends Parser {
             $object = new stdClass();
             $object->html = $fetch;
             $variable = $smarty->getTemplateVars();
+
             if(isset($variable['link'])){
                 if(is_string($variable['link'])){
                     $variable['link'] = (array) $variable['link'];

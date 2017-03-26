@@ -18,6 +18,7 @@ function smarty_block_content($params, $content, $template, &$repeat)
     if (is_null($content)) {
         return;
     }
+    $vars = $template->getTemplateVars();
     $assign = null;
     $trim = null;
 
@@ -43,7 +44,7 @@ function smarty_block_content($params, $content, $template, &$repeat)
                 trigger_error("content_block: unknown attribute '$_key'");
         }
     }
-    if($trim=='html'){
+    if($trim == 'html' || $trim == 'svg' || $trim == 'canvas-svg'){
         $content = trim($content, "\r\n\s\t");
         $data = explode('<', $content);
         foreach ($data as $nr => $row){
@@ -60,13 +61,16 @@ function smarty_block_content($params, $content, $template, &$repeat)
         }
         $content = implode('<', $data);
     }
+    if($trim == 'canvas-svg'){
+        $app = new Priya\Application();
+        $result = new Priya\Module\Canvas\Svg($app->handler(), $app->route(), $app->object($vars));
+        $content = $result->run($content);
+    }
     $priya = '<!-- <priya-' . str_replace('_', '-', $assign);
     $class = array();
 
     $search_class = trim('-' . str_replace(array(" ", "\t", "\n", "\r", "\r\n"),'',implode('-', $search)), '-');
     $replace_class = trim('-' . str_replace(array(" ", "\t", "\n", "\r", "\r\n"),'',implode('-', $replace)), '-');
-
-
 
     if(empty($trim)){
         $class[] = 'html-search' . $search_class;
@@ -79,6 +83,11 @@ function smarty_block_content($params, $content, $template, &$repeat)
     $priya .= ' class="' . implode(' ', $class) . '">  //-->' . "\r\n";
     $priya .= $content;
     $priya .= '<!-- </priya-' . str_replace('_', '-', $assign) . '> //-->' . "\r\n";
+
+    if($trim == 'svg' || $trim == 'canvas-svg'){
+        $priya = $content;
+        $priya = str_replace(array("\t","\n", "\r", "\r\n"),'', $priya);
+    }
 
     if($assign){
         $template->assign($assign, $priya);
