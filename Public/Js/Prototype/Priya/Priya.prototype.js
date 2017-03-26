@@ -23,13 +23,6 @@ var priya = function (id){
 };
 
 priya.prototype.run = function (data){
-    var element = this.dom(data);
-    var request = element.data('request');
-    if(!this.empty(request)){
-        return element.request(request);
-    }
-    element.data('mtime', this.microtime(true));
-    return element;
 }
 
 priya.prototype.dom = function(data){
@@ -120,6 +113,7 @@ priya.prototype.select = function(selector){
         } else {
             selector = selector.join(' ');
         }
+
     }
     if(typeof list == 'undefined' || (typeof list != 'undefined' && list.length == 0)){
         if(typeof selector == 'object'){
@@ -133,6 +127,7 @@ priya.prototype.select = function(selector){
             }
         }
     }
+
     if(list.length == 0){
         var priya = this.attach(this.create('element', selector));
         priya.data('selector', selector);
@@ -852,8 +847,10 @@ priya.prototype.addScriptText = function (data){
     }
     temp = this.explode('</' +tag.tagName, temp[1]);
     temp = this.explode('>', temp[0]);
-    temp.shift();
-    var text = this.trim(this.implode('>', temp));
+    if(!this.isset(temp[1])){
+        return;
+    }
+    var text = this.trim(temp[1]);
     delete temp;
     if(this.empty(text)){
         return;
@@ -877,25 +874,21 @@ priya.prototype.addScriptText = function (data){
 }
 
 priya.prototype.readTag = function (data){
-    var temp = this.explode(' ', this.trim(data));
+    temp = this.explode(' ', this.trim(data));
     var index;
     var tag = {
         "tagName": temp[0].substr(1)
     };
-    var temp = this.explode('="', data);
-    var previous;
-    for (index = 0; index < temp.length; index++){
-        if(index >= 1){
-            previous = temp[index-1];
+    for (index in temp){
+        var key = this.explode('="', temp[index]);
+        var value = this.explode('"',key[1]);
+        key = key[0];
+        if(this.empty(value)){
+            continue;
         }
-        if(!this.empty(previous)){
-            var key = this.explode(' ', previous);
-            key = key.pop();
-            var value = this.explode('"', temp[index]);
-            value.pop();
-            value = this.implode('"', value);
-            tag[key] = value;
-        }
+        value.pop();
+        value = this.implode('"', value);
+        tag[key] = value;
     }
     return tag;
 }
@@ -939,7 +932,7 @@ priya.prototype.content = function (data){
             else if(method == 'before' || method == 'beforebegin'){
                 node.insertAdjacentHTML('beforebegin', data['html']);
             } else {
-                console.log('unknown method ('+ method +') in content');
+                this.dump('unknown method ('+ method +') in content');
             }
         }
     } else {
@@ -961,7 +954,7 @@ priya.prototype.content = function (data){
         else if(method == 'before' || method == 'beforebegin'){
             target.insertAdjacentHTML('beforebegin', data['html']);
         } else {
-            console.log('unknown method ('+ method +') in content');
+            this.dump('unknown method ('+ method +') in content');
         }
     }
     return target;
@@ -1203,14 +1196,14 @@ priya.prototype.naturalCompare = function (a, b){
     , codeB = 1
     , posA = 0
     , posB = 0
-    , alphabet = String.alphabet;
+    , alphabet = String.alphabet
 
-    function getCode(str, pos, code){
+    function getCode(str, pos, code) {
         if (code) {
             for (i = pos; code = getCode(str, i), code < 76 && code > 65;) ++i;
-            return +str.slice(pos - 1, i);
+            return +str.slice(pos - 1, i)
         }
-        code = alphabet && alphabet.indexOf(str.charAt(pos));
+        code = alphabet && alphabet.indexOf(str.charAt(pos))
         return code > -1 ? code + 76 : ((code = str.charCodeAt(pos) || 0), code < 45 || code > 127) ? code
             : code < 46 ? 65               // -
             : code < 48 ? code - 1
@@ -1220,20 +1213,20 @@ priya.prototype.naturalCompare = function (a, b){
             : code < 97 ? code - 37
             : code < 123 ? code + 5        // a-z
             : code - 63
-        ;
     }
-    if ((a+="") != (b+="")) for (;codeB;){
-        codeA = getCode(a, posA++);
-        codeB = getCode(b, posB++);
 
-        if (codeA < 76 && codeB < 76 && codeA > 66 && codeB > 66){
-            codeA = getCode(a, posA, posA);
-            codeB = getCode(b, posB, posA = i);
-            posB = i;
+
+    if ((a+="") != (b+="")) for (;codeB;) {
+        codeA = getCode(a, posA++)
+        codeB = getCode(b, posB++)
+
+        if (codeA < 76 && codeB < 76 && codeA > 66 && codeB > 66) {
+            codeA = getCode(a, posA, posA)
+            codeB = getCode(b, posB, posA = i)
+            posB = i
         }
-        if (codeA != codeB){
-            return (codeA < codeB) ? -1 : 1;
-        }
+
+        if (codeA != codeB) return (codeA < codeB) ? -1 : 1
     }
     return 0
 }
@@ -1346,17 +1339,17 @@ priya.prototype.explode = function (delimiter, string, limit){
     if (arguments.length < 2 || typeof delimiter === 'undefined' || typeof string === 'undefined'){
         return null;
     }
-    if (delimiter === '' || delimiter === false || delimiter === null){
-        return false;
-    }
-    if (typeof delimiter === 'function' || typeof delimiter === 'object' || typeof string === 'function' || typeof string ==='object') {
+      if (delimiter === '' || delimiter === false || delimiter === null){
+          return false;
+      }
+      if (typeof delimiter === 'function' || typeof delimiter === 'object' || typeof string === 'function' || typeof string ==='object') {
         return {
-            0: ''
+              0: ''
         };
-    }
-    if (delimiter === true){
-        delimiter = '1';
-    }
+      }
+      if (delimiter === true){
+          delimiter = '1';
+      }
     delimiter += '';
     string += '';
       var s = string.split(delimiter);
@@ -1370,11 +1363,10 @@ priya.prototype.explode = function (delimiter, string, limit){
         if (limit >= s.length){
             return s;
         }
-        return
-            s.slice(0, limit - 1)
-            .concat([s.slice(limit - 1)
-            .join(delimiter)
-        ]);
+        return s.slice(0, limit - 1)
+                  .concat([s.slice(limit - 1)
+                .join(delimiter)
+          ]);
       }
       if (-limit >= s.length){
           return [];
@@ -1434,11 +1426,10 @@ priya.prototype.is_numeric = function (mixed_var){
         " \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000";
     return (
         typeof mixed_var === 'number' ||
-        (typeof mixed_var === 'string' &&
-                whitespace.indexOf(mixed_var.slice(-1)) === -1)
-        ) &&
-        mixed_var !== '' && !isNaN(mixed_var)
-    ;
+            (typeof mixed_var === 'string' &&
+                    whitespace.indexOf(mixed_var.slice(-1)) === -1)
+            ) &&
+        mixed_var !== '' && !isNaN(mixed_var);
 }
 
 priya.prototype.in_array = function (needle, haystack, strict) {
@@ -1606,15 +1597,6 @@ priya.prototype.object_delete = function(attributeList, object, parent, key){
     }
 }
 
-priya.prototype.is_nodeList = function (nodes){
-    var stringRepr = Object.prototype.toString.call(nodes);
-
-    return typeof nodes === 'object' &&
-        /^\[object (HTMLCollection|NodeList|Object)\]$/.test(stringRepr) &&
-        (typeof nodes.length === 'number') &&
-        (nodes.length === 0 || (typeof nodes[0] === "object" && nodes[0].nodeType > 0));
-}
-
 priya.prototype.is_array = function (mixedVar) {
     var _getFuncName = function (fn) {
         var name = (/\W*function\s+([\w$]+)\s*\(/).exec(fn)
@@ -1646,159 +1628,168 @@ priya.prototype.is_array = function (mixedVar) {
     return false;
 }
 
+priya.prototype.is_nodeList = function (nodes){
+    var stringRepr = Object.prototype.toString.call(nodes);
+
+    return typeof nodes === 'object' &&
+        /^\[object (HTMLCollection|NodeList|Object)\]$/.test(stringRepr) &&
+        (typeof nodes.length === 'number') &&
+        (nodes.length === 0 || (typeof nodes[0] === "object" && nodes[0].nodeType > 0));
+}
+
 priya.prototype.dump = function () {
-      var output = ''
-      var padChar = ' '
-      var padVal = 4
-      var lgth = 0
-      var i = 0
-      var _getFuncName = function (fn) {
-        var name = (/\W*function\s+([\w$]+)\s*\(/)
-          .exec(fn)
-        if (!name) {
-          return '(Anonymous)'
-        }
-        return name[1]
+    var output = ''
+    var padChar = ' '
+    var padVal = 4
+    var lgth = 0
+    var i = 0
+    var _getFuncName = function (fn) {
+      var name = (/\W*function\s+([\w$]+)\s*\(/)
+        .exec(fn)
+      if (!name) {
+        return '(Anonymous)'
       }
-      var _repeatChar = function (len, padChar) {
-        var str = ''
-        for (var i = 0; i < len; i++) {
-          str += padChar
-        }
-        return str
-      }
-      var _getInnerVal = function (val, thickPad) {
-        var ret = ''
-        if (val === null) {
-          ret = 'NULL'
-        } else if (typeof val === 'boolean') {
-          ret = 'bool(' + val + ')'
-        } else if (typeof val === 'string') {
-          ret = 'string(' + val.length + ') "' + val + '"'
-        } else if (typeof val === 'number') {
-          if (parseFloat(val) === parseInt(val, 10)) {
-            ret = 'int(' + val + ')'
-          } else {
-            ret = 'float(' + val + ')'
-          }
-        } else if (typeof val === 'undefined') {
-          // The remaining are not PHP behavior because these values
-          // only exist in this exact form in JavaScript
-          ret = 'undefined'
-        } else if (typeof val === 'function') {
-          var funcLines = val.toString()
-            .split('\n')
-          ret = ''
-          for (var i = 0, fll = funcLines.length; i < fll; i++) {
-            ret += (i !== 0 ? '\n' + thickPad : '') + funcLines[i]
-          }
-        } else if (val instanceof Date) {
-          ret = 'Date(' + val + ')'
-        } else if (val instanceof RegExp) {
-          ret = 'RegExp(' + val + ')'
-        } else if (val.nodeName) {
-          // Different than PHP's DOMElement
-          switch (val.nodeType) {
-            case 1:
-              if (typeof val.namespaceURI === 'undefined' ||
-                val.namespaceURI === 'http://www.w3.org/1999/xhtml') {
-              // Undefined namespace could be plain XML, but namespaceURI not widely supported
-                ret = 'HTMLElement("' + val.nodeName + '")'
-              } else {
-                ret = 'XML Element("' + val.nodeName + '")'
-              }
-              break
-            case 2:
-              ret = 'ATTRIBUTE_NODE(' + val.nodeName + ')'
-              break
-            case 3:
-              ret = 'TEXT_NODE(' + val.nodeValue + ')'
-              break
-            case 4:
-              ret = 'CDATA_SECTION_NODE(' + val.nodeValue + ')'
-              break
-            case 5:
-              ret = 'ENTITY_REFERENCE_NODE'
-              break
-            case 6:
-              ret = 'ENTITY_NODE'
-              break
-            case 7:
-              ret = 'PROCESSING_INSTRUCTION_NODE(' + val.nodeName + ':' + val.nodeValue + ')'
-              break
-            case 8:
-              ret = 'COMMENT_NODE(' + val.nodeValue + ')'
-              break
-            case 9:
-              ret = 'DOCUMENT_NODE'
-              break
-            case 10:
-              ret = 'DOCUMENT_TYPE_NODE'
-              break
-            case 11:
-              ret = 'DOCUMENT_FRAGMENT_NODE'
-              break
-            case 12:
-              ret = 'NOTATION_NODE'
-              break
-          }
-        }
-        return ret
-      }
-      var _formatArray = function (obj, curDepth, padVal, padChar) {
-        if (curDepth > 0) {
-          curDepth++
-        }
-        var basePad = _repeatChar(padVal * (curDepth - 1), padChar)
-        var thickPad = _repeatChar(padVal * (curDepth + 1), padChar)
-        var str = ''
-        var val = ''
-        if (typeof obj === 'object' && obj !== null) {
-          if (obj.constructor && _getFuncName(obj.constructor) === 'LOCUTUS_Resource') {
-            return obj.var_dump()
-          }
-          lgth = 0
-          for (var someProp in obj) {
-            if (obj.hasOwnProperty(someProp)) {
-              lgth++
-            }
-          }
-          str += 'array(' + lgth + ') {\n'
-          for (var key in obj) {
-            var objVal = obj[key]
-            if (typeof objVal === 'object' &&
-              objVal !== null &&
-              !(objVal instanceof Date) &&
-              !(objVal instanceof RegExp) &&
-              !objVal.nodeName) {
-              str += thickPad
-              str += '['
-              str += key
-              str += '] =>\n'
-              str += thickPad
-              str += _formatArray(objVal, curDepth + 1, padVal, padChar)
-            } else {
-              val = _getInnerVal(objVal, thickPad)
-              str += thickPad
-              str += '['
-              str += key
-              str += '] =>\n'
-              str += thickPad
-              str += val
-              str += '\n'
-            }
-          }
-          str += basePad + '}\n'
-        } else {
-          str = _getInnerVal(obj, thickPad)
-        }
-        return str
-      }
-      output = _formatArray(arguments[0], 0, padVal, padChar)
-      for (i = 1; i < arguments.length; i++) {
-        output += '\n' + _formatArray(arguments[i], 0, padVal, padChar)
-      }
-      alert(output)
-      // Not how PHP does it, but helps us test:
-      return output
+      return name[1]
     }
+    var _repeatChar = function (len, padChar) {
+      var str = ''
+      for (var i = 0; i < len; i++) {
+        str += padChar
+      }
+      return str
+    }
+    var _getInnerVal = function (val, thickPad) {
+      var ret = ''
+      if (val === null) {
+        ret = 'NULL'
+      } else if (typeof val === 'boolean') {
+        ret = 'bool(' + val + ')'
+      } else if (typeof val === 'string') {
+        ret = 'string(' + val.length + ') "' + val + '"'
+      } else if (typeof val === 'number') {
+        if (parseFloat(val) === parseInt(val, 10)) {
+          ret = 'int(' + val + ')'
+        } else {
+          ret = 'float(' + val + ')'
+        }
+      } else if (typeof val === 'undefined') {
+        // The remaining are not PHP behavior because these values
+        // only exist in this exact form in JavaScript
+        ret = 'undefined'
+      } else if (typeof val === 'function') {
+        var funcLines = val.toString()
+          .split('\n')
+        ret = ''
+        for (var i = 0, fll = funcLines.length; i < fll; i++) {
+          ret += (i !== 0 ? '\n' + thickPad : '') + funcLines[i]
+        }
+      } else if (val instanceof Date) {
+        ret = 'Date(' + val + ')'
+      } else if (val instanceof RegExp) {
+        ret = 'RegExp(' + val + ')'
+      } else if (val.nodeName) {
+        // Different than PHP's DOMElement
+        switch (val.nodeType) {
+          case 1:
+            if (typeof val.namespaceURI === 'undefined' ||
+              val.namespaceURI === 'http://www.w3.org/1999/xhtml') {
+            // Undefined namespace could be plain XML, but namespaceURI not widely supported
+              ret = 'HTMLElement("' + val.nodeName + '")'
+            } else {
+              ret = 'XML Element("' + val.nodeName + '")'
+            }
+            break
+          case 2:
+            ret = 'ATTRIBUTE_NODE(' + val.nodeName + ')'
+            break
+          case 3:
+            ret = 'TEXT_NODE(' + val.nodeValue + ')'
+            break
+          case 4:
+            ret = 'CDATA_SECTION_NODE(' + val.nodeValue + ')'
+            break
+          case 5:
+            ret = 'ENTITY_REFERENCE_NODE'
+            break
+          case 6:
+            ret = 'ENTITY_NODE'
+            break
+          case 7:
+            ret = 'PROCESSING_INSTRUCTION_NODE(' + val.nodeName + ':' + val.nodeValue + ')'
+            break
+          case 8:
+            ret = 'COMMENT_NODE(' + val.nodeValue + ')'
+            break
+          case 9:
+            ret = 'DOCUMENT_NODE'
+            break
+          case 10:
+            ret = 'DOCUMENT_TYPE_NODE'
+            break
+          case 11:
+            ret = 'DOCUMENT_FRAGMENT_NODE'
+            break
+          case 12:
+            ret = 'NOTATION_NODE'
+            break
+        }
+      }
+      return ret
+    }
+    var _formatArray = function (obj, curDepth, padVal, padChar) {
+      if (curDepth > 0) {
+        curDepth++
+      }
+      var basePad = _repeatChar(padVal * (curDepth - 1), padChar)
+      var thickPad = _repeatChar(padVal * (curDepth + 1), padChar)
+      var str = ''
+      var val = ''
+      if (typeof obj === 'object' && obj !== null) {
+        if (obj.constructor && _getFuncName(obj.constructor) === 'LOCUTUS_Resource') {
+          return obj.var_dump()
+        }
+        lgth = 0
+        for (var someProp in obj) {
+          if (obj.hasOwnProperty(someProp)) {
+            lgth++
+          }
+        }
+        str += 'array(' + lgth + ') {\n'
+        for (var key in obj) {
+          var objVal = obj[key]
+          if (typeof objVal === 'object' &&
+            objVal !== null &&
+            !(objVal instanceof Date) &&
+            !(objVal instanceof RegExp) &&
+            !objVal.nodeName) {
+            str += thickPad
+            str += '['
+            str += key
+            str += '] =>\n'
+            str += thickPad
+            str += _formatArray(objVal, curDepth + 1, padVal, padChar)
+          } else {
+            val = _getInnerVal(objVal, thickPad)
+            str += thickPad
+            str += '['
+            str += key
+            str += '] =>\n'
+            str += thickPad
+            str += val
+            str += '\n'
+          }
+        }
+        str += basePad + '}\n'
+      } else {
+        str = _getInnerVal(obj, thickPad)
+      }
+      return str
+    }
+    output = _formatArray(arguments[0], 0, padVal, padChar)
+    for (i = 1; i < arguments.length; i++) {
+      output += '\n' + _formatArray(arguments[i], 0, padVal, padChar)
+    }
+    alert(output)
+    // Not how PHP does it, but helps us test:
+    return output
+  }
