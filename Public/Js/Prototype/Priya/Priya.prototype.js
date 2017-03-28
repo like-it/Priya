@@ -23,6 +23,13 @@ var priya = function (id){
 };
 
 priya.prototype.run = function (data){
+    var element = this.dom(data);
+    var request = element.data('request');
+    if(!this.empty(request)){
+        return element.request(request);
+    }
+    element.data('mtime', this.microtime(true));
+    return element;
 }
 
 priya.prototype.dom = function(data){
@@ -847,10 +854,8 @@ priya.prototype.addScriptText = function (data){
     }
     temp = this.explode('</' +tag.tagName, temp[1]);
     temp = this.explode('>', temp[0]);
-    if(!this.isset(temp[1])){
-        return;
-    }
-    var text = this.trim(temp[1]);
+    temp.shift();
+    var text = this.trim(this.implode('>', temp));
     delete temp;
     if(this.empty(text)){
         return;
@@ -1426,10 +1431,12 @@ priya.prototype.is_numeric = function (mixed_var){
         " \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000";
     return (
         typeof mixed_var === 'number' ||
-            (typeof mixed_var === 'string' &&
-                    whitespace.indexOf(mixed_var.slice(-1)) === -1)
-            ) &&
-        mixed_var !== '' && !isNaN(mixed_var);
+        (
+            typeof mixed_var === 'string' &&
+            whitespace.indexOf(mixed_var.slice(-1)) === -1)
+        ) &&
+        mixed_var !== '' && !isNaN(mixed_var)
+    ;
 }
 
 priya.prototype.in_array = function (needle, haystack, strict) {
