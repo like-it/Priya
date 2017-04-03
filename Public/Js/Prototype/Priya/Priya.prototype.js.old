@@ -773,24 +773,34 @@ priya.prototype.script = function (data){
     }
 }
 
-priya.prototype.exception = function (data){
-    var index;
-    var found = false;
-    for (index in data){
-        if(this.stristr(index,'\\exception')){
-            found = true;
+priya.prototype.exception = function (data, exception){
+    if(data == 'write'){
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"append",
+            "html":"<pre>"+ this.dump(exception) +"</pre>"
         }
+        exception.content(content);
+    } else {
+        var index;
+        var found = false;
+        for (index in data){
+            if(this.stristr(index,'\\exception')){
+                found = true;
+            }
+        }
+        if(this.empty(found)){
+            return;
+        }
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"append",
+            "html":"<pre>"+ JSON.stringify(data, null, 4) +"</pre>"
+        }
+        exception.content(content);
     }
-    if(this.empty(found)){
-        return;
-    }
-    var exception = this.dom('.exception');
-    var content = {
-        "target": ".exception",
-        "method":"append",
-        "html":"<pre>"+ JSON.stringify(data, null, 4) +"</pre>"
-    }
-    exception.content(content);
 }
 
 priya.prototype.addScriptSrc = function (data){
@@ -802,7 +812,7 @@ priya.prototype.addScriptSrc = function (data){
         return;
     }
     var element = document.createElement(tag.tagName);
-    var index;
+    var index;/e
     for(index in tag){
         if(index == 'tagName'){
             continue;

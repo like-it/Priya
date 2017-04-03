@@ -804,24 +804,44 @@ priya.prototype.script = function (data){
     return this;
 }
 
-priya.prototype.exception = function (data){
-    var index;
-    var found = false;
-    for (index in data){
-        if(this.stristr(index,'\\exception')){
-            found = true;
+priya.prototype.exception = function (data, except){
+    if(data == 'write' || data == 'replace'){
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"replace",
+            "html":"<pre>"+ except +"</pre>"
         }
+        exception.content(content);
     }
-    if(this.empty(found)){
-        return;
+    else if(data == 'append'){
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"append",
+            "html":"<pre>"+ except +"</pre>"
+        }
+        exception.content(content);
     }
-    var exception = this.dom('.exception');
-    var content = {
-        "target": ".exception",
-        "method":"append",
-        "html":"<pre>"+ JSON.stringify(data, null, 4) +"</pre>"
+    else {
+        var index;
+        var found = false;
+        for (index in data){
+            if(this.stristr(index,'\\exception')){
+                found = true;
+            }
+        }
+        if(this.empty(found)){
+            return;
+        }
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"append",
+            "html":"<pre>"+ JSON.stringify(data, null, 4) +"</pre>"
+        }
+        exception.content(content);
     }
-    exception.content(content);
 }
 
 priya.prototype.addScriptSrc = function (data){
@@ -937,7 +957,7 @@ priya.prototype.content = function (data){
             else if(method == 'before' || method == 'beforebegin'){
                 node.insertAdjacentHTML('beforebegin', data['html']);
             } else {
-                this.dump('unknown method ('+ method +') in content');
+                this.exception('write', this.dump('unknown method ('+ method +') in content'));
             }
         }
     } else {
@@ -959,7 +979,7 @@ priya.prototype.content = function (data){
         else if(method == 'before' || method == 'beforebegin'){
             target.insertAdjacentHTML('beforebegin', data['html']);
         } else {
-            this.dump('unknown method ('+ method +') in content');
+            this.exception('write', this.dump('unknown method ('+ method +') in content'));
         }
     }
     return target;
@@ -1426,6 +1446,15 @@ priya.prototype.implode = function (glue, pieces){
     return pieces;
 }
 
+priya.prototype.rand = function (min, max) {
+    var argc = arguments.length;
+    if (argc === 0) {
+        min = 0;
+        max = 2147483647;
+    }
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 priya.prototype.is_numeric = function (mixed_var){
     var whitespace =
         " \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000";
@@ -1796,7 +1825,6 @@ priya.prototype.dump = function () {
     for (i = 1; i < arguments.length; i++) {
       output += '\n' + _formatArray(arguments[i], 0, padVal, padChar)
     }
-    alert(output)
     // Not how PHP does it, but helps us test:
     return output
   }
