@@ -24,6 +24,9 @@ var priya = function (id){
 
 priya.prototype.run = function (data){
     var element = this.dom(data);
+    if(element.tagName == 'PRIYA-NODE'){
+        return;
+    }
     var request = element.data('request');
     if(!this.empty(request)){
         return element.request(request);

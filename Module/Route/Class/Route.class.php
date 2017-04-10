@@ -136,6 +136,25 @@ class Route extends Parser{
         }
         if(!empty($attributeList)){
             $itemList = array();
+            $counter = 0;
+            $count = count($attributeList);
+            foreach($attributeList as $attribute_nr => $attribute){
+                if(isset($valueList[$attribute_nr])){
+                    if($counter == $count -1){
+                        $value = implode('/', $valueList);
+                    } else {
+                        $value = $valueList[$attribute_nr];
+                    }
+                    $record = $this->parseAttributeList($attribute, $value);
+                    unset($valueList[$attribute_nr]);
+                    foreach($record as $record_nr => $item){
+                        $itemList[] = $item;
+                    }
+                }
+                $counter++;
+
+            }
+            /*
             foreach($attributeList as $attribute_nr => $attribute){
                 if(isset($valueList[$attribute_nr])){
                     $record = $this->parseAttributeList($attribute, $valueList[$attribute_nr]);
@@ -144,6 +163,7 @@ class Route extends Parser{
                     }
                 }
             }
+            */
             foreach($itemList as $request){
                 if(isset($request->name) && isset($request->value)){
                     $this->request($request->name, $request->value);
