@@ -1166,7 +1166,7 @@ priya.prototype.setCollection = function (attribute, value){
 }
 
 priya.prototype.deleteCollection = function(attribute){
-    return this.object_delete(attribute, this.collection);
+    return this.object_delete(attribute, this.collect);
 }
 
 priya.prototype.empty = function (mixed_var){
