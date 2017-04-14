@@ -58,6 +58,6 @@ class Parser extends Data {
     }
 
     public function read($url=''){
-        $data = $this->parser('object')->read($url);
+        return $this->parser('object')->read($url);
     }
 }
