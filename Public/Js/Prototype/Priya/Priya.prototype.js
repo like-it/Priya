@@ -1520,6 +1520,9 @@ priya.prototype.object_horizontal = function (verticalArray, value, result){
 
 priya.prototype.object_merge = function (main, merge){
     var key;
+    if (typeof main == 'undefined'){
+        main = {};
+    }
     for (key in merge){
         var value = merge[key];
         if(!this.isset(main[key])){

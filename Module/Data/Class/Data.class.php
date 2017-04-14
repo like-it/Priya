@@ -6,12 +6,9 @@
  * @changeLog
  * 	-	all
  */
-namespace Priya\Module\Core;
+namespace Priya\Module;
 
-use Priya\Module\Core;
 use Priya\Application;
-use Priya\Module\File;
-use Priya\Module\Handler;
 use stdClass;
 
 class Data extends Core {
@@ -20,16 +17,74 @@ class Data extends Core {
     private $url;
     private $data;
 
-    private $object_data;
-
     public function __construct($handler=null, $route=null, $data=null){
-        if(stristr(get_class($handler), 'autoload') !== false){
-            $this->autoload($handler);
-            parent::__construct(null, $route);
-        } else {
-            parent::__construct($handler, $route);
+        $this->data($this->object_merge($this->data(), $handler));
+    }
+
+    public function data($attribute=null, $value=null){
+        if($attribute !== null){
+            if($value !== null){
+                if($attribute=='delete'){
+                    return $this->deleteData($value);
+                } else {
+                    $this->object_delete($attribute, $this->data()); //for sorting an object
+                    $this->object_set($attribute, $value, $this->data());
+                    return $this->object_get($attribute, $this->data());
+                }
+            } else {
+                if(is_string($attribute)){
+                    return $this->object_get($attribute, $this->data());
+                } else {
+                    $this->setData($attribute);
+                    return $this->getData();
+                }
+            }
         }
-        $this->data($this->object_merge($this->data(), $data));
+        return $this->getData();
+    }
+
+    private function setData($attribute='', $value=null){
+        if(is_array($attribute) || is_object($attribute)){
+            if(is_object($this->data)){
+                foreach($attribute as $key => $value){
+                    $this->data->{$key} = $value;
+                }
+            }
+            elseif(is_array($this->data)){
+                foreach($attribute as $key => $value){
+                    $this->data[$key] = $value;
+                }
+            } else {
+                $this->data = $attribute;
+            }
+        } else {
+            if(is_object($this->data)){
+                $this->data->{$attribute} = $value;
+            }
+            elseif(is_array($this->data)) {
+                $this->data[$attribute] = $value;
+            } else {
+                var_dump('setData create object and set object');
+            }
+        }
+    }
+
+    private function getData($attribute=null){
+        if($attribute === null){
+            if(is_null($this->data)){
+                $this->data = new stdClass();
+            }
+            return $this->data;
+        }
+        if(isset($this->data[$attribute])){
+            return $this->data[$attribute];
+        } else {
+            return false;
+        }
+    }
+
+    private function deleteData($attribute=null){
+        return $this->object_delete($attribute, $this->data());
     }
 
     public function object_data($object_data=null){
@@ -51,39 +106,159 @@ class Data extends Core {
         return $this->object_data;
     }
 
-    public function data($attribute=null, $value=null){
-        if($attribute == 'object'){
-            return $this->object_data();
-        } else {
-            return $this->object_data()->data($attribute, $value);
+    public function url($url=null, $attribute=null){
+        if($url !== null){
+            if($attribute !== null){
+                switch($url){
+                    case 'encode':
+                        return $this->encodeUrl($attribute);
+                    break;
+                    case 'decode':
+                        return $this->decodeUrl($attribute);
+                    break;
+                    default:
+                        trigger_error('unknown attribute (' . $url . ') in url');
+                }
+            } else {
+                $this->setUrl($url);
+            }
         }
+
+        return $this->getUrl();
     }
 
-    public function url($url=null, $attribute=null){
-        return $this->object_data()->url($url, $attribute);
+    private function setUrl($url=''){
+        $this->url = $url;
+    }
+
+    private function getUrl(){
+        return $this->url;
+    }
+
+    private function encodeUrl($url=''){
+        $temp = explode('/', $url);
+        foreach($temp as $nr => $part){
+            if($part == 'http:'){
+                continue;
+            }
+            $temp[$nr] = rawurlencode($part);
+        }
+        $url = implode('/', $temp);
+        return $url;
+    }
+
+    private function decodeUrl($url=''){
+        $temp = explode('/', $url);
+        foreach($temp as $nr => $part){
+            if($part == 'http:'){
+                continue;
+            }
+            $temp[$nr] = rawurldecode($part);
+        }
+        $url = implode('/', $temp);
+        return $url;
     }
 
     public function read($url=''){
-        return $this->object_data()->read($url);
+        $namespace = '';
+        if(empty($url)){
+            $url = get_called_class();
+        }
+        if(file_exists($url)){
+            $file = new File();
+            $read = $file->read($this->url($url));
+            $read = $this->object($read);
+            $data = $this->data();
+            if(empty($data)){
+                $data = new stdClass();
+            }
+            if(!empty($read)){
+                if(is_array($read) || is_object($read)){
+                    foreach($read as $attribute => $value){
+                        $this->object_set($attribute, $value, $data);
+                    }
+                }
+            }
+            return $this->data($data);
+        } else {
+            $module = $url;
+        }
+        $autoload = $this->autoload();
+        if(empty($autoload)){
+            $tmp = explode('\\', trim(str_replace(Application::DS, '\\',$url),'\\'));
+            $class = array_pop($tmp);
+            $namespace = implode('\\', $tmp);
+            $directory = explode(Application::DS, Application::DIR);
+            array_pop($directory);
+            array_pop($directory);
+            $priya = array_pop($directory);
+            $directory = implode(Application::DS, $directory) . Application::DS;
+            if(empty($namespace)){
+                $namespace = $priya . '\\' . Application::MODULE;
+            }
+            $directory .= str_replace('\\', Application::DS, $namespace) . Application::DS;
+            $data = new \Priya\Module\Autoload\Data();
+            $environment = $this->data('environment');
+            if(!empty($environment)){
+//              $data->environment('development');
+            }
+            $class = get_called_class();
+            if($class::DIR){
+                $dir = dirname($class::DIR) . Application::DS;// . 'Data' . Application::DS;
+                $data->addPrefix('none', $dir);
+            }
+            $data->addPrefix($namespace, $directory);
+            $autoload = $this->data('autoload');
+            if(is_object($autoload)){
+                foreach($autoload as $prefix => $directory){
+                    $data->addPrefix($prefix, $directory);
+                }
+            }
+            $autoload = $this->autoload($data);
+        }
+        $url = $autoload->data_load($url);
+        if($url !== false){
+            $this->url($url);
+        }
+        $file = new File();
+        $read = $file->read($url);
+        $read = $this->object($read);
+        $data = $this->data();
+        if(empty($data)){
+            $data = new stdClass();
+        }
+        if(!empty($module)){
+            $this->object_set('module', $module, $data);
+            $class = str_replace('\\', '-', strtolower($module));
+            $this->object_set('class', $class, $data);
+            $namespace = explode('\\', $module);
+            array_pop($namespace);
+            $namespace = implode(Application::DS, $namespace) . Application::DS;
+            $this->object_set('namespace', $namespace, $data);
+        }
+        if(!empty($read)){
+            foreach($read as $attribute => $value){
+                $this->object_set($attribute, $value, $data);
+            }
+        } else {
+            return false;
+        }
+        return $this->data($data);
     }
 
     public function write($url=''){
-        return $this->object_data()->write($url);
+        if(!empty($url)){
+            $this->url($url);
+        }
+        $url = $this->url();
+        if(empty($url)){
+            return false;
+        }
+        $file = new File();
+        $write = $file->write($url, $this->object($this->data(), 'json'));
+        return $write;
     }
 
-    public function node($attribute='', $node='', $merge=false){
-        return $this->object_data()->node($attribute, $node, $merge);
-    }
-
-    public function jid($list=''){
-        return $this->object_data()->jid($list);
-    }
-
-    public function copy($copy=null){
-        return $this->object_data()->copy($copy);
-    }
-
-    /*
     public function search($list, $find, $attribute=null, $case=false, $not=false){
         $useData = true;
         $output = 'array';
@@ -419,8 +594,7 @@ class Data extends Core {
         }
         return $list;
     }
-    */
-    /*
+
     public function node($attribute='', $node='', $merge=false){
         $url = $this->url();
         if(empty($url)){
@@ -507,5 +681,4 @@ class Data extends Core {
         }
         return parent::session($attribute, $value);
     }
-    */
 }
