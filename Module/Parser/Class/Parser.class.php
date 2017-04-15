@@ -14,9 +14,6 @@ use stdClass;
 class Parser extends Data {
     const DIR = __DIR__;
 
-    private $url;
-    private $data;
-
     public function __construct($handler=null, $route=null, $data=null){
         $this->data($this->object_merge($this->data(), $handler));
     }

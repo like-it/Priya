@@ -17,8 +17,8 @@ use stdClass;
 class Data extends Core {
     const DIR = __DIR__;
 
-    private $url;
-    private $data;
+//     private $url;
+//     private $data;
 
     private $object_data;
 
@@ -59,10 +59,6 @@ class Data extends Core {
         }
     }
 
-    public function url($url=null, $attribute=null){
-        return $this->data('object')->url($url, $attribute);
-    }
-
     public function read($url=''){
         return $this->data('object')->read($url);
     }
@@ -71,15 +67,21 @@ class Data extends Core {
         return $this->data('object')->write($url);
     }
 
+    public function copy($copy=null){
+        return $this->data('object')->copy($copy);
+    }
+
+    public function url($url=null, $attribute=null){
+        return $this->data('object')->url($url, $attribute);
+    }
+
     public function node($attribute='', $node='', $merge=false){
+        trigger_error('Deprecated: node use $this->data(\'object\')->node()', E_USER_NOTICE);
         return $this->data('object')->node($attribute, $node, $merge);
     }
 
     public function jid($list=''){
+        trigger_error('Deprecated: jid use $this->data(\'object\')->jid()', E_USER_NOTICE);
         return $this->data('object')->jid($list);
-    }
-
-    public function copy($copy=null){
-        return $this->data('object')->copy($copy);
     }
 }

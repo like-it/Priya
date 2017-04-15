@@ -152,8 +152,8 @@ class Application extends Parser {
         $allowed_contentType = $this->data('contentType');
         if(isset($allowed_contentType->{$ext})){
             $contentType = $allowed_contentType->{$ext};
-            header('Content-Type: ' . $contentType);
             if(file_exists($url) && strstr(strtolower($url), strtolower($this->data('public_html'))) !== false){
+                header('Content-Type: ' . $contentType);
                 if($ext == 'css'){
                     $read = str_replace('/', Application::DS, $request);
                     $read = str_replace(Application::DS . $this->data('public_html') . Application::DS . 'Css' . Application::DS , Application::DS, $read);
@@ -162,7 +162,7 @@ class Application extends Parser {
                     $data->read($read);
                     $parser = new Parser();
                     $file = new File();
-                    return $parser->compile($file->read($url), $data->data());
+                    return $parser->data('object')->compile($file->read($url), $data->data());
                 } else {
                     $file = new File();
                     return $file->read($url);

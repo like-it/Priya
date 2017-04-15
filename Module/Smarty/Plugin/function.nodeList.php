@@ -74,7 +74,7 @@ function build($class='', $item='', $nodeList=array(), $name='', Smarty_Internal
             $data = str_replace('=}"', '="{$', $data);
 
             $parser = new Priya\Module\Core\Parser();
-            $data = $parser->compile($data, $node);
+            $data = $parser->data('object')->compile($data, $node);
 
             if(isset($node[$name])){
                 if(empty($class)){

@@ -17,6 +17,7 @@ class Indent extends \Priya\Module\Core\NodeList {
     }
 
     public function css(){
+        header('Content-Type: ' . $this->data('contentType.css'));
         $this->read(__CLASS__);
         return $this->result('template');
     }

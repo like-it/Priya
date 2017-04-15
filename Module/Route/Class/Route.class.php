@@ -37,7 +37,7 @@ class Route extends Parser{
         }
         foreach($data as $name => $route){
             if(isset($route->resource) && !isset($route->read)){
-                $route->resource = $this->compile($route->resource, $this->data());
+                $route->resource = $this->parser('object')->compile($route->resource, $this->data());
                 if(file_exists($route->resource)){
                     $object = new Data();
                     $this->data($object->read($route->resource));
@@ -50,11 +50,15 @@ class Route extends Parser{
         }
         $path = explode('/', trim($path, '/'));
 
+//         var_dump($data);
         foreach($data as $name => $route){
             if(!isset($route->path)){
                 continue;
             }
+//             var_dump($route);
+//             var_dump($path);
             $node = $this->parsePath($path, $route);
+//             var_dump($node);
             if(empty($node)){
                 continue;
             }
@@ -93,7 +97,7 @@ class Route extends Parser{
         if(is_array($data) || is_object($data)){
             foreach($data as $name => $route){
                 if(isset($route->resource) && !isset($route->read)){
-                    $route->resource = $this->compile($route->resource, $this->data());
+                    $route->resource = $this->parser('object')->compile($route->resource, $this->data());
                     if(file_exists($route->resource)){
                         $object = new Data();
                         $this->data($object->read($route->resource));
@@ -121,7 +125,7 @@ class Route extends Parser{
                 $found = false;
                 break;
             }
-            if($part != $path[$part_nr]){
+            if($part != strtolower($path[$part_nr])){
                 $found = false;
                 break;
             }
