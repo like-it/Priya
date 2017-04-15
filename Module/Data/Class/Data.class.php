@@ -87,25 +87,6 @@ class Data extends Core {
         return $this->object_delete($attribute, $this->data());
     }
 
-    public function object_data($object_data=null){
-        if($object_data!== null){
-            $this->set_object_data($object_data);
-        }
-        $object_data = $this->get_object_data();
-        if($object_data === null){
-            $this->set_object_data(new \Priya\Module\Data());
-        }
-        return $this->get_object_data();
-    }
-
-    private function set_object_data($object_data=''){
-        $this->object_data= $object_data;
-    }
-
-    private function get_object_data(){
-        return $this->object_data;
-    }
-
     public function url($url=null, $attribute=null){
         if($url !== null){
             if($attribute !== null){
@@ -666,19 +647,4 @@ class Data extends Core {
         return unserialize(serialize($copy));
     }
 
-    public function request($attribute=null, $value=null){
-        $handler = $this->handler();
-        if(empty($handler)){
-            $this->handler(new Handler($this->data()));
-        }
-        return parent::request($attribute, $value);
-    }
-
-    public function session($attribute=null, $value=null){
-        $handler = $this->handler();
-        if(empty($handler)){
-            $this->handler(new Handler($this->data()));
-        }
-        return parent::session($attribute, $value);
-    }
 }

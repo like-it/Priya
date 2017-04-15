@@ -53,12 +53,6 @@ class Parser extends Data {
         }
     }
 
-    public function compile($string='', $data, $keep=false){
-        var_dump(debug_backtrace());
-        trigger_error('Deprecated: compile use $this->parser(\'object\')->compile()', E_USER_NOTICE);
-        return $this->parser('object')->compile($string, $data, $keep);
-    }
-
     public function read($url=''){
         return $this->parser('object')->read($url);
     }
