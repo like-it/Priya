@@ -17,9 +17,6 @@ use stdClass;
 class Data extends Core {
     const DIR = __DIR__;
 
-//     private $url;
-//     private $data;
-
     private $object_data;
 
     public function __construct($handler=null, $route=null, $data=null){
@@ -73,15 +70,5 @@ class Data extends Core {
 
     public function url($url=null, $attribute=null){
         return $this->data('object')->url($url, $attribute);
-    }
-
-    public function node($attribute='', $node='', $merge=false){
-        trigger_error('Deprecated: node use $this->data(\'object\')->node()', E_USER_NOTICE);
-        return $this->data('object')->node($attribute, $node, $merge);
-    }
-
-    public function jid($list=''){
-        trigger_error('Deprecated: jid use $this->data(\'object\')->jid()', E_USER_NOTICE);
-        return $this->data('object')->jid($list);
     }
 }
