@@ -3,10 +3,9 @@
 namespace Priya\Module;
 
 use Priya\Application;
-use Priya\Module\Core\Data;
 use stdClass;
 
-class Handler extends Data{
+class Handler extends \Priya\Module\Core\Data{
     const CONTENT_TYPE_CSS = 'text/css';
     const CONTENT_TYPE_HTML = 'text/html';
     const CONTENT_TYPE_JSON = 'application/json';

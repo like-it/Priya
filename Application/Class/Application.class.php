@@ -128,6 +128,7 @@ class Application extends Parser {
         $this->route()->create('Application.Restore');
         $this->route()->create('Application.Pull');
         $this->route()->create('Application.Push');
+        $this->route()->create('Application.Cache.Clear');
 //         $this->route()->create('Application.Install');
 //         $this->route()->create('Application.Update');
 //         $this->route()->create('Application.Config');

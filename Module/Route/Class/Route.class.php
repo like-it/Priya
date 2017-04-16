@@ -3,11 +3,9 @@
 namespace Priya\Module;
 
 use Priya\Application;
-use Priya\Module\Core\Parser;
-use Priya\Module\Core\Data;
 use stdClass;
 
-class Route extends Parser{
+class Route extends \Priya\Module\Core\Parser{
     const DIR = __DIR__;
     private $item;
 
