@@ -181,7 +181,7 @@ class Data extends Core {
             $data = new \Priya\Module\Autoload\Data();
             $environment = $this->data('environment');
             if(!empty($environment)){
-//              $data->environment('development');
+//                 $data->environment('development');
             }
             $class = get_called_class();
             if($class::DIR){
