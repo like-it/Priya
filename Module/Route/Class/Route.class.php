@@ -3,11 +3,9 @@
 namespace Priya\Module;
 
 use Priya\Application;
-use Priya\Module\Core\Parser;
-use Priya\Module\Core\Data;
 use stdClass;
 
-class Route extends Parser{
+class Route extends \Priya\Module\Core\Parser{
     const DIR = __DIR__;
     private $item;
 
@@ -37,7 +35,7 @@ class Route extends Parser{
         }
         foreach($data as $name => $route){
             if(isset($route->resource) && !isset($route->read)){
-                $route->resource = $this->compile($route->resource, $this->data());
+                $route->resource = $this->parser('object')->compile($route->resource, $this->data());
                 if(file_exists($route->resource)){
                     $object = new Data();
                     $this->data($object->read($route->resource));
@@ -48,13 +46,17 @@ class Route extends Parser{
                 }
             }
         }
-        $path = explode('/', trim(strtolower($path), '/'));
+        $path = explode('/', trim($path, '/'));
 
+//         var_dump($data);
         foreach($data as $name => $route){
             if(!isset($route->path)){
                 continue;
             }
+//             var_dump($route);
+//             var_dump($path);
             $node = $this->parsePath($path, $route);
+//             var_dump($node);
             if(empty($node)){
                 continue;
             }
@@ -93,7 +95,7 @@ class Route extends Parser{
         if(is_array($data) || is_object($data)){
             foreach($data as $name => $route){
                 if(isset($route->resource) && !isset($route->read)){
-                    $route->resource = $this->compile($route->resource, $this->data());
+                    $route->resource = $this->parser('object')->compile($route->resource, $this->data());
                     if(file_exists($route->resource)){
                         $object = new Data();
                         $this->data($object->read($route->resource));
@@ -121,7 +123,7 @@ class Route extends Parser{
                 $found = false;
                 break;
             }
-            if($part != $path[$part_nr]){
+            if($part != strtolower($path[$part_nr])){
                 $found = false;
                 break;
             }
@@ -136,6 +138,25 @@ class Route extends Parser{
         }
         if(!empty($attributeList)){
             $itemList = array();
+            $counter = 0;
+            $count = count($attributeList);
+            foreach($attributeList as $attribute_nr => $attribute){
+                if(isset($valueList[$attribute_nr])){
+                    if($counter == $count -1){
+                        $value = implode('/', $valueList);
+                    } else {
+                        $value = $valueList[$attribute_nr];
+                    }
+                    $record = $this->parseAttributeList($attribute, $value);
+                    unset($valueList[$attribute_nr]);
+                    foreach($record as $record_nr => $item){
+                        $itemList[] = $item;
+                    }
+                }
+                $counter++;
+
+            }
+            /*
             foreach($attributeList as $attribute_nr => $attribute){
                 if(isset($valueList[$attribute_nr])){
                     $record = $this->parseAttributeList($attribute, $valueList[$attribute_nr]);
@@ -144,6 +165,7 @@ class Route extends Parser{
                     }
                 }
             }
+            */
             foreach($itemList as $request){
                 if(isset($request->name) && isset($request->value)){
                     $this->request($request->name, $request->value);

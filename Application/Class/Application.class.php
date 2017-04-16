@@ -128,6 +128,7 @@ class Application extends Parser {
         $this->route()->create('Application.Restore');
         $this->route()->create('Application.Pull');
         $this->route()->create('Application.Push');
+        $this->route()->create('Application.Cache.Clear');
 //         $this->route()->create('Application.Install');
 //         $this->route()->create('Application.Update');
 //         $this->route()->create('Application.Config');
@@ -139,16 +140,21 @@ class Application extends Parser {
             header('Last-Modified: '. $this->request('lastModified'));
         }
         $request = $this->request('request');
-
-        $tmp = explode('.', $request);
+        $url = $this->handler()->url();
+        $tmp = explode('?', $url, 2);
+        $url = reset($tmp);
+        $tmp = explode('.', $url);
         $ext = strtolower(end($tmp));
-        $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $request);
-
+        if(!empty($this->data('prefix'))){
+            $tmp = explode($this->data('prefix'), $url, 2);
+            $url = implode('', $tmp);
+        }
+        $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
         $allowed_contentType = $this->data('contentType');
         if(isset($allowed_contentType->{$ext})){
             $contentType = $allowed_contentType->{$ext};
-            header('Content-Type: ' . $contentType);
             if(file_exists($url) && strstr(strtolower($url), strtolower($this->data('public_html'))) !== false){
+                header('Content-Type: ' . $contentType);
                 if($ext == 'css'){
                     $read = str_replace('/', Application::DS, $request);
                     $read = str_replace(Application::DS . $this->data('public_html') . Application::DS . 'Css' . Application::DS , Application::DS, $read);
@@ -157,7 +163,7 @@ class Application extends Parser {
                     $data->read($read);
                     $parser = new Parser();
                     $file = new File();
-                    return $parser->compile($file->read($url), $data->data());
+                    return $parser->data('object')->compile($file->read($url), $data->data());
                 } else {
                     $file = new File();
                     return $file->read($url);

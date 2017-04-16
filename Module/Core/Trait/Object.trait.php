@@ -20,7 +20,7 @@ trait Object {
                     return json_decode($input);
                 }
             }
-            elseif($output=='json' || $output=='json_data'){
+            elseif(stristr($output, 'json') !== false){
                 if(substr($input,0,1)=='{' && substr($input,-1,1)=='}' && stristr($input,':')){
                     $input = json_decode($input);
                 }
@@ -31,7 +31,7 @@ trait Object {
                 }
             }
         }
-        if($output=='json_data'){
+        if(stristr($output, 'json') !== false && stristr($output, 'data') !== false){
             $data =str_replace('"', '&quot;',json_encode($input));
         } else {
             $data = json_encode($input, JSON_PRETTY_PRINT);
@@ -40,7 +40,7 @@ trait Object {
         if($output=='object'){
             return json_decode($data);
         }
-        elseif($output=='json' || $output=='json_data'){
+        elseif(stristr($output, 'json') !== false){
             if($type=='child'){
                 return substr($data,1,-1);
             } else {
@@ -56,6 +56,15 @@ trait Object {
 
     public function explode_multi($delimiter=array(), $string='', $limit=array()){
         $result = array();
+        if(!is_array($limit)){
+            $limit = explode(',', $limit);
+            $value = reset($limit);
+            if(count($delimiter) > count($limit)){
+                for($i = count($limit); $i < count($delimiter); $i++){
+                    $limit[$i] = $value;
+                }
+            }
+        }
         foreach($delimiter as $nr => $delim){
             if(isset($limit[$nr])){
                 $tmp = explode($delim, $string, $limit[$nr]);

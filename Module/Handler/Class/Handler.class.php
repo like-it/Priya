@@ -3,10 +3,9 @@
 namespace Priya\Module;
 
 use Priya\Application;
-use Priya\Module\Core\Data;
 use stdClass;
 
-class Handler extends Data{
+class Handler extends \Priya\Module\Core\Data{
     const CONTENT_TYPE_CSS = 'text/css';
     const CONTENT_TYPE_HTML = 'text/html';
     const CONTENT_TYPE_JSON = 'application/json';
@@ -46,8 +45,10 @@ class Handler extends Data{
                 elseif($attribute=='request'){
                     $value = $this->removeHost($value);
                     $this->object_set($attribute, $value, $this->request());
+                    return $value;
                 } else {
                     $this->object_set($attribute, $value, $this->request());
+                    return $value;
                 }
             } else {
                 if(is_string($attribute)){
@@ -368,16 +369,7 @@ class Handler extends Data{
     }
 
     public function web(){
-        if(!empty($_SERVER['REQUEST_SCHEME'])){
-            $scheme = $_SERVER['REQUEST_SCHEME'];
-        } else {
-            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
-                $scheme = 'https';
-            } else {
-                $scheme = 'http';
-            }
-
-        }
+        $scheme = $this->scheme();
         if(empty($_SERVER['HTTP_HOST'])){
             return false;
         }
@@ -389,12 +381,25 @@ class Handler extends Data{
         ;
     }
 
-    public function url($url=null){
-        $url = parent::url($url);
-        if($url === null){
-            if(empty($_SERVER['REQUEST_SCHEME'])){
-                return false;
+    public function scheme(){
+        $scheme = 'http';
+        if(!empty($_SERVER['REQUEST_SCHEME'])){
+            $scheme = $_SERVER['REQUEST_SCHEME'];
+        } else {
+            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
+                $scheme = 'https';
             }
+        }
+        return $scheme;
+    }
+
+    public function url($url=null, $attribute=null){
+        $scheme = $this->scheme();
+        if(empty($scheme)){
+            return false;
+        }
+        $url = parent::url($url, $attribute);
+        if($url === null){
             if(empty($_SERVER['HTTP_HOST'])){
                 return false;
             }
@@ -402,13 +407,13 @@ class Handler extends Data{
                 return false;
             }
             $url =
-            $_SERVER['REQUEST_SCHEME'] .
+            $scheme .
             '://' .
             $_SERVER['HTTP_HOST'] .
             $_SERVER['REQUEST_URI']
             ;
         }
-        return parent::url($url);
+        return parent::url($url, $attribute);
     }
 
     public function csrf(){
@@ -590,18 +595,18 @@ class Handler extends Data{
     }
 
     public function host(){
-        if(isset($_SERVER['REQUEST_SCHEME']) && isset($_SERVER['SERVER_NAME'])){
-            $host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/';
-            return $host;
+        if(isset($_SERVER['HTTP_HOST'])){
+            $domain = $_SERVER['HTTP_HOST'];
         }
-        if(isset($_SERVER['SERVER_NAME'])){
-            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
-                $host = 'https://' . $_SERVER['SERVER_NAME'];
-            } else {
-                $host = 'http://' . $_SERVER['SERVER_NAME'];
-            }
-            return $host;
+        elseif(isset($_SERVER['SERVER_NAME'])){
+            $domain = $_SERVER['SERVER_NAME'];
         }
+        $scheme = $this->scheme();
+        $host = '';
+        if(isset($scheme) && isset($domain)){
+            $host = $scheme . '://' . $domain . '/';
+        }
+        return $host;
     }
 
     public function removeHost($value=''){

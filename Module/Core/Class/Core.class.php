@@ -48,6 +48,10 @@ class Core {
         if($handler !== null){
             $this->setHandler($handler);
         }
+        $handler = $this->getHandler();
+        if($handler === null){
+            $this->setHandler(new Handler());
+        }
         return $this->getHandler();
     }
 
@@ -140,6 +144,12 @@ class Core {
         $module = implode('', $module);
         $module = str_replace('\\', Application::DS, $module);
         return $module;
+    }
+
+    public function dom_class($class=''){
+        $class = strtolower($class);
+        $class = str_replace(array('\\', '/'), '-', $class);
+        return $class;
     }
 
     public function refresh($url=''){

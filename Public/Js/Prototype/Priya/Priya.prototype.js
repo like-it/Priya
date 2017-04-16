@@ -18,13 +18,21 @@
  */
 
 var priya = function (id){
-    this.collection = {};
+    this.collect = {};
     this.parent = this;
 };
 
 priya.prototype.run = function (data){
-    //.dom
-    //.request
+    var element = this.dom(data);
+    if(element.tagName == 'PRIYA-NODE'){
+        return;
+    }
+    var request = element.data('request');
+    if(!this.empty(request)){
+        return element.request(request);
+    }
+    element.data('mtime', this.microtime(true));
+    return element;
 }
 
 priya.prototype.dom = function(data){
@@ -188,15 +196,17 @@ priya.prototype.calculate = function (calculate){
             return result;
         break;
         case 'width':
+            var className = this.className;
             this.addClass('display-block overflow-auto');
             result =  this.offsetWidth;
-            this.removeClass('display-block overflow-auto');
+            this.className = className;
             return result;
         break;
         case 'height':
+            var className = this.className;
             this.addClass('display-block overflow-auto');
             result =  this.offsetHeight;
-            this.removeClass('display-block overflow-auto');
+            this.className = className;
             return result;
         break;
     }
@@ -272,8 +282,6 @@ priya.prototype.previous = function (node){
         if(found !== true && !empty(found)){
             return this.select(found);
         }
-    } else {
-        console.log('node.next() isnt available yet');
     }
 }
 
@@ -296,10 +304,7 @@ priya.prototype.next = function (node){
         if(found !== true && !empty(found)){
             return this.select(found);
         }
-    } else {
-        console.log('node.next() isnt available yet');
     }
-
 }
 
 priya.prototype.children = function (index){
@@ -411,11 +416,9 @@ priya.prototype.removeClass = function(className){
         for(index=0; index < this.length; index++){
             if(typeof this[index].className != 'undefined' && typeof this[index].Priya != 'undefined'){
                 this[index].removeClass(className);
-            } else {
-                console.log('error in this');
-                console.log(this);
             }
         }
+        return this;
     }
     var list = className.split(' ');
     var index;
@@ -433,6 +436,15 @@ priya.prototype.removeClass = function(className){
 
 priya.prototype.toggleClass = function(className){
     var className = this.str_replace('&&', ' ', className);
+    if(typeof this.className == 'undefined'){
+        var index;
+        for(index=0; index < this.length; index++){
+            if(typeof this[index].className != 'undefined' && typeof this[index].Priya != 'undefined'){
+                this[index].toggleClass(className);
+            }
+        }
+        return this;
+    }
     var list = className.split(' ');
     var index;
     for(index = 0; index < list.length; index++){
@@ -451,15 +463,45 @@ priya.prototype.toggleClass = function(className){
 
 priya.prototype.hasClass = function (className){
     var className = this.str_replace('&&', ' ', className);
-    //classname classname = &&
-    //classname && classname = &&
-    //classname || classname = ||
-    //add later () sets
-    console.log('dom.hasClass: ' + className);
+    if(typeof this.className == 'undefined'){
+        var index;
+        var collection = new Array();
+        for(index=0; index < this.length; index++){
+            if(typeof this[index].className != 'undefined' && typeof this[index].Priya != 'undefined'){
+                collection.push(this[index].hasClass(className));
+            }
+        }
+        for(index=0; index < collection.length; index++){
+            if(collection[index] === false){
+                return false;
+            }
+        }
+        return true;
+    }
+    var list = className.split(' ');
+    var index;
+    for(index = 0; index < list.length; index++){
+        var name = this.trim(list[index]);
+        if(this.empty(name)){
+            continue;
+        }
+        if(this.stristr(this.className, name) !== false){
+            return true;
+        }
+    }
+    return false;
 }
 
 priya.prototype.css = function(attribute, value){
-    //write and read to .style.property
+    if(this.empty(value)){
+        if(typeof this.style == 'undefined'){
+            return '';
+        }
+        if(this.empty(this.style[attribute])){
+            return '';
+        }
+        return this.style[attribute];
+    }
     if(this.is_nodeList(this)){
         var index;
         for(index=0; index < this.length; index++){
@@ -469,15 +511,17 @@ priya.prototype.css = function(attribute, value){
     } else {
         this.style[attribute] = value;
     }
-    console.log('priya.css: ' + attribute + ' -> ' + value);
 }
 
 priya.prototype.val = function (value){
-    if(this.isset('value')){
+    if(!this.empty(value)){
         this.value = value
         return this.value;
     } else {
-        return false;
+        if(typeof this.value == 'undefined'){
+            return false;
+        }
+        return this.value;
     }
 }
 
@@ -599,9 +643,7 @@ priya.prototype.data = function (attribute, value){
             }
             return value;
         }
-    }
-
-    else {
+    } else {
         if(typeof attribute == 'undefined' || attribute == 'ignore' || attribute == 'select'){
             var select = value;
             var attr;
@@ -660,10 +702,10 @@ priya.prototype.remove = function (){
         var node = this.parentNode;
         if(node != null){
             return node.removeChild(this);
+        } else {
+            return false;
         }
-
     }
-
 }
 
 priya.prototype.request = function (url, data, script){
@@ -671,13 +713,11 @@ priya.prototype.request = function (url, data, script){
         data = url;
         url = '';
     }
-    //add script here to execute script
     if(this.empty(url)){
         url = this.data('request');
     }
     if(this.empty(url)){
         return;
-        //error cannot request
     }
     if(this.empty(data)){
         data = this.data();
@@ -713,7 +753,6 @@ priya.prototype.request = function (url, data, script){
     } else {
         xhttp.open("POST", url, true);
         xhttp.setRequestHeader("Content-Type", "application/json");
-        console.log(data);
         var send = JSON.stringify(data);
         xhttp.send(send);
     }
@@ -750,6 +789,7 @@ priya.prototype.link = function (data){
         };
         this.content(link);
     }
+    return this;
 }
 
 priya.prototype.script = function (data){
@@ -764,27 +804,47 @@ priya.prototype.script = function (data){
         this.addScriptSrc(data.script[index]);
         this.addScriptText(data.script[index]);
     }
+    return this;
 }
 
-priya.prototype.exception = function (data){
-    var index;
-    var found = false;
-    for (index in data){
-        if(this.stristr(index,'\\exception')){
-            found = true;
+priya.prototype.exception = function (data, except){
+    if(data == 'write' || data == 'replace'){
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"replace",
+            "html":"<pre>"+ except +"</pre>"
         }
+        exception.content(content);
     }
-    if(this.empty(found)){
-        return;
+    else if(data == 'append'){
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"append",
+            "html":"<pre>"+ except +"</pre>"
+        }
+        exception.content(content);
     }
-    var exception = this.dom('.exception');
-    var content = {
-        "target": ".exception",
-        "method":"append",
-        "html":"<pre>"+ JSON.stringify(data, null, 4) +"</pre>"
+    else {
+        var index;
+        var found = false;
+        for (index in data){
+            if(this.stristr(index,'\\exception')){
+                found = true;
+            }
+        }
+        if(this.empty(found)){
+            return;
+        }
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"append",
+            "html":"<pre>"+ JSON.stringify(data, null, 4) +"</pre>"
+        }
+        exception.content(content);
     }
-    exception.content(content);
-    console.log(exception);
 }
 
 priya.prototype.addScriptSrc = function (data){
@@ -817,10 +877,8 @@ priya.prototype.addScriptText = function (data){
     }
     temp = this.explode('</' +tag.tagName, temp[1]);
     temp = this.explode('>', temp[0]);
-    if(!this.isset(temp[1])){
-        return;
-    }
-    var text = this.trim(temp[1]);
+    temp.shift();
+    var text = this.trim(this.implode('>', temp));
     delete temp;
     if(this.empty(text)){
         return;
@@ -863,11 +921,6 @@ priya.prototype.readTag = function (data){
     return tag;
 }
 
-/**
- * @todo
- * - wrap
- * - unwrap
- */
 priya.prototype.content = function (data){
     if(typeof data == 'undefined'){
         console.log('json.content failed (data)');
@@ -896,7 +949,6 @@ priya.prototype.content = function (data){
                 node.html(data['html'], 'outer');
             }
             else if(method == 'append' || method == 'beforeend'){
-                console.log(node);
                 node.insertAdjacentHTML('beforeend',data['html']);
             }
             else if(method == 'prepend' || method == 'afterbegin'){
@@ -908,7 +960,7 @@ priya.prototype.content = function (data){
             else if(method == 'before' || method == 'beforebegin'){
                 node.insertAdjacentHTML('beforebegin', data['html']);
             } else {
-                console.log('unknown method ('+ method +') in content');
+                this.exception('write', this.dump('unknown method ('+ method +') in content'));
             }
         }
     } else {
@@ -930,18 +982,11 @@ priya.prototype.content = function (data){
         else if(method == 'before' || method == 'beforebegin'){
             target.insertAdjacentHTML('beforebegin', data['html']);
         } else {
-            console.log('unknown method ('+ method +') in content');
+            this.exception('write', this.dump('unknown method ('+ method +') in content'));
         }
     }
+    return target;
 }
-
-priya.prototype.append = function (node, html){
-    console.log('hree');
-    console.log(this);
-    console.log(node);
-//	this.insertAdjacentHTML('beforeend', html);
-}
-
 
 priya.prototype.attribute = function (attribute, value){
     if(attribute == 'remove'){
@@ -973,15 +1018,6 @@ priya.prototype.attribute = function (attribute, value){
         if (typeof this.setAttribute == 'function'){
             this.setAttribute(attribute, value);
         }
-        /*
-        var attr = document.createAttribute(attribute);
-        attr.value = value;                           // Set the value of the class attribute
-        if(typeof this.setAttributeNode == 'function'){
-            this.setAttributeNode(attr);
-        } else {
-//			console.log('attribute: ' + attribute + ' not set to value: ' + value + ' this is probably a list');
-        }
-        */
         return value;
     }
 }
@@ -1007,10 +1043,8 @@ priya.prototype.on = function (event, action){
 }
 
 priya.prototype.off = function (event, action){
-    console.log('priya.off event:' + event);
     this.removeEventListener(event, action)
 }
-
 
 priya.prototype.trigger = function (trigger){
     var event = new Event(trigger, {
@@ -1020,16 +1054,7 @@ priya.prototype.trigger = function (trigger){
     event.initEvent(trigger, true, true);
     event.synthetic = true;
     this.dispatchEvent(event, true);
-    console.log('dom.trigger: ' + event);
 }
-
-/*
-dom.prototype.bind = function (node) {
-      var obj = Object.create(this.prototype);
-      this.apply(node);
-      return obj;
-    };
-*/
 
 priya.prototype.attach = function (element){
     if(element === null){
@@ -1040,18 +1065,6 @@ priya.prototype.attach = function (element){
     }
     if(typeof element['Priya'] == 'object'){
         return element;
-        //make a nice error
-        //make instance run log
-        var message = 'Priya in:' + element.tagName;
-        if(typeof element.id !== 'undefined'){
-            message += ' id: ' + element.id;
-        }
-        if(typeof element.className != 'undefined'){
-            message += ' class: ' + element.className;
-        }
-        console.log(message);
-        console.log(element.Priya);
-        return element;
     }
     var dom;
     if(this.isDom === true){
@@ -1059,13 +1072,10 @@ priya.prototype.attach = function (element){
     }
     else if(typeof this['Priya'] == 'undefined'){
         dom = this;
-//		console.log(dom);
     }
     else if(typeof this['Priya']['dom'] == 'object'){
         dom = this['Priya']['dom'];
     } else {
-        console.log('unexpected dom in attach');
-        console.log(this);
         dom = this;
     }
     for(property in dom){
@@ -1080,10 +1090,10 @@ priya.prototype.attach = function (element){
     element['parent'] = dom['parentNode'].bind(element);
     element['Priya'] = {
             "version": '0.0.1',
-            "mTime": this.microtime(true),
+            "mtime": this.microtime(true),
             "dom" : dom
     };
-    element.data('mTime', element['Priya']['mTime']);
+    element.data('mtime', element['Priya']['mtime']);
     return element;
 }
 
@@ -1095,14 +1105,79 @@ priya.prototype.init = function (data, configuration){
         var element = this.select(data);
         return element;
     }
-    console.log('dom init');
-    console.log(data);
     return data;
+}
+
+priya.prototype.collection = function (attribute, value){
+    if(typeof attribute != 'undefined'){
+        if(typeof value != 'undefined'){
+            if(attribute == 'delete'){
+                return this.deleteCollection(value);
+            } else {
+                this.object_delete(attribute, this.collection());
+                this.object_set(attribute, value, this.collection());
+                return this.object_get(attribute, this.collection());
+            }
+        } else {
+            if(typeof attribute == 'string'){
+                return this.object_get(attribute, this.collection());
+            } else {
+                this.setCollection(attribute);
+                return this.getCollection();
+            }
+        }
+    }
+    return this.getCollection();
+}
+
+priya.prototype.getCollection = function (attribute){
+    if(typeof attribute == 'undefined'){
+        if(typeof this.collect == 'undefined'){
+            this.collect = {};
+        }
+        return this.collect;
+    }
+    if(this.isset(this.collect[attribute])){
+        return this.collect[attribute];
+    } else {
+        return false;
+    }
+}
+
+priya.prototype.setCollection = function (attribute, value){
+    if(typeof attribute == 'object'){
+        if(typeof this.collect == 'object'){
+            var key;
+            for (key in attribute){
+                this.collect[key] = attribute[key];
+            }
+        } else {
+            this.collect = attribute;
+        }
+    } else {
+        if(typeof this.collect == 'object'){
+            this.collect[attribute] = value;
+        } else {
+            this.collect = {};
+            this.collect[attribute] = value;
+        }
+    }
+    this.collect = collection;
+}
+
+priya.prototype.deleteCollection = function(attribute){
+    return this.object_delete(attribute, this.collect);
 }
 
 priya.prototype.empty = function (mixed_var){
     var key;
-     if (mixed_var === "" || mixed_var === 0 || mixed_var === "0" || mixed_var === null || mixed_var === false || typeof mixed_var === 'undefined') {
+     if (
+        mixed_var === "" ||
+        mixed_var === 0 ||
+        mixed_var === "0" ||
+        mixed_var === null ||
+        mixed_var === false ||
+        typeof mixed_var === 'undefined') {
         return true;
     }
     if (typeof mixed_var == 'object') {
@@ -1328,6 +1403,31 @@ priya.prototype.explode = function (delimiter, string, limit){
       return s;
 }
 
+priya.prototype.explode_multi = function(delimiter, string, limit){
+    var result = new Array();
+    var index;
+    for(index =0; index < delimiter.length; index++){
+        var delim = delimiter[index];
+        if(typeof limit != 'undefined' && this.isset(limit[index])){
+            var tmp = this.explode(delim. string. limit[index]);
+        } else {
+            var tmp = this.explode(delim, string);
+        }
+        if(tmp.length == 1){
+            continue;
+        }
+        var i;
+        for(i = 0; i < tmp.length; i++){
+            var value = tmp[i];
+            result.push(value);
+        }
+    }
+    if(this.empty(result)){
+        result.push(string);
+    }
+    return result;
+}
+
 priya.prototype.implode = function (glue, pieces){
     var i = '',
         retVal = '',
@@ -1349,15 +1449,26 @@ priya.prototype.implode = function (glue, pieces){
     return pieces;
 }
 
+priya.prototype.rand = function (min, max) {
+    var argc = arguments.length;
+    if (argc === 0) {
+        min = 0;
+        max = 2147483647;
+    }
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 priya.prototype.is_numeric = function (mixed_var){
     var whitespace =
         " \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000";
     return (
         typeof mixed_var === 'number' ||
-            (typeof mixed_var === 'string' &&
-                    whitespace.indexOf(mixed_var.slice(-1)) === -1)
-            ) &&
-        mixed_var !== '' && !isNaN(mixed_var);
+        (
+            typeof mixed_var === 'string' &&
+            whitespace.indexOf(mixed_var.slice(-1)) === -1)
+        ) &&
+        mixed_var !== '' && !isNaN(mixed_var)
+    ;
 }
 
 priya.prototype.in_array = function (needle, haystack, strict) {
@@ -1381,7 +1492,7 @@ priya.prototype.in_array = function (needle, haystack, strict) {
 
 priya.prototype.object_horizontal = function (verticalArray, value, result){
     if(this.empty(result)){
-        var result = 'object';
+        result = 'object';
     }
     if(this.empty(verticalArray)){
         return false;
@@ -1409,6 +1520,9 @@ priya.prototype.object_horizontal = function (verticalArray, value, result){
 
 priya.prototype.object_merge = function (main, merge){
     var key;
+    if (typeof main == 'undefined'){
+        main = {};
+    }
     for (key in merge){
         var value = merge[key];
         if(!this.isset(main[key])){
@@ -1420,9 +1534,140 @@ priya.prototype.object_merge = function (main, merge){
                 main[key] = value;
             }
         }
-
     }
     return main;
+}
+
+priya.prototype.object_get = function(attributeList, object){
+    if(this.empty(object)){
+        return object;
+    }
+    if(typeof attributeList == 'string'){
+        attributeList = this.explode_multi(['.', ':', '->'], attributeList);
+        var key;
+        for(key in attributeList){
+            if(this.empty(attributeList[key])){
+                delete attributeList[key];
+            }
+        }
+    }
+    if(this.is_array(attributeList)){
+        attributeList = this.object_horizontal(attributeList);
+    }
+    if(this.empty(attributeList)){
+        return object;
+    }
+    var key;
+    for (key in attributeList){
+        if(this.empty(key)){
+            continue;
+        }
+        var attribute = attributeList[key];
+        if(this.isset(object[key])){
+            return this.object_get(attributeList[key], object[key]);
+        }
+    }
+    return null;
+}
+
+priya.prototype.object_set = function(attributeList, value, object, result){
+    if(typeof result == 'undefined'){
+        result = 'child';
+    }
+    if(typeof result == 'string' && result != 'child'){
+        if(result == 'root'){
+            result = object;
+        } else {
+            result = this.object_get(result, object);
+        }
+    }
+    if(typeof attributeList == 'string'){
+        attributeList = this.explode_multi(['.', ':', '->'], attributeList);
+    }
+    if(this.is_array(attributeList)){
+        attributeList = this.object_horizontal(attributeList);
+    }
+    if(!this.empty(attributeList)){
+        var index;
+        for(index in attributeList){
+            var attribute = attributeList[index];
+            if(this.isset(object[index]) && typeof object[index] == 'object'){
+                if(this.empty(attribute) && typeof value == 'object'){
+                    var key;
+                    for(key in value){
+                        var value_value = value[key];
+                        object[index][key] = value_value;
+                    }
+                    return object[index];
+                }
+                return this.object_set(attribute, value, object[index], result);
+            }
+            else if(typeof attribute == 'object'){
+                object[index] = new Object();
+                return this.object_set(attribute, value, object[index], result);
+            } else {
+                object[index] = value;
+            }
+        }
+    }
+    if(result == 'child'){
+        return value;
+    }
+    return result;
+}
+
+priya.prototype.object_delete = function(attributeList, object, parent, key){
+    if(typeof attributeList == 'string'){
+        attributeList = this.explode_multi(['.', ':', '->'], attributeList);
+    }
+    if(this.is_array(attributeList)){
+        attributeList = this.object_horizontal(attributeList);
+    }
+    if(!this.empty(attributeList)){
+        var index;
+        for(index in attributeList){
+            var attribute = attributeList[index];
+            if(this.isset(object[index])){
+                return this.object_delete(attribute, object[index], object, index);
+            } else {
+                return false;
+            }
+        }
+    } else {
+        delete parent[key];
+        return true;
+    }
+}
+
+priya.prototype.is_array = function (mixedVar) {
+    var _getFuncName = function (fn) {
+        var name = (/\W*function\s+([\w$]+)\s*\(/).exec(fn)
+        if (!name) {
+          return '(Anonymous)';
+        }
+        return name[1];
+    }
+    var _isArray = function (mixedVar) {
+        if (!mixedVar || typeof mixedVar !== 'object' || typeof mixedVar.length !== 'number') {
+            return false;
+        }
+        var len = mixedVar.length;
+        mixedVar[mixedVar.length] = 'bogus';
+        if (len !== mixedVar.length) {
+            mixedVar.length -= 1;
+            return true;
+        }
+        delete mixedVar[mixedVar.length];
+        return false;
+    }
+    if (!mixedVar || typeof mixedVar !== 'object') {
+        return false;
+    }
+    var isArray = _isArray(mixedVar);
+    if (isArray) {
+        return true;
+    }
+    return false;
 }
 
 priya.prototype.is_nodeList = function (nodes){
@@ -1433,3 +1678,159 @@ priya.prototype.is_nodeList = function (nodes){
         (typeof nodes.length === 'number') &&
         (nodes.length === 0 || (typeof nodes[0] === "object" && nodes[0].nodeType > 0));
 }
+
+priya.prototype.dump = function () {
+    var output = ''
+    var padChar = ' '
+    var padVal = 4
+    var lgth = 0
+    var i = 0
+    var _getFuncName = function (fn) {
+      var name = (/\W*function\s+([\w$]+)\s*\(/)
+        .exec(fn)
+      if (!name) {
+        return '(Anonymous)'
+      }
+      return name[1]
+    }
+    var _repeatChar = function (len, padChar) {
+      var str = ''
+      for (var i = 0; i < len; i++) {
+        str += padChar
+      }
+      return str
+    }
+    var _getInnerVal = function (val, thickPad) {
+      var ret = ''
+      if (val === null) {
+        ret = 'NULL'
+      } else if (typeof val === 'boolean') {
+        ret = 'bool(' + val + ')'
+      } else if (typeof val === 'string') {
+        ret = 'string(' + val.length + ') "' + val + '"'
+      } else if (typeof val === 'number') {
+        if (parseFloat(val) === parseInt(val, 10)) {
+          ret = 'int(' + val + ')'
+        } else {
+          ret = 'float(' + val + ')'
+        }
+      } else if (typeof val === 'undefined') {
+        // The remaining are not PHP behavior because these values
+        // only exist in this exact form in JavaScript
+        ret = 'undefined'
+      } else if (typeof val === 'function') {
+        var funcLines = val.toString()
+          .split('\n')
+        ret = ''
+        for (var i = 0, fll = funcLines.length; i < fll; i++) {
+          ret += (i !== 0 ? '\n' + thickPad : '') + funcLines[i]
+        }
+      } else if (val instanceof Date) {
+        ret = 'Date(' + val + ')'
+      } else if (val instanceof RegExp) {
+        ret = 'RegExp(' + val + ')'
+      } else if (val.nodeName) {
+        // Different than PHP's DOMElement
+        switch (val.nodeType) {
+          case 1:
+            if (typeof val.namespaceURI === 'undefined' ||
+              val.namespaceURI === 'http://www.w3.org/1999/xhtml') {
+            // Undefined namespace could be plain XML, but namespaceURI not widely supported
+              ret = 'HTMLElement("' + val.nodeName + '")'
+            } else {
+              ret = 'XML Element("' + val.nodeName + '")'
+            }
+            break
+          case 2:
+            ret = 'ATTRIBUTE_NODE(' + val.nodeName + ')'
+            break
+          case 3:
+            ret = 'TEXT_NODE(' + val.nodeValue + ')'
+            break
+          case 4:
+            ret = 'CDATA_SECTION_NODE(' + val.nodeValue + ')'
+            break
+          case 5:
+            ret = 'ENTITY_REFERENCE_NODE'
+            break
+          case 6:
+            ret = 'ENTITY_NODE'
+            break
+          case 7:
+            ret = 'PROCESSING_INSTRUCTION_NODE(' + val.nodeName + ':' + val.nodeValue + ')'
+            break
+          case 8:
+            ret = 'COMMENT_NODE(' + val.nodeValue + ')'
+            break
+          case 9:
+            ret = 'DOCUMENT_NODE'
+            break
+          case 10:
+            ret = 'DOCUMENT_TYPE_NODE'
+            break
+          case 11:
+            ret = 'DOCUMENT_FRAGMENT_NODE'
+            break
+          case 12:
+            ret = 'NOTATION_NODE'
+            break
+        }
+      }
+      return ret
+    }
+    var _formatArray = function (obj, curDepth, padVal, padChar) {
+      if (curDepth > 0) {
+        curDepth++
+      }
+      var basePad = _repeatChar(padVal * (curDepth - 1), padChar)
+      var thickPad = _repeatChar(padVal * (curDepth + 1), padChar)
+      var str = ''
+      var val = ''
+      if (typeof obj === 'object' && obj !== null) {
+        if (obj.constructor && _getFuncName(obj.constructor) === 'LOCUTUS_Resource') {
+          return obj.var_dump()
+        }
+        lgth = 0
+        for (var someProp in obj) {
+          if (obj.hasOwnProperty(someProp)) {
+            lgth++
+          }
+        }
+        str += 'array(' + lgth + ') {\n'
+        for (var key in obj) {
+          var objVal = obj[key]
+          if (typeof objVal === 'object' &&
+            objVal !== null &&
+            !(objVal instanceof Date) &&
+            !(objVal instanceof RegExp) &&
+            !objVal.nodeName) {
+            str += thickPad
+            str += '['
+            str += key
+            str += '] =>\n'
+            str += thickPad
+            str += _formatArray(objVal, curDepth + 1, padVal, padChar)
+          } else {
+            val = _getInnerVal(objVal, thickPad)
+            str += thickPad
+            str += '['
+            str += key
+            str += '] =>\n'
+            str += thickPad
+            str += val
+            str += '\n'
+          }
+        }
+        str += basePad + '}\n'
+      } else {
+        str = _getInnerVal(obj, thickPad)
+      }
+      return str
+    }
+    output = _formatArray(arguments[0], 0, padVal, padChar)
+    for (i = 1; i < arguments.length; i++) {
+      output += '\n' + _formatArray(arguments[i], 0, padVal, padChar)
+    }
+    // Not how PHP does it, but helps us test:
+    return output
+  }

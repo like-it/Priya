@@ -57,7 +57,15 @@ function build($class='', $nodeList=array(), $request=array(), Smarty_Internal_T
                 if(!empty($node['method']) && !empty($node['target'])){
                     $tag_a = '<a href="#" data-request="' . $node['href'] . '" data-method="' . $node['method'] .'" data-target="' . $node['target'] .'">';
                 } else {
-                    $tag_a = '<a href="' . $node['href'] . '">';
+                    if(!empty($node['target']) && (!empty($node['target']['name']) || !empty($node['target']['labeled']))){
+                        if(!empty($node['target']['name'])){
+                            $tag_a = '<a href="' . $node['href'] . '" target="' . $node['target']['name'] . '">';
+                        } else {
+                            $tag_a = '<a href="' . $node['href'] . '" target="' . $node['target']['labeled'] . '">';
+                        }
+                    } else {
+                        $tag_a = '<a href="' . $node['href'] . '">';
+                    }
                 }
                 if (!empty($request) && !empty($request['name']) && $request['name'] == $node['name']){
                     $class_active = $class . ' active';
