@@ -122,16 +122,17 @@ class Application extends Parser {
             $this->handler(),
             clone $this->data()
         ));
+        $this->route()->create('Application.Config');
         $this->route()->create('Application.Help');
         $this->route()->create('Application.Error');
         $this->route()->create('Application.Route');
         $this->route()->create('Application.Restore');
         $this->route()->create('Application.Pull');
         $this->route()->create('Application.Push');
+        $this->route()->create('Application.Build');
         $this->route()->create('Application.Cache.Clear');
 //         $this->route()->create('Application.Install');
 //         $this->route()->create('Application.Update');
-//         $this->route()->create('Application.Config');
 //         $this->route()->create('Application.User');
     }
 
@@ -179,6 +180,7 @@ class Application extends Parser {
             if(method_exists($controller, $item->function) === false){
                 trigger_error('method (' . $item->function . ') not exists in class: (' . get_class($controller) . ')');
             } else {
+                $controller->autoload($this->autoload());
                 $result = $controller->{$item->function}();
             }
         } else {

@@ -103,21 +103,30 @@ class Core {
 
     public function parameter($parameter){
         $data = $this->request('data');
-        foreach($data as $key => $param){
-            $param = ltrim($param,'-');
-            $tmp = explode('=', $param);
-            if(count($tmp) > 1){
-                $param = array_shift($tmp);
-                $value = implode('=', $tmp);
+        if(is_numeric($parameter)){
+            if(isset($data[$parameter])){
+                $param = ltrim($data[$parameter],'-');
+                return $param;
+            } else {
+                return false;
             }
-            if(strtolower($param) == strtolower($parameter)){
-                if(isset($value)){
-                    return $value;
+        } else {
+            foreach($data as $key => $param){
+                $param = ltrim($param,'-');
+                $tmp = explode('=', $param);
+                if(count($tmp) > 1){
+                    $param = array_shift($tmp);
+                    $value = implode('=', $tmp);
                 }
-                return true;
+                if(strtolower($param) == strtolower($parameter)){
+                    if(isset($value)){
+                        return $value;
+                    }
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
     }
 
     public function csrf(){
