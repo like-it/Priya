@@ -37,19 +37,6 @@ class Clear extends Cli {
               Application::DS
           ;
         $dir = new Dir();
-        $read = $dir->read($url, true);
-
-        foreach($read as $file){
-            if($file->type == 'file'){
-                unlink($file->url);
-            }
-        }
-        rsort($read);
-        foreach($read as $file){
-            if($file->type == 'dir'){
-                rmdir($file->url);
-            }
-        }
-        return @rmdir($url);
+        return $dir->delete($url);
     }
 }
