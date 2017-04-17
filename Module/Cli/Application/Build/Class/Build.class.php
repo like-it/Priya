@@ -135,6 +135,7 @@ class Build extends Cli {
                     mkdir($dir, Dir::CHMOD, true);
                 }
                 copy($file->url, $file->target);
+                touch($file->target, filemtime($file->url));
             }
         }
     }
