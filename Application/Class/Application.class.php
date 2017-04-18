@@ -134,9 +134,6 @@ class Application extends Parser {
     }
 
     public function run(){
-        if(!headers_sent()){
-            header('Last-Modified: '. $this->request('lastModified'));
-        }
         $request = $this->request('request');
         $url = $this->handler()->url();
         $tmp = explode('?', $url, 2);
@@ -152,7 +149,10 @@ class Application extends Parser {
         if(isset($allowed_contentType->{$ext})){
             $contentType = $allowed_contentType->{$ext};
             if(file_exists($url) && strstr(strtolower($url), strtolower($this->data('public_html'))) !== false){
-                header('Content-Type: ' . $contentType);
+                if(!headers_sent()){
+                    header('Last-Modified: '. filemtime($url));
+                    header('Content-Type: ' . $contentType);
+                }
                 if($ext == 'css'){
                     $read = str_replace('/', Application::DS, $request);
                     $read = str_replace(Application::DS . $this->data('public_html') . Application::DS . 'Css' . Application::DS , Application::DS, $read);
@@ -167,6 +167,9 @@ class Application extends Parser {
                     return $file->read($url);
                 }
             }
+        }
+        if(!headers_sent()){
+            header('Last-Modified: '. $this->request('lastModified'));
         }
         $item = $this->route()->run();
         $handler = $this->handler();
@@ -184,7 +187,7 @@ class Application extends Parser {
             if($contentType == 'text/cli'){
                 if($request == 'Application/Error/'){
                     trigger_error('cannot route to Application/Error/', E_USER_ERROR);
-                    //if dir.data = empty on cli this can occur
+                    //bug when dir.data = empty ?
                 }
                 if($this->route()->error('read')){
                     $handler->request('request', 'Application/Error/');
@@ -215,7 +218,7 @@ class Application extends Parser {
                 return $result;
             }
         } else {
-            //404 ?
+//          404
         }
     }
 
