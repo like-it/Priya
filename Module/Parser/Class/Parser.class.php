@@ -169,7 +169,7 @@ class Parser extends Data {
                     return end($argumentList);
                 }
                 return $value;
-                break;
+            break;
             case 'date_format':
                 if(empty($value) && count($argumentList) > 1){
                     return end($argumentList);
@@ -181,7 +181,7 @@ class Parser extends Data {
                     return false;
                 }
                 return date(reset($argumentList), $value);
-                break;
+            break;
             case 'basename':
                 $value = str_replace(array('\\', '\/'), Application::DS, $value);
                 $basename = basename($value, end($argumentList));
@@ -189,7 +189,7 @@ class Parser extends Data {
                     return false;
                 }
                 return $basename;
-                break;
+            break;
             case 'dirname':
                 $value = str_replace(array('\\', '\/'), Application::DS, $value);
                 $dirname = dirname($value);
@@ -197,9 +197,10 @@ class Parser extends Data {
                     return false;
                 }
                 return $dirname . Application::DS;
-                break;
+            break;
             default:
-                trigger_error('modifier (' . $modifier . ') not allowed or not defined.');
+                return $value;
+            break;
         }
     }
 
