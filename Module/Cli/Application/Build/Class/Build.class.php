@@ -8,6 +8,7 @@
  */
 namespace Priya\Module\Cli\Application;
 
+use stdClass;
 use Priya\Application;
 use Priya\Module\Core\Cli;
 use Priya\Module\Data;
@@ -40,14 +41,14 @@ class Build extends Cli {
         $data->data('delete', 'server');
         $data->data('delete', 'autoload');
         $data->read($package);
-        $autoload = $data->data('autoload');
+        $autoload = new stdClass();
 
         if(isset($this->autoload()->prefixList)){
             foreach ($this->autoload()->prefixList as $load){
-                if(!isset($load['prefix'])){
+                if(empty($load['prefix'])){
                     continue;
                 }
-                if(!isset($load['directory'])){
+                if(empty($load['directory'])){
                     continue;
                 }
                 if($load['prefix'] != 'Priya'){
@@ -56,12 +57,30 @@ class Build extends Cli {
                 $autoload->Priya = $load['directory'];
                 break;
             }
+            if(empty($data->data('package'))){
+                $this->error('autoload', true);
+                return false;
+            }
+            foreach($data->data('package') as $prefix => $node){
+                foreach ($this->autoload()->prefixList as $load){
+                    if(empty($load['prefix'])){
+                        continue;
+                    }
+                    if(empty($load['directory'])){
+                        continue;
+                    }
+                    if($load['prefix'] == $prefix){
+                        $autoload->{$prefix} = $load['directory'];
+                    }
+                }
+            }
         }
         if(file_exists($target) === false){
             mkdir($target, Dir::CHMOD, true);
         }
         $dir = new Dir();
-        foreach($autoload as $name => $url){
+
+        foreach($autoload as $prefix => $url){
             $read = $dir->read($url, true);
             if(!empty($read)){
                 $temp = explode($this->data('dir.root'), $url, 2);
@@ -79,6 +98,7 @@ class Build extends Cli {
                 $this->copy($read);
             }
         }
+
         $dir->ignore($data->data('ignore'));
         $read = $dir->read($data->data('dir.data'), true);
         if(!empty($read)){
@@ -107,14 +127,47 @@ class Build extends Cli {
             $config = new Data();
             $config->read($this->data('dir.data') . Application::CONFIG);
 
+            $autoload = $data->data('package');
+
+            $ignore = array();
+            $ignore[] = 'ignore';
+            $ignore[] = 'package';
+
             foreach($data->data() as $key => $value){
-                if($key == 'ignore'){
-                    continue;
+                if(in_array($key, $ignore)){
+                    $data->data('delete', $key);
                 }
-                $config->data('delete', $key);
-                $config->data($key, $value);
             }
+            $config->data($this->object_merge($config->data(), $data->data()));
+            $config->data('autoload', $autoload);
             $config->write($url);
+
+            $public = $build->data('dir.public');
+            if(empty($public)){
+                $this->error('public', true);
+                return false;
+            }
+            if(is_dir($public) === false){
+                mkdir($public, Dir::CHMOD, true);
+            }
+            elseif(file_exists($public) && is_dir($public) === false){
+                $this->error('dir', true);
+                return false;
+            }
+            $list = array();
+            $list[] = '.htaccess';
+            $list[] = 'index.php';
+            foreach ($list as $file){
+                if(file_exists($build->data('dir.module.data') . $file) && !file_exists($public . $file)){
+                    copy($build->data('dir.module.data') . $file, $public . $file);
+                    touch($public . $file, filemtime($build->data('dir.module.data') . $file));
+                }
+            }
+            return true;
+        } else {
+            $this->error('priya', true);
+            //trigger error cannot start priya
+            return false;
         }
     }
 
@@ -134,6 +187,9 @@ class Build extends Cli {
                 if(is_dir($dir) === false){
                     mkdir($dir, Dir::CHMOD, true);
                 }
+                if(file_exists($file->target) && filemtime($file->target) == filemtime($file->url)){
+                    continue;
+                }
                 copy($file->url, $file->target);
                 touch($file->target, filemtime($file->url));
             }
@@ -142,9 +198,6 @@ class Build extends Cli {
 
     private function createRoute($list=array(), $build=''){
         $data = new Data();
-        if(file_exists($this->data('dir.data') . Application::ROUTE)){
-//             $data->read($this->data('dir.data') . Application::ROUTE);
-        }
         foreach($list as $nr => $node){
             if($node->url == $this->data('dir.data') . Application::ROUTE){
                 continue;
