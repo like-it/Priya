@@ -131,9 +131,6 @@ class Application extends Parser {
         $this->route()->create('Application.Push');
         $this->route()->create('Application.Build');
         $this->route()->create('Application.Cache.Clear');
-//         $this->route()->create('Application.Install');
-//         $this->route()->create('Application.Update');
-//         $this->route()->create('Application.User');
     }
 
     public function run(){
@@ -187,6 +184,7 @@ class Application extends Parser {
             if($contentType == 'text/cli'){
                 if($request == 'Application/Error/'){
                     trigger_error('cannot route to Application/Error/', E_USER_ERROR);
+                    //if dir.data = empty on cli this can occur
                 }
                 if($this->route()->error('read')){
                     $handler->request('request', 'Application/Error/');
@@ -207,7 +205,7 @@ class Application extends Parser {
         }
         if(is_object($result) && isset($result->html)){
             if($contentType == 'application/json'){
-                return json_encode($result, JSON_PRETTY_PRINT);
+                return $this->object($result, 'json');
             } else {
                 return $result->html;
             }
@@ -217,9 +215,7 @@ class Application extends Parser {
                 return $result;
             }
         } else {
-//             trigger_error('unknown result');
-            var_dump($result);
-            var_dump($item);
+            //404 ?
         }
     }
 
