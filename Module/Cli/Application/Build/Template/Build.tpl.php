@@ -11,5 +11,4 @@
 namespace Priya;
 
 echo 'build in "' .$this->parameter(3) . '" with version (' . $this->data('version') . ')' . PHP_EOL;
-var_dump($this->error());
 ?>
