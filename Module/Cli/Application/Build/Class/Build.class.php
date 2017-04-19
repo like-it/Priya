@@ -90,14 +90,21 @@ class Build extends Cli {
                 $this->copy($read);
             }
         }
+        $dir->ignore('Config.json');
+        $dir->ignore('Route.json');
+        $dir->ignore('Credential.json');
         $read = $dir->read($data->data('dir.data'), true);
         if(!empty($read)){
             foreach($read as $file){
+                var_dump($file);
                 $temp = explode($this->data('dir.root'), $file->url, 2);
                 array_shift($temp);
                 $file->target = $target . implode($this->data('dir.root'), $temp);
             }
             $this->copy($read);
+        }
+        if(is_dir($target . Application::DATA . Application::DS) === false){
+            mkdir($target . Application::DATA . Application::DS, Dir::CHMOD, true);
         }
         $dir->ignore('delete');
 
