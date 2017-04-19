@@ -13,6 +13,7 @@ use Priya\Application;
 use Priya\Module\Core\Cli;
 use Priya\Module\Data;
 use Priya\Module\Parser;
+use Priya\Module\File;
 use Priya\Module\File\Dir;
 
 class Build extends Cli {
@@ -36,12 +37,13 @@ class Build extends Cli {
     }
 
     public function build($package='', $target=''){
+        $target = File::dir($target);
         $data = new Parser();
         $data->data($this->data());
         $data->data('delete', 'server');
         $data->data('delete', 'autoload');
         $data->read($package);
-        $autoload = new stdClass();
+        $vendor = new stdClass();
 
         if(isset($this->autoload()->prefixList)){
             foreach ($this->autoload()->prefixList as $load){
@@ -54,7 +56,7 @@ class Build extends Cli {
                 if($load['prefix'] != 'Priya'){
                     continue;
                 }
-                $autoload->Priya = $load['directory'];
+                $vendor->Priya = $load['directory'];
                 break;
             }
             if(empty($data->data('package'))){
@@ -62,25 +64,15 @@ class Build extends Cli {
                 return false;
             }
             foreach($data->data('package') as $prefix => $node){
-                foreach ($this->autoload()->prefixList as $load){
-                    if(empty($load['prefix'])){
-                        continue;
-                    }
-                    if(empty($load['directory'])){
-                        continue;
-                    }
-                    if($load['prefix'] == $prefix){
-                        $autoload->{$prefix} = $load['directory'];
-                    }
-                }
+                $vendor->{$prefix} = $node;
             }
         }
         if(file_exists($target) === false){
             mkdir($target, Dir::CHMOD, true);
         }
         $dir = new Dir();
-
-        foreach($autoload as $prefix => $url){
+        $dir->ignore($data->data('ignore'));
+        foreach($vendor as $prefix => $url){
             $read = $dir->read($url, true);
             if(!empty($read)){
                 $temp = explode($this->data('dir.root'), $url, 2);
@@ -98,16 +90,21 @@ class Build extends Cli {
                 $this->copy($read);
             }
         }
-
-        $dir->ignore($data->data('ignore'));
+        $dir->ignore('Config.json');
+        $dir->ignore('Route.json');
+        $dir->ignore('Credential.json');
         $read = $dir->read($data->data('dir.data'), true);
         if(!empty($read)){
             foreach($read as $file){
+                var_dump($file);
                 $temp = explode($this->data('dir.root'), $file->url, 2);
                 array_shift($temp);
                 $file->target = $target . implode($this->data('dir.root'), $temp);
             }
             $this->copy($read);
+        }
+        if(is_dir($target . Application::DATA . Application::DS) === false){
+            mkdir($target . Application::DATA . Application::DS, Dir::CHMOD, true);
         }
         $dir->ignore('delete');
 
