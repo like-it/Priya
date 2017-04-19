@@ -64,7 +64,7 @@ class Autoload{
 
     public function addPrefix($prefix='', $directory='', $extension=''){
         $prefix = trim($prefix, '\\\/'); //.'\\';
-        $directory = rtrim($directory,'\\\/') . DIRECTORY_SEPARATOR;
+        $directory = str_replace('\\\/', DIRECTORY_SEPARATOR, rtrim($directory,'\\\/')) . DIRECTORY_SEPARATOR; //see File::dir()
         $list = $this->getPrefixList();
         if(empty($extension)){
             $list[]  = array(

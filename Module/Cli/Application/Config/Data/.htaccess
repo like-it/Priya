@@ -1,0 +1,33 @@
+php_value iconv.input_encoding "UTF-8"
+php_value iconv.output_encoding "UTF-8"
+php_value iconv.internal_encoding "UTF-8"
+php_value default_charset "UTF-8"
+php_value memory_limit 512M
+php_value post_max_size 1768M
+php_value upload_max_filesize 1512M
+php_flag display_startup_errors on
+php_flag display_errors on
+php_flag html_errors on
+php_flag  log_errors on
+php_value error_log  ../log/PHP_errors.log
+RewriteEngine On
+
+#
+# Don't rewrite if dir/link/file exists
+#
+
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule .* - [L]
+
+#
+# Handle in route class...
+#
+
+RewriteCond %{HTTPS} off
+RewriteRule .* - [E=REQUEST_SCHEME:http]
+
+RewriteCond %{HTTPS} on
+RewriteRule .* - [E=REQUEST_SCHEME:https]
+
+RewriteRule ^/?(.*)$ /index.php?request=$1 [L,QSA]

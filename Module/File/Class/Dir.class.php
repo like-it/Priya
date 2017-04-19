@@ -24,7 +24,13 @@ class Dir {
             $node->ignore = array();
         }
         if($ignore !== null){
-            if($ignore=='list' && $attribute !== null){
+            if(is_array($ignore) && $attribute === null){
+                $node->ignore = $ignore;
+            }
+            elseif($ignore == 'delete' && $attribute === null){
+                $node->ignore = array();
+            }
+            elseif($ignore=='list' && $attribute !== null){
                 $node->ignore = $attribute;
             }
             elseif($ignore=='find'){
@@ -112,9 +118,31 @@ class Dir {
         return $list;
     }
 
+    public function delete($dir=''){
+        if(is_dir($dir) === false){
+            return true;
+        }
+        $files = array_diff(scandir($dir), array('.','..'));
+        foreach ($files as $nr => $file) {
+            if($this->ignore('find', "$dir/$file")){
+                continue;
+            }
+            if(is_dir("$dir/$file")){
+                $this->delete("$dir/$file");
+            } else {
+                unlink("$dir/$file");
+                unset($files[$nr]);
+            }
+        }
+        if($this->ignore('find', "$dir")){
+            return true;
+        }
+        return rmdir($dir);
+    }
+
+
+    /*
     public function delete($url='', $recursive=true){
-        $this->debug('yup permission',true);
-        die;
         if(file_exists($url)===false){
             return true;
         }
@@ -129,22 +157,25 @@ class Dir {
                     }
                 }
             }
+            sleep(1);
             foreach ($list as $nr => $file){
                 if(isset($file->type) && $file->type == 'dir'){
-                    $unlink = @rmdir($file->url);
+                    $unlink = rmdir($file->url);
                     if(!empty($unlink)){
                         unset($list[$nr]);
                     }
                 }
             }
         }
-        @rmdir($url);
         if(empty($list)){
-            return true;
+//         	otherways directory might not be empty
+            $this->read($url, $recursive);
+            return rmdir($url);
         } else {
             return false;
         }
     }
+    */
 
 
     public function node($node=null){

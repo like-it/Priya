@@ -11,6 +11,10 @@ namespace Priya\Module;
 class File {
     const CHMOD = 0640;
 
+    public static function dir($directory=''){
+        return str_replace('\\\/', DIRECTORY_SEPARATOR, rtrim($directory,'\\\/')) . DIRECTORY_SEPARATOR;
+    }
+
     public function write($url='', $data=''){
         $url = (string) $url;
         $data = (string) $data;

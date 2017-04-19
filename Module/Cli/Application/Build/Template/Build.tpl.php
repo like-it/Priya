@@ -10,7 +10,5 @@
  */
 namespace Priya;
 
-if($this->data('options')){
-    echo "\t" . 'restore                  (this will restore the installation from ' . $this->data('dir.priya.data') . 'Restore/' . PHP_EOL;
-}
+echo 'build in "' .$this->parameter(3) . '" with version (' . $this->data('version') . ')' . PHP_EOL;
 ?>
