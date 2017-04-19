@@ -66,6 +66,11 @@ class Build extends Cli {
             foreach($data->data('package') as $prefix => $node){
                 $vendor->{$prefix} = $node;
             }
+            if(!empty($data->data('plugin'))){
+                foreach($data->data('plugin') as $prefix => $node){
+                    $vendor->{$prefix} = $node;
+                }
+            }
         }
         if(file_exists($target) === false){
             mkdir($target, Dir::CHMOD, true);
