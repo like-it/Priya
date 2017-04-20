@@ -7,14 +7,13 @@
  * 	-	all
  */
 
-
 namespace Priya;
 
+use Priya\Module\File;
+use Priya\Module\Handler;
 use Priya\Module\Core\Parser;
 use Priya\Module\Core\Data;
-use Priya\Module\File;
 use Priya\Module\Core\Object;
-use Priya\Module\Handler;
 
 class Application extends Parser {
     const DS = DIRECTORY_SEPARATOR;
