@@ -163,45 +163,22 @@ class Parser extends Data {
         if(is_array($modifier)){
             return $this->modifyList($value, $modifier);
         }
-        switch($modifier){
-            case 'default':
-                if(empty($value) && count($argumentList) >= 1){
-                    return end($argumentList);
-                }
-                return $value;
-            break;
-            case 'date_format':
-                if(empty($value) && count($argumentList) > 1){
-                    return end($argumentList);
-                }
-                if(empty($value)){
-                    return false;
-                }
-                if(is_numeric($value) === false){
-                    return false;
-                }
-                return date(reset($argumentList), $value);
-            break;
-            case 'basename':
-                $value = str_replace(array('\\', '\/'), Application::DS, $value);
-                $basename = basename($value, end($argumentList));
-                if(empty($basename)){
-                    return false;
-                }
-                return $basename;
-            break;
-            case 'dirname':
-                $value = str_replace(array('\\', '\/'), Application::DS, $value);
-                $dirname = dirname($value);
-                if(empty($dirname)){
-                    return false;
-                }
-                return $dirname . Application::DS;
-            break;
-            default:
-                return $value;
-            break;
+        $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
+
+        $url = $dir . 'modifier.' . $modifier . '.php';
+
+        if(file_exists($url)){
+            require_once $url;
+        } else {
+            return $value;
         }
+        $function = 'modifier_' . $modifier;
+        var_dump($function);
+        if(function_exists($function) === false){
+            //trigger error?
+            return $value;
+        }
+        return $function($value, $argumentList);
     }
 
     private function modifier($value='', $modifier_value='', $return='modify'){
