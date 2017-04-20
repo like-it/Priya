@@ -10,10 +10,15 @@
 
 use Priya\Module\Handler;
 
-function function_route($value=null, $argumentList=array(), $parser=null){
+function function_if($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
+    var_dump($value);
+    var_dump($argumentList);
+//     die;
+    return $value;
+
     if(isset($argumentList['name'])){
         $name = $argumentList['name'];
     }

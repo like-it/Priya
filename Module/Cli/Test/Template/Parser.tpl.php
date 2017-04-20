@@ -15,7 +15,8 @@ use Priya\Module\Parser;
 
 $parse = function(){
     $url = $this->parameter('url') ? $this->parameter('url') : $this->parameter(3);
-    if(empty($url)){
+
+    if(empty($url) || file_exists($url) === false){
         $url = $this->data('dir.module.data') . "Parser.json";
     }
     $parser = new Parser($this->data());

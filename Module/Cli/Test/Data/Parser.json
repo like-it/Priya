@@ -6,10 +6,14 @@
     "variable" : "variable",
     "directory" : "{$dir.module.data}",
     "extension":"json",
+    "group": "Administrator",
     "file" : "{$dir.module.data}{$module}.{$test.extension}",
     "modifier_basename_1" : "{$test.directory|basename}",
     "modifier_basename_2" : "{$test.file|basename:\".{$test.extension}\"}",
     "modifier_basename_3" : "{$test.file|basename}",
-    "function_route_1" : "{route name=\"Documentation\" attribute=\"{$test.variable}\"}"
+    "function_route_1" : "{route name=\"Documentation\" attribute=\"{$test.variable}\"}",
+    "function_route_2" : "{route name=\"Documentation\" attribute=\"[{$test.variable}, \\\"test\\\"]\"}",
+    "function_permission_1" : "{permission rule=\"Documentation\" group=\"{$test.group}\"}",
+    "function_if_1" : "{if empty({$test.variable})}test{else}{$test.variable}{/if}"
 }
 }

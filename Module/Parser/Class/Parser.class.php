@@ -76,12 +76,12 @@ class Parser extends Data {
                 }
                 $temp = explode(' ', $string);
                 $function = ltrim(reset($temp), '{');
-
                 $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
                 $url = $dir . 'function.' . $function . '.php';
                 if(file_exists($url)){
                     require_once $url;
                 } else {
+                    var_dump('missing file: ' . $url);
                     //remove function ?
                     continue;
                 }
@@ -90,7 +90,13 @@ class Parser extends Data {
                     //trigger error?
                     continue;
                 }
-                $argumentList = $this->createArgumentList($list);
+                if($function == 'function_if'){
+                    $argumentList = $this->createArgumentListIf($string);
+//                     var_dump($argumentList);
+                    die;
+                } else {
+                    $argumentList = $this->createArgumentList($list);
+                }
                 $argumentList= $this->compile($argumentList, $this->data());
                 $string =  $function($string, $argumentList, $this);
             }
@@ -156,8 +162,6 @@ class Parser extends Data {
         $argumentList = array();
         $index = false;
         foreach($attribute as $key => $value){
-            if(empty($index)){
-            }
             $index = explode(' ', $value, 2);
             array_shift($index);
             $index = implode(' ', $index);
@@ -166,10 +170,80 @@ class Parser extends Data {
             }
             if(isset($attribute[$key+1])){
                 $temp = $attribute[$key+1];
-                $temp = explode('"', $temp, 2); //maybe add str_Replace('\"', to temp
-                $argumentList[$index] = reset($temp);
+                $temp = explode('"', str_replace('\"', '__internal_quote', $temp), 2); //maybe add str_Replace('\"', to temp
+                $temp = reset($temp);
+                $temp = str_replace('__internal_quote', '"', $temp);
+                $argumentList[$index] = $temp;
             }
         }
+        foreach($argumentList as $key => $value){
+            if(substr($value,0,1) == '[' && substr($value,-1,1) == ']'){
+                $temp = explode(',', substr($value, 1, -1));
+                foreach($temp as $temp_key => $temp_value){
+                    $temp[$temp_key] = trim($temp_value);
+                }
+                $argumentList[$key] = $temp;
+            }
+        }
+
+        return $argumentList;
+    }
+
+    private function createArgumentListIf($list=array()){
+        if(!is_array($list)){
+            $list = (array) $list;
+        }
+        $attribute = reset($list);
+        if(empty($attribute)){
+            return array();
+        }
+        $attribute = explode('{if', $attribute);
+        $argumentList = array();
+        $index = false;
+        foreach($attribute as $key => $value){
+            $temp = explode('}', $value, 2);
+            $statement = trim(reset($temp));
+            if(empty($statement)){
+                continue;
+            }
+            var_dump($statement);
+            $else = explode('{else}', end($temp));
+            if(count($else) == 1){
+                //no else
+            } else {
+                $true = reset($else);
+                $false = rtrim(end($else), '{/if}');
+            }
+            var_dump($true);
+            var_dump($false);
+            die;
+
+            /*
+            $index = explode(' ', $value, 2);
+            array_shift($index);
+            $index = implode(' ', $index);
+            if(empty($index)){
+                continue;
+            }
+            if(isset($attribute[$key+1])){
+                $temp = $attribute[$key+1];
+                $temp = explode('"', str_replace('\"', '__internal_quote', $temp), 2);
+                $temp = reset($temp);
+                $temp = str_replace('__internal_quote', '"', $temp);
+                $argumentList[$index] = $temp;
+            }
+            */
+        }
+        foreach($argumentList as $key => $value){
+            if(substr($value,0,1) == '[' && substr($value,-1,1) == ']'){
+                $temp = explode(',', substr($value, 1, -1));
+                foreach($temp as $temp_key => $temp_value){
+                    $temp[$temp_key] = trim($temp_value);
+                }
+                $argumentList[$key] = $temp;
+            }
+        }
+
         return $argumentList;
     }
 

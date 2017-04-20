@@ -11,9 +11,8 @@ namespace Priya\Module;
 
 use Priya\Application;
 use Priya\Module\Core;
-use Priya\Module\Core\Data;
 
-class User extends Data {
+class User extends \Priya\Module\Core\Data {
 
     public function validate($username, $password){
         $data = new Data();
