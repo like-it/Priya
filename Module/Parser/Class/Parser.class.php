@@ -164,16 +164,13 @@ class Parser extends Data {
             return $this->modifyList($value, $modifier);
         }
         $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
-
         $url = $dir . 'modifier.' . $modifier . '.php';
-
         if(file_exists($url)){
             require_once $url;
         } else {
             return $value;
         }
         $function = 'modifier_' . $modifier;
-        var_dump($function);
         if(function_exists($function) === false){
             //trigger error?
             return $value;
