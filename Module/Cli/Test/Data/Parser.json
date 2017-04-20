@@ -1,0 +1,15 @@
+{
+"web" : {
+    "root" : "http:://{$test.variable}/"
+},
+"test" : {
+    "variable" : "variable",
+    "directory" : "{$dir.module.data}",
+    "extension":"json",
+    "file" : "{$dir.module.data}{$module}.{$test.extension}",
+    "modifier_basename_1" : "{$test.directory|basename}",
+    "modifier_basename_2" : "{$test.file|basename:\".{$test.extension}\"}",
+    "modifier_basename_3" : "{$test.file|basename}",
+    "function_route_1" : "{route name=\"Documentation\" attribute=\"{$test.variable}\"}"
+}
+}

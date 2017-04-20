@@ -40,6 +40,9 @@ class Parser extends Data {
             }
             $data = $this->object($data);
             foreach($list as $key => $value){
+                if(substr($key, 1, 1) != '$'){
+                    continue;
+                }
                 $modifierList = explode('|', trim($key,'{}$ '));
                 $attribute = trim(array_shift($modifierList));
                 if($keep === 'disable-modify'){
@@ -54,6 +57,7 @@ class Parser extends Data {
                 if($modify===false){
                     continue;
                 }
+                $list[$key] = $modify;
                 $attributeList[$key] = $modify;
             }
             foreach($attributeList as $search => $replace){
@@ -65,6 +69,30 @@ class Parser extends Data {
                     $replace = $this->object($replace, 'json');
                 }
                 $string = str_replace($search, $replace, $string);
+            }
+            foreach($list as $key => $value){
+                if(substr($key, 1, 1) == '$'){
+                    continue;
+                }
+                $temp = explode(' ', $string);
+                $function = ltrim(reset($temp), '{');
+
+                $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
+                $url = $dir . 'function.' . $function . '.php';
+                if(file_exists($url)){
+                    require_once $url;
+                } else {
+                    //remove function ?
+                    continue;
+                }
+                $function = 'function_' . $function;
+                if(function_exists($function) === false){
+                    //trigger error?
+                    continue;
+                }
+                $argumentList = $this->createArgumentList($list);
+                $argumentList= $this->compile($argumentList, $this->data());
+                $string =  $function($string, $argumentList, $this);
             }
             return $string;
         }
@@ -116,6 +144,35 @@ class Parser extends Data {
         return $list;
     }
 
+    private function createArgumentList($list=array()){
+        if(!is_array($list)){
+            $list = (array) $list;
+        }
+        $attribute = reset($list);
+        if(empty($attribute)){
+            return array();
+        }
+        $attribute = explode('="', $attribute);
+        $argumentList = array();
+        $index = false;
+        foreach($attribute as $key => $value){
+            if(empty($index)){
+            }
+            $index = explode(' ', $value, 2);
+            array_shift($index);
+            $index = implode(' ', $index);
+            if(empty($index)){
+                continue;
+            }
+            if(isset($attribute[$key+1])){
+                $temp = $attribute[$key+1];
+                $temp = explode('"', $temp, 2); //maybe add str_Replace('\"', to temp
+                $argumentList[$index] = reset($temp);
+            }
+        }
+        return $argumentList;
+    }
+
     private function attributeList($string=''){
         $function = explode('function(', $string);
         foreach($function as $function_nr => $content){
@@ -126,6 +183,7 @@ class Parser extends Data {
                 return $string;
             }
             foreach($list as $nr => $record){
+                $variable = false;
                 $tmp = explode('}', $record);
                 $tmpAttribute = '';
                 if(count($tmp) > 1){
@@ -133,9 +191,14 @@ class Parser extends Data {
                 }
                 if(!empty($tmpAttribute)){
                     if(substr($tmpAttribute,0,1) == '$'){
+                        $variable = true;
                         $tmpAttribute = substr($tmpAttribute, 1);
                     }
-                    $key = '{$' . $tmpAttribute . '}';
+                    if(empty($variable)){
+                        $key = '{' . $tmpAttribute . '}';
+                    } else {
+                        $key = '{$' . $tmpAttribute . '}';
+                    }
                     $oldString = $string;
                     $string = str_replace($key, '[[' . $tmpAttribute . ']]', $string);
 
@@ -175,6 +238,7 @@ class Parser extends Data {
             //trigger error?
             return $value;
         }
+        $argumentList= $this->compile($argumentList, $this->data());
         return $function($value, $argumentList);
     }
 

@@ -1,1 +1,5 @@
-{}
+{
+    "Cli\/Test\/Data\/Route": {
+            "resource": "{$dir.priya.module}Cli\/Test\/Data\/Route.json"
+    }
+}
