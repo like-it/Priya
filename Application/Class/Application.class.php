@@ -119,9 +119,6 @@ class Application extends Parser {
                 $this->autoload()->addPrefix($prefix, $directory);
             }
         }
-        $data = new Data();
-        $data->data($this->data());
-
         $this->route(new Module\Route(
             $this->handler(),
             clone $this->data()
