@@ -8,6 +8,7 @@
  * @note
  *  - In Smarty bash coloring isn't working.
  */
+
 namespace Priya;
 
 $request = $this->request('data');
@@ -69,4 +70,3 @@ foreach($request as $key => $value){
             break;
     }
 }
-?>

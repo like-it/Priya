@@ -6,14 +6,15 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module\Cli\Application;
 
-use Priya\Module\Core\Cli;
 use Priya\Application;
 use Priya\Module\Handler;
 use Priya\Module\User;
-use Priya\Module\File\Dir;
 use Priya\Module\File;
+use Priya\Module\File\Dir;
+use Priya\Module\Core\Cli;
 
 class Pull extends Cli {
     const DIR = __DIR__;
@@ -87,7 +88,7 @@ class Pull extends Cli {
         $data = array('user' => $user, 'password' => $password);
         $options = array(
             'http' => array(
-              'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+              'header'  => 'Content-type: ' . Handler::CONTENT_TYPE_FORM . "\r\n",
               'method'  => 'POST',
               'content' => http_build_query($data),
               'timeout' => $this->data('server.timeout') ? $this->data('server.timeout') : 600

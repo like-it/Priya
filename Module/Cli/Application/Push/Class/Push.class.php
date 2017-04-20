@@ -6,14 +6,15 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module\Cli\Application;
 
-use Priya\Module\Core\Cli;
 use Priya\Application;
 use Priya\Module\Handler;
 use Priya\Module\User;
-use Priya\Module\File\Dir;
 use Priya\Module\File;
+use Priya\Module\File\Dir;
+use Priya\Module\Core\Cli;
 use Priya\Module\Core\Data;
 
 class Push extends Cli {
@@ -70,7 +71,6 @@ class Push extends Cli {
                         $this->data('step', 'extract');
                     }
                 }
-
             } else {
                 $this->error('permission', true);
             }

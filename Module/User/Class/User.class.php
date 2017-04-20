@@ -6,11 +6,12 @@
  * @changeLog
  *  -	all
  */
+
 namespace Priya\Module;
 
+use Priya\Application;
 use Priya\Module\Core;
 use Priya\Module\Core\Data;
-use Priya\Application;
 
 class User extends Data {
 
@@ -18,7 +19,7 @@ class User extends Data {
         $data = new Data();
         $data->read($this->data('dir.data') . Application::CREDENTIAL);
         $users = $data->data('user');
-        if(isset($users)){
+        if(isset($users) && (is_array($users) || is_object($users))){
             foreach($users as $user){
                 if(isset($user->email) && $user->email == $username) {
                     if(isset($user->password)){

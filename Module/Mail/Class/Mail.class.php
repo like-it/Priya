@@ -1,10 +1,17 @@
 <?php
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-01-10
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
 
 namespace Priya\Module;
 
+use stdClass;
 use Priya\Application;
 use Priya\Module\Core\Data;
-use stdClass;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class Mail extends Data{
@@ -41,7 +48,6 @@ class Mail extends Data{
         $secure = $this->data('mail.secure');
         $username = $this->data('mail.username');
         $password = $this->data('mail.password');
-
         if(empty($host)){
             return false;
         }
@@ -62,7 +68,6 @@ class Mail extends Data{
         $this->mailer()->isHTML(true);
         if($debug !== false && $debug !== null){
             $this->mailer()->SMTPDebug = $debug;
-            var_dump('doing');
         }
         $this->mailer()->Host = $host;
         $this->mailer()->Port = $port;
@@ -106,9 +111,10 @@ class Mail extends Data{
     public function send(){
         if(!$this->mailer()->send()) {
             $this->error('mail', $this->mailer()->ErrorInfo);
+            return false;
         } else {
             $this->message('mail', true);
-            echo 'Message has been sent.';
+            return true;
         }
     }
 
@@ -139,6 +145,5 @@ class Mail extends Data{
     public function altBody($altBody=''){
         return $this->mailer()->AltBody = $altBody;
     }
-
 }
 ?>

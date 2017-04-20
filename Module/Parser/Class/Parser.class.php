@@ -6,10 +6,11 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module;
 
-use Priya\Application;
 use stdClass;
+use Priya\Application;
 
 class Parser extends Data {
     const DIR = __DIR__;
@@ -94,7 +95,6 @@ class Parser extends Data {
         }
         return $data;
     }
-
 
     public function read($url=''){
         $read = parent::read($url);

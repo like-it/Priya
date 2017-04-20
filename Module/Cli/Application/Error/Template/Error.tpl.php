@@ -8,6 +8,7 @@
  * @note
  *  - In Smarty bash coloring isn't working.
  */
+
 namespace Priya;
 
 switch ($this->request('id')){
@@ -28,4 +29,3 @@ switch ($this->request('id')){
         echo "\t - php " . getcwd() . Application::DS . "Priya.php route --list        (this will show available routes)" . PHP_EOL;
         break;
 }
-?>

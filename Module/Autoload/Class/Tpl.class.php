@@ -9,11 +9,10 @@
 
 namespace Priya\Module\Autoload;
 
-use Priya\Module\Autoload;
 use Priya\Application;
+use Priya\Module\Autoload;
 
 class Tpl extends Autoload {
-    const TEMPLATE = 'Template';
     const DIR_CSS = 'Css';
     const DIR_JS = 'Js';
 
@@ -32,56 +31,55 @@ class Tpl extends Autoload {
         return false;
     }
 
-    public function filelist($item=array()){		//name to configure ?
+    public function filelist($item=array()){
         if(empty($item)){
             return array();
         }
         if(empty($item['extension'])){
-            $item['extension'] = 'tpl';
+            $item['extension'] = Autoload::EXT_TPL;
+        } else {
+            $item['extension'] = ltrim($item['extension'], '.');
         }
         $data = array();
 
         $directory = explode(Application::DS, $item['file']);
         if(count($directory) == 1){
             if(stristr($item['file'], $item['extension']) !== false){
-                $data[] = $item['directory'] . Tpl::TEMPLATE . Application::DS . $item['file'];
+                $data[] = $item['directory'] . Application::TEMPLATE . Application::DS . $item['file'];
             } else {
-                $data[] = $item['directory'] . $item['file'] . Application::DS . Tpl::TEMPLATE . Application::DS. $item['file'] . '.' . $item['extension'];
-                $dir = explode(Tpl::TEMPLATE, $item['directory'], 2);
+                $data[] = $item['directory'] . $item['file'] . Application::DS . Application::TEMPLATE . Application::DS. $item['file'] . '.' . $item['extension'];
+                $dir = explode(Application::TEMPLATE, $item['directory'], 2);
                 $dir = implode('', $dir);
                 $dir = rtrim($dir, Application::DS) . Application::DS;
-                $data[] = $dir . $item['file'] . Application::DS . Tpl::TEMPLATE . Application::DS. $item['file'] . '.' . $item['extension'];
+                $data[] = $dir . $item['file'] . Application::DS . Application::TEMPLATE . Application::DS. $item['file'] . '.' . $item['extension'];
             }
-            $data[] = $item['directory'] . $item['baseName'] . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' .$item['extension'];
+            $data[] = $item['directory'] . $item['baseName'] . Application::DS. Application::TEMPLATE . Application::DS. $item['baseName'] . '.' . $item['extension'];
             $data[] = '[---]';
-            $data[] = $item['directory'] . $item['baseName'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.' .$item['extension'];
+            $data[] = $item['directory'] . $item['baseName'] . Application::DS. $item['baseName'] . '.' . $item['extension'];
             $data[] = '[---]';
-            $data[] = $item['directory'] . 'Template' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' .$item['extension'];
+            $data[] = $item['directory'] . Application::TEMPLATE . Application::DS. $item['baseName'] . '.' . $item['extension'];
             $data[] = '[---]';
-            $data[] = $item['directory'] . $item['file'] . '.' .$item['extension'];
+            $data[] = $item['directory'] . $item['file'] . '.' . $item['extension'];
             $data[] = '[---]';
-            $data[] = $item['directory'] . $item['baseName'] . '.' .$item['extension'];
+            $data[] = $item['directory'] . $item['baseName'] . '.' . $item['extension'];
             $data[] = '[---]';
         } else {
             $file = array_pop($directory);
             $directory = implode(Application::DS, $directory) . Application::DS;
             if(stristr($file, $item['extension']) !== false){
-                $data[] = $item['directory'] . $directory . Tpl::TEMPLATE . Application::DS . $file;
+                $data[] = $item['directory'] . $directory . Application::TEMPLATE . Application::DS . $file;
             } else {
-                $data[] = $item['directory'] . $directory . $file . Application::DS . Tpl::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
-                $data[] = $item['directory'] . $directory . Tpl::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
-                $dir = explode(Tpl::TEMPLATE, $item['directory'], 2);
+                $data[] = $item['directory'] . $directory . $file . Application::DS . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
+                $data[] = $item['directory'] . $directory . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
+                $dir = explode(Application::TEMPLATE, $item['directory'], 2);
                 $dir = implode('', $dir);
                 $dir = rtrim($dir, Application::DS) . Application::DS;
-                $data[] = $dir . $directory . Tpl::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
+                $data[] = $dir . $directory . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
             }
-            $data[] = $item['directory'] . $item['baseName'] . Application::DS . 'Template' . Application::DS . $item['baseName'] . '.' .$item['extension'];
+            $data[] = $item['directory'] . $item['baseName'] . Application::DS . Application::TEMPLATE . Application::DS . $item['baseName'] . '.' . $item['extension'];
             $data[] = '[---]';
-            $data[] = $item['directory'] . $item['file'] . '.' .$item['extension'];
+            $data[] = $item['directory'] . $item['file'] . '.' . $item['extension'];
             $data[] = '[---]';
-//             $data[] = $item['directory'] . $item['baseName'] . '.' .$item['extension'];
-            $data[] = '[---]';
-            //         var_dump($data);
         }
         return $data;
     }

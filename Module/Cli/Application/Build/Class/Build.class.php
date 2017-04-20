@@ -6,15 +6,16 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module\Cli\Application;
 
 use stdClass;
 use Priya\Application;
-use Priya\Module\Core\Cli;
-use Priya\Module\Data;
 use Priya\Module\Parser;
+use Priya\Module\Data;
 use Priya\Module\File;
 use Priya\Module\File\Dir;
+use Priya\Module\Core\Cli;
 
 class Build extends Cli {
     const DIR = __DIR__;
@@ -44,7 +45,6 @@ class Build extends Cli {
         $data->data('delete', 'autoload');
         $data->read($package);
         $vendor = new stdClass();
-
         if(isset($this->autoload()->prefixList)){
             foreach ($this->autoload()->prefixList as $load){
                 if(empty($load['prefix'])){
@@ -112,7 +112,6 @@ class Build extends Cli {
             mkdir($target . Application::DATA . Application::DS, Dir::CHMOD, true);
         }
         $dir->ignore('delete');
-
         $read = $dir->read($target, true);
         $priya = $this->findPriya($read);
         if(!empty($priya)){
@@ -173,7 +172,7 @@ class Build extends Cli {
         }
     }
 
-    public function copy($copy = null){
+    public function copy($copy=null){
         krsort($copy);
         foreach ($copy as $file){
             if(isset($file->type) && $file->type == 'dir'){

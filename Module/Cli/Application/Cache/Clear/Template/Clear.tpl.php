@@ -8,7 +8,7 @@
  * @note
  *  - In Smarty bash coloring isn't working.
  */
+
 namespace Priya;
 
 echo "\t" . 'Clearing Cache...' . PHP_EOL;
-?>

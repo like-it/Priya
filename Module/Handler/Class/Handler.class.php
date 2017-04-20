@@ -1,15 +1,23 @@
 <?php
+/**
+ * @author 		Remco van der Velde
+ * @since 		2016-10-19
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
 
 namespace Priya\Module;
 
-use Priya\Application;
 use stdClass;
+use Priya\Application;
 
 class Handler extends \Priya\Module\Core\Data{
     const CONTENT_TYPE_CSS = 'text/css';
     const CONTENT_TYPE_HTML = 'text/html';
     const CONTENT_TYPE_JSON = 'application/json';
     const CONTENT_TYPE_CLI = 'text/cli';
+    const CONTENT_TYPE_FORM = 'application/x-www-form-urlencoded';
 
     const METHOD_CLI = 'CLI';
     const METHOD_HEAD = 'HEAD';
@@ -17,6 +25,9 @@ class Handler extends \Priya\Module\Core\Data{
     const METHOD_POST = 'POST';
     const METHOD_PUT = 'PUT';
     const METHOD_DELETE = 'DELETE';
+
+    const SCHEME_HTTP = 'http';
+    const SCHEME_HTTPS = 'https';
 
     private $request;
     private $file;
@@ -71,7 +82,6 @@ class Handler extends \Priya\Module\Core\Data{
             } else {
                 $this->request[$attribute] = $value;
             }
-
         }
     }
 
@@ -87,8 +97,7 @@ class Handler extends \Priya\Module\Core\Data{
         }
         elseif(isset($this->request->{$attribute})){
             return $this->request->{$attribute};
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -131,8 +140,7 @@ class Handler extends \Priya\Module\Core\Data{
             if($value !== null){
                 if($attribute=='delete'){
                     return $this->deleteFile($value);
-                }
-                else {
+                } else {
                     $this->object_set($attribute, $value, $this->file());
                 }
             } else {
@@ -226,14 +234,14 @@ class Handler extends \Priya\Module\Core\Data{
     }
 
     private function createContentType(){
-        $contentType = 'text/html';
+        $contentType = Handler::CONTENT_TYPE_HTML;
         if(isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == Handler::CONTENT_TYPE_JSON){
             $contentType = Handler::CONTENT_TYPE_JSON;
         }
         if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
             $contentType = Handler::CONTENT_TYPE_JSON;
         }
-        if(isset($_SERVER['HTTP_ACCEPT']) && stristr($_SERVER['HTTP_ACCEPT'], 'text/css')){
+        if(isset($_SERVER['HTTP_ACCEPT']) && stristr($_SERVER['HTTP_ACCEPT'], Handler::CONTENT_TYPE_CSS)){
             $contentType = Handler::CONTENT_TYPE_CSS;
         }
         $host = $this->host();
@@ -309,10 +317,8 @@ class Handler extends \Priya\Module\Core\Data{
                         } else {
                             $object->{$key} = $node;
                         }
-
                         $input->nodeList[] = $object;
                     }
-
                 }
                 $input->nodeList[] = $_REQUEST;
                 $input = json_encode($input);
@@ -364,7 +370,7 @@ class Handler extends \Priya\Module\Core\Data{
         if(empty($_SERVER['DOCUMENT_ROOT'])){
             return false;
         }
-        return str_replace('/', Application::DS, $_SERVER['DOCUMENT_ROOT'] .
+        return str_replace(array('/', '\\'), Application::DS, $_SERVER['DOCUMENT_ROOT'] .
         Application::DS);
     }
 
@@ -374,7 +380,7 @@ class Handler extends \Priya\Module\Core\Data{
             return false;
         }
         return
-               $scheme .
+            $scheme .
             '://' .
             $_SERVER['HTTP_HOST'] .
             '/'
@@ -382,12 +388,12 @@ class Handler extends \Priya\Module\Core\Data{
     }
 
     public function scheme(){
-        $scheme = 'http';
+        $scheme = Handler::SCHEME_HTTP;
         if(!empty($_SERVER['REQUEST_SCHEME'])){
             $scheme = $_SERVER['REQUEST_SCHEME'];
         } else {
             if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
-                $scheme = 'https';
+                $scheme = Handler::SCHEME_HTTPS;
             }
         }
         return $scheme;
@@ -472,6 +478,21 @@ class Handler extends \Priya\Module\Core\Data{
                         case 5 :
                             unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]]);
                         break;
+                        case 6 :
+                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]]);
+                        break;
+                        case 7 :
+                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]]);
+                        break;
+                        case 8 :
+                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]]);
+                        break;
+                        case 9 :
+                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]]);
+                        break;
+                        case 10 :
+                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]][$tmp[9]]);
+                        break;
                     }
                     return true;
                 } else {
@@ -493,6 +514,21 @@ class Handler extends \Priya\Module\Core\Data{
                         break;
                         case 5 :
                             $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]] = $value;
+                        break;
+                        case 6 :
+                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]] = $value;
+                        break;
+                        case 7 :
+                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]]= $value;
+                        break;
+                        case 8 :
+                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]]= $value;
+                        break;
+                        case 9 :
+                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]]= $value;
+                        break;
+                        case 10 :
+                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]][$tmp[9]]= $value;
                         break;
                     }
                 }
@@ -540,6 +576,86 @@ class Handler extends \Priya\Module\Core\Data{
                         isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]])
                     ){
                         return $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]];
+                    } else {
+                        return null;
+                    }
+                break;
+                case 6 :
+                    if(
+                    isset($_SESSION[$tmp[0]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]])
+                    ){
+                        return $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]];
+                    } else {
+                        return null;
+                    }
+                break;
+                case 7 :
+                    if(
+                    isset($_SESSION[$tmp[0]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]])
+                    ){
+                        return $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]];
+                    } else {
+                        return null;
+                    }
+                break;
+                case 8 :
+                    if(
+                    isset($_SESSION[$tmp[0]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]])
+                    ){
+                        return $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]];
+                    } else {
+                        return null;
+                    }
+                break;
+                case 9 :
+                    if(
+                    isset($_SESSION[$tmp[0]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]])
+                    ){
+                        return $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]];
+                    } else {
+                        return null;
+                    }
+                break;
+                case 10 :
+                    if(
+                    isset($_SESSION[$tmp[0]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]]) &&
+                    isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]][$tmp[9]])
+                    ){
+                        return $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]][$tmp[9]];
                     } else {
                         return null;
                     }
@@ -592,6 +708,7 @@ class Handler extends \Priya\Module\Core\Data{
         if(isset($_SERVER['HTTP_REFERER'])){
             return $this->referer($_SERVER['HTTP_REFERER']);
         }
+        return false;
     }
 
     public function host(){
@@ -618,6 +735,4 @@ class Handler extends \Priya\Module\Core\Data{
         $value = implode('', $value);
         return $value;
     }
-
 }
-?>

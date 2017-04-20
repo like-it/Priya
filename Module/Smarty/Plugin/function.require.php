@@ -1,17 +1,13 @@
 <?php
-use Priya\Application;
-
 /**
- * Smarty plugin
-*
-* @package Smarty
-* @subpackage PluginsFunction
-* @version 1.0
-* @author Remco van der Velde
-* @param array/object/value                    $params   parameters
-* @param Smarty_Internal_Template $template template object
-* @return html
-*/
+ * @author 		Remco van der Velde
+ * @since 		19-01-2016
+ * @version		1.0
+ * @changeLog
+ *  -	all
+ */
+
+use Priya\Application;
 
 function smarty_function_require($params, $template)
 {

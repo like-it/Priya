@@ -6,15 +6,18 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module\Core;
 
+use stdClass;
+use Priya\Application;
+use Priya\Module\Handler;
+use Priya\Module\Route;
+use Priya\Module\Autoload;
+use Priya\Module\Autoload\Tpl;
+use Priya\Module\File;
 use Priya\Module\File\Dir;
 use Priya\Module\Core\Parser;
-use Priya\Module\Autoload\Tpl;
-use Priya\Module\Route;
-use Priya\Application;
-use Priya\Module\Autoload;
-use stdClass;
 
 class Result extends Parser {
     const DIR = __DIR__;
@@ -76,8 +79,7 @@ class Result extends Parser {
         }
         elseif($type == 'cli'){
             return $this->result($this->cli('create'));
-        }
-        else {
+        } else {
             $this->setResult($type);
         }
         return $this->getResult();
@@ -136,12 +138,11 @@ class Result extends Parser {
         foreach($template_list as $template){
             require $template;
         }
-        return 'text/cli';
+        return Handler::CONTENT_TYPE_CLI;
     }
 
     public function createTemplate($template=''){
         $contentType = $this->request('contentType');
-
         $data = $this->data();
         if(empty($template) && isset($data->contentType) && isset($data->contentType->{$contentType}) && isset($data->contentType->{$contentType}->template)){
             $list = $data->contentType->{$contentType}->template;
@@ -183,13 +184,11 @@ class Result extends Parser {
 
         $dir_cache =
             $dir_module_smarty  .
-            'Data' .
+            Application::DATA .
             Application::DS
         ;
-
         $dir_compile = $dir_cache . 'Compile' .	Application::DS;
         $dir_cache .=  'Cache' .	Application::DS;
-
         if(is_dir($dir_compile) === false){
             mkdir($dir_compile, Dir::CHMOD, true);
         }
@@ -204,6 +203,7 @@ class Result extends Parser {
         }
         $this->url($url);
         $dir = dirname($url);
+        $cwd = getcwd();
         chdir($dir);
         $functions = spl_autoload_functions();
         foreach($functions as $function) {
@@ -213,14 +213,13 @@ class Result extends Parser {
         restore_exception_handler();
 
         $dir_vendor = dirname($dir_priya) . Application::DS;
-
         $dir_smarty =
             $dir_vendor .
             'Smarty' .
             Application::DS .
             'libs' .
-            Application::DS;
-
+            Application::DS
+        ;
         require_once $dir_smarty . 'Smarty.class.php';
         $smarty = new \Smarty();
 
@@ -231,13 +230,13 @@ class Result extends Parser {
         $dir_template = '';
         $class = get_called_class();
         if($class::DIR){
-            $dir_template = dirname($class::DIR) . Application::DS . 'Template' . Application::DS;
+            $dir_template = dirname($class::DIR) . Application::DS . Application::TEMPLATE . Application::DS;
         }
         $smarty->setTemplateDir($dir_template);
         $smarty->setCompileDir($dir_compile);
         $smarty->setCacheDir($dir_cache);
         $smarty->setConfigDir('');
-        $smarty->addPluginsDir($dir_module_smarty . 'Plugin'. Application::DS);	//priya plugins...
+        $smarty->addPluginsDir($dir_module_smarty . Application::PLUGIN . Application::DS);	//priya plugins...
         $smarty->assign('class', $this->dom_class($class));
         $smarty->assign('template_list', $template_list);
 
@@ -246,7 +245,7 @@ class Result extends Parser {
             $plugin_dir = (array) $plugin_dir;
         }
         foreach($plugin_dir as $location){
-            $location = str_replace(array('\\', '/'), Application::DS, rtrim($location,'\\/')) . Application::DS;
+            $location = File::dir($location);
             if(is_dir($location)){
                 $smarty->addPluginsDir($location);	//own plugins...
             }
@@ -298,7 +297,7 @@ class Result extends Parser {
         } else {
             $smarty->assign('link', array());
         }
-        if($contentType == 'application/json'){
+        if($contentType == Handler::CONTENT_TYPE_JSON){
             $target = $this->request('target');
             if(empty($target)){
                 $target = $this->data('target');
@@ -321,7 +320,7 @@ class Result extends Parser {
 
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
-        if($contentType == 'application/json'){
+        if($contentType == Handler::CONTENT_TYPE_JSON){
             $object = new stdClass();
             $object->html = $fetch;
             $variable = $smarty->getTemplateVars();
@@ -362,6 +361,7 @@ class Result extends Parser {
         foreach($functions as $function) {
             spl_autoload_register($function);
         }
+        chdir($cwd);
         return $result;
     }
 
@@ -389,7 +389,7 @@ class Result extends Parser {
             $caller = get_called_class();
         }
         if($caller::DIR){
-            $dir = dirname($caller::DIR) . Application::DS . 'Template' . Application::DS;
+            $dir = dirname($caller::DIR) . Application::DS . Application::TEMPLATE . Application::DS;
             $tpl->addPrefix('none', $dir, $extension);
         }
         $autoload = $this->data('autoload');

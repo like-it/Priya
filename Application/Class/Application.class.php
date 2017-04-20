@@ -16,16 +16,20 @@ use Priya\Module\Core\Parser;
 use Priya\Module\Core\Data;
 use Priya\Module\File;
 use Priya\Module\Core\Object;
+use Priya\Module\Handler;
 
 class Application extends Parser {
     const DS = DIRECTORY_SEPARATOR;
     const DIR = __DIR__;
     const ENVIRONMENT = 'development';
     const MODULE = 'Module';
+    const TEMPLATE = 'Template';
+    const PLUGIN = 'Plugin';
     const DATA = 'Data';
     const BACKUP = 'Backup';
     const RESTORE = 'Restore';
     const UPDATE = 'Update';
+    const TEMP = 'Temp';
     const PUBLIC_HTML = 'Public';
     const CONFIG = 'Config.json';
     const ROUTE = 'Route.json';
@@ -184,7 +188,7 @@ class Application extends Parser {
                 $result = $controller->{$item->function}();
             }
         } else {
-            if($contentType == 'text/cli'){
+            if($contentType == Handler::CONTENT_TYPE_CLI){
                 if($request == 'Application/Error/'){
                     trigger_error('cannot route to Application/Error/', E_USER_ERROR);
                     //bug when dir.data = empty ?
@@ -207,14 +211,14 @@ class Application extends Parser {
             }
         }
         if(is_object($result) && isset($result->html)){
-            if($contentType == 'application/json'){
+            if($contentType == Handler::CONTENT_TYPE_JSON){
                 return $this->object($result, 'json');
             } else {
                 return $result->html;
             }
         }
         elseif(is_string($result)){
-            if($result != 'text/cli'){
+            if($result != Handler::CONTENT_TYPE_CLI){
                 return $result;
             }
         } else {

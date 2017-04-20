@@ -6,6 +6,7 @@
  * @changeLog
  * 	-	all
  */
+
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Vendor/Priya/Application/Autoload.php';
 
 $app = new Priya\Application($autoload);

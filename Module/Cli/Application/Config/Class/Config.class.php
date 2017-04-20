@@ -6,7 +6,9 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module\Cli\Application;
+
 use Priya\Module\Core\Cli;
 
 class Config extends Cli {

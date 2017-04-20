@@ -1,16 +1,10 @@
 <?php
 /**
- * @author Remco van der Velde
- * @since 2014-06-12
- * @version 1.0
- *
- * @package Smarty
- * @subpackage PluginsBlock
- * @category block_content
- *
- * @description
- * Smarty plugin
- *
+ * @author 		Remco van der Velde
+ * @since 		19-01-2016
+ * @version		1.0
+ * @changeLog
+ *  -	all
  */
 
 function smarty_block_content($params, $content, $template, &$repeat)

@@ -1,3 +1,6 @@
+.buildpath
+.project
+org.*
 Module/Smarty/Data/
 Application/Data/Restore/
 Application/Data/Update/
