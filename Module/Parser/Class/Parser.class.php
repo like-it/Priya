@@ -207,15 +207,15 @@ class Parser extends Data {
         }
         $modifier = trim(array_shift($argumentList));
         if($return == 'modify'){
-            $value = $this->modify($value, $modifier, $argumentList);
-            return $value;
+            return $this->modify($value, $modifier, $argumentList);
         }
         elseif($return == 'modifier'){
             return $modifier;
         } elseif($return == 'modifier-value') {
             return implode(':', $argumentList);
         } else {
-            $this->debug($argumentList);
+            var_dump($argumentList);
+            die;
         }
     }
 
