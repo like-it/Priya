@@ -1,9 +1,16 @@
 <?php
+/**
+ * @author 		Remco van der Velde
+ * @since 		2016-10-19
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
 
 namespace Priya\Module;
 
-use Priya\Application;
 use stdClass;
+use Priya\Application;
 
 class Route extends \Priya\Module\Core\Parser{
     const DIR = __DIR__;
@@ -47,16 +54,11 @@ class Route extends \Priya\Module\Core\Parser{
             }
         }
         $path = explode('/', trim($path, '/'));
-
-//         var_dump($data);
         foreach($data as $name => $route){
             if(!isset($route->path)){
                 continue;
             }
-//             var_dump($route);
-//             var_dump($path);
             $node = $this->parsePath($path, $route);
-//             var_dump($node);
             if(empty($node)){
                 continue;
             }
@@ -154,18 +156,7 @@ class Route extends \Priya\Module\Core\Parser{
                     }
                 }
                 $counter++;
-
             }
-            /*
-            foreach($attributeList as $attribute_nr => $attribute){
-                if(isset($valueList[$attribute_nr])){
-                    $record = $this->parseAttributeList($attribute, $valueList[$attribute_nr]);
-                    foreach($record as $record_nr => $item){
-                        $itemList[] = $item;
-                    }
-                }
-            }
-            */
             foreach($itemList as $request){
                 if(isset($request->name) && isset($request->value)){
                     $this->request($request->name, $request->value);
@@ -204,7 +195,8 @@ class Route extends \Priya\Module\Core\Parser{
         $object->translate = false;
         $this->data(strtolower(implode('-',$name)) . '/', $object);
         $object = $this->copy($object);
-        $object->path = end($name);
+        array_shift($name);
+        $object->path = implode('/', $name) . '/';
         $this->data(strtolower(implode('-',$name) . '-shorthand') . '/', $object);
     }
 
@@ -270,7 +262,7 @@ class Route extends \Priya\Module\Core\Parser{
             if(!empty($path)){
                 $path .= '/';
             }
-            if(stristr($path, 'http') === false){
+            if(strpos($path, Handler::SCHEME_HTTP) !== 0){
                 $path = $this->data('web.root') . $path;
             }
             return $path;

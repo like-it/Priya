@@ -6,10 +6,11 @@
  * @changeLog
  *  -	all
  */
+
 namespace Priya\Module\File;
 
-use Priya\Application;
 use stdClass;
+use Priya\Application;
 
 class Dir {
     const CHMOD = 0740;
@@ -43,8 +44,7 @@ class Dir {
                     }
                 }
                 return false;
-            }
-            else {
+            } else {
                 if(substr($ignore,-1) !== Application::DS){
                     $ignore .= Application::DS;
                 }
@@ -101,11 +101,6 @@ class Dir {
                 if(is_link($entry)){
                     $file->link = true;
                 }
-                /* absolute url is_link wont work probably the targeting type
-                if(is_link($file->url)){
-                    $file->link = true;
-                }
-                */
                 $list[] = $file;
                 if(!empty($recursiveList)){
                     foreach ($recursiveList as $recursive_nr => $recursive_file){
@@ -122,7 +117,7 @@ class Dir {
         if(is_dir($dir) === false){
             return true;
         }
-        $files = array_diff(scandir($dir), array('.','..'));
+        $files = array_diff(scandir($dir), array('.', '..'));
         foreach ($files as $nr => $file) {
             if($this->ignore('find', "$dir/$file")){
                 continue;
@@ -139,44 +134,6 @@ class Dir {
         }
         return rmdir($dir);
     }
-
-
-    /*
-    public function delete($url='', $recursive=true){
-        if(file_exists($url)===false){
-            return true;
-        }
-        $list = $this->read($url, $recursive);
-        if(!empty($list)){
-            krsort($list);
-            foreach ($list as $nr => $file){
-                if(isset($file->type) && $file->type == 'file'){
-                    $unlink = unlink($file->url);
-                    if(!empty($unlink)){
-                        unset($list[$nr]);
-                    }
-                }
-            }
-            sleep(1);
-            foreach ($list as $nr => $file){
-                if(isset($file->type) && $file->type == 'dir'){
-                    $unlink = rmdir($file->url);
-                    if(!empty($unlink)){
-                        unset($list[$nr]);
-                    }
-                }
-            }
-        }
-        if(empty($list)){
-//         	otherways directory might not be empty
-            $this->read($url, $recursive);
-            return rmdir($url);
-        } else {
-            return false;
-        }
-    }
-    */
-
 
     public function node($node=null){
         if($node !== null){

@@ -14,6 +14,7 @@ use Priya\Module\Autoload;
 use Priya\Module\File;
 
 class Data extends Autoload {
+
     use \Priya\Module\Core\Object;
 
     public function register($method='data_load', $prepend=false){
@@ -28,46 +29,37 @@ class Data extends Autoload {
         }
         if (!empty($url)) {
             return $url;
-
-            $file = new File();
-            $data = $file->read($url);
-            $data = $this->object($data);
-            if($this->environment() == 'development' && empty($data)){
-                trigger_error('File (' . $url . '): empty or corrupted. (No valid Json)');
-            }
-            return $data;
         }
         return false;
     }
 
-    public function filelist($item=array()){		//name to configure ?
+    public function filelist($item=array()){
         $data = array();
         if(empty($item)){
-
-            $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . 'Application' . '.json';
-            $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . 'Application' . '.json';
-            $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . 'Application' . Application::DS . 'Application' . '.json';
+            $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . 'Application' . '.' . Autoload::EXT_JSON;
+            $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . 'Application' . '.' . Autoload::EXT_JSON;
+            $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . 'Application' . Application::DS . 'Application' . '.' . Autoload::EXT_JSON;
             return $data;
         }
-        $data[] = $item['directory'] . $item['file'] . Application::DS . Application::DATA . Application::DS . $item['baseName'] . '.json';
+        $data[] = $item['directory'] . $item['file'] . Application::DS . Application::DATA . Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = $item['directory'] . dirname($item['file']) . Application::DS . Application::DATA . Application::DS . $item['baseName'] . '.json';
+        $data[] = $item['directory'] . dirname($item['file']) . Application::DS . Application::DATA . Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . '.json';
+        $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = $item['directory'] . $item['file'] . Application::DS . Application::DATA . Application::DS . $item['file'] . '.json';
+        $data[] = $item['directory'] . $item['file'] . Application::DS . Application::DATA . Application::DS . $item['file'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . $item['file'] . '.json';
+        $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . $item['file'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . Application::DS . $item['baseName'] . '.json';
+        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . '.json';
+        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['file'] . '.json';
+        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['file'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = $item['directory'] . $item['file'] . Application::DS . $item['file'] . '.json';
+        $data[] = $item['directory'] . $item['file'] . Application::DS . $item['file'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = $item['directory'] . $item['file'] . Application::DS . $item['baseName'] . '.json';
+        $data[] = $item['directory'] . $item['file'] . Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
         return $data;
     }

@@ -6,10 +6,11 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module\Core;
 
-use Priya\Module\Core;
 use Priya\Application;
+use Priya\Module\Core;
 
 class Parser extends Data {
     private $object_parser;

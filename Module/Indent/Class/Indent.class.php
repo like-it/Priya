@@ -6,6 +6,7 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module;
 
 class Indent extends \Priya\Module\Core\NodeList {

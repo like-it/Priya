@@ -1,16 +1,11 @@
 <?php
-
 /**
- * Smarty plugin
-*
-* @package Smarty
-* @subpackage PluginsFunction
-* @version 1.0
-* @author Remco van der Velde
-* @param array/object/value                    $params   parameters
-* @param Smarty_Internal_Template $template template object
-* @return html
-*/
+ * @author 		Remco van der Velde
+ * @since 		19-01-2016
+ * @version		1.0
+ * @changeLog
+ *  -	all
+ */
 
 function smarty_function_nodelist($params, $template)
 {
@@ -39,10 +34,10 @@ function smarty_function_nodelist($params, $template)
     $node = '';
     foreach ($params as $key => $value){
         if(substr($key,0, 5) == 'data-'){
-            $attribute .= $key . '="'.$value .'" ';
+            $attribute .= $key . '="'. $value .'" ';
         }
         if(substr($key,0, 10) == 'node-data-'){
-            $node .= substr($key, 5) . '="'.$value .'" ';
+            $node .= substr($key, 5) . '="'. $value .'" ';
         }
     }
     $attribute = rtrim($attribute, ' ');

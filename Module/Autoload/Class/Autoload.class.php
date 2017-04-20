@@ -5,13 +5,20 @@
  * @version		1.0
  * @changeLog
  *  -	all
- *  -	lowered the l
+ *  -	lowered the l of Autoload
  */
 
 namespace Priya\Module;
+
 use stdClass;
 
 class Autoload{
+    const EXT_PHP = 'php';
+    const EXT_TPL = 'tpl';
+    const EXT_JSON = 'json';
+    const EXT_CLASS_PHP = 'class.php';
+    const EXT_TRAIT_PHP = 'trait.php';
+
     public $prefixList = array();
     public $environment = 'production';
 
@@ -22,12 +29,11 @@ class Autoload{
             foreach($functions as $function){
                 $object = reset($function);
                 if(is_object($object) && get_class($object) == get_class($this)){
-                    return; //register once...
+                    return true; //register once...
                 }
-
             }
         }
-        spl_autoload_register(array($this, $method), true, $prepend);
+        return spl_autoload_register(array($this, $method), true, $prepend);
     }
 
     public function unregister($method='load'){
@@ -90,7 +96,6 @@ class Autoload{
     }
 
     public function load($load){
-// 		$this->environment('development');
         $file = $this->locate($load);
         if (!empty($file)) {
             require $file;
@@ -104,51 +109,44 @@ class Autoload{
             return array();
         }
         $data = array();
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['file'] . '.class.php';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['file'] . '.php';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['file'] . '.trait.php';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['file'] . '.php';
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_CLASS_PHP;
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_PHP;
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_TRAIT_PHP;
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.class.php';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.php';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.trait.php';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.php';
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_CLASS_PHP;
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['file'] . '.class.php';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['file'] . '.trait.php';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['file'] . '.php';
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_CLASS_PHP;
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_TRAIT_PHP;
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.class.php';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.trait.php';
-        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.php';
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_CLASS_PHP;
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
+        $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.class.php';
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.trait.php';
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.php';
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.php';
+        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_CLASS_PHP;
+        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
+        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
+        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] =  '[---]';
-        $data[] = $item['directory'] . $item['file'] . '.class.php';
-        $data[] = $item['directory'] . $item['file'] . '.trait.php';
-        $data[] = $item['directory'] . $item['file'] . '.php';
+        $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_CLASS_PHP;
+        $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_TRAIT_PHP;
+        $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
-        $data[] = $item['directory'] . $item['baseName'] . '.class.php';
-        $data[] = $item['directory'] . $item['baseName'] . '.trait.php';
-        $data[] = $item['directory'] . $item['baseName'] . '.php';
+        $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_CLASS_PHP;
+        $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
+        $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
-//         var_dump($data);
         return $data;
     }
 
     public function locate($load=null){
-
         $load = ltrim($load, '\\');
         $prefixList = $this->getPrefixList();
         $list = array();
-        /* causes wrong placement in Smarty
-        if(ob_get_level() !== 0){
-            ob_flush();
-        }
-        */
         if(!empty($prefixList)){
             foreach($prefixList as $nr => $item){
                 if(empty($item['prefix'])){
@@ -159,20 +157,30 @@ class Autoload{
                 }
                 $item['file'] = false;
                 if (strpos($load, $item['prefix']) === 0) {
-                    $item['file'] = trim(substr($load, strlen($item['prefix'])),'\\');
-                    $item['file'] = str_replace('\\', DIRECTORY_SEPARATOR, $item['file']);
+                    $item['file'] =
+                        trim(substr($load, strlen($item['prefix'])),'\\');
+                    $item['file'] =
+                        str_replace('\\', DIRECTORY_SEPARATOR, $item['file']);
                 } else {
                     $tmp = explode('.', $load);
                     if(count($tmp) >= 2){
                         array_pop($tmp);
                     }
                     $item['file'] = implode('.',$tmp);
+
                 }
                 if(empty($item['file'])){
                     $item['file'] = $load;
                 }
                 if(!empty($item['file'])){
-                    $item['baseName'] = basename($this->removeExtension($item['file'], array('.php','.tpl')));
+                    $item['baseName'] = basename(
+                        $this->removeExtension($item['file'],
+                            array(
+                                Autoload::EXT_PHP,
+                                Autoload::EXT_TPL
+
+                            )
+                    ));
                     $item['dirName'] = dirname($item['file']);
                     $fileList = $this->fileList($item);
                     if(is_array($fileList)){
@@ -185,16 +193,6 @@ class Autoload{
                     $list[] = $fileList;
                 }
             }
-        } else {
-            $fileList = $this->fileList();
-            if(is_array($fileList)){
-                foreach($fileList as $nr => $file){
-                    if(file_exists($file)){
-                        return $file;
-                    }
-                }
-            }
-            $list[] = $fileList;
         }
         if($this->environment()=='development'){
             $object = new stdClass();
@@ -210,8 +208,9 @@ class Autoload{
 
     private function removeExtension($filename='', $extension=array()){
         foreach($extension as $ext){
-            $filename = explode($ext, $filename);
-            if(count($filename) > 1){
+            $ext = '.' . ltrim($ext, '.');
+            $filename = explode($ext, $filename, 2);
+            if(count($filename) > 1 && empty(end($filename))){
                 array_pop($filename);
             }
             $filename = implode($ext, $filename);

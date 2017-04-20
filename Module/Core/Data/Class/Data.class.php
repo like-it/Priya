@@ -6,13 +6,14 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module\Core;
 
-use Priya\Module\Core;
+use stdClass;
 use Priya\Application;
+use Priya\Module\Core;
 use Priya\Module\File;
 use Priya\Module\Handler;
-use stdClass;
 
 class Data extends Core {
     const DIR = __DIR__;

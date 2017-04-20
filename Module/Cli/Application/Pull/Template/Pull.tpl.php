@@ -8,6 +8,7 @@
  * @note
  *  - In Smarty bash coloring isn't working.
  */
+
 namespace Priya;
 
 use Priya\Module\Handler;
@@ -41,4 +42,3 @@ if($this->error() && $this->handler()->method() == Handler::METHOD_POST){
         }
     }
 }
-?>

@@ -6,10 +6,11 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module;
 
-use Priya\Application;
 use stdClass;
+use Priya\Application;
 
 class Data extends Core {
     const DIR = __DIR__;
@@ -63,8 +64,6 @@ class Data extends Core {
             }
             elseif(is_array($this->data)) {
                 $this->data[$attribute] = $value;
-            } else {
-                var_dump('setData create object and set object');
             }
         }
     }
@@ -104,7 +103,6 @@ class Data extends Core {
                 $this->setUrl($url);
             }
         }
-
         return $this->getUrl();
     }
 
@@ -119,7 +117,10 @@ class Data extends Core {
     private function encodeUrl($url=''){
         $temp = explode('/', $url);
         foreach($temp as $nr => $part){
-            if($part == 'http:'){
+            if($part == Handler::SCHEME_HTTP . ':'){
+                continue;
+            }
+            if($part == Handler::SCHEME_HTTPS . ':'){
                 continue;
             }
             $temp[$nr] = rawurlencode($part);
@@ -131,7 +132,10 @@ class Data extends Core {
     private function decodeUrl($url=''){
         $temp = explode('/', $url);
         foreach($temp as $nr => $part){
-            if($part == 'http:'){
+            if($part == Handler::SCHEME_HTTP . ':'){
+                continue;
+            }
+            if($part == Handler::SCHEME_HTTPS . ':'){
                 continue;
             }
             $temp[$nr] = rawurldecode($part);
@@ -180,9 +184,6 @@ class Data extends Core {
             $directory .= str_replace('\\', Application::DS, $namespace) . Application::DS;
             $data = new \Priya\Module\Autoload\Data();
             $environment = $this->data('environment');
-            if(!empty($environment)){
-//                 $data->environment('development');
-            }
             $class = get_called_class();
             if($class::DIR){
                 $dir = dirname($class::DIR) . Application::DS;// . 'Data' . Application::DS;
@@ -398,8 +399,6 @@ class Data extends Core {
         }
         if(is_object($values)){
             $values = $this->object($values, 'array');
-            var_dump($values);
-            die;
         }
         elseif(!is_array($values)){
             $values = explode(',', $values);

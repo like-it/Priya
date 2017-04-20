@@ -6,10 +6,11 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module\Core\Data;
 
-use Priya\Module\Core\Data;
 use stdClass;
+use Priya\Module\Core\Data;
 
 class Rule extends Data {
     const DIR = __DIR__;
@@ -79,7 +80,6 @@ class Rule extends Data {
 
     public function validate(){
         $ruleList = $this->ruleList();
-
         foreach($ruleList as $nr => $rule){
             if(!isset($rule->attribute)){
                 trigger_error('attribute not defined in rule');
@@ -93,7 +93,6 @@ class Rule extends Data {
             if(!isset($rule->error)){
                 trigger_error('error not defined in rule');
             }
-
             switch($rule->type){
                 case 'string':
                     if(!isset($rule->method)){
@@ -116,7 +115,6 @@ class Rule extends Data {
                                     }
                                 }
                                 if($count >= 1){
-//                                     $this->error('add', 'nodeList', $rule->error);
                                     $this->error('add', $rule->attribute, $rule->error);
                                     $this->error('add', $rule->error, true);
                                 }
@@ -127,7 +125,6 @@ class Rule extends Data {
                                     $attribute = $rule->attribute;
                                 }
                                 if($this->is_email($attribute) === false){
-//                                     $this->error('add', 'nodeList', $rule->error);
                                     $this->error('add', $rule->attribute, $rule->error);
                                     $this->error('add', $rule->error, true);
                                 }
@@ -138,7 +135,6 @@ class Rule extends Data {
                                 if($attribute  != $compare){
                                     //actions?
                                 } else {
-//                                     $this->error('add', 'nodeList', $rule->error);
                                     $this->error('add', $rule->attribute, $rule->error);
                                     $this->error('add', $rule->error, true);
                                 }
@@ -150,7 +146,6 @@ class Rule extends Data {
                                 if($attribute  == $compare){
                                     //actions?
                                 } else {
-//                                     $this->error('add', 'nodeList', $rule->error);
                                     $this->error('add', $rule->attribute, $rule->error);
                                     $this->error('add', $rule->error, true);
                                 }
@@ -166,7 +161,6 @@ class Rule extends Data {
                                     case '>' :
                                         if(strlen($this->data($rule->attribute)) > $rule->compare){
                                         } else {
-//                                             $this->error('add', 'nodeList', $rule->error);
                                             $this->error('add', $rule->attribute, $rule->error);
                                             $this->error('add', $rule->error, true);
                                         }
@@ -174,7 +168,6 @@ class Rule extends Data {
                                     case '>=':
                                         if(strlen($this->data($rule->attribute)) >= $rule->compare){
                                         } else {
-//                                             $this->error('add', 'nodeList', $rule->error);
                                             $this->error('add', $rule->attribute, $rule->error);
                                             $this->error('add', $rule->error, true);
                                         }
@@ -182,7 +175,6 @@ class Rule extends Data {
                                     case '!=':
                                         if(strlen($this->data($rule->attribute)) != $rule->compare){
                                         } else {
-//                                             $this->error('add', 'nodeList', $rule->error);
                                             $this->error('add', $rule->attribute, $rule->error);
                                             $this->error('add', $rule->error, true);
                                         }
@@ -190,7 +182,6 @@ class Rule extends Data {
                                     case '==':
                                         if(strlen($this->data($rule->attribute)) == $rule->compare){
                                         } else {
-//                                             $this->error('add', 'nodeList', $rule->error);
                                             $this->error('add', $rule->attribute, $rule->error);
                                             $this->error('add', $rule->error, true);
                                         }
@@ -198,7 +189,6 @@ class Rule extends Data {
                                     case '<=':
                                         if(strlen($this->data($rule->attribute)) <= $rule->compare){
                                         } else {
-//                                             $this->error('add', 'nodeList', $rule->error);
                                             $this->error('add', $rule->attribute, $rule->error);
                                             $this->error('add', $rule->error, true);
                                         }
@@ -206,7 +196,6 @@ class Rule extends Data {
                                     case '<':
                                         if(strlen($this->data($rule->attribute)) < $rule->compare){
                                         } else {
-//                                             $this->error('add', 'nodeList', $rule->error);
                                             $this->error('add', $rule->attribute, $rule->error);
                                             $this->error('add', $rule->error, true);
                                         }
@@ -238,7 +227,6 @@ class Rule extends Data {
                                         }
                                     }
                                     if(empty($found)){
-//                                         $this->error('add', 'nodeList', $rule->error);
                                         $this->error('add', $rule->attribute, $rule->error);
                                         $this->error('add', $rule->error, true);
                                     }
@@ -252,7 +240,6 @@ class Rule extends Data {
                                     }
                                 }
                                 if(empty($found)){
-//                                     $this->error('add', 'nodeList', $rule->error);
                                     $this->error('add', $rule->attribute, $rule->error);
                                     $this->error('add', $rule->error, true);
                                 }
@@ -264,7 +251,6 @@ class Rule extends Data {
                                 case '>' :
                                     if(count($this->data($rule->attribute)) > $rule->compare){
                                     } else {
-//                                         $this->error('add', 'nodeList', $rule->error);
                                         $this->error('add', $rule->attribute, $rule->error);
                                         $this->error('add', $rule->error, true);
                                     }
@@ -272,7 +258,6 @@ class Rule extends Data {
                                 case '>=' :
                                     if(count($this->data($rule->attribute)) >= $rule->compare){
                                     } else {
-//                                         $this->error('add', 'nodeList', $rule->error);
                                         $this->error('add', $rule->attribute, $rule->error);
                                         $this->error('add', $rule->error, true);
                                     }
@@ -280,7 +265,6 @@ class Rule extends Data {
                                 case '!=' :
                                     if(count($this->data($rule->attribute)) != $rule->compare){
                                     } else {
-//                                         $this->error('add', 'nodeList', $rule->error);
                                         $this->error('add', $rule->attribute, $rule->error);
                                         $this->error('add', $rule->error, true);
                                     }
@@ -288,7 +272,6 @@ class Rule extends Data {
                                 case '==' :
                                     if(count($this->data($rule->attribute)) == $rule->compare){
                                     } else {
-//                                         $this->error('add', 'nodeList', $rule->error);
                                         $this->error('add', $rule->attribute, $rule->error);
                                         $this->error('add', $rule->error, true);
                                     }
@@ -296,7 +279,6 @@ class Rule extends Data {
                                 case '<=' :
                                     if(count($this->data($rule->attribute)) <= $rule->compare){
                                     } else {
-//                                         $this->error('add', 'nodeList', $rule->error);
                                         $this->error('add', $rule->attribute, $rule->error);
                                         $this->error('add', $rule->error, true);
                                     }
@@ -304,7 +286,6 @@ class Rule extends Data {
                                 case '<' :
                                     if(count($this->data($rule->attribute)) < $rule->compare){
                                     } else {
-//                                         $this->error('add', 'nodeList', $rule->error);
                                         $this->error('add', $rule->attribute, $rule->error);
                                         $this->error('add', $rule->error, true);
                                     }

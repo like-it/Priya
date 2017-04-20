@@ -8,9 +8,9 @@
  * @note
  *  - In Smarty bash coloring isn't working.
  */
+
 namespace Priya;
 
 if($this->data('options')){
     echo "\t" . 'restore                  (this will restore the installation from ' . $this->data('dir.priya.data') . 'Restore/' . PHP_EOL;
 }
-?>

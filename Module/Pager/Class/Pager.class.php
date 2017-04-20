@@ -6,11 +6,12 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module;
 
-use Priya\Module\Core\Data;
-use Priya\Application;
 use stdClass;
+use Priya\Application;
+use Priya\Module\Core\Data;
 
 class Pager extends Data {
     const LENGTH = 20;
@@ -24,7 +25,6 @@ class Pager extends Data {
     private $route;
 
     private $content;
-
 
     public function __construct($handler=null, $route=null, $data=null){
         parent::__construct($handler, $route, $data);
@@ -288,5 +288,4 @@ class Pager extends Data {
         $node->nodeList = $this->object($content);
         return $this->content($node);
     }
-
 }

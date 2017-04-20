@@ -6,15 +6,16 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module\Cli\Application;
 
-use Priya\Module\Core\Cli;
-use Priya\Module\File\Dir;
-use Priya\Module\File;
-use Priya\Module\Core\Data;
+use stdClass;
 use ZipArchive;
 use Priya\Application;
-use stdClass;
+use Priya\Module\File;
+use Priya\Module\File\Dir;
+use Priya\Module\Core\Cli;
+use Priya\Module\Core\Data;
 
 class Restore extends Cli {
     const DIR = __DIR__;
@@ -79,11 +80,11 @@ class Restore extends Cli {
         if(is_dir($this->data('dir.priya.restore')) === false){
             mkdir($this->data('dir.priya.restore'), Dir::CHMOD, true);
         }
-        if(is_dir($this->data('dir.priya.restore') . 'Temp' . Application::DS) === false){
-            mkdir($this->data('dir.priya.restore') . 'Temp' . Application::DS, Dir::CHMOD, true);
+        if(is_dir($this->data('dir.priya.restore') . Application::TEMP . Application::DS) === false){
+            mkdir($this->data('dir.priya.restore') . Application::TEMP . Application::DS, Dir::CHMOD, true);
         } else {
             $dir->ignore('list', array());
-            $temp = $dir->read($this->data('dir.priya.restore') . 'Temp' . Application::DS, true);
+            $temp = $dir->read($this->data('dir.priya.restore') . Application::TEMP . Application::DS, true);
             foreach($temp as $node){
                 if($node->type != 'file'){
                     continue;
@@ -100,7 +101,7 @@ class Restore extends Cli {
         }
         foreach($read as $node){
             $node->target = explode($url, $node->url, 2);
-            $node->target = $this->data('dir.priya.restore') . 'Temp' . Application::DS . implode('', $node->target);
+            $node->target = $this->data('dir.priya.restore') . Application::TEMP . Application::DS . implode('', $node->target);
             if($node->type == 'dir'){
                 mkdir($node->target, DIR::CHMOD, true);
             }
@@ -130,7 +131,6 @@ class Restore extends Cli {
             $location = explode($this->data('dir.root'), $node->url, 2);
             $location = implode('', $location);
             $zip->addFile($node->target, $location);
-//             $zip->addFromString($location, file_get_contents($node->url));
         }
         $zip->close();
         foreach($read as $node){
@@ -293,7 +293,6 @@ class Restore extends Cli {
                     }
                 }
             }
-
             if(file_exists($node->url)){
                 unlink($node->url);
             }

@@ -5,14 +5,16 @@
  * @version		1.0
  * @changeLog
  * 	-	all
- */ 
+ */
+
 namespace Priya\Module\Cli\Application;
+
 use Priya\Module\Core\Cli;
 
 class Error extends Cli {
-	const DIR = __DIR__;
-			
-	public function run(){
-		return $this->result('cli');						
-	}		
+    const DIR = __DIR__;
+
+    public function run(){
+        return $this->result('cli');
+    }
 }

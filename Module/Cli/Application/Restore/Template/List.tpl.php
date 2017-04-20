@@ -8,6 +8,7 @@
  * @note
  *  - In Smarty bash coloring isn't working.
  */
+
 namespace Priya;
 
 $nodeList = $this->data('nodeList');
@@ -19,4 +20,3 @@ if(is_array($nodeList)){
         }
     }
 }
-?>

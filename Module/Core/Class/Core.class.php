@@ -6,10 +6,11 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module;
 
-use Priya\Application;
 use stdClass;
+use Priya\Application;
 
 class Core {
     use Core\Object;
@@ -175,7 +176,7 @@ class Core {
             $this->session('post', $post);
         }
         $contentType = $this->request('contentType');
-        if($contentType == 'application/json'){
+        if($contentType == Handler::CONTENT_TYPE_JSON){
             $output = new stdClass();
             $output->refresh = $url;
             echo json_encode($output);
@@ -451,8 +452,6 @@ class Core {
             }
             elseif(is_array($this->message)) {
                 $this->message[$attribute] = $value;
-            } else {
-                var_dump('setMessage create object and set object');
             }
         }
     }
@@ -595,5 +594,4 @@ class Core {
     private function getAutoload(){
         return $this->autoload;
     }
-
 }

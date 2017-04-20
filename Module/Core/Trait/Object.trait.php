@@ -8,6 +8,7 @@
  */
 
 namespace Priya\Module\Core;
+
 use stdClass;
 
 trait Object {
@@ -36,7 +37,6 @@ trait Object {
         } else {
             $data = json_encode($input, JSON_PRETTY_PRINT);
         }
-
         if($output=='object'){
             return json_decode($data);
         }
@@ -206,7 +206,6 @@ trait Object {
                     unset($attributeList[$nr]);
                 }
             }
-
         }
         if(is_array($attributeList)){
             $attributeList = $this->object_horizontal($attributeList);
@@ -228,7 +227,6 @@ trait Object {
     public function object_merge(){
         $objects = func_get_args();
         $main = array_shift($objects);
-
         foreach($objects as $nr => $object){
             if(is_array($object)){
                 foreach($object as $key => $value){
@@ -280,7 +278,6 @@ trait Object {
                 $array[$key] = $value;
             }
         }
-        return  $array;
+        return $array;
     }
-
 }

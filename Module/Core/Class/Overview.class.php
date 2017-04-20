@@ -6,12 +6,13 @@
  * @changeLog
  * 	-	all
  */
+
 namespace Priya\Module\Core;
 
 class Overview extends Result {
 
-	public function __construct($handler=null, $route=null, $data=null){
-		parent::__construct($handler, $route, $data);
-	}
+    public function __construct($handler=null, $route=null, $data=null){
+        parent::__construct($handler, $route, $data);
+    }
 
 }
