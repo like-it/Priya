@@ -197,7 +197,7 @@ class Data extends Core {
             }
             $autoload = $this->autoload($data);
         }
-        $autoload->environment('development');
+//         $autoload->environment('development');
         $url = $autoload->data_load($url);
         if($url !== false){
             $this->url($url);

@@ -22,6 +22,7 @@ $parse = function(){
     $parser = new Parser($this->data());
     $parser->route($this->route());
     $read = $parser->read($url);
+    echo 'result:' . PHP_EOL;
     echo $this->object($parser->data('test'), 'json');
 };
 $parse();

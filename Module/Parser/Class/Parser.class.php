@@ -77,7 +77,13 @@ class Parser extends Data {
                 $temp = explode(' ', $string);
                 $function = ltrim(reset($temp), '{');
                 $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
-                $url = $dir . 'function.' . $function . '.php';
+                if(in_array($function, array('if'))){
+                    $url = $dir . 'control.' . $function . '.php';
+                    $function = 'control_' . $function;
+                } else {
+                    $url = $dir . 'function.' . $function . '.php';
+                    $function = 'function_' . $function;
+                }
                 if(file_exists($url)){
                     require_once $url;
                 } else {
@@ -85,20 +91,37 @@ class Parser extends Data {
                     //remove function ?
                     continue;
                 }
-                $function = 'function_' . $function;
+
                 if(function_exists($function) === false){
+                    var_dump('missing function: ' . $function);
                     //trigger error?
                     continue;
                 }
-                if($function == 'function_if'){
-                    $argumentList = $this->createArgumentListIf($string);
-//                     var_dump($argumentList);
-                    die;
+                if(strpos($function, 'control') === 0){
+                    if($key == '{/if}'){
+                        $argumentList = $this->createArgumentListIf($string);
+                        foreach($argumentList as $nr => $argument){
+                            $methodList = $this->createMethodList($argument['statement']);
+                            $argumentList[$nr]['methodList'] = $methodList;
+                        }
+                        $string =  $function($string, $argumentList, $this);
+                    }
+                    /*
+
+                    foreach($argumentList as $nr => $argument){
+                        //if argument['statement'] == function
+                    }
+                    var_dump('---------------------------------------');
+                    var_dump($key);
+                    var_dump($argumentList);
+//                     $argumentList= $this->compile($argumentList, $this->data());
+                    $string =  $function($string, $argumentList, $this);
+                    */
                 } else {
                     $argumentList = $this->createArgumentList($list);
+                    $argumentList= $this->compile($argumentList, $this->data());
+                    $string =  $function($string, $argumentList, $this);
                 }
-                $argumentList= $this->compile($argumentList, $this->data());
-                $string =  $function($string, $argumentList, $this);
             }
             return $string;
         }
@@ -148,6 +171,108 @@ class Parser extends Data {
             }
         }
         return $list;
+    }
+
+    private function createMethodList($statement=''){
+        $temp = $this->explode_multi(
+            array(
+                '&&',
+                '||',
+                'and',
+                'or',
+                'xor',
+                '==',
+                '===',
+                '<>',
+                '!=',
+                '!==',
+                '<',
+                '<=',
+                '>',
+                '>=',
+                '<=>'
+            ),
+            $statement
+         );
+        $methodList = array();
+        foreach ($temp as $nr => $part){
+            $method = explode('(', $part, 2);
+            if(count($method) == 1){
+                return $methodList;
+            }
+            $inSet = false;
+            foreach($method as $key => $value){
+                if(empty($value)){
+                    $inSet = true;
+                    continue;
+                }
+                if(!empty($inSet)){
+                    $method = explode('(', $value, 2);
+                    break;
+                }
+            }
+            foreach($method as $key => $value){
+                $method[$key] = trim($value);
+            }
+            $function_key = trim($part, ' ()') . ')';
+            $function = array();
+            $function[$function_key]['function'] = array_shift($method);
+            $arguments = reset($method);
+            $arguments = strrev($arguments);
+            $args = explode(')', $arguments, 2);
+            array_shift($args);
+            $arguments = reset($args);
+            $arguments = strrev($arguments);
+
+            $args = explode(',', $arguments);
+            $array = false;
+            $list = array();
+            foreach($args  as $key => $value){
+                $arg = trim($value);
+                if(strpos($arg, '[') === 0){
+                    $array = array();
+                    $array[] = $value;
+                    continue;
+                }
+                if(strpos($arg, 'array(') === 0){
+                    $array = array();
+                    $array[] = $value;
+                    continue;
+                }
+                $arg = strrev($arg);
+                if(strpos($arg, ']') === 0){
+                    $array[] = $value;
+                    $list[] = implode(',', $array);
+                    $array = false;
+                    continue;
+                }
+                if(strpos($arg, ')') === 0){
+                    $array[] = $value;
+                    $list[] = implode(',', $array);
+                    $array = false;
+                    continue;
+                }
+                if(!empty($array)){
+                    $array[] = $value;
+                } else {
+                    $list[] = $value;
+                }
+            }
+            $function[$function_key]['argumentList'] = $list;
+            $methodList[$statement][] = $function;
+        }
+        return $methodList;
+
+
+        /*
+        foreach($temp as $nr => $part){
+            $sep = explode(')', $part);
+            var_dump($sep);
+        }
+        var_dump('------------------------');
+        */
+
+//         var_dump($temp);
     }
 
     private function createArgumentList($list=array()){
@@ -206,7 +331,8 @@ class Parser extends Data {
             if(empty($statement)){
                 continue;
             }
-            var_dump($statement);
+            //explode statements on space
+//             var_dump($statement);
             $else = explode('{else}', end($temp));
             if(count($else) == 1){
                 //no else
@@ -214,26 +340,14 @@ class Parser extends Data {
                 $true = reset($else);
                 $false = rtrim(end($else), '{/if}');
             }
-            var_dump($true);
-            var_dump($false);
-            die;
+            $argument = array();
+            $argument['statement'] = $statement;
+            $argument['true'] = $true;
+            $argument['false'] = $false;
 
-            /*
-            $index = explode(' ', $value, 2);
-            array_shift($index);
-            $index = implode(' ', $index);
-            if(empty($index)){
-                continue;
-            }
-            if(isset($attribute[$key+1])){
-                $temp = $attribute[$key+1];
-                $temp = explode('"', str_replace('\"', '__internal_quote', $temp), 2);
-                $temp = reset($temp);
-                $temp = str_replace('__internal_quote', '"', $temp);
-                $argumentList[$index] = $temp;
-            }
-            */
+            $argumentList[] = $argument;
         }
+        /*
         foreach($argumentList as $key => $value){
             if(substr($value,0,1) == '[' && substr($value,-1,1) == ']'){
                 $temp = explode(',', substr($value, 1, -1));
@@ -243,7 +357,7 @@ class Parser extends Data {
                 $argumentList[$key] = $temp;
             }
         }
-
+        */
         return $argumentList;
     }
 
