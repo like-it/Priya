@@ -87,7 +87,7 @@ class Parser extends Data {
                 if(file_exists($url)){
                     require_once $url;
                 } else {
-                    var_dump('missing file: ' . $url);
+//                     var_dump('missing file: ' . $url);
                     //remove function ?
                     continue;
                 }
@@ -174,7 +174,7 @@ class Parser extends Data {
     }
 
     private function createMethodList($statement=''){
-        $temp = $this->explode_multi(
+        $temp = $this->explode_single(
             array(
                 '&&',
                 '||',

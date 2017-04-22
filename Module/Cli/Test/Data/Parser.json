@@ -11,14 +11,6 @@
     "modifier_basename_1" : "{$test.directory|basename}",
     "modifier_basename_2" : "{$test.file|basename:\".{$test.extension}\"}",
     "modifier_basename_3" : "{$test.file|basename}",
-    "function_if_8" : "{if round( 2.3, 2) < 2.1}test{else}{$test.variable}{/if}",
-    "function_if_1" : "{if 1}test{else}{$test.variable}{/if}",
-    "function_if_3" : "{if 1 == 1}test2{else}{$test.variable}2{/if}",
-    "function_if_4" : "{if 1 <> 2}test3{else}{$test.variable}3{/if}",
-    "function_if_2" : "{if empty({$test.variable})}test{else}{$test.variable}{/if}",
-    "function_if_5" : "{if empty({$test.variable}) && isset(\"test\")}test{else}{$test.variable}{/if}",
-    "function_if_6" : "{if (empty({$test.variable}) && isset(\"test\")}test{else}{$test.variable}{/if}",
-    "function_if_7" : "{if (tmp_array({$test.variable}, array(\"test\", \"te)st2\", \"test3\"), array(\"test4\", \"test5\", 1)) && isset(\"test\")}test{else}{$test.variable}{/if}",
-    "function_if_9" : "{if (empty({$test.variable}) && is_array([\"test\", \"tes,t2\"])}test{else}{$test.variable}{/if}"
+    "function_if_8" : "{if is_dir(\"file\") && round( 2.3, 2) > round(2.1) && 1 + 1 == 2 && \"string+\" == \"string+\"}test{else}{$test.variable}{/if}"
 }
 }
