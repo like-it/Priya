@@ -1,0 +1,11 @@
+{
+"title": "Test.Parser.Control.If",
+"web" : {
+    "root" : "http:://{$test.variable}/"
+},
+"test" : {
+    "value" : "",
+    "variable" : "testing",
+    "control_if_2" : "{if 1 == 1)}test{else}{$test.variable}{/if}"
+}
+}

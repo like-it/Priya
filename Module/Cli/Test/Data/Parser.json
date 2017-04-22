@@ -11,6 +11,10 @@
     "modifier_basename_1" : "{$test.directory|basename}",
     "modifier_basename_2" : "{$test.file|basename:\".{$test.extension}\"}",
     "modifier_basename_3" : "{$test.file|basename}",
-    "function_if_8" : "{if is_dir(\"file\") && round( 2.3, 2) > round(2.1) && 1 + 1 == 2 && \"string+\" == \"string+\"}test{else}{$test.variable}{/if}"
+    "function_if_8" : "{if round( 2.3, 2) > round(2.1) && 1 + 1 == 2}test{else}{$test.variable}{/if}",
+    "function_if_2" : "{if !empty(\"{$test.value}\")}test{else}{$test.variable}{/if}",
+    "function_if_5" : "{if !empty(\"{$test.variable}\") && isset(\"test\")}test{else}{$test.variable}{/if}",
+    "function_if_6" : "{if (empty(\"{$test.variable}\") && isset(\"test\"))}test{else}{$test.variable}{/if}",
+    "function_if_9" : "{if (empty(\"{$test.variable}\") && is_array([\"test\", \"tes,t2\"]))}test{else}{$test.variable}{/if}"
 }
 }

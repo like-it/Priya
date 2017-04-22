@@ -87,13 +87,15 @@ trait Object {
                 foreach ($delimiter as $delim){
                     if(strpos($part, $delim) !== false){
                         unset($list[$part]);
-                    } else{
                     }
                 }
             }
             $result = array();
             foreach($list as $part => $value){
                 $result[] = $part;
+            }
+            if(empty($result)){
+                $result[] = $string;
             }
             return $result;
         } else {

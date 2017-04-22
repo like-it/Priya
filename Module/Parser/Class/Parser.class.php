@@ -70,24 +70,31 @@ class Parser extends Data {
                 }
                 $string = str_replace($search, $replace, $string);
             }
+            $functon_list = array();
             foreach($list as $key => $value){
                 if(substr($key, 1, 1) == '$'){
                     continue;
                 }
                 $temp = explode(' ', $string);
-                $function = ltrim(reset($temp), '{');
+                $method= ltrim(reset($temp), '{');
+                $method = explode('(', $method, 2);
+                $function = reset($method);
+                $function_key = $function;
+                var_dump('^^^^^^^^^^^^^^^^^^^^^^^^^^');
+                var_dump($string);
                 $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
                 if(in_array($function, array('if'))){
-                    $url = $dir . 'control.' . $function . '.php';
+                    $url = $dir . 'Control.' . ucfirst(strtolower($function)) . '.php';
                     $function = 'control_' . $function;
                 } else {
-                    $url = $dir . 'function.' . $function . '.php';
+                    $url = $dir . 'Function.' . ucfirst(strtolower($function))  . '.php';
                     $function = 'function_' . $function;
                 }
                 if(file_exists($url)){
                     require_once $url;
                 } else {
-//                     var_dump('missing file: ' . $url);
+                    var_dump($string);
+                    var_dump('(parser) missing file: ' . $url);
                     //remove function ?
                     continue;
                 }
@@ -105,24 +112,32 @@ class Parser extends Data {
                             $argumentList[$nr]['methodList'] = $methodList;
                         }
                         $string =  $function($string, $argumentList, $this);
+                        $functon_list[$key][$function_key] = $string;
                     }
-                    /*
-
-                    foreach($argumentList as $nr => $argument){
-                        //if argument['statement'] == function
-                    }
-                    var_dump('---------------------------------------');
-                    var_dump($key);
-                    var_dump($argumentList);
-//                     $argumentList= $this->compile($argumentList, $this->data());
-                    $string =  $function($string, $argumentList, $this);
-                    */
                 } else {
+//                     $methodList = $this->createMethodList($value);
+//                     var_dump($methodList);
+//                 	$methodList = $this->createMethodList($attribute);
+//                 	$methodList= $this->compile($methodList, $this->data());
+//                     var_dump($attribute);
+//                     var_dump($string);
+//                 	var_dump($methodList);
+
                     $argumentList = $this->createArgumentList($list);
-                    $argumentList= $this->compile($argumentList, $this->data());
+//                     var_dump('-----------------------------');
+//                     var_dump($argumentList);
+//                     $argumentList = $this->createArgumentListIf($string);
+//                     var_dump($argumentList);
+
+//                     $argumentList = $this->createArgumentList($list);
+//                     $argumentList= $this->compile($argumentList, $this->data());
+//                     var_dump($argumentList);
                     $string =  $function($string, $argumentList, $this);
+                    $functon_list[$key][$function_key] = $string;
                 }
             }
+            var_dump('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            var_dump($functon_list);
             return $string;
         }
     }
@@ -216,7 +231,8 @@ class Parser extends Data {
             }
             $function_key = trim($part, ' ()') . ')';
             $function = array();
-            $function[$function_key]['function'] = array_shift($method);
+            $func = array_shift($method);
+            $function[$function_key]['function'] = ltrim($func, '!');
             $arguments = reset($method);
             $arguments = strrev($arguments);
             $args = explode(')', $arguments, 2);
@@ -262,17 +278,10 @@ class Parser extends Data {
             $methodList[$statement][] = $function;
         }
         return $methodList;
+    }
 
+    private function createArgumentListFunction($list=array()){
 
-        /*
-        foreach($temp as $nr => $part){
-            $sep = explode(')', $part);
-            var_dump($sep);
-        }
-        var_dump('------------------------');
-        */
-
-//         var_dump($temp);
     }
 
     private function createArgumentList($list=array()){
@@ -288,7 +297,7 @@ class Parser extends Data {
         $index = false;
         foreach($attribute as $key => $value){
             $index = explode(' ', $value, 2);
-            array_shift($index);
+            $temp = array_shift($index);
             $index = implode(' ', $index);
             if(empty($index)){
                 continue;
@@ -310,7 +319,20 @@ class Parser extends Data {
                 $argumentList[$key] = $temp;
             }
         }
-
+        if(empty($argumentList)){
+            /*
+            $attribute = reset($list);
+            if(empty($attribute)){
+                return array();
+            }
+            var_dump('$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
+            $methodList = $this->createMethodList($attribute);
+            $methodList= $this->compile($methodList, $this->data());
+            var_dump($attribute);
+            var_dump($methodList);
+            */
+//             $attribute = explode('="', $attribute);
+        }
         return $argumentList;
     }
 
@@ -331,16 +353,18 @@ class Parser extends Data {
             if(empty($statement)){
                 continue;
             }
-            //explode statements on space
-//             var_dump($statement);
             $else = explode('{else}', end($temp));
             if(count($else) == 1){
+                var_dump('######### only if');
+                var_dump($temp);
+                die;
                 //no else
             } else {
                 $true = reset($else);
                 $false = rtrim(end($else), '{/if}');
             }
             $argument = array();
+            $argument['original'] = $statement;
             $argument['statement'] = $statement;
             $argument['true'] = $true;
             $argument['false'] = $false;
@@ -415,7 +439,7 @@ class Parser extends Data {
             return $this->modifyList($value, $modifier);
         }
         $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
-        $url = $dir . 'modifier.' . $modifier . '.php';
+        $url = $dir . 'Modifier.' . ucfirst(strtolower($modifier)) . '.php';
         if(file_exists($url)){
             require_once $url;
         } else {

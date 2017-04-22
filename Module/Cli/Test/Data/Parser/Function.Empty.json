@@ -1,0 +1,11 @@
+{
+"title": "Test.Parser.Function.Empty",
+"web" : {
+    "root" : "http:://{$test.variable}/"
+},
+"test" : {
+    "value" : "1",
+    "variable" : "testing",
+    "function_empty_2" : "{empty(\"{$test.value}\")};{empty(\"{$test.variable}\")};"
+}
+}
