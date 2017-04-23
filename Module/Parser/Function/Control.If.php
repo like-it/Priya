@@ -102,12 +102,15 @@ function evaluate($argument = array()){
         $argument = (array) $argument;
     }
     $result = false;
+//     var_dump($argument);
+//     var_dump($argument['statement']);
     $eval = 'if(' . $argument['statement'] .'){ $result = true; } else { $result = false; }';
 //     var_dump($eval);
     ob_start();
     eval($eval);
     $error = ob_end_clean();
     $argument['condition'] = $result;
+//     var_Dump($result);
     return $argument;
     /*
     if($result === false){

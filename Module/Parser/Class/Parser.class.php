@@ -14,6 +14,7 @@ use Priya\Application;
 
 class Parser extends Data {
     const DIR = __DIR__;
+    const MAX_ITERATION = 128;
 
     private $argument;
 
@@ -42,6 +43,7 @@ class Parser extends Data {
                 return $string;
             }
             $data = $this->object($data);
+            $compile_list = array();
             foreach($list as $key => $value){
                 if(substr($key, 1, 1) != '$'){
                     continue;
@@ -63,7 +65,6 @@ class Parser extends Data {
                 $list[$key] = $modify;
                 $attributeList[$key] = $modify;
             }
-            $compile_list = array();
             foreach($attributeList as $search => $replace){
                 $replace = $this->compile($replace, $data, $keep);
                 $compile_list[$search] = $replace;
@@ -75,10 +76,8 @@ class Parser extends Data {
                 }
                 $string = str_replace($search, $replace, $string);
             }
-            $function_list = array();
-            $replace = $string;
-
             $init = 0;
+            $counter = 0;
             while($init < 2){
                 $test = array();
                 $list = $this->controlList($string, 10, $init);
@@ -101,38 +100,12 @@ class Parser extends Data {
                         $init = 0;
                     }
                 }
+                $counter++;
+                if($counter > Parser::MAX_ITERATION){
+                    //variable in if condition
+                    break;
+                }
             }
-
-            /*
-            $list = $this->controlList($string, 20, 1);
-            $string = $this->createStatementList($string, $list);
-            $list = $this->controlList($string, 20, 0);
-            $string = $this->createStatementList($string, $list);
-            $list = $this->controlList($string, 20, 1);
-            $string = $this->createStatementList($string, $list);
-            $list = $this->controlList($string, 20, 0);
-            $string = $this->createStatementList($string, $list);
-            $list = $this->controlList($string, 20, 1);
-            $string = $this->createStatementList($string, $list);
-            if(!empty($list)){
-                $list = $this->controlList($string, 20, 0);
-                $list = $this->controlList($string, 20, 1);
-                var_dump('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
-                var_dump($string);
-                var_dump($list);
-            }
-//             $string = $this->createStatementList($string, $list);
-             *
-             */
-            /*
-            while ($list !== false){
-                $string = $this->createStatementList($string, $list);
-                $list = $this->controlList($string);
-//                 var_dump($string);
-                var_dump($list);
-            }
-//             $list = $this->controlList($string);
-            */
             return $string;
         }
     }
@@ -196,8 +169,7 @@ class Parser extends Data {
                     continue;
 
                 } else{
-                    var_dump('false condition');
-                    die;
+                    $string = str_replace($argument['string'], $argument['result'] . $argument['extra'], $string);
                 }
             }
         }
@@ -209,6 +181,14 @@ class Parser extends Data {
         $method= ltrim(reset($temp), '{');
         $method = explode('(', $method, 2);
         $function = ltrim(reset($method), '!');
+        /*
+        $function_list = explode('{', $function, 2);
+        if(count($function_list) == 2){
+            array_shift($function_list);
+        }
+        $function = reset($function_list);
+        */
+
         $function_key = $function;
         $search  = $key;
         foreach($compile_list as $compile_key => $compile_value){
@@ -227,6 +207,8 @@ class Parser extends Data {
         } else {
             var_dump('output');
             var_dump($string);
+            var_dump($function);
+            var_dump($compile_list);
             var_dump('(parser) missing file: ' . $url);
             //remove function ?
             return array();

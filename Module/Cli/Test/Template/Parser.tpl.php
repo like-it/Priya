@@ -32,18 +32,23 @@ $parse = function(){
     $data->read($url);
 
     $test = $data->data('test');
-    foreach($test as $key => $value){
+    if(is_array($test) || is_object($test)){
+        foreach($test as $key => $value){
             $result = new stdClass();
             $result->input__ = $value;
-            $result->parser = $parser->data('test.' . $key);
+            $result->parser_ = $parser->data('test.' . $key);
             $result->output_ = $parser->data('output.' . $key);
-            if($result->parser === $result->output_){
+            if($result->parser_ === $result->output_){
                 $result->success = true;
             } else {
                 $result->success = false;
             }
             $this->data('nodeList.' . $key, $result);
+        }
+        echo $this->object($this->data('nodeList'), 'json') . PHP_EOL;
+    } else {
+        echo 'empty input...' . PHP_EOL;
     }
-    echo $this->object($this->data('nodeList'), 'json') . PHP_EOL;
+
 };
 $parse();
