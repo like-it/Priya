@@ -15,6 +15,8 @@ use Priya\Application;
 class Parser extends Data {
     const DIR = __DIR__;
 
+    private $argument;
+
     public function __construct($handler=null, $route=null, $data=null){
         $this->data($this->object_merge($this->data(), $handler));
     }
@@ -33,6 +35,7 @@ class Parser extends Data {
             }
             return $string;
         } else {
+            $original = $string;
             $list =  $this->attributeList($string);
             $attributeList = array();
             if(empty($list)){
@@ -60,8 +63,10 @@ class Parser extends Data {
                 $list[$key] = $modify;
                 $attributeList[$key] = $modify;
             }
+            $compile_list = array();
             foreach($attributeList as $search => $replace){
                 $replace = $this->compile($replace, $data, $keep);
+                $compile_list[$search] = $replace;
                 if(empty($replace) && !empty($keep)){
                     continue;
                 }
@@ -70,76 +75,225 @@ class Parser extends Data {
                 }
                 $string = str_replace($search, $replace, $string);
             }
-            $functon_list = array();
-            foreach($list as $key => $value){
-                if(substr($key, 1, 1) == '$'){
-                    continue;
-                }
-                $temp = explode(' ', $string);
-                $method= ltrim(reset($temp), '{');
-                $method = explode('(', $method, 2);
-                $function = reset($method);
-                $function_key = $function;
-                var_dump('^^^^^^^^^^^^^^^^^^^^^^^^^^');
-                var_dump($string);
-                $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
-                if(in_array($function, array('if'))){
-                    $url = $dir . 'Control.' . ucfirst(strtolower($function)) . '.php';
-                    $function = 'control_' . $function;
-                } else {
-                    $url = $dir . 'Function.' . ucfirst(strtolower($function))  . '.php';
-                    $function = 'function_' . $function;
-                }
-                if(file_exists($url)){
-                    require_once $url;
-                } else {
-                    var_dump($string);
-                    var_dump('(parser) missing file: ' . $url);
-                    //remove function ?
-                    continue;
-                }
+            $function_list = array();
+            $replace = $string;
 
-                if(function_exists($function) === false){
-                    var_dump('missing function: ' . $function);
-                    //trigger error?
-                    continue;
+            $init = 0;
+            while($init < 2){
+                $test = array();
+                $list = $this->controlList($string, 10, $init);
+                if($list === false){
+                    $test[] = false;
+                } else {
+                    $test[] = true;
                 }
-                if(strpos($function, 'control') === 0){
-                    if($key == '{/if}'){
-                        $argumentList = $this->createArgumentListIf($string);
-                        foreach($argumentList as $nr => $argument){
-                            $methodList = $this->createMethodList($argument['statement']);
-                            $argumentList[$nr]['methodList'] = $methodList;
-                        }
-                        $string =  $function($string, $argumentList, $this);
-                        $functon_list[$key][$function_key] = $string;
+                $string = $this->createStatementList($string, $list);
+                $init++;
+                $list = $this->controlList($string, 20, $init);
+                if($list === false){
+                    $test[] = false;
+                } else {
+                    $test[] = true;
+                }
+                $string = $this->createStatementList($string, $list);
+                foreach($test as $output){
+                    if(!empty($output)){
+                        $init = 0;
                     }
-                } else {
-//                     $methodList = $this->createMethodList($value);
-//                     var_dump($methodList);
-//                 	$methodList = $this->createMethodList($attribute);
-//                 	$methodList= $this->compile($methodList, $this->data());
-//                     var_dump($attribute);
-//                     var_dump($string);
-//                 	var_dump($methodList);
-
-                    $argumentList = $this->createArgumentList($list);
-//                     var_dump('-----------------------------');
-//                     var_dump($argumentList);
-//                     $argumentList = $this->createArgumentListIf($string);
-//                     var_dump($argumentList);
-
-//                     $argumentList = $this->createArgumentList($list);
-//                     $argumentList= $this->compile($argumentList, $this->data());
-//                     var_dump($argumentList);
-                    $string =  $function($string, $argumentList, $this);
-                    $functon_list[$key][$function_key] = $string;
                 }
             }
-            var_dump('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-            var_dump($functon_list);
+
+            /*
+            $list = $this->controlList($string, 20, 1);
+            $string = $this->createStatementList($string, $list);
+            $list = $this->controlList($string, 20, 0);
+            $string = $this->createStatementList($string, $list);
+            $list = $this->controlList($string, 20, 1);
+            $string = $this->createStatementList($string, $list);
+            $list = $this->controlList($string, 20, 0);
+            $string = $this->createStatementList($string, $list);
+            $list = $this->controlList($string, 20, 1);
+            $string = $this->createStatementList($string, $list);
+            if(!empty($list)){
+                $list = $this->controlList($string, 20, 0);
+                $list = $this->controlList($string, 20, 1);
+                var_dump('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
+                var_dump($string);
+                var_dump($list);
+            }
+//             $string = $this->createStatementList($string, $list);
+             *
+             */
+            /*
+            while ($list !== false){
+                $string = $this->createStatementList($string, $list);
+                $list = $this->controlList($string);
+//                 var_dump($string);
+                var_dump($list);
+            }
+//             $list = $this->controlList($string);
+            */
             return $string;
         }
+    }
+
+    private function createStatementList($string='', $list=array()){
+        if(empty($list)){
+            return $string;
+        }
+        $condition_list = array();
+        foreach($list as $key => $value){
+            if(!is_array($value)){
+                continue;
+            }
+            $tmp = array();
+            foreach ($value as $val_key => $val_value){
+                $tmp[$val_key] = $val_value;
+                if($val_key == '{/if}'){
+                    $statement = '';
+                    foreach($tmp as $tmp_key => $tmp_value){
+                        $statement .= $tmp_key;
+                        foreach($tmp_value as $tmp_value_key => $tmp_value_list){
+                            foreach ($tmp_value_list as $tmp_value_list_key => $tmp_value_list_value){
+                                $statement .= $tmp_value_list_value;
+                            }
+                        }
+                    }
+                    $condition_list[] = $statement;
+                }
+            }
+        }
+        if(empty($condition_list)){
+            return $string;
+        }
+        foreach ($condition_list as $condition_key => $condition){
+            $argumentList = $this->createArgumentListIf($condition);
+            foreach($argumentList as $nr => $argument){
+                $methodList = $this->createMethodList($argument['statement']);
+                $argumentList[$nr]['methodList'] = $methodList;
+                $argumentList[$nr]['string'] = $condition;
+            }
+            $function = 'if';
+            $function_key = $function;
+            $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
+            $url = $dir . 'Control.' . ucfirst(strtolower($function)) . '.php';
+            $function = 'control_' . $function;
+
+            if(file_exists($url)){
+                require_once $url;
+            }
+            if(function_exists($function) === false){
+                var_dump('missing function: ' . $function);
+                //trigger error?
+                return array();
+            }
+            $condition =  $function($condition, $argumentList, $this);
+            $argumentList = $this->argument();
+            foreach($argumentList as $nr => $argument){
+                if($argument['condition'] === true){
+                    $string = str_replace($argument['string'], $argument['result'] . $argument['extra'], $string);
+                } elseif($argument['condition'] == 'ignore') {
+                    continue;
+
+                } else{
+                    var_dump('false condition');
+                    die;
+                }
+            }
+        }
+        return $string;
+    }
+
+    private function createFunctionList($string='', $replace='', $key='', $list=array(), $compile_list=array()){
+        $temp = explode(' ', $string);
+        $method= ltrim(reset($temp), '{');
+        $method = explode('(', $method, 2);
+        $function = ltrim(reset($method), '!');
+        $function_key = $function;
+        $search  = $key;
+        foreach($compile_list as $compile_key => $compile_value){
+            $search = str_replace($compile_key, $compile_value, $search);
+        }
+        $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
+        if(in_array($function, array('if'))){
+            $url = $dir . 'Control.' . ucfirst(strtolower($function)) . '.php';
+            $function = 'control_' . $function;
+        } else {
+            $url = $dir . 'Function.' . ucfirst(strtolower($function))  . '.php';
+            $function = 'function_' . $function;
+        }
+        if(file_exists($url)){
+            require_once $url;
+        } else {
+            var_dump('output');
+            var_dump($string);
+            var_dump('(parser) missing file: ' . $url);
+            //remove function ?
+            return array();
+        }
+
+        if(function_exists($function) === false){
+            var_dump('missing function: ' . $function);
+            //trigger error?
+            return array();
+        }
+        if(strpos($function, 'control') === 0){
+            if($key == '{/if}'){
+                $argumentList = $this->createArgumentListIf($string);
+                foreach($argumentList as $nr => $argument){
+                    $methodList = $this->createMethodList($argument['statement']);
+                    $argumentList[$nr]['methodList'] = $methodList;
+                }
+                $string =  $function($string, $argumentList, $this);
+                $functon_list[$search][$function_key] = $string;
+            }
+        } else {
+            foreach($compile_list as $compile_key => $compile_value){
+                $value = str_replace($compile_key, $compile_value, $value);
+            }
+            $methodList = $this->createMethodList($value);
+            foreach ($methodList as $method_key => $method_value){
+                foreach ($method_value as $method_nr => $methodCollection){
+                    foreach ($methodCollection as $method_collection_key => $method){
+                        if(empty($method['function'])){
+                            continue;
+                        }
+                        $argList = array();
+                        if(!empty($method['argumentList'])){
+                            $argList = $method['argumentList'];
+                        }
+                        $function = $method['function'];
+                        $url = $dir . 'Function.' . ucfirst(strtolower($function)) . '.php';
+                        $function = 'function_' . $function;
+
+                        if(file_exists($url)){
+                            require_once $url;
+                        } else {
+                            var_dump('(Control.If) missing file: ' . $url);
+                            //remove function ?
+                            continue;
+                        }
+
+                        if(function_exists($function) === false){
+                            var_dump('missing function: ' . $function);
+                            //trigger error?
+                            continue;
+                        }
+                        $res =  $function($method_collection_key, $argList, $this);
+                        $function_list[$search][$function_key] = $res;
+                    }
+                }
+            }
+        }
+        if(isset($function_list[$search][$function_key])){
+//             continue;	//done by method
+            return $function_list;
+        }
+        $argumentList = $this->createArgumentList($list);
+        $argumentList= $this->compile($argumentList, $this->data());
+        $replace =  $function($replace, $argumentList, $this);
+        $function_list[$search][$function_key] = $replace;
+        return $function_list;
     }
 
     public function replace($search='', $replace='', $data=''){
@@ -280,16 +434,15 @@ class Parser extends Data {
         return $methodList;
     }
 
-    private function createArgumentListFunction($list=array()){
-
-    }
-
     private function createArgumentList($list=array()){
         if(!is_array($list)){
             $list = (array) $list;
         }
         $attribute = reset($list);
         if(empty($attribute)){
+            return array();
+        }
+        if(is_array($attribute)){
             return array();
         }
         $attribute = explode('="', $attribute);
@@ -319,20 +472,6 @@ class Parser extends Data {
                 $argumentList[$key] = $temp;
             }
         }
-        if(empty($argumentList)){
-            /*
-            $attribute = reset($list);
-            if(empty($attribute)){
-                return array();
-            }
-            var_dump('$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
-            $methodList = $this->createMethodList($attribute);
-            $methodList= $this->compile($methodList, $this->data());
-            var_dump($attribute);
-            var_dump($methodList);
-            */
-//             $attribute = explode('="', $attribute);
-        }
         return $argumentList;
     }
 
@@ -353,21 +492,27 @@ class Parser extends Data {
             if(empty($statement)){
                 continue;
             }
+            if($statement == '{else'){
+                continue;
+            }
             $else = explode('{else}', end($temp));
             if(count($else) == 1){
-                var_dump('######### only if');
-                var_dump($temp);
-                die;
-                //no else
+                $explode = explode('{/if}', reset($else));
+                $true = array_shift($explode);
+                $extra = implode('{/if}', $explode);
+                $false = '';
             } else {
                 $true = reset($else);
-                $false = rtrim(end($else), '{/if}');
+                $explode = explode('{/if}', end($else));
+                $false = array_shift($explode);
+                $extra = implode('{/if}', $explode);
             }
             $argument = array();
             $argument['original'] = $statement;
             $argument['statement'] = $statement;
             $argument['true'] = $true;
             $argument['false'] = $false;
+            $argument['extra'] = $extra;
 
             $argumentList[] = $argument;
         }
@@ -432,6 +577,58 @@ class Parser extends Data {
             }
         }
         return $attributeList;
+    }
+
+    private function controlList($string='', $indent=0, $count=0){
+        $function = explode('function(', $string);
+//         var_dump($function);
+        foreach($function as $function_nr => $content){
+            $attributeList = array();
+            $list = explode('{', $string);
+            if(empty($list)){
+                return false;
+            }
+            foreach($list as $nr => $record){
+                $tmp = explode('}', $record);
+                $attribute = array_shift($tmp);
+                $value = false;
+                if(count($tmp) >= 1){
+                    $value = implode('}', $tmp);
+                }
+                if($value === false){
+                    continue;
+                }
+                if(strpos($attribute, '$') === 0){
+                    continue;
+                }
+                $key = $nr;
+                if(strpos($attribute, '/') === 0){
+                    $attributeList[$key]['{' . $attribute . '}'][$indent-1] = $value;
+                    $indent-=2;
+                } else {
+                    if(substr($attribute,0,2) == 'if'){
+                        $attributeList[$key]['{' . $attribute . '}'][$indent+$count] = $value;
+                    } else {
+                        $attributeList[$key]['{' . $attribute . '}'][$indent] = $value;
+                    }
+                    $indent+=1;
+                }
+            }
+            $list = array();
+
+            foreach($attributeList as $key => $attList){
+                foreach($attList as $attribute => $record){
+                    foreach($record as $indent => $value){
+                        $list[$indent][$attribute][$key] = $record;
+                    }
+                }
+            }
+        }
+        if(empty($list)){
+            return false;
+        } else {
+            return $list;
+        }
     }
 
     private function modify($value=null, $modifier=null, $argumentList=array()){
@@ -500,5 +697,20 @@ class Parser extends Data {
             $value = $this->modifier($value, $modifier_value, 'modify');
         }
         return $value;
+    }
+
+    public function argument($argument=null){
+        if($argument !== null){
+            $this->setArgument($argument);
+        }
+        return $this->getArgument();
+    }
+
+    private function setArgument($argument=array()){
+        $this->argument = $argument;
+    }
+
+    private function getArgument(){
+        return $this->argument;
     }
 }

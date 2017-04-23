@@ -16,9 +16,19 @@ function control_if($value=null, $argumentList=array(), $parser=null){
         $argumentList = (array) $argumentList;
     }
     $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
+    $compile_list = array();
     foreach($argumentList as $key => $argument){
         if(empty($argument['methodList'])){
-//             echo 'empty methodList';
+            $argumentList[$key] = evaluate($argument);
+            if($argumentList[$key]['condition'] === true){
+                $argumentList[$key]['result'] = $argument['true'];
+            }
+            elseif($argumentList[$key]['condition'] == 'ignore'){
+                continue;
+            }
+            else {
+                $argumentList[$key]['result'] = $argument['false'];
+            }
             continue;
         }
         foreach($argument['methodList'] as $nr => $methodList){
@@ -61,22 +71,49 @@ function control_if($value=null, $argumentList=array(), $parser=null){
                 }
             }
         }
-        /*
-         * @todo
-         * only own methods can pass and we should add forbidden methods here
-         * add elseif statements
-         */
-        $result = false;
-        $eval = 'if(' . $argument['statement'] .'){ $result = true; } else { $result = false; }';
-        ob_start();
-        eval($eval);
-        $error = ob_end_clean();
-//         var_dump($error);
-        $argument['result'] = $result;
-        if(empty($result)){
-            return $argument['false'];
-        } else {
-            return $argument['true'];
+        $argumentList[$key] = evaluate($argument);
+        if($argumentList[$key]['condition'] === true){
+            $argumentList[$key]['result'] = $argument['true'];
+        }
+        elseif($argumentList[$key]['condition'] == 'ignore'){
+            continue;
+        }
+        else {
+            $argumentList[$key]['result'] = $argument['false'];
         }
     }
+    $result = '';
+    foreach ($argumentList as $key => $argument){
+        if(isset($argument['result'])){
+            $result .= $argument['result'];
+        }
+    }
+    $parser->argument($argumentList);
+    return $result;
+}
+
+function evaluate($argument = array()){
+    /*
+     * @todo
+     * only own methods can pass and we should add forbidden methods here
+     * add elseif statements
+     */
+    if(!is_array($argument)){
+        $argument = (array) $argument;
+    }
+    $result = false;
+    $eval = 'if(' . $argument['statement'] .'){ $result = true; } else { $result = false; }';
+//     var_dump($eval);
+    ob_start();
+    eval($eval);
+    $error = ob_end_clean();
+    $argument['condition'] = $result;
+    return $argument;
+    /*
+    if($result === false){
+        return $argument['false'];
+    } else {
+        return $argument['true'];
+    }
+    */
 }

@@ -24,5 +24,11 @@ function function_empty($value=null, $argumentList=array(), $parser=null){
             unset($argumentList[$nr]);
         }
     }
-    return empty($argumentList);
+    $temp = explode('(', $value, 2);
+    $count = substr_count(reset($temp), '!');
+    if($count % 2 == 0){
+        return empty($argumentList);
+    } else {
+        return !empty($argumentList);
+    }
 }

@@ -11,7 +11,9 @@
 
 namespace Priya;
 
+use stdClass;
 use Priya\Module\Parser;
+use Priya\Module\Data;
 
 $parse = function(){
     $url = $this->parameter('url') ? $this->parameter('url') : $this->parameter(3);
@@ -22,7 +24,26 @@ $parse = function(){
     $parser = new Parser($this->data());
     $parser->route($this->route());
     $read = $parser->read($url);
-    echo 'result:' . PHP_EOL;
-    echo $this->object($parser->data('test'), 'json');
+    echo 'input:' . PHP_EOL;
+    echo $this->object($parser->data('test'), 'json') . PHP_EOL;
+    echo 'output:' . PHP_EOL;
+
+    $data = new Data();
+    $data->read($url);
+
+    $test = $data->data('test');
+    foreach($test as $key => $value){
+            $result = new stdClass();
+            $result->input__ = $value;
+            $result->parser = $parser->data('test.' . $key);
+            $result->output_ = $parser->data('output.' . $key);
+            if($result->parser === $result->output_){
+                $result->success = true;
+            } else {
+                $result->success = false;
+            }
+            $this->data('nodeList.' . $key, $result);
+    }
+    echo $this->object($this->data('nodeList'), 'json') . PHP_EOL;
 };
 $parse();

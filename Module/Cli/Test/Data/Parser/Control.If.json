@@ -6,6 +6,13 @@
 "test" : {
     "value" : "",
     "variable" : "testing",
-    "control_if_2" : "{if 1 == 1)}test{else}{$test.variable}{/if}"
+    "control_if_3" : "test{if 1 == 1} water{if 2 == 2} grain{if 1 == 1} test{if 5==5}ok{else}not ok{/if}{/if} butter{else} atre{/if} end{else} dus {$test.variable}{/if}",
+    "control_if_2" : "test{if 1 == 1} water{if 2 == 2} grain{if 1 == 1} test{/if} butter{else} atre{/if} end{else} dus {$test.variable}{/if}"
+},
+"output" : {
+    "check_1" : " water dus testing",
+    "check_2" : "test .end ",
+    "control_if_2":  "test water grain test butter end",
+    "control_if_3":  "test water grain testok butter end"
 }
 }
