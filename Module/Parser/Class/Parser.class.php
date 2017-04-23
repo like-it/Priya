@@ -329,9 +329,9 @@ class Parser extends Data {
             array(
                 '&&',
                 '||',
-                'and',
-                'or',
-                'xor',
+                ' and ',
+                ' or ',
+                ' xor ',
                 '==',
                 '===',
                 '<>',
