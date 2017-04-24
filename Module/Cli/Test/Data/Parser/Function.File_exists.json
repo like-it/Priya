@@ -1,0 +1,20 @@
+{
+"title": "Test.Parser.Function.File_exists",
+"web" : {
+    "root" : "http:://{$test.variable}/"
+},
+"test" : {
+    "value" : "1",
+    "variable" : "Priya",
+    "function_file_exists_dir" : "{file_exists(\"{$dir.vendor}\")}"
+},
+"output" : {
+    "value" : "1",
+    "variable" : "Priya",
+    "function_file_exists_dir" : "testing true with some extra text",
+    "control_if_2":  "Priya is awesome and fun but there is a lot todo end.",
+    "control_if_3":  "test water grain test butter end",
+    "control_if_4":  "with some extra text",
+    "control_if_5":  "Vendor directory exists \/mnt\/c\/Server\/Web\/Vendor\/"
+}
+}

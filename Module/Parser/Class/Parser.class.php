@@ -81,6 +81,7 @@ class Parser extends Data {
             while($init < 2){
                 $test = array();
                 $list = $this->controlList($string, 10, $init);
+//                 var_dump($list);
                 if($list === false){
                     $test[] = false;
                 } else {
@@ -89,6 +90,7 @@ class Parser extends Data {
                 $string = $this->createStatementList($string, $list);
                 $init++;
                 $list = $this->controlList($string, 20, $init);
+//                 var_dump($list);
                 if($list === false){
                     $test[] = false;
                 } else {
@@ -138,6 +140,11 @@ class Parser extends Data {
         }
         if(empty($condition_list)){
             return $string;
+            $methodList = $this->createMethodList($string);
+//             var_dump($methodList);
+            $string = $this->execMethodList($methodList, $string);
+//             var_dump($string);
+            return $string;
         }
         foreach ($condition_list as $condition_key => $condition){
             $argumentList = $this->createArgumentListIf($condition);
@@ -170,6 +177,57 @@ class Parser extends Data {
 
                 } else{
                     $string = str_replace($argument['string'], $argument['result'] . $argument['extra'], $string);
+                }
+            }
+        }
+        return $string;
+    }
+
+    public function execMethodList($methodList=array(), $string=''){
+        if(empty($string)){
+            return $string;
+        }
+        if(empty($methodList)){
+            return $string;
+        }
+        $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
+        foreach ($methodList as $method_nr => $methodCollection){
+            foreach ($methodCollection as $method_collection_key => $methodCollectionList){
+                foreach ($methodCollectionList as $method_collection_list_key => $method){
+                    if(empty($method['function'])){
+                        continue;
+                    }
+                    $function = $method['function'];
+                    $url = $dir . 'Function.' . ucfirst(strtolower($function)) . '.php';
+                    $function = 'function_' . $function;
+
+                    if(file_exists($url)){
+                        require_once $url;
+                    } else {
+                        var_dump('(Parser) missing file: ' . $url);
+                        //remove function ?
+                        continue;
+                    }
+
+                    if(function_exists($function) === false){
+                        var_dump('(Parser) missing function: ' . $function);
+                        //trigger error?
+                        continue;
+                    }
+                    $argList = array();
+                    if(!empty($method['argumentList'])){
+                        $argList = $method['argumentList'];
+                    }
+                    $res =  $function($method_collection_key, $argList, $this);
+                    if($res === false || $res === null){
+                        $res = 0;	//not in if statement
+                    }
+                    $string = str_replace($method_collection_key, $res, $string);
+                    $before = explode('(', $method_collection_key, 2);
+                    $count = substr_count($before[0], '!');
+                    for($i=0; $i < $count; $i++){
+                        $string= '!' . $string;
+                    }
                 }
             }
         }
@@ -341,7 +399,8 @@ class Parser extends Data {
                 '<=',
                 '>',
                 '>=',
-                '<=>'
+                '<=>',
+                '};'
             ),
             $statement
          );
@@ -368,7 +427,7 @@ class Parser extends Data {
             $function_key = trim($part, ' ()') . ')';
             $function = array();
             $func = array_shift($method);
-            $function[$function_key]['function'] = ltrim($func, '!');
+            $function[$function_key]['function'] = ltrim($func, '{!');
             $arguments = reset($method);
             $arguments = strrev($arguments);
             $args = explode(')', $arguments, 2);
