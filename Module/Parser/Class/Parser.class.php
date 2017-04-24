@@ -193,7 +193,7 @@ class Parser extends Data {
         $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
         foreach ($methodList as $method_nr => $methodCollection){
             foreach ($methodCollection as $method_collection_key => $methodCollectionList){
-                foreach ($methodCollectionList as $method_collection_list_key => $method){
+                foreach ($methodCollectionList as $search => $method){
                     if(empty($method['function'])){
                         continue;
                     }
@@ -218,12 +218,12 @@ class Parser extends Data {
                     if(!empty($method['argumentList'])){
                         $argList = $method['argumentList'];
                     }
-                    $res =  $function($method_collection_key, $argList, $this);
-                    if($res === false || $res === null){
-                        $res = 0;	//not in if statement
+                    $replace =  $function($search, $argList, $this);
+                    if($replace=== false || $replace=== null){
+                        $replace= 0;	//not in if statement
                     }
-                    $string = str_replace($method_collection_key, $res, $string);
-                    $before = explode('(', $method_collection_key, 2);
+                    $string = str_replace($search, $replace, $string);
+                    $before = explode('(', $search, 2);
                     $count = substr_count($before[0], '!');
                     for($i=0; $i < $count; $i++){
                         $string= '!' . $string;
