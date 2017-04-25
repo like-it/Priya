@@ -64,10 +64,13 @@ function evaluate($argument = array()){
     }
     $result = false;
     $eval = 'if(' . $argument['statement'] .'){ $result = true; } else { $result = false; }';
+    if (version_compare(PHP_VERSION, Parser::PHP_MIN_VERSION) >= 0) {
+        error_clear_last();
+    }
+    $error = error_get_last();
     @eval($eval);
-    if (error_get_last()){
-        echo 'Show your custom error message';
-        //Or you can
+    if ($error != error_get_last()){
+        //add to parser->error();
         print_r(error_get_last());
     }
     $argument['condition'] = $result;

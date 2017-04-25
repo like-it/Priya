@@ -14,6 +14,7 @@ use Priya\Application;
 
 class Parser extends Data {
     const DIR = __DIR__;
+    const PHP_MIN_VERSION = '7.0.0';
     const MAX_ITERATION = 128;
 
     private $argument;
@@ -44,11 +45,45 @@ class Parser extends Data {
             }
             $data = $this->object($data);
             $compile_list = array();
+            $key_previous = false;
             foreach($list as $key => $value){
                 if(substr($key, 1, 1) != '$'){
+                    $key_previous = $key;
                     continue;
                 }
-                $modifierList = explode('|', trim($key,'{}$ '));
+                $modifierList = explode('|', $value);
+                $attribute = trim(array_shift($modifierList));
+                $modify = $this->object_get($attribute, $data);
+                if(!empty($key_previous) && strpos($key_previous, '{if') !== false){
+                    if(
+                        strpos($value, '|') !== false &&
+                        strpos($value, 'default') > strpos($value, '|') &&
+                        strpos($value, ':') > strpos($value, 'default')
+                    ){
+                      //if should be fine (has default)
+                    } elseif(strpos($key_previous, $value) !== false) {
+                        //if should have a default in case of empty variable
+//                         $value .= '|default:0';
+                        $list[$key] = $value;
+                    }
+                    if(
+                        strpos($value, '|') !== false &&
+                        strpos($value, 'string_quote') > strpos($value, '|') &&
+                        strpos($value, ':') > strpos($value, 'string_quote')
+                    ){
+                      //if should be fine (has string_quote)
+                    } elseif(strpos($key_previous, $value) !== false) {
+                        if(is_bool($modify) || is_numeric($modify)){
+
+                        } else {
+                            //  if should have a string_quote in case of string variable
+                            $value .= '|string_quote:"[string_quote]"';
+                            $list[$key] = $value;
+                        }
+                    }
+                }
+                $modifierList = explode('|', $value);
+//                 $modifierList = explode('|', trim($key,'{}$ ')); //old
                 $attribute = trim(array_shift($modifierList));
                 if($keep === 'disable-modify'){
                     $modifierList = array();
@@ -64,6 +99,7 @@ class Parser extends Data {
                 }
                 $list[$key] = $modify;
                 $attributeList[$key] = $modify;
+                $key_previous = $key;
             }
             foreach($attributeList as $search => $replace){
                 $replace = $this->compile($replace, $data, $keep);
@@ -81,16 +117,15 @@ class Parser extends Data {
             while($init < 2){
                 $test = array();
                 $list = $this->controlList($string, 10, $init);
-//                 var_dump($list);
                 if($list === false){
                     $test[] = false;
                 } else {
                     $test[] = true;
                 }
+                //why list & not attributeList
                 $string = $this->createStatementList($string, $list);
                 $init++;
                 $list = $this->controlList($string, 20, $init);
-//                 var_dump($list);
                 if($list === false){
                     $test[] = false;
                 } else {
@@ -104,6 +139,7 @@ class Parser extends Data {
                 }
                 $counter++;
                 if($counter > Parser::MAX_ITERATION){
+                    trigger_error('ineffecient parse');
                     //variable in if condition
                     break;
                 }
@@ -141,9 +177,7 @@ class Parser extends Data {
         if(empty($condition_list)){
             return $string;
             $methodList = $this->createMethodList($string);
-//             var_dump($methodList);
             $string = $this->execMethodList($methodList, $string);
-//             var_dump($string);
             return $string;
         }
         foreach ($condition_list as $condition_key => $condition){
@@ -163,10 +197,13 @@ class Parser extends Data {
                 require_once $url;
             }
             if(function_exists($function) === false){
-                var_dump('missing function: ' . $function);
+                var_dump('(Parser) missing function: ' . $function);
                 //trigger error?
                 return array();
             }
+            var_dump($condition);
+            $condition = str_replace('[string_quote]', '\'', $condition);
+            var_dump($condition);
             $condition =  $function($condition, $argumentList, $this);
             $argumentList = $this->argument();
             foreach($argumentList as $nr => $argument){
@@ -407,6 +444,9 @@ class Parser extends Data {
         $methodList = array();
         foreach ($temp as $nr => $part){
             $method = explode('(', $part, 2);
+            if(empty(reset($method))){
+                return $methodList;
+            }
             if(count($method) == 1){
                 return $methodList;
             }
@@ -434,8 +474,7 @@ class Parser extends Data {
             array_shift($args);
             $arguments = reset($args);
             $arguments = strrev($arguments);
-
-            $args = explode(',', $arguments);
+            $args = str_getcsv($arguments); //to handle quotes
             $array = false;
             $list = array();
             foreach($args  as $key => $value){
@@ -681,6 +720,7 @@ class Parser extends Data {
         if(file_exists($url)){
             require_once $url;
         } else {
+            var_dump('(Parser) modifier (' . $modifier . ') not found');
             return $value;
         }
         $function = 'modifier_' . $modifier;

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author 		Remco van der Velde
  * @since 		2017-04-20
@@ -8,10 +7,10 @@
  * 	-	all
  */
 
-function function_file_exists($value=null, $argumentList=array(), $parser=null){
+function modifier_string_quote($value=null, $argumentList=array()){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
     $argument = reset($argumentList);
-    return file_exists($argument);
+    return  $argument .  $value. $argument;
 }
