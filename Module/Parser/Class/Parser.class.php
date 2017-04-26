@@ -152,6 +152,15 @@ class Parser extends Data {
                     break;
                 }
             }
+            if($string == 'null'){
+                $string = null;
+            }
+            elseif($string == 'true'){
+                $string = true;
+            }
+            elseif($string == 'false'){
+                $string = false;
+            }
             return $string;
         }
     }

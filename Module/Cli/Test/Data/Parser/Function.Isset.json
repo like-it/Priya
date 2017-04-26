@@ -7,14 +7,18 @@
     "true" : true,
     "value" : "1",
     "variable" : "Priya",
-    "function_empty_1" : "{if isset({$test.test})}Isset{else}Not isset{/if}",
-    "function_empty_2" : "{!!isset(\"{$test.value}\")};{empty(\"{$test.variable}\")};"
+    "function_isset_1" : "{if isset({$test.test})}Isset{else}Not isset{/if}",
+    "function_isset_2" : "{!!isset(\"{$test.value}\")};{empty(\"{$test.variable}\")};",
+    "function_isset_3" : "{isset({$test.value})}",
+    "numeric_1" : 456.32,
+    "numeric_2" : "{if 1==1}test1{else}test2{/if}"
 },
 "output" : {
     "true" : true,
     "value" : "1",
     "variable" : "Priya",
-    "function_empty_1" : "Not isset",
-    "function_empty_2":  "!!true;false;"
+    "function_isset_1" : "Not isset",
+    "function_isset_2":  "!!true;false;",
+    "function_isset_3":  "true"
 }
 }
