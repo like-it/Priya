@@ -12,8 +12,6 @@ function function_empty($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    var_dump('$$$$$$$$$$$$$$$$$$$$$');
-    var_dump($argumentList);
     foreach($argumentList as $nr => $argument){
         $argument = str_replace('"null"', '', $argument);
         $argument = str_replace('"false"', '', $argument);

@@ -119,6 +119,7 @@ class Parser extends Data {
             }
             $init = 0;
             $counter = 0;
+            $string = $this->functionList($string, $list);
             while($init < 2){
                 $test = array();
                 $list = $this->controlList($string, 10, $init);
@@ -146,6 +147,7 @@ class Parser extends Data {
                 if($counter > Parser::MAX_ITERATION){
                     var_dump('@@@@@@@@@@@@@@@@@@@@@@@');
                     var_dump('ineffecient parse');
+                    var_dump($string);
                     //variable in if condition
                     break;
                 }
@@ -203,7 +205,7 @@ class Parser extends Data {
                 require_once $url;
             }
             if(function_exists($function) === false){
-                var_dump('(Parser) missing function: ' . $function);
+                var_dump('(Parser) (statementList) missing function: ' . $function);
                 //trigger error?
                 return array();
             }
@@ -223,7 +225,7 @@ class Parser extends Data {
         return $string;
     }
 
-    public function execMethodList($methodList=array(), $string=''){
+    public function execMethodList($methodList=array(), $string='', $type='statementList'){
         if(empty($string)){
             return $string;
         }
@@ -244,13 +246,13 @@ class Parser extends Data {
                     if(file_exists($url)){
                         require_once $url;
                     } else {
-                        var_dump('(Parser) missing file: ' . $url);
+                        var_dump('(Parser) (execMethodList) missing file: ' . $url);
                         //remove function ?
                         continue;
                     }
 
                     if(function_exists($function) === false){
-                        var_dump('(Parser) missing function: ' . $function);
+                        var_dump('(Parser) (execMethodList) missing function: ' . $function);
                         //trigger error?
                         continue;
                     }
@@ -269,22 +271,26 @@ class Parser extends Data {
                             $argList[$arg_nr] = null;
                         }
                     }
-                    var_dump('****************');
-                    var_dump($argList);
-                    var_dump($function);
                     $replace =  $function($search, $argList, $this);
-                    var_dump($replace);
-                    if($replace === false || $replace === null){
-                        $replace= 0;	//not in if statement
-                        var_dump('%%%%%%%%%%%%%%%%');
-                        var_dump($function);
-                    }
-                    elseif($replace === true){
-                        $replace = 1;
+                    if($type == 'functionList'){
+                        if($replace === null){
+                            $replace = 'null';
+                        }
+                        elseif($replace === false){
+                            $replace = 'false';
+                        }
+                        elseif($replace === true){
+                            $replace = 'true';
+                        }
+                    } else {
+                        if($replace === false || $replace === null){
+                            $replace = 0; //in if statement
+                        }
+                        elseif($replace === true){
+                            $replace = 1; //in if statement
+                        }
                     }
                     $string = str_replace($search, $replace, $string);
-                    var_dump('+++++++++++++++++++++++');
-                    var_dump($string);
                     $before = explode('(', $search, 2);
                     $count = substr_count($before[0], '!');
                     for($i=0; $i < $count; $i++){
@@ -296,19 +302,18 @@ class Parser extends Data {
         return $string;
     }
 
+    private function FunctionList($string='', $list=array()){
+        $methodList = $this->createMethodList($string, 'functionList');
+        $string = $this->execMethodList($methodList, $string, 'functionList');
+        return $string;
+    }
+
+    /*
     private function createFunctionList($string='', $replace='', $key='', $list=array(), $compile_list=array()){
         $temp = explode(' ', $string);
         $method= ltrim(reset($temp), '{');
         $method = explode('(', $method, 2);
         $function = ltrim(reset($method), '!');
-        /*
-        $function_list = explode('{', $function, 2);
-        if(count($function_list) == 2){
-            array_shift($function_list);
-        }
-        $function = reset($function_list);
-        */
-
         $function_key = $function;
         $search  = $key;
         foreach($compile_list as $compile_key => $compile_value){
@@ -397,6 +402,7 @@ class Parser extends Data {
         $function_list[$search][$function_key] = $replace;
         return $function_list;
     }
+    */
 
     public function replace($search='', $replace='', $data=''){
         return $data;
@@ -444,7 +450,7 @@ class Parser extends Data {
         return $list;
     }
 
-    private function createMethodList($statement=''){
+    private function createMethodList($statement='', $type='statementList'){
         $temp = $this->explode_single(
             array(
                 '&&',
@@ -462,7 +468,8 @@ class Parser extends Data {
                 '>',
                 '>=',
                 '<=>',
-                '};'
+                '}',		//was '};'
+                '{',	//was not here
             ),
             $statement
          );
@@ -470,10 +477,12 @@ class Parser extends Data {
         foreach ($temp as $nr => $part){
             $method = explode('(', $part, 2);
             if(empty(reset($method))){
-                return $methodList;
+                continue;
+//                 return $methodList;
             }
             if(count($method) == 1){
-                return $methodList;
+                continue;
+//                 return $methodList;
             }
             $inSet = false;
             foreach($method as $key => $value){
@@ -490,8 +499,14 @@ class Parser extends Data {
                 $method[$key] = trim($value);
             }
             $function_key = trim($part, ' ()') . ')';
+            if($type == 'functionList'){
+                $function_key = '{' . $function_key . '}';
+            }
             $function = array();
             $func = array_shift($method);
+            if(strpos($func, ' ') !== false){
+                continue; //contains statement
+            }
             $function[$function_key]['function'] = ltrim($func, '{!');
             $arguments = reset($method);
             $arguments = strrev($arguments);
@@ -620,7 +635,6 @@ class Parser extends Data {
             $argument['original'] = $statement;
             $argument['statement'] = str_replace('"[string_quote]', '"', $statement);
             $argument['statement'] = str_replace('[string_quote]"', '"', $argument['statement']);
-            var_dump($argument['statement']);
             $argument['statement'] = str_replace('"[string_quote]"', 'null', $argument['statement']);
 
             $argument['statement'] = str_replace('[string_quote][string_quote]', 'null', $argument['statement']);
@@ -629,8 +643,6 @@ class Parser extends Data {
             $argument['false'] = $false;
             $argument['extra'] = $extra;
             $argumentList[] = $argument;
-            var_dump('***************************');
-            var_dump($argument);
         }
         /*
         foreach($argumentList as $key => $value){
