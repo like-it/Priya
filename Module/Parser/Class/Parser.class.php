@@ -64,7 +64,7 @@ class Parser extends Data {
                     } elseif(strpos($key_previous, $value) !== false) {
                         //if should have a default in case of empty variable
 //                         $value .= '|default:0';
-                        $list[$key] = $value;
+//                         $list[$key] = $value;
                     }
                     if(
                         strpos($value, '|') !== false &&
@@ -73,11 +73,16 @@ class Parser extends Data {
                     ){
                       //if should be fine (has string_quote)
                     } elseif(strpos($key_previous, $value) !== false) {
+                        if($modify === null){
+//                             var_dump($modify);
+//                             $value .= 'default:0';
+//                             $list[$key] = $value;
+                        }
                         if(is_bool($modify) || is_numeric($modify)){
 
                         } else {
                             //  if should have a string_quote in case of string variable
-                            $value .= '|string_quote:"[string_quote]"';
+                            $value .= '|string_quote:"[string_quote]":"\\\'"';
                             $list[$key] = $value;
                         }
                     }
@@ -139,7 +144,8 @@ class Parser extends Data {
                 }
                 $counter++;
                 if($counter > Parser::MAX_ITERATION){
-                    trigger_error('ineffecient parse');
+                    var_dump('@@@@@@@@@@@@@@@@@@@@@@@');
+                    var_dump('ineffecient parse');
                     //variable in if condition
                     break;
                 }
@@ -201,9 +207,6 @@ class Parser extends Data {
                 //trigger error?
                 return array();
             }
-            var_dump($condition);
-            $condition = str_replace('[string_quote]', '\'', $condition);
-            var_dump($condition);
             $condition =  $function($condition, $argumentList, $this);
             $argumentList = $this->argument();
             foreach($argumentList as $nr => $argument){
@@ -255,11 +258,33 @@ class Parser extends Data {
                     if(!empty($method['argumentList'])){
                         $argList = $method['argumentList'];
                     }
+                    foreach($argList as $arg_nr => $argument){
+                        if($argument == 'true'){
+                            $argList[$arg_nr] = true;
+                        }
+                        if($argument == 'false'){
+                            $argList[$arg_nr] = false;
+                        }
+                        if($argument == 'null'){
+                            $argList[$arg_nr] = null;
+                        }
+                    }
+                    var_dump('****************');
+                    var_dump($argList);
+                    var_dump($function);
                     $replace =  $function($search, $argList, $this);
-                    if($replace=== false || $replace=== null){
+                    var_dump($replace);
+                    if($replace === false || $replace === null){
                         $replace= 0;	//not in if statement
+                        var_dump('%%%%%%%%%%%%%%%%');
+                        var_dump($function);
+                    }
+                    elseif($replace === true){
+                        $replace = 1;
                     }
                     $string = str_replace($search, $replace, $string);
+                    var_dump('+++++++++++++++++++++++');
+                    var_dump($string);
                     $before = explode('(', $search, 2);
                     $count = substr_count($before[0], '!');
                     for($i=0; $i < $count; $i++){
@@ -478,6 +503,10 @@ class Parser extends Data {
             $array = false;
             $list = array();
             foreach($args  as $key => $value){
+                if(substr($value, 0, 1) == '\'' && substr($value, -1, 1) == '\''){
+                    $value = substr($value, 1, -1);
+                }
+                $value = str_replace('\\\'', '\'', $value);
                 $arg = trim($value);
                 if(strpos($arg, '[') === 0){
                     $array = array();
@@ -589,12 +618,19 @@ class Parser extends Data {
             }
             $argument = array();
             $argument['original'] = $statement;
-            $argument['statement'] = $statement;
-            $argument['true'] = $true;
+            $argument['statement'] = str_replace('"[string_quote]', '"', $statement);
+            $argument['statement'] = str_replace('[string_quote]"', '"', $argument['statement']);
+            var_dump($argument['statement']);
+            $argument['statement'] = str_replace('"[string_quote]"', 'null', $argument['statement']);
+
+            $argument['statement'] = str_replace('[string_quote][string_quote]', 'null', $argument['statement']);
+            $argument['statement'] = str_replace('[string_quote]', '\'', $argument['statement']);
+            $argument['true'] = str_replace('[string_quote]', '', $true);
             $argument['false'] = $false;
             $argument['extra'] = $extra;
-
             $argumentList[] = $argument;
+            var_dump('***************************');
+            var_dump($argument);
         }
         /*
         foreach($argumentList as $key => $value){
@@ -754,8 +790,16 @@ class Parser extends Data {
             $quote_remove = false;
         }
         if(!empty($quote_remove)){
-            $argumentList[$argumentListLength-1] = substr(trim(end($argumentList)),0,-1);
+//             $argumentList[$argumentListLength-1] = substr(trim(end($argumentList)),0,-1);
+            foreach($argumentList as $nr => $argument){
+                if(empty($nr)){
+                    continue;
+                }
+                $argumentList[$nr] = substr(trim($argument), 0, -1);
+            }
+
         }
+
         $modifier = trim(array_shift($argumentList));
         if($return == 'modify'){
             return $this->modify($value, $modifier, $argumentList);
@@ -765,6 +809,8 @@ class Parser extends Data {
         } elseif($return == 'modifier-value') {
             return implode(':', $argumentList);
         } else {
+            var_dump('^^^^^^^^^^^^^^^^^^^^^^');
+            var_dump($return);
             var_dump($argumentList);
             die;
         }

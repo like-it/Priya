@@ -12,5 +12,6 @@ function function_isset($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    return isset($argumentList);
+    $argument = reset($argumentList);
+    return isset($argument);
 }

@@ -6,6 +6,9 @@
  * @version		1.0
  * @changeLog
  * 	-	all
+ * @todo
+ *  -	value = argument original ?
+ *
  */
 
 use Priya\Application;
@@ -70,6 +73,7 @@ function evaluate($argument = array()){
     $error = error_get_last();
     @eval($eval);
     if ($error != error_get_last()){
+        var_dump($eval);
         //add to parser->error();
         print_r(error_get_last());
     }

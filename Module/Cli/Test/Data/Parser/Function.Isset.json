@@ -1,0 +1,18 @@
+{
+"title": "Test.Parser.Function.Empty",
+"web" : {
+    "root" : "http:://{$test.variable}/"
+},
+"test" : {
+    "value" : "1",
+    "variable" : "Priya",
+    "function_empty_1" : "{if isset({$test.test})}Isset{else}Not isset{/if}",
+    "function_empty_2" : "{!!isset(\"{$test.value}\")};{empty(\"{$test.variable}\")};"
+},
+"output" : {
+    "value" : "1",
+    "variable" : "Priya",
+    "function_empty_1" : "testing true with some extra text",
+    "function_empty_2":  "Priya is awesome and fun but there is a lot todo end."
+}
+}
