@@ -24,9 +24,12 @@ $parse = function(){
     $parser = new Parser($this->data());
     $parser->route($this->route());
     $read = $parser->read($url);
-    echo 'input:' . PHP_EOL;
-    echo $this->object($parser->data('test'), 'json') . PHP_EOL;
-    echo 'output:' . PHP_EOL;
+
+    $output = new Parser();
+    $output->data('input', $parser->data('test'));
+//     echo 'input:' . PHP_EOL;
+//     echo $this->object($parser->data('test'), 'json') . PHP_EOL;
+//     echo 'output:' . PHP_EOL;
 
     $data = new Data();
     $data->read($url);
@@ -45,7 +48,9 @@ $parse = function(){
             }
             $this->data('nodeList.' . $key, $result);
         }
-        echo $this->object($this->data('nodeList'), 'json') . PHP_EOL;
+        $output->data('output', $this->data('nodeList'));
+        echo $this->object($output->data(), 'json') . PHP_EOL;
+//         echo $this->object($this->data('nodeList'), 'json') . PHP_EOL;
     } else {
         echo 'empty input...' . PHP_EOL;
     }

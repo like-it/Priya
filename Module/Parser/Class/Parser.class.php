@@ -18,10 +18,28 @@ class Parser extends Data {
     const MAX_ITERATION = 128;
 
     private $argument;
+    private $random;
 
     public function __construct($handler=null, $route=null, $data=null){
+        $this->random(rand(1000,9999) . '-' . rand(1000,9999) . '-' . rand(1000,9999) . '-' . rand(1000,9999));
         $this->data($this->object_merge($this->data(), $handler));
     }
+
+    public function random($random=null){
+        if($random !== null){
+            $this->setRandom($random);
+        }
+        return $this->getRandom();
+    }
+
+    private function setRandom($random=''){
+        $this->random = $random;
+    }
+
+    private function getRandom(){
+        return $this->random;
+    }
+
 
     public function compile($string='', $data, $keep=false){
         $input = $string;
@@ -38,11 +56,9 @@ class Parser extends Data {
             return $string;
         } else {
             $original = $string;
+            $string = $this->literalList($string);
             $list =  $this->attributeList($string);
             $attributeList = array();
-            if(empty($list)){
-                return $string;
-            }
             $data = $this->object($data);
             $compile_list = array();
             $key_previous = false;
@@ -148,6 +164,8 @@ class Parser extends Data {
                     var_dump('@@@@@@@@@@@@@@@@@@@@@@@');
                     var_dump('ineffecient parse');
                     var_dump($string);
+                    var_dump($test);
+                    var_dump($list);
                     //variable in if condition
                     break;
                 }
@@ -161,6 +179,10 @@ class Parser extends Data {
             elseif($string == 'false'){
                 $string = false;
             }
+            $string = str_replace('[' . $this->random() . '[', '{', $string);
+            $string = str_replace(']' . $this->random() . ']', '}', $string);
+            $string = str_replace('{literal}', '' , $string);
+            $string = str_replace('{/literal}', '' , $string);
             return $string;
         }
     }
@@ -310,6 +332,60 @@ class Parser extends Data {
         }
         return $string;
     }
+
+    private function literalList($string=''){
+        if(strpos($string, '{literal}') === false){
+            return $string;
+        }
+        $list = explode('{literal}', $string, 2);
+        if(strpos($list[1], '{literal}') !== false){
+            $list[1] = $this->literalList($list[1]);
+        }
+        $literal = explode('{/literal}', $list[1], 2);
+        $attributeList = $this->attributeList($literal[0]);
+        foreach ($attributeList as $search => $attr_value){
+            $replace = '[' . $this->random() . '[' . substr($search, 1, -1) . ']' . $this->random() . ']';
+            $literal[0] = str_replace($search, $replace, $literal[0]);
+        }
+        $list[1] = implode('[' . $this->random() . '[/literal]' . $this->random() . ']', $literal);
+        $string = implode('[' . $this->random() . '[literal]' . $this->random() . ']' , $list);
+        return $string;
+    }
+
+    /*
+    private function literalList($string=''){
+        if(strpos($string, '{literal}') === false){
+            return $string;
+        }
+        $list = explode('{literal}', $string, 2);
+        if(strpos($list[1], '{literal}') !== false){
+            $list[1] = $this->literalList($list[1]);
+        }
+        $literal = explode('{/literal}', $list[1], 2);
+        foreach($literal as $nr => $liter){
+            $attributeList = $this->attributeList($liter);
+            var_dump('@@@@@@@@@@@@@@@@@@@@@@@@@@');
+            var_dump($attributeList);
+            foreach ($attributeList as $search => $attr_value){
+                $replace = '[' . $this->random() . '[' . substr($search, 1, -1) . ']' . $this->random() . ']';
+                $liter = str_replace($search, $replace, $liter);
+            }
+            $literal[$nr] = $liter;
+        }
+        $list[1] = implode('[' . $this->random() . '[/literal]' . $this->random() . ']', $literal);
+        $attributeList = $this->attributeList($list[1]);
+
+        var_dump('@@@@@@@@@@@@@@@@@@@@@@@@@@');
+        var_dump($attributeList);
+
+        foreach($attributeList as $search => $attr_value){
+            $replace = '[' . $this->random() . '[' . substr($search, 1, -1) . ']' . $this->random() . ']';
+            $list[1]= str_replace($search, $replace, $list[1]);
+        }
+        $string = implode('[' . $this->random() . '[literal]' . $this->random() . ']' , $list);
+        return $string;
+    }
+    */
 
     private function FunctionList($string='', $list=array()){
         $methodList = $this->createMethodList($string, 'functionList');
@@ -507,7 +583,12 @@ class Parser extends Data {
             foreach($method as $key => $value){
                 $method[$key] = trim($value);
             }
-            $function_key = trim($part, ' ()') . ')';
+            $function_key = trim($part, ' ()');
+            if(strpos($function_key, '(') !== false){
+                $function_key .=  ')';
+            } else {
+                $function_key .=  '()';
+            }
             if($type == 'functionList'){
                 $function_key = '{' . $function_key . '}';
             }
@@ -736,6 +817,9 @@ class Parser extends Data {
                     continue;
                 }
                 if(strpos($attribute, '$') === 0){
+                    continue;
+                }
+                if(strpos($attribute, 'literal') !== false){
                     continue;
                 }
                 $key = $nr;
