@@ -57,4 +57,8 @@ class Parser extends Data {
     public function read($url=''){
         return $this->parser('object')->read($url);
     }
+
+    public function literal($node=''){
+        return $this->parser('object')->literal($node);
+    }
 }

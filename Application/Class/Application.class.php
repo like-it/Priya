@@ -152,10 +152,10 @@ class Application extends Parser {
                     header('Last-Modified: '. filemtime($url));
                     header('Content-Type: ' . $contentType);
                 }
-                if($ext == 'css'){
+                if($ext == 'pcss'){
                     $read = str_replace('/', Application::DS, $request);
-                    $read = str_replace(Application::DS . $this->data('public_html') . Application::DS . 'Css' . Application::DS , Application::DS, $read);
-                    $read = str_replace('.css', '', $read);
+                    $read = str_replace(Application::DS . $this->data('public_html') . Application::DS . 'Pcss' . Application::DS , Application::DS, $read);
+                    $read = str_replace('.pcss', '', $read);
                     $data = new Data();
                     $data->read($read);
                     $parser = new Parser();

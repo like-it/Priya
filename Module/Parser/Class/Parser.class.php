@@ -278,6 +278,10 @@ class Parser extends Data {
                     if(file_exists($url)){
                         require_once $url;
                     } else {
+                        if($function == 'function_rgba'){
+                            var_dump($methodList);
+                            die;
+                        }
                         var_dump('(Parser) (execMethodList) missing file: ' . $url);
                         //remove function ?
                         continue;
@@ -329,6 +333,36 @@ class Parser extends Data {
                         $string= '!' . $string;
                     }
                 }
+            }
+        }
+        return $string;
+    }
+
+    public function literal($string=''){
+        if (is_array($string)){
+            foreach($string as $nr => $line){
+                $string[$nr] = $this->literal($line);
+            }
+            return $string;
+        }
+        elseif(is_object($string)){
+            foreach ($string as $key => $value){
+                $string->{$key} = $this->literal($value);
+            }
+            return $string;
+        } else {
+            if(strpos($string, '{') !== false || strpos($string, '}') !== false){
+                $literal_start = '{' . Parser::LITERAL . '}';
+                $literal_end = '{/' . Parser::LITERAL . '}';
+                $explode = explode($literal_end, $string);
+                $literal_end_count = count($explode);
+                $explode = explode($literal_start, $string);
+                $literal_start_count = count($explode);
+
+                for($i=0; $i < ($literal_end_count - $literal_start_count); $i++){
+                    $string = $literal_start . $string;
+                }
+                $string = $literal_start . $string . $literal_end;
             }
         }
         return $string;
@@ -433,11 +467,14 @@ class Parser extends Data {
             $method = explode('(', $part, 2);
             if(empty(reset($method))){
                 continue;
-//                 return $methodList;
             }
             if(count($method) == 1){
                 continue;
-//                 return $methodList;
+            }
+            if($type == 'functionList'){
+                if(strpos($statement, '{' . reset($method)) === false){
+                    continue;
+                }
             }
             $inSet = false;
             foreach($method as $key => $value){
@@ -690,6 +727,13 @@ class Parser extends Data {
                     continue;
                 }
                 if(strpos($attribute, Parser::LITERAL) !== false){
+                    continue;
+                }
+                if(
+                    strpos($attribute, "\r") !== false ||
+                    strpos($attribute, "\n") !== false ||
+                    strpos($attribute, "\r\n") !== false
+                ){
                     continue;
                 }
                 $key = $nr;
