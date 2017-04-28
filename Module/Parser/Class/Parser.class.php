@@ -14,6 +14,7 @@ use Priya\Application;
 
 class Parser extends Data {
     const DIR = __DIR__;
+    const LITERAL = 'literal';
     const PHP_MIN_VERSION = '7.0.0';
     const MAX_ITERATION = 128;
 
@@ -181,8 +182,8 @@ class Parser extends Data {
             }
             $string = str_replace('[' . $this->random() . '[', '{', $string);
             $string = str_replace(']' . $this->random() . ']', '}', $string);
-            $string = str_replace('{literal}', '' , $string);
-            $string = str_replace('{/literal}', '' , $string);
+            $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
+            $string = str_replace('{/' . Parser::LITERAL . '}', '' , $string);
             return $string;
         }
     }
@@ -334,160 +335,29 @@ class Parser extends Data {
     }
 
     private function literalList($string=''){
-        if(strpos($string, '{literal}') === false){
+        if(strpos($string, '{' . Parser::LITERAL . '}') === false){
             return $string;
         }
-        $list = explode('{literal}', $string, 2);
-        if(strpos($list[1], '{literal}') !== false){
+        $list = explode('{' . Parser::LITERAL . '}', $string, 2);
+        if(strpos($list[1], '{' . Parser::LITERAL . '}') !== false){
             $list[1] = $this->literalList($list[1]);
         }
-        $literal = explode('{/literal}', $list[1], 2);
+        $literal = explode('{/' . Parser::LITERAL . '}', $list[1], 2);
         $attributeList = $this->attributeList($literal[0]);
         foreach ($attributeList as $search => $attr_value){
             $replace = '[' . $this->random() . '[' . substr($search, 1, -1) . ']' . $this->random() . ']';
             $literal[0] = str_replace($search, $replace, $literal[0]);
         }
-        $list[1] = implode('[' . $this->random() . '[/literal]' . $this->random() . ']', $literal);
-        $string = implode('[' . $this->random() . '[literal]' . $this->random() . ']' , $list);
+        $list[1] = implode('[' . $this->random() . '[/' . Parser::LITERAL . ']' . $this->random() . ']', $literal);
+        $string = implode('[' . $this->random() . '[' . Parser::LITERAL . ']' . $this->random() . ']' , $list);
         return $string;
     }
-
-    /*
-    private function literalList($string=''){
-        if(strpos($string, '{literal}') === false){
-            return $string;
-        }
-        $list = explode('{literal}', $string, 2);
-        if(strpos($list[1], '{literal}') !== false){
-            $list[1] = $this->literalList($list[1]);
-        }
-        $literal = explode('{/literal}', $list[1], 2);
-        foreach($literal as $nr => $liter){
-            $attributeList = $this->attributeList($liter);
-            var_dump('@@@@@@@@@@@@@@@@@@@@@@@@@@');
-            var_dump($attributeList);
-            foreach ($attributeList as $search => $attr_value){
-                $replace = '[' . $this->random() . '[' . substr($search, 1, -1) . ']' . $this->random() . ']';
-                $liter = str_replace($search, $replace, $liter);
-            }
-            $literal[$nr] = $liter;
-        }
-        $list[1] = implode('[' . $this->random() . '[/literal]' . $this->random() . ']', $literal);
-        $attributeList = $this->attributeList($list[1]);
-
-        var_dump('@@@@@@@@@@@@@@@@@@@@@@@@@@');
-        var_dump($attributeList);
-
-        foreach($attributeList as $search => $attr_value){
-            $replace = '[' . $this->random() . '[' . substr($search, 1, -1) . ']' . $this->random() . ']';
-            $list[1]= str_replace($search, $replace, $list[1]);
-        }
-        $string = implode('[' . $this->random() . '[literal]' . $this->random() . ']' , $list);
-        return $string;
-    }
-    */
 
     private function FunctionList($string='', $list=array()){
         $methodList = $this->createMethodList($string, 'functionList');
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
     }
-
-    /*
-    private function createFunctionList($string='', $replace='', $key='', $list=array(), $compile_list=array()){
-        $temp = explode(' ', $string);
-        $method= ltrim(reset($temp), '{');
-        $method = explode('(', $method, 2);
-        $function = ltrim(reset($method), '!');
-        $function_key = $function;
-        $search  = $key;
-        foreach($compile_list as $compile_key => $compile_value){
-            $search = str_replace($compile_key, $compile_value, $search);
-        }
-        $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
-        if(in_array($function, array('if'))){
-            $url = $dir . 'Control.' . ucfirst(strtolower($function)) . '.php';
-            $function = 'control_' . $function;
-        } else {
-            $url = $dir . 'Function.' . ucfirst(strtolower($function))  . '.php';
-            $function = 'function_' . $function;
-        }
-        if(file_exists($url)){
-            require_once $url;
-        } else {
-            var_dump('output');
-            var_dump($string);
-            var_dump($function);
-            var_dump($compile_list);
-            var_dump('(parser) missing file: ' . $url);
-            //remove function ?
-            return array();
-        }
-
-        if(function_exists($function) === false){
-            var_dump('missing function: ' . $function);
-            //trigger error?
-            return array();
-        }
-        if(strpos($function, 'control') === 0){
-            if($key == '{/if}'){
-                $argumentList = $this->createArgumentListIf($string);
-                foreach($argumentList as $nr => $argument){
-                    $methodList = $this->createMethodList($argument['statement']);
-                    $argumentList[$nr]['methodList'] = $methodList;
-                }
-                $string =  $function($string, $argumentList, $this);
-                $functon_list[$search][$function_key] = $string;
-            }
-        } else {
-            foreach($compile_list as $compile_key => $compile_value){
-                $value = str_replace($compile_key, $compile_value, $value);
-            }
-            $methodList = $this->createMethodList($value);
-            foreach ($methodList as $method_key => $method_value){
-                foreach ($method_value as $method_nr => $methodCollection){
-                    foreach ($methodCollection as $method_collection_key => $method){
-                        if(empty($method['function'])){
-                            continue;
-                        }
-                        $argList = array();
-                        if(!empty($method['argumentList'])){
-                            $argList = $method['argumentList'];
-                        }
-                        $function = $method['function'];
-                        $url = $dir . 'Function.' . ucfirst(strtolower($function)) . '.php';
-                        $function = 'function_' . $function;
-
-                        if(file_exists($url)){
-                            require_once $url;
-                        } else {
-                            var_dump('(Control.If) missing file: ' . $url);
-                            //remove function ?
-                            continue;
-                        }
-
-                        if(function_exists($function) === false){
-                            var_dump('missing function: ' . $function);
-                            //trigger error?
-                            continue;
-                        }
-                        $res =  $function($method_collection_key, $argList, $this);
-                        $function_list[$search][$function_key] = $res;
-                    }
-                }
-            }
-        }
-        if(isset($function_list[$search][$function_key])){
-//             continue;	//done by method
-            return $function_list;
-        }
-        $argumentList = $this->createArgumentList($list);
-        $argumentList= $this->compile($argumentList, $this->data());
-        $replace =  $function($replace, $argumentList, $this);
-        $function_list[$search][$function_key] = $replace;
-        return $function_list;
-    }
-    */
 
     public function replace($search='', $replace='', $data=''){
         return $data;
@@ -819,7 +689,7 @@ class Parser extends Data {
                 if(strpos($attribute, '$') === 0){
                     continue;
                 }
-                if(strpos($attribute, 'literal') !== false){
+                if(strpos($attribute, Parser::LITERAL) !== false){
                     continue;
                 }
                 $key = $nr;
