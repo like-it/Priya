@@ -362,7 +362,17 @@ class Parser extends Data {
                 for($i=0; $i < ($literal_end_count - $literal_start_count); $i++){
                     $string = $literal_start . $string;
                 }
-                $string = $literal_start . $string . $literal_end;
+                $literal_has = false;
+                if(strpos($string, $literal_start) === 0){
+                    $literal_end_reverse = strrev($literal_end);
+                    $string_reverse = strrev($string);
+                    if(strpos($string_reverse, $literal_end_reverse) === 0){
+                        $literal_has = true;
+                    }
+                }
+                if(empty($literal_has)){
+                    $string = $literal_start . $string . $literal_end;
+                }
             }
         }
         return $string;
