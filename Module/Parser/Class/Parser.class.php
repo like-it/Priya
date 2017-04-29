@@ -139,6 +139,7 @@ class Parser extends Data {
             $string = $this->functionList($string, $list);
             while($init < 2){
                 $test = array();
+                $test_string[] = $string;
                 $list = $this->controlList($string, 10, $init);
                 if($list === false){
                     $test[] = false;
@@ -161,12 +162,16 @@ class Parser extends Data {
                     }
                 }
                 $counter++;
+                if(reset($test_string) == end ($test_string) && count($test_string) > 1){
+                    break;
+                }
                 if($counter > Parser::MAX_ITERATION){
                     var_dump('@@@@@@@@@@@@@@@@@@@@@@@');
                     var_dump('ineffecient parse');
                     var_dump($string);
                     var_dump($test);
                     var_dump($list);
+                    var_dump($test_string);
                     //variable in if condition
                     break;
                 }
@@ -716,8 +721,10 @@ class Parser extends Data {
 
     private function controlList($string='', $indent=0, $count=0){
         $function = explode('function(', $string);
-//         var_dump($function);
         foreach($function as $function_nr => $content){
+            if(strpos($content, '[' . $this->random() . '[' . Parser::LITERAL . ']' .  $this->random() . ']') !== false){
+                return false;
+            }
             $attributeList = array();
             $list = explode('{', $string);
             if(empty($list)){
