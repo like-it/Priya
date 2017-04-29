@@ -1,4 +1,6 @@
 <?php
+use Priya\Module\Handler;
+
 /**
  * @author 		Remco van der Velde
  * @since 		19-01-2016
@@ -42,7 +44,7 @@ function smarty_function_route($params, $template)
         } else {
             $route_path = explode('/', trim(strtolower($route['path']), '/'));
             foreach($route_path as $part_nr => $part){
-                if(substr($part,0,1) == '{' && substr($part,-1) == '}'){
+                if(substr($part,0, 2) == '{$' && substr($part, -1) == '}'){
                     $route_path[$part_nr] = array_shift($attribute);
                 }
                 if(empty($route_path[$part_nr])){
@@ -53,7 +55,7 @@ function smarty_function_route($params, $template)
             if(!empty($path)){
                 $path .= '/';
             }
-            if(stristr($path, 'http') === false){
+            if(stristr($path, Handler::SCHEME_HTTP) === false){
                 if(isset($vars['web']) && isset($vars['web']['root'])){
                     $path = $vars['web']['root'] . $path;
                 }

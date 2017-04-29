@@ -78,7 +78,7 @@ class Result extends Parser {
             return $this->result($this->template('create', $result));
         }
         elseif($type == 'cli'){
-            return $this->result($this->cli('create'));
+            return $this->result($this->cli('create', $result));
         } else {
             $this->setResult($type);
         }

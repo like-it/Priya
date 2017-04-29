@@ -183,7 +183,6 @@ class Data extends Core {
             }
             $directory .= str_replace('\\', Application::DS, $namespace) . Application::DS;
             $data = new \Priya\Module\Autoload\Data();
-            $environment = $this->data('environment');
             $class = get_called_class();
             if($class::DIR){
                 $dir = dirname($class::DIR) . Application::DS;// . 'Data' . Application::DS;
@@ -198,6 +197,7 @@ class Data extends Core {
             }
             $autoload = $this->autoload($data);
         }
+//         $autoload->environment('development');
         $url = $autoload->data_load($url);
         if($url !== false){
             $this->url($url);

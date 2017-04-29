@@ -21,6 +21,28 @@ foreach($request as $key => $value){
     $value = trim($value, ' -');
 
     switch ($value){
+        case 'array' :
+            $list = array();
+            foreach($route->data() as $name => $route){
+                if(empty($route->method)){
+                    continue;
+                }
+                if(!is_array($route->method)){
+                    $route->method = (array) $route->method;
+                }
+                foreach ($route->method as $key => $value){
+                    $route->method[$key] = strtoupper($value);
+                }
+                if(!in_array('CLI', $route->method)){
+                    continue;
+                }
+                if(isset($route->path)){
+                    $route->name = $name;
+                    $list[] = $route;
+                }
+            }
+            echo $this->object($list, 'json');
+        break;
         case 'list' :
             foreach($route->data() as $name => $route){
                 if(empty($route->method)){

@@ -54,6 +54,59 @@ trait Object {
         }
     }
 
+    public function explode_single($delimiter=array(), $string='', $internal=array()){
+        $result = array();
+        if(is_array($delimiter)){
+            foreach($delimiter as $nr => $delim){
+                $tmp = $this->explode_single($delim, $string, $result);
+                if(count($tmp)==1){
+                    continue;
+                }
+                foreach ($tmp as $tmp_nr => $tmp_value){
+                    $result[] = $tmp_value;
+                }
+            }
+            $list = array();
+            foreach ($result as $nr => $part){
+                $splitted = false;
+                foreach ($delimiter as $delim){
+                    $tmp = explode($delim, $part);
+                    if(count($tmp) == 1){
+                        continue;
+                    }
+                    $splitted = true;
+                    foreach($tmp as $part_splitted){
+                        $list[$part_splitted][] = $part_splitted;
+                    }
+                }
+                if(empty($splitted)){
+                    $list[$part][] = $part;
+                }
+            }
+            foreach($list as $part => $value){
+                foreach ($delimiter as $delim){
+                    if(strpos($part, $delim) !== false){
+                        unset($list[$part]);
+                    }
+                }
+            }
+            $result = array();
+            foreach($list as $part => $value){
+                $result[] = $part;
+            }
+            if(empty($result)){
+                $result[] = $string;
+            }
+            return $result;
+        } else {
+            $result = explode($delimiter, $string);
+        }
+        if(empty($result)){
+            $result[] = $string;
+        }
+        return $result;
+    }
+
     public function explode_multi($delimiter=array(), $string='', $limit=array()){
         $result = array();
         if(!is_array($limit)){
