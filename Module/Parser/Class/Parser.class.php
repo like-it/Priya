@@ -139,7 +139,6 @@ class Parser extends Data {
             $string = $this->functionList($string, $list);
             while($init < 2){
                 $test = array();
-                $test_string[] = $string;
                 $list = $this->controlList($string, 10, $init);
                 if($list === false){
                     $test[] = false;
@@ -148,6 +147,7 @@ class Parser extends Data {
                 }
                 //why list & not attributeList
                 $string = $this->createStatementList($string, $list);
+                $test_string[] = $string;
                 $init++;
                 $list = $this->controlList($string, 20, $init);
                 if($list === false){
@@ -156,6 +156,7 @@ class Parser extends Data {
                     $test[] = true;
                 }
                 $string = $this->createStatementList($string, $list);
+                $test_string[] = $string;
                 foreach($test as $output){
                     if(!empty($output)){
                         $init = 0;
