@@ -14,6 +14,7 @@ use Priya\Application;
 
 class Route extends \Priya\Module\Core\Parser{
     const DIR = __DIR__;
+
     private $item;
 
     public function __construct(Handler $handler, $data=''){
@@ -190,7 +191,7 @@ class Route extends \Priya\Module\Core\Parser{
         $object = new stdClass();
         $object->path = implode('/', $name) . '/';
         $object->default = new stdClass();
-        $object->default->controller = 'Priya:Module:' . $module . '.'. implode('.', $name) . '.' .  $method;
+        $object->default->controller = 'Priya.Module:' . $module . '.'. implode('.', $name) . '.' .  $method;
         $object->method = array('CLI');
         $object->translate = false;
         $this->data(strtolower(implode('-',$name)) . '/', $object);

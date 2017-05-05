@@ -295,9 +295,31 @@ class Handler extends \Priya\Module\Core\Data{
         global $argc, $argv;
 
         $node = array();
-        $input = htmlspecialchars(htmlspecialchars_decode(implode('', file('php://input')), ENT_NOQUOTES), ENT_NOQUOTES, "UTF-8");
+        $input =
+            htmlspecialchars(
+                htmlspecialchars_decode(
+                    implode(
+                        '',
+                        file('php://input')
+                    ),
+                    ENT_NOQUOTES
+                ),
+                ENT_NOQUOTES,
+                'UTF-8'
+            )
+        ;
         if(empty($input) && !empty($_REQUEST)){
-            $input = htmlspecialchars(json_encode(array('nodeList' => array(0 => $_REQUEST))), ENT_NOQUOTES, "UTF-8");
+            $input =
+                htmlspecialchars(
+                    json_encode(
+                        array(
+                            'nodeList' => array(0 => $_REQUEST)
+                        )
+                    ),
+                    ENT_NOQUOTES,
+                    'UTF-8'
+                )
+            ;
         }
         elseif(!empty($input) && !empty($_REQUEST)){
             $old = json_decode($input);
@@ -355,11 +377,15 @@ class Handler extends \Priya\Module\Core\Data{
             $object->data =  $attribute;
             $data->nodeList[] = $object;
             $object = new stdClass();
-            $object->file =  Application::DIR . Application::DS . basename(array_shift($attribute));
+            $object->file =
+                Application::DIR .
+                Application::DS .
+                basename(array_shift($attribute))
+            ;
             $data->nodeList[] = $object;
             if(count($argv) >= 1){
                 $object = new stdClass();
-                $object->request =  str_replace('\\','/',array_shift($attribute));
+                $object->request = str_replace('\\','/',array_shift($attribute));
                 $data->nodeList[] = $object;
             }
         }
@@ -370,8 +396,11 @@ class Handler extends \Priya\Module\Core\Data{
         if(empty($_SERVER['DOCUMENT_ROOT'])){
             return false;
         }
-        return str_replace(array('/', '\\'), Application::DS, $_SERVER['DOCUMENT_ROOT'] .
-        Application::DS);
+        return str_replace(
+            array('/', '\\'),
+            Application::DS,
+            $_SERVER['DOCUMENT_ROOT'] . Application::DS
+        );
     }
 
     public function web(){
@@ -464,34 +493,109 @@ class Handler extends \Priya\Module\Core\Data{
                     $tmp = explode('.', $value);
                     switch(count($tmp)){
                         case 1 :
-                            unset($_SESSION[$value]);
+                            unset(
+                                $_SESSION
+                                [$value]
+                            );
                         break;
                         case 2 :
-                            unset($_SESSION[$tmp[0]][$tmp[1]]);
+                            unset(
+                                $_SESSION
+                                [$tmp[0]]
+                                [$tmp[1]]
+                            );
                         break;
                         case 3 :
-                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]]);
+                            unset(
+                                $_SESSION
+                                [$tmp[0]]
+                                [$tmp[1]]
+                                [$tmp[2]]
+                            );
                         break;
                         case 4 :
-                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]]);
+                            unset(
+                                $_SESSION
+                                [$tmp[0]]
+                                [$tmp[1]]
+                                [$tmp[2]]
+                                [$tmp[3]]
+                            );
                         break;
                         case 5 :
-                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]]);
+                            unset(
+                                $_SESSION
+                                [$tmp[0]]
+                                [$tmp[1]]
+                                [$tmp[2]]
+                                [$tmp[3]]
+                                [$tmp[4]]
+                            );
                         break;
                         case 6 :
-                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]]);
+                            unset(
+                                $_SESSION
+                                [$tmp[0]]
+                                [$tmp[1]]
+                                [$tmp[2]]
+                                [$tmp[3]]
+                                [$tmp[4]]
+                                [$tmp[5]]
+                            );
                         break;
                         case 7 :
-                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]]);
+                            unset(
+                                $_SESSION
+                                [$tmp[0]]
+                                [$tmp[1]]
+                                [$tmp[2]]
+                                [$tmp[3]]
+                                [$tmp[4]]
+                                [$tmp[5]]
+                                [$tmp[6]]
+                            );
                         break;
                         case 8 :
-                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]]);
+                            unset(
+                                $_SESSION
+                                [$tmp[0]]
+                                [$tmp[1]]
+                                [$tmp[2]]
+                                [$tmp[3]]
+                                [$tmp[4]]
+                                [$tmp[5]]
+                                [$tmp[6]]
+                                [$tmp[7]]
+                            );
                         break;
                         case 9 :
-                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]]);
+                            unset(
+                                $_SESSION
+                                [$tmp[0]]
+                                [$tmp[1]]
+                                [$tmp[2]]
+                                [$tmp[3]]
+                                [$tmp[4]]
+                                [$tmp[5]]
+                                [$tmp[6]]
+                                [$tmp[7]]
+                                [$tmp[8]]
+                            );
                         break;
                         case 10 :
-                            unset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]][$tmp[9]]);
+                            unset(
+                                $_SESSION
+                                [$tmp[0]]
+                                [$tmp[1]]
+                                [$tmp[2]]
+                                [$tmp[3]]
+                                [$tmp[4]]
+                                [$tmp[5]]
+                                [$tmp[6]]
+                                [$tmp[7]]
+                                [$tmp[8]]
+                                [$tmp[9]]
+                            );
                         break;
                     }
                     return true;
@@ -501,34 +605,89 @@ class Handler extends \Priya\Module\Core\Data{
                     }
                     switch(count($tmp)){
                         case 1 :
-                            $_SESSION[$attribute] = $value;
+                            $_SESSION
+                            [$attribute] = $value;
                         break;
                         case 2 :
-                            $_SESSION[$tmp[0]][$tmp[1]] = $value;
+                            $_SESSION
+                            [$tmp[0]]
+                            [$tmp[1]] = $value;
                         break;
                         case 3 :
-                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]] = $value;
+                            $_SESSION
+                            [$tmp[0]]
+                            [$tmp[1]]
+                            [$tmp[2]] = $value;
                         break;
                         case 4 :
-                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]] = $value;
+                            $_SESSION
+                            [$tmp[0]]
+                            [$tmp[1]]
+                            [$tmp[2]]
+                            [$tmp[3]] = $value;
                         break;
                         case 5 :
-                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]] = $value;
+                            $_SESSION
+                            [$tmp[0]]
+                            [$tmp[1]]
+                            [$tmp[2]]
+                            [$tmp[3]]
+                            [$tmp[4]] = $value;
                         break;
                         case 6 :
-                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]] = $value;
+                            $_SESSION
+                            [$tmp[0]]
+                            [$tmp[1]]
+                            [$tmp[2]]
+                            [$tmp[3]]
+                            [$tmp[4]]
+                            [$tmp[5]] = $value;
                         break;
                         case 7 :
-                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]]= $value;
+                            $_SESSION
+                            [$tmp[0]]
+                            [$tmp[1]]
+                            [$tmp[2]]
+                            [$tmp[3]]
+                            [$tmp[4]]
+                            [$tmp[5]]
+                            [$tmp[6]] = $value;
                         break;
                         case 8 :
-                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]]= $value;
+                            $_SESSION
+                            [$tmp[0]]
+                            [$tmp[1]]
+                            [$tmp[2]]
+                            [$tmp[3]]
+                            [$tmp[4]]
+                            [$tmp[5]]
+                            [$tmp[6]]
+                            [$tmp[7]] = $value;
                         break;
                         case 9 :
-                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]]= $value;
+                            $_SESSION
+                            [$tmp[0]]
+                            [$tmp[1]]
+                            [$tmp[2]]
+                            [$tmp[3]]
+                            [$tmp[4]]
+                            [$tmp[5]]
+                            [$tmp[6]]
+                            [$tmp[7]]
+                            [$tmp[8]] = $value;
                         break;
                         case 10 :
-                            $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]][$tmp[3]][$tmp[4]][$tmp[5]][$tmp[6]][$tmp[7]][$tmp[8]][$tmp[9]]= $value;
+                            $_SESSION
+                            [$tmp[0]]
+                            [$tmp[1]]
+                            [$tmp[2]]
+                            [$tmp[3]]
+                            [$tmp[4]]
+                            [$tmp[5]]
+                            [$tmp[6]]
+                            [$tmp[7]]
+                            [$tmp[8]]
+                            [$tmp[9]] = $value;
                         break;
                     }
                 }
@@ -542,14 +701,21 @@ class Handler extends \Priya\Module\Core\Data{
                     }
                 break;
                 case 2 :
-                    if(isset($_SESSION[$tmp[0]]) && isset($_SESSION[$tmp[0]][$tmp[1]])){
+                    if(
+                        isset($_SESSION[$tmp[0]]) &&
+                        isset($_SESSION[$tmp[0]][$tmp[1]])
+                    ){
                         return $_SESSION[$tmp[0]][$tmp[1]];
                     } else {
                         return null;
                     }
                 break;
                 case 3 :
-                    if(isset($_SESSION[$tmp[0]]) && isset($_SESSION[$tmp[0]][$tmp[1]]) && isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]])){
+                    if(
+                        isset($_SESSION[$tmp[0]]) &&
+                        isset($_SESSION[$tmp[0]][$tmp[1]]) &&
+                        isset($_SESSION[$tmp[0]][$tmp[1]][$tmp[2]])
+                    ){
                         return $_SESSION[$tmp[0]][$tmp[1]][$tmp[2]];
                     } else {
                         return null;

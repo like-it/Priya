@@ -57,4 +57,16 @@ class File {
         }
         return $extension;
     }
+
+    public function removeExtension($filename='', $extension=array()){
+        foreach($extension as $ext){
+            $ext = '.' . ltrim($ext, '.');
+            $filename = explode($ext, $filename, 2);
+            if(count($filename) > 1 && empty(end($filename))){
+                array_pop($filename);
+            }
+            $filename = implode($ext, $filename);
+        }
+        return $filename;
+    }
 }

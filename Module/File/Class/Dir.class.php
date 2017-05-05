@@ -10,10 +10,10 @@
 namespace Priya\Module\File;
 
 use stdClass;
-use Priya\Application;
 
 class Dir {
     const CHMOD = 0740;
+
     private $node;
 
     public function ignore($ignore=null, $attribute=null){
@@ -35,8 +35,8 @@ class Dir {
                 $node->ignore = $attribute;
             }
             elseif($ignore=='find'){
-                if(substr($attribute,-1) !== Application::DS){
-                    $attribute .= Application::DS;
+                if(substr($attribute,-1) !== DIRECTORY_SEPARATOR){
+                    $attribute .= DIRECTORY_SEPARATOR;
                 }
                 foreach ($node->ignore as $nr => $item){
                     if(stristr($attribute, $item) !== false){
@@ -45,8 +45,8 @@ class Dir {
                 }
                 return false;
             } else {
-                if(substr($ignore,-1) !== Application::DS){
-                    $ignore .= Application::DS;
+                if(substr($ignore,-1) !== DIRECTORY_SEPARATOR){
+                    $ignore .= DIRECTORY_SEPARATOR;
                 }
                 $node->ignore[] = $ignore;
             }
@@ -56,8 +56,8 @@ class Dir {
     }
 
     public function read($url='', $recursive=false, $format='flat'){
-        if(substr($url,-1) !== Application::DS){
-            $url .= Application::DS;
+        if(substr($url,-1) !== DIRECTORY_SEPARATOR){
+            $url .= DIRECTORY_SEPARATOR;
         }
         if($this->ignore('find', $url)){
             return array();
@@ -77,7 +77,7 @@ class Dir {
                 $file = new stdClass();
                 $file->url = $url . $entry;
                 if(is_dir($file->url)){
-                    $file->url .= Application::DS;
+                    $file->url .= DIRECTORY_SEPARATOR;
                     $file->type = 'dir';
                 }
                 if($this->ignore('find', $file->url)){
