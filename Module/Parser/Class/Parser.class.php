@@ -136,7 +136,8 @@ class Parser extends Data {
             }
             $init = 0;
             $counter = 0;
-            $string = $this->functionList($string, $list);
+            $functionList = $list;
+//             $string = $this->functionList($string, $list); //wrong function in if (true & false)  statement gets executed
             while($init < 2){
                 $test = array();
                 $test_string = array();
@@ -147,7 +148,7 @@ class Parser extends Data {
                     $test[] = true;
                 }
                 //why list & not attributeList
-                $string = $this->createStatementList($string, $list);
+                $string = $this->createStatementList($string, $list, $functionList);
                 $test_string[] = $string;
                 $init++;
                 $list = $this->controlList($string, 20, $init);
@@ -156,7 +157,7 @@ class Parser extends Data {
                 } else {
                     $test[] = true;
                 }
-                $string = $this->createStatementList($string, $list);
+                $string = $this->createStatementList($string, $list, $functionList);
                 $test_string[] = $string;
                 foreach($test as $output){
                     if(!empty($output)){
@@ -195,8 +196,9 @@ class Parser extends Data {
         }
     }
 
-    private function createStatementList($string='', $list=array()){
+    private function createStatementList($string='', $list=array(), $functionList=array()){
         if(empty($list)){
+            $string = $this->FunctionList($string, $functionList);
             return $string;
         }
         $condition_list = array();
@@ -222,10 +224,11 @@ class Parser extends Data {
             }
         }
         if(empty($condition_list)){
+            $string = $this->FunctionList($string, $functionList);
             return $string;
-            $methodList = $this->createMethodList($string);
-            $string = $this->execMethodList($methodList, $string);
-            return $string;
+//             $methodList = $this->createMethodList($string);
+//             $string = $this->execMethodList($methodList, $string);
+//             return $string;
         }
         foreach ($condition_list as $condition_key => $condition){
             $argumentList = $this->createArgumentListIf($condition);
@@ -285,12 +288,8 @@ class Parser extends Data {
                     if(file_exists($url)){
                         require_once $url;
                     } else {
-                        if($function == 'function_rgba'){
-                            var_dump($methodList);
-                            die;
-                        }
                         var_dump('(Parser) (execMethodList) missing file: ' . $url);
-                        //remove function ?
+                        //remove {function} ?
                         continue;
                     }
 
@@ -406,12 +405,6 @@ class Parser extends Data {
 
     private function FunctionList($string='', $list=array()){
         $methodList = $this->createMethodList($string, 'functionList');
-        if(!empty($methodList)){
-            var_dump($string);
-            echo "<pre>";
-            var_export($methodList);
-//             die;
-        }
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
     }
@@ -537,8 +530,8 @@ class Parser extends Data {
             $args = str_getcsv($arguments); //to handle quotes
             $array = false;
             $list = array();
-            var_dump($args);
             foreach($args  as $key => $value){
+                $value = ltrim($value, ' '); //added
                 if(substr($value, 0, 1) == '\'' && substr($value, -1, 1) == '\''){
                     $value = substr($value, 1, -1);
                 }
@@ -577,6 +570,9 @@ class Parser extends Data {
                     $val = strrev($value);
                     $val = explode(')', $val, 2);
                     $val = strrev(end($val));
+                    if(substr($val, 0, 1) == ('"' || '\'') && substr($val, -1, 1) == ('"' || '\'')){
+                        $val = substr($val, 1, -1);
+                    }
                     $array[] = $val;
                     $list[] = $array; //implode(',', $array);
                     $array = false;

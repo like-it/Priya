@@ -260,9 +260,6 @@ class Route extends \Priya\Module\Core\Parser{
                 }
             }
             $path = implode('/', $route_path);
-            if(!empty($path)){
-                $path .= '/';
-            }
             if(strpos($path, Handler::SCHEME_HTTP) !== 0){
                 $path = $this->data('web.root') . $path;
             }

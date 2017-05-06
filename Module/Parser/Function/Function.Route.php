@@ -14,13 +14,23 @@ function function_route($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    var_dump($argumentList);
-    die;
+//     var_dump($argumentList);
+//     die;
     if(isset($argumentList['name'])){
         $name = $argumentList['name'];
+    } else {
+        $name = false;
     }
     if(isset($argumentList['attribute'])){
         $attribute = $argumentList['attribute'];
+    } else {
+        $attribute = false;
+    }
+    if($name === false){
+        $name = array_shift($argumentList);
+    }
+    if($attribute === false){
+        $attribute = array_shift($argumentList);
     }
     if(!is_array($attribute)){
         $attribute = (array) $attribute;
@@ -31,6 +41,9 @@ function function_route($value=null, $argumentList=array(), $parser=null){
         //maybe empty string trigger error ?
         return $value;
     }
+    $route->data($parser->data());
+    return $route->route($name, $attribute);
+    /*
     foreach($route->data() as $routeName => $route){
         if(!is_object($route)){
             continue;
@@ -57,13 +70,11 @@ function function_route($value=null, $argumentList=array(), $parser=null){
             }
         }
         $path = implode('/', $route_path);
-        if(!empty($path)){
-            $path .= '/';
-        }
         if(stristr($path, Handler::SCHEME_HTTP) === false){
             $path = $parser->data('web.root') . $path;
         }
         return $path;
     }
     return $value;
+    */
 }
