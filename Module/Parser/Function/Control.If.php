@@ -47,6 +47,8 @@ function control_if($value=null, $argumentList=array(), $parser=null){
         }
     }
     $result = '';
+//     var_dump('*************************');
+//     var_dump($argumentList);
     foreach ($argumentList as $key => $argument){
         if(isset($argument['result'])){
             $result .= $argument['result'];

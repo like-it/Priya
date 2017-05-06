@@ -137,7 +137,7 @@ class Parser extends Data {
             $init = 0;
             $counter = 0;
             $functionList = $list;
-//             $string = $this->functionList($string, $list); //wrong function in if (true & false)  statement gets executed
+//             $string = $this->functionList($string, $list); //wrong function in if (true & false)  statements gets executed
             while($init < 2){
                 $test = array();
                 $test_string = array();
@@ -148,7 +148,7 @@ class Parser extends Data {
                     $test[] = true;
                 }
                 //why list & not attributeList
-                $string = $this->createStatementList($string, $list, $functionList);
+                $string = $this->createStatementList($string, $list, $functionList, $init);
                 $test_string[] = $string;
                 $init++;
                 $list = $this->controlList($string, 20, $init);
@@ -157,7 +157,7 @@ class Parser extends Data {
                 } else {
                     $test[] = true;
                 }
-                $string = $this->createStatementList($string, $list, $functionList);
+                $string = $this->createStatementList($string, $list, $functionList, $init);
                 $test_string[] = $string;
                 foreach($test as $output){
                     if(!empty($output)){
@@ -196,17 +196,17 @@ class Parser extends Data {
         }
     }
 
-    private function createStatementList($string='', $list=array(), $functionList=array()){
+    private function createStatementList($string='', $list=array(), $functionList=array(), $init=0){
         if(empty($list)){
             $string = $this->FunctionList($string, $functionList);
             return $string;
         }
         $condition_list = array();
+        $tmp = array();
         foreach($list as $key => $value){
             if(!is_array($value)){
                 continue;
             }
-            $tmp = array();
             foreach ($value as $val_key => $val_value){
                 $tmp[$val_key] = $val_value;
                 if($val_key == '{/if}'){
@@ -220,6 +220,7 @@ class Parser extends Data {
                         }
                     }
                     $condition_list[] = $statement;
+                    $tmp = array();
                 }
             }
         }
@@ -643,6 +644,9 @@ class Parser extends Data {
             return array();
         }
         $attribute = explode('{if', $attribute);
+        if(count($attribute) == 1){
+            return array();
+        }
         $argumentList = array();
         $index = false;
         foreach($attribute as $key => $value){

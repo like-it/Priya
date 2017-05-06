@@ -1,0 +1,17 @@
+{
+"title": "Test.Parser.Control.If",
+"web" : {
+    "root" : "http:://{$test.variable}/"
+},
+"test" : {
+    "value" : "",
+    "variable" : "Priya",
+    "control_if_1" : "{if file_exists({$dir.root})}and also exists here{else}test {file_test(testing)}{file_should(shooting)}{/if}"
+},
+"output" : {
+    "value" : "",
+    "int" : 1,
+    "variable" : "Priya",
+    "control_if_1" : "testing true with some extra text"
+}
+}
