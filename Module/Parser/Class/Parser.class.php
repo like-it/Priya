@@ -166,7 +166,8 @@ class Parser extends Data {
                 }
                 $counter++;
                 if(reset($test_string) == end ($test_string) && count($test_string) > 1){
-                    break;
+//                     var_dump('hete');
+//                     break;
                 }
                 if($counter > Parser::MAX_ITERATION){
                     var_dump('@@@@@@@@@@@@@@@@@@@@@@@');
@@ -203,10 +204,13 @@ class Parser extends Data {
         }
         $condition_list = array();
         $tmp = array();
+//         var_dump('-----------------------------');
+//         var_dump($list);
         foreach($list as $key => $value){
             if(!is_array($value)){
                 continue;
             }
+//             $tmp = array(); //needed for test 3
             foreach ($value as $val_key => $val_value){
                 $tmp[$val_key] = $val_value;
                 if($val_key == '{/if}'){
@@ -220,10 +224,12 @@ class Parser extends Data {
                         }
                     }
                     $condition_list[] = $statement;
-                    $tmp = array();
+                    $tmp = array(); //makes one broken
                 }
             }
         }
+//         var_dump('--------------------------------');
+//         var_dump($condition_list);
         if(empty($condition_list)){
             $string = $this->FunctionList($string, $functionList);
             return $string;
@@ -233,6 +239,9 @@ class Parser extends Data {
         }
         foreach ($condition_list as $condition_key => $condition){
             $argumentList = $this->createArgumentListIf($condition);
+            if(empty($argumentList)){
+                continue;
+            }
             foreach($argumentList as $nr => $argument){
                 $methodList = $this->createMethodList($argument['statement']);
                 $argumentList[$nr]['methodList'] = $methodList;
@@ -254,6 +263,8 @@ class Parser extends Data {
             }
             $condition =  $function($condition, $argumentList, $this);
             $argumentList = $this->argument();
+//             var_dump(';;;;;;;;;;;;;;;;;;;;;;;;;;;;');
+//             var_dump($argumentList);
             foreach($argumentList as $nr => $argument){
                 if($argument['condition'] === true){
                     $string = str_replace($argument['string'], $argument['result'] . $argument['extra'], $string);
