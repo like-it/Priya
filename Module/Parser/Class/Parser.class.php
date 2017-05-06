@@ -139,6 +139,7 @@ class Parser extends Data {
             $string = $this->functionList($string, $list);
             while($init < 2){
                 $test = array();
+                $test_string = array();
                 $list = $this->controlList($string, 10, $init);
                 if($list === false){
                     $test[] = false;
@@ -405,6 +406,12 @@ class Parser extends Data {
 
     private function FunctionList($string='', $list=array()){
         $methodList = $this->createMethodList($string, 'functionList');
+        if(!empty($methodList)){
+            var_dump($string);
+            echo "<pre>";
+            var_export($methodList);
+//             die;
+        }
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
     }
@@ -506,9 +513,9 @@ class Parser extends Data {
             foreach($method as $key => $value){
                 $method[$key] = trim($value);
             }
-            $function_key = trim($part, ' ()');
+            $function_key = ltrim($part, ' ()');	//was trim
             if(strpos($function_key, '(') !== false){
-                $function_key .=  ')';
+//                 $function_key .=  ')';	//see was trim (together)
             } else {
                 $function_key .=  '()';
             }
@@ -530,6 +537,7 @@ class Parser extends Data {
             $args = str_getcsv($arguments); //to handle quotes
             $array = false;
             $list = array();
+            var_dump($args);
             foreach($args  as $key => $value){
                 if(substr($value, 0, 1) == '\'' && substr($value, -1, 1) == '\''){
                     $value = substr($value, 1, -1);
@@ -543,19 +551,34 @@ class Parser extends Data {
                 }
                 if(strpos($arg, 'array(') === 0){
                     $array = array();
-                    $array[] = $value;
-                    continue;
+                    $val = explode('array(', $value, 2);
+                    if(count($val) == 1){
+                        $array[] = $value;
+                        continue;
+                    } else {
+                        $val = end($val);
+                        if(substr($val, 0, 1) == ('"' || '\'') && substr($val, -1, 1) == ('"' || '\'')){
+                            $value = substr($val, 1, -1);
+                        } else {
+                            $value = $val;
+                        }
+                        $array[] = $value;
+                        continue;
+                    }
                 }
                 $arg = strrev($arg);
                 if(strpos($arg, ']') === 0){
                     $array[] = $value;
-                    $list[] = implode(',', $array);
+                    $list[] = $array; //implode(',', $array);
                     $array = false;
                     continue;
                 }
                 if(strpos($arg, ')') === 0){
-                    $array[] = $value;
-                    $list[] = implode(',', $array);
+                    $val = strrev($value);
+                    $val = explode(')', $val, 2);
+                    $val = strrev(end($val));
+                    $array[] = $val;
+                    $list[] = $array; //implode(',', $array);
                     $array = false;
                     continue;
                 }
@@ -564,6 +587,9 @@ class Parser extends Data {
                 } else {
                     $list[] = $value;
                 }
+            }
+            if(!empty($array)){
+                $list[] = implode(',', $array);
             }
             $function[$function_key]['argumentList'] = $list;
             $methodList[$statement][] = $function;

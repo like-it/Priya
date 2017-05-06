@@ -1,0 +1,18 @@
+{
+"title": "Test.Parser.Control.Literal",
+"web" : {
+    "root" : "http:://{$test.variable}/"
+},
+"test" : {
+    "value" : "value",
+    "variable" : "Priya",
+    "function_route_1" : "{route(array(\"priya-documentation-doxygen\",\"t'est2\", \"{$test.variable}\"), array(\"_core_8class_8php_source.html\", \"test\"))}",
+    "function_route_2" : "{route(\"priya-documentation-doxygen\", array(\"_core_8class_8php_source.html\", \"test\"))}"
+},
+"output" : {
+    "value" : "",
+    "int" : 1,
+    "variable" : "Priya",
+    "function_route_1" : "testing true with some extra text"
+}
+}

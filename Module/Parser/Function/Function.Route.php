@@ -14,6 +14,8 @@ function function_route($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
+    var_dump($argumentList);
+    die;
     if(isset($argumentList['name'])){
         $name = $argumentList['name'];
     }
