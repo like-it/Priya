@@ -28,4 +28,27 @@ class Cli extends Result {
             break;
         }
     }
+
+    public function read($type='', $url='', $read=''){
+        if($type=='input'){
+            readline_completion_function(array($this, 'complete'));
+            $input = readline($url);
+        }
+        elseif($type=='input-hidden'){
+            echo $url;
+            system('stty -echo');
+            $input = trim(fgets(STDIN));
+            system('stty echo');
+            echo PHP_EOL;
+        } else {
+            return parent::read($type);
+        }
+        return $input;
+    }
+
+
+    public function complete($text=''){
+        var_dump($text);
+    }
+
 }

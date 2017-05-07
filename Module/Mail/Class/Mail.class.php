@@ -95,7 +95,7 @@ class Mail extends Data{
             switch(count($arguments)){
                 case 1:
                     return $mail->{$method}(
-                        $arguments[0],
+                        $arguments[0]
                     );
                 break;
                 case 2:

@@ -128,7 +128,7 @@ class Application extends Parser {
         $this->route()->create('Application.Pull');
         $this->route()->create('Application.Push');
         $this->route()->create('Application.Build');
-        $this->route()->create('Application.Readline');
+        $this->route()->create('Application.Install');
         $this->route()->create('Test');
         $this->route()->create('Application.Cache.Clear');
     }
