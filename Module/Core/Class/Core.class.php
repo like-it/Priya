@@ -318,7 +318,7 @@ class Core {
             }
             elseif($attribute !== null){
                 if($type == 'delete'){
-                    return $this->deleteError($value);
+                    return $this->deleteError($attribute);
                 } else {
                     $error = $this->error();
                     if(is_null($error)){
@@ -412,7 +412,7 @@ class Core {
             }
             elseif($attribute !== null){
                 if($type == 'delete'){
-                    return $this->deleteMessage($value);
+                    return $this->deleteMessage($attribute);
                 } else {
                     $message = $this->message();
                     if(is_null($message)){

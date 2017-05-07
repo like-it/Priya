@@ -47,7 +47,6 @@ class Pager extends Data {
 
     public function data($attribute=null, $value=null){
         $data = parent::data($attribute, $value);
-
         $counter = 0;
         foreach($data as $nr => $node){
             $counter++;
@@ -233,8 +232,6 @@ class Pager extends Data {
             }
             elseif(is_array($this->content)) {
                 $this->content[$attribute] = $value;
-            } else {
-                var_dump('setContent create object and set object');
             }
         }
     }

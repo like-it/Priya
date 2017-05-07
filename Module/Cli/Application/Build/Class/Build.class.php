@@ -21,19 +21,24 @@ class Build extends Cli {
     const DIR = __DIR__;
 
     public function run(){
-        $package = $this->parameter(2);
-        $target = $this->parameter(3);
+        $this->request('package', $this->parameter(2));
+        $this->request('target', $this->parameter(3));
 
-        if(empty($package)){
+        if(empty($this->request('package'))){
+            $this->request('package', $this->read('input', 'Package: '));
+        }
+        while(file_exists($this->request('package')) === false){
             $this->error('package', true);
+            $this->result('cli');
+            $this->request('package', $this->read('input', 'Package: '));
         }
-        if(file_exists($package) === false){
-            $this->error('package', true);
+        $this->error('delete', 'package');
+        if(empty($this->request('target'))){
+            $this->request('target', $this->read('input', 'Target: '));
         }
-        if(empty($target)){
-            $this->error('target', true);
+        if(empty($this->error('package'))){
+            $this->build($this->request('package'), $this->request('target'));
         }
-        $this->build($package, $target);
         return $this->result('cli');
     }
 

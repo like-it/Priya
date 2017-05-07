@@ -12,11 +12,6 @@ namespace Priya\Module;
 class Indent extends \Priya\Module\Core\NodeList {
     const DIR = __DIR__;
 
-    public function run(){
-        $this->read(__CLASS__);
-        return $this->result('template');
-    }
-
     public function css(){
         header('Content-Type: ' . $this->data('contentType.css'));
         $this->read(__CLASS__);

@@ -9,8 +9,6 @@
 
 namespace Priya\Module;
 
-use stdClass;
-use Priya\Application;
 use Priya\Module\Core\Data;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -49,18 +47,23 @@ class Mail extends Data{
         $username = $this->data('mail.username');
         $password = $this->data('mail.password');
         if(empty($host)){
+            $this->error('host', true);
             return false;
         }
         if(empty($port)){
+            $this->error('port', true);
             return false;
         }
         if(empty($secure)){
+            $this->error('secure', true);
             return false;
         }
         if(empty($username)){
+            $this->error('username', true);
             return false;
         }
         if(empty($password)){
+            $this->error('password', true);
             return false;
         }
         $this->setMailer(new PHPMailer());
@@ -91,16 +94,99 @@ class Mail extends Data{
         if(!empty($method)){
             switch(count($arguments)){
                 case 1:
-                    return $mail->{$method}($arguments[0]);
+                    return $mail->{$method}(
+                        $arguments[0]
+                    );
                 break;
                 case 2:
-                    return $mail->{$method}($arguments[0], $arguments[1]);
+                    return $mail->{$method}(
+                        $arguments[0],
+                        $arguments[1]
+                    );
                 break;
                 case 3:
-                    return $mail->{$method}($arguments[0], $arguments[1], $arguments[2]);
+                    return $mail->{$method}(
+                        $arguments[0],
+                        $arguments[1],
+                        $arguments[2]
+                    );
                 break;
                 case 4:
-                    return $mail->{$method}($arguments[0], $arguments[1], $arguments[2], $arguments[3]);
+                    return $mail->{$method}(
+                        $arguments[0],
+                        $arguments[1],
+                        $arguments[2],
+                        $arguments[3]
+                    );
+                break;
+                case 5:
+                    return $mail->{$method}(
+                        $arguments[0],
+                        $arguments[1],
+                        $arguments[2],
+                        $arguments[3],
+                        $arguments[4]
+                    );
+                break;
+                case 6:
+                    return $mail->{$method}(
+                        $arguments[0],
+                        $arguments[1],
+                        $arguments[2],
+                        $arguments[3],
+                        $arguments[4],
+                        $arguments[5]
+                    );
+                break;
+                case 7:
+                    return $mail->{$method}(
+                        $arguments[0],
+                        $arguments[1],
+                        $arguments[2],
+                        $arguments[3],
+                        $arguments[4],
+                        $arguments[5],
+                        $arguments[6]
+                    );
+                break;
+                case 8:
+                    return $mail->{$method}(
+                        $arguments[0],
+                        $arguments[1],
+                        $arguments[2],
+                        $arguments[3],
+                        $arguments[4],
+                        $arguments[5],
+                        $arguments[6],
+                        $arguments[7]
+                    );
+                break;
+                case 9:
+                    return $mail->{$method}(
+                        $arguments[0],
+                        $arguments[1],
+                        $arguments[2],
+                        $arguments[3],
+                        $arguments[4],
+                        $arguments[5],
+                        $arguments[6],
+                        $arguments[7],
+                        $arguments[8]
+                    );
+                break;
+                case 10:
+                    return $mail->{$method}(
+                        $arguments[0],
+                        $arguments[1],
+                        $arguments[2],
+                        $arguments[3],
+                        $arguments[4],
+                        $arguments[5],
+                        $arguments[6],
+                        $arguments[7],
+                        $arguments[8],
+                        $arguments[9]
+                    );
                 break;
             }
         } else {
@@ -146,4 +232,3 @@ class Mail extends Data{
         return $this->mailer()->AltBody = $altBody;
     }
 }
-?>

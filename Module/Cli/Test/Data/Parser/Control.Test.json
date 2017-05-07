@@ -1,0 +1,19 @@
+{
+"title": "Test.Parser.Control.If",
+"web" : {
+    "root" : "http:://{$test.variable}/"
+},
+"test" : {
+    "value" : "",
+    "variable" : "Priya",
+    "control_if_1" : "{if file_exists(\"{$dir.vendor}\")}Vendor directory exists {/if}{if file_exists({$dir.root})}and also exists here{else}test {file_test(test.variable)}{/if}",
+    "control_if_2" : "{if 1 == 1}{$test.variable} is{if 2 == 2} awesome{if 1 == 1} and {if 5==5}fun {else}not ok{/if}{/if}but there is a lot todo {else}different {/if}end.{else} start with {$test.variable}{/if}"
+},
+"output" : {
+    "value" : "",
+    "int" : 1,
+    "variable" : "Priya",
+    "control_if_1" : "Vendor directory exists and also exists here",
+    "control_if_2" : "Priya is awesome and fun but there is a lot todo end."
+}
+}
