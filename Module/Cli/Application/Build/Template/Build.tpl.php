@@ -11,4 +11,13 @@
 
 namespace Priya;
 
-echo 'build in "' .$this->parameter(3) . '" with version (' . $this->data('version') . ')' . PHP_EOL;
+
+if($this->error('package')){
+//     $this->data('style.package.color', );
+    $this->data('style.package.background.color', 1);
+    $this->write('output', 'File not found (' . $this->request('package') . ') ', 'style.package');
+    $this->write('output', PHP_EOL);
+} else {
+    echo 'Build in "' .$this->request('target') . '" with version (' . $this->data('version') . ')' . PHP_EOL;
+
+}
