@@ -35,9 +35,10 @@ function function_route($value=null, $argumentList=array(), $parser=null){
     if(!is_array($attribute)){
         $attribute = (array) $attribute;
     }
-    $found = false;
     $route = $parser->route();
     if(empty($route)){
+        var_dump($parser);
+        trigger_error('Route not found');
         //maybe empty string trigger error ?
         return $value;
     }

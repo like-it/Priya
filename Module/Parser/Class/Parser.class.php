@@ -170,12 +170,16 @@ class Parser extends Data {
 //                     break;
                 }
                 if($counter > Parser::MAX_ITERATION){
+                    $string = $this->functionList($string, $functionList);
+                    var_dump($string);
+                    /*
                     var_dump('@@@@@@@@@@@@@@@@@@@@@@@');
                     var_dump('ineffecient parse');
-                    var_dump($string);
+
                     var_dump($test);
                     var_dump($list);
                     var_dump($test_string);
+                    */
                     //variable in if condition
                     break;
                 }
@@ -279,6 +283,7 @@ class Parser extends Data {
         return $string;
     }
 
+    //registrer method & result
     public function execMethodList($methodList=array(), $string='', $type='statementList'){
         if(empty($string)){
             return $string;
@@ -417,6 +422,9 @@ class Parser extends Data {
 
     private function FunctionList($string='', $list=array()){
         $methodList = $this->createMethodList($string, 'functionList');
+//         if(!empty($methodList)){
+//             var_dump($methodList);
+//         }
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
     }
