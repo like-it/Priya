@@ -13,6 +13,7 @@ use Priya\Application;
 use Priya\Module\Core;
 
 class Parser extends Data {
+
     private $object_parser;
 
     public function __construct($handler=null, $route=null, $data=null){
@@ -20,18 +21,20 @@ class Parser extends Data {
     }
 
     public function object_parser($object_parser=null){
-        if($object_parser!== null){
+        if($object_parser !== null){
             $this->set_object_parser($object_parser);
         }
         $object_parser= $this->get_object_parser();
-        if($object_parser=== null){
+        if($object_parser === null){
             $this->set_object_parser(new \Priya\Module\Parser());
+            $this->get_object_parser()->route($this->route());
+            $this->get_object_parser()->handler($this->handler());
         }
         return $this->get_object_parser();
     }
 
     private function set_object_parser($object_parser=''){
-        $this->object_parser= $object_parser;
+        $this->object_parser = $object_parser;
     }
 
     private function get_object_parser(){
