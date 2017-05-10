@@ -252,7 +252,7 @@ class Route extends \Priya\Module\Core\Parser{
         if(empty($found)){
 //             trigger_error('Route not found for ('. $name.')');
         } else {
-            $route_path = explode('/', trim(strtolower($route->path), '/'));
+            $route_path = explode('/', trim($route->path, '/'));
             foreach($route_path as $part_nr => $part){
                 if(substr($part,0,1) == '{' && substr($part,-1) == '}'){
                     $route_path[$part_nr] = array_shift($attribute);
