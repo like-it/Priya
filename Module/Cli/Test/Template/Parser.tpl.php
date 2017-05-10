@@ -17,14 +17,19 @@ use Priya\Module\Data;
 
 $parse = function(){
     $url = $this->parameter('url') ? $this->parameter('url') : $this->parameter(3);
-
+    $cwd = getcwd();
+    chdir($this->data('dir.module.data') . 'Parser' );
     while (file_exists($url) === false){
+        if(!empty($url)){
+            $this->color(0,1);
+            $this->write('output', 'File not found (' . $url . ')');
+            $this->write('output', PHP_EOL);
+        }
         $url = $this->read('input', 'Please provide the parser file: ');
     }
     $parser = new Parser($this->data());
     $parser->route($this->route());
     $read = $parser->read($url);
-
     $output = new Parser();
     $output->data('input', $parser->data('test'));
 //     echo 'input:' . PHP_EOL;
@@ -33,6 +38,8 @@ $parse = function(){
 
     $data = new Data();
     $data->read($url);
+
+    chdir($cwd);
 
     $test = $data->data('test');
     if(is_array($test) || is_object($test)){
