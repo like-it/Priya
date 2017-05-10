@@ -166,7 +166,7 @@ class Parser extends Data {
                 }
                 $counter++;
                 if(reset($test_string) == end ($test_string) && count($test_string) > 1){
-//                     var_dump('hete');
+//                     var_dump('here');
 //                     break;
                 }
                 if($counter > Parser::MAX_ITERATION){
@@ -251,6 +251,8 @@ class Parser extends Data {
                 $argumentList[$nr]['methodList'] = $methodList;
                 $argumentList[$nr]['string'] = $condition;
             }
+//             var_dump('----------------------');
+//             var_dump($argumentList);
             $function = 'if';
             $function_key = $function;
             $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
