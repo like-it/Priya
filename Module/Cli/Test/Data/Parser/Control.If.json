@@ -12,7 +12,8 @@
     "control_if_4" : "{if !!!empty(\"{$test.value}\")}testing function true {/if}with some extra text",
     "control_if_5" : "{if file_exists(\"{$dir.vendor}\")}Vendor directory exists {/if}{if file_exists({$dir.root})}and also exists here{else}{file_test(test.variable)}{/if}",
     "control_if_6" : "{if ({$test.variable} == 'Priya')}{$test.variable}{/if}",
-    "control_if_7" : "{$test.variable}"
+    "control_if_7" : "{$test.variable}",
+    "control_if_8" : "{if !file_exists(\"{$dir.vendor}\")}{if file_read(\"{$dir.vendor}\")}Vendor directory exists {else}endTest{/if}{else}exists{/if}"
 },
 "output" : {
     "value" : "",
