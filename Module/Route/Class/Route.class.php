@@ -195,10 +195,12 @@ class Route extends \Priya\Module\Core\Parser{
         $object->method = array('CLI');
         $object->translate = false;
         $this->data(strtolower(implode('-',$name)) . '/', $object);
-        $object = $this->copy($object);
-        array_shift($name);
-        $object->path = implode('/', $name) . '/';
-        $this->data(strtolower(implode('-',$name) . '-shorthand') . '/', $object);
+        if(count($name) > 1){
+            $object = $this->copy($object);
+            array_shift($name);
+            $object->path = implode('/', $name) . '/';
+            $this->data(strtolower(implode('-',$name) . '-shorthand') . '/', $object);
+        }
     }
 
     public function parseAttributeList($attribute='', $value=''){
