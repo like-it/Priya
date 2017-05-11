@@ -10,6 +10,7 @@ namespace Priya\Module;
 
 class File {
     const CHMOD = 0640;
+    const SCHEME_HTTP = 'http';
 
     public static function dir($directory=''){
         return str_replace('\\\/', DIRECTORY_SEPARATOR, rtrim($directory,'\\\/')) . DIRECTORY_SEPARATOR;
@@ -42,6 +43,9 @@ class File {
     }
 
     public function read($url=''){
+        if(strpos($url, File::SCHEME_HTTP) !== false){
+            return implode('',file($url));
+        }
         if(file_exists($url) === false){
             return false;
         }

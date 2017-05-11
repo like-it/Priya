@@ -144,9 +144,9 @@ class Result extends Parser {
     public function createTemplate($template=''){
         $contentType = $this->request('contentType');
         $data = $this->data();
+        $template_list = array();
         if(empty($template) && isset($data->contentType) && isset($data->contentType->{$contentType}) && isset($data->contentType->{$contentType}->template)){
             $list = $data->contentType->{$contentType}->template;
-            $template_list = array();
             foreach($list as $template){
                 $url = $this->locateTemplate($template);
                 if(!empty($url)){
@@ -388,7 +388,7 @@ class Result extends Parser {
         if(empty($caller)){
             $caller = get_called_class();
         }
-        if($caller::DIR){
+        if(defined("$caller::DIR")){
             $dir = dirname($caller::DIR) . Application::DS . Application::TEMPLATE . Application::DS;
             $tpl->addPrefix('none', $dir, $extension);
         }
