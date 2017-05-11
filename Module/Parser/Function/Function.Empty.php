@@ -9,6 +9,7 @@
  */
 
 function function_empty($value=null, $argumentList=array(), $parser=null){
+    var_dump($argumentList);
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
