@@ -137,7 +137,6 @@ class Parser extends Data {
             $init = 0;
             $counter = 0;
             $functionList = $list;
-
             $string = $this->controlIfList($string);
             $list = $this->data('Parser.Control.If.list');
             if(empty($list)){
@@ -259,7 +258,11 @@ class Parser extends Data {
                         $node->end_if_replace
                         ;
                     }
-
+                    $node->statement = str_replace('"[string_quote]', '"', $node->statement);
+                    $node->statement = str_replace('[string_quote]"', '"', $node->statement);
+                    $node->statement = str_replace('"[string_quote]"', 'null', $node->statement);
+                    $node->statement = str_replace('[string_quote][string_quote]', 'null', $node->statement);
+                    $node->statement = str_replace('[string_quote]', '\'', $node->statement);
                 }
             }
         }
@@ -281,7 +284,7 @@ class Parser extends Data {
             require_once $url;
         }
         if(function_exists($function) === false){
-            var_dump('(Parser) (statementList) missing function: ' . $function);
+            var_dump('(Parser) (statementList) missing control: ' . $function);
             //trigger error?
             return array();
         }
@@ -293,7 +296,6 @@ class Parser extends Data {
             $string = $function($string, $node, $this);
             return $this->statementIfList($string, $this->data('Parser.Control.If.list'));
         }
-//         var_dump($this->data('Parser.Control.If.list'));
         return $string;
     }
 
@@ -319,7 +321,13 @@ class Parser extends Data {
                     if(file_exists($url)){
                         require_once $url;
                     } else {
-                        var_dump('(Parser) (execMethodList) missing file: ' . $url);
+                        if($type=='functionList'){
+                            $replace = 'null';
+                        } else {
+                            $replace = '0';
+                        }
+                        $string = str_replace($search, $replace, $string);
+                        trigger_error('(Parser) (execMethodList) missing file: ' . $url);
                         //remove {function} ?
                         continue;
                     }

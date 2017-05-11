@@ -6,6 +6,7 @@
 "test" : {
     "value" : "",
     "variable" : "Priya",
+    "memory_check_1" : "{memory_usage('MB')}",
     "control_if_1" : "{if ({$test.int}) || {$test.var|default:1} == 1}testing true{/if} with some extra text",
     "control_if_2" : "{if 1 == 1}{$test.variable} is{if 2 == 2} awesome{if 1 == 1} and {if 5==5}fun {else}not ok{/if}{/if}but there is a lot todo {else}different {/if}end.{else} start with {$test.variable}{/if}",
     "control_if_3" : "test{if 1 == 1} water{if 2 == 2} grain{if 1 == 1} test{/if} butter{else} atre{/if} end{else} dus {$test.variable}{/if}",
@@ -13,7 +14,8 @@
     "control_if_5" : "{if file_exists(\"{$dir.vendor}\")}Vendor directory exists {/if}{if file_exists({$dir.root})}and also exists here{else}{file_test(test.variable)}{/if}",
     "control_if_6" : "{if ({$test.variable} == 'Priya')}{$test.variable}{/if}",
     "control_if_7" : "{$test.variable}",
-    "control_if_8" : "{if !file_exists(\"{$dir.vendor}\")}{if file_read(\"{$dir.vendor}\")}Vendor directory exists {else}endTest{/if}{else}exists{/if}"
+    "control_if_8" : "{if !file_exists(\"{$dir.vendor}\")}{if file_read(\"{$dir.vendor}\")}Vendor directory exists {else}endTest{/if}{else}exists{/if}",
+    "memory_check_2" : "{memory_usage('MB')}"
 },
 "output" : {
     "value" : "",
@@ -25,6 +27,7 @@
     "control_if_4":  "with some extra text",
     "control_if_5":  "Vendor directory exists and also exists here",
     "control_if_6":  "Priya",
-    "control_if_7":  "Priya"
+    "control_if_7":  "Priya",
+    "control_if_8":  "exists"
 }
 }
