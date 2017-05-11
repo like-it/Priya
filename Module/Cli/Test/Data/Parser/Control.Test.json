@@ -6,6 +6,7 @@
 "test" : {
     "value" : "",
     "variable" : "Priya",
+    "control_if_8" : "front{if !file_exists(\"{$dir.vendor}\")}before {if file_read(\"{$dir.vendor}\")}Vendor directory exists {else}endTest{/if}after{else}exists{/if} {if empty({$empty})} is empty {/if}back",
     "control_if_1" : "{if file_exists(\"{$dir.vendor}\")}Vendor directory exists {/if}{if file_exists({$dir.root})}and also exists here{else}test {file_test(test.variable)}{/if}",
     "control_if_2" : "{if 1 == 1}{$test.variable} is{if 2 == 2} awesome{if 1 == 1} and {if 5==5}fun {else}not ok{/if}{/if}but there is a lot todo {else}different {/if}end.{else} start with {$test.variable}{/if}"
 },

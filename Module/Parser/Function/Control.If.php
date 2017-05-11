@@ -14,61 +14,43 @@
 use Priya\Application;
 use Priya\Module\Parser;
 
-function control_if($value=null, $argumentList=array(), $parser=null){
-    if(!is_array($argumentList)){
-        $argumentList = (array) $argumentList;
+function control_if($value=null, $node='', $parser=null){
+    if(!is_object($node)){
+        return $value;
+    }
+    $explode = explode($node->if_replace, $value, 2);
+    if(count($explode) == 1){
+        $node->result = 'ignore';
+        return $value;
     }
     $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
     $compile_list = array();
-    foreach($argumentList as $key => $argument){
-        if(empty($argument['methodList'])){
-            $argumentList[$key] = evaluate($argumentList[$key]);
-            if($argumentList[$key]['condition'] === true){
-                $argumentList[$key]['result'] = $argumentList[$key]['true'];
-            }
-            elseif($argumentList[$key]['condition'] == 'ignore'){
-                continue;
-            }
-            else {
-                $argumentList[$key]['result'] = $argumentList[$key]['false'];
-            }
-            continue;
-        }
-        $argumentList[$key]['statement'] = $parser->execMethodList($argumentList[$key]['methodList'], $argumentList[$key]['statement']);
-        $argumentList[$key] = evaluate($argumentList[$key]);
-        if($argumentList[$key]['condition'] === true){
-            $argumentList[$key]['result'] = $argument['true'];
-        }
-        elseif($argumentList[$key]['condition'] == 'ignore'){
-            continue;
-        }
-        else {
-            $argumentList[$key]['result'] = $argument['false'];
-        }
+    if(empty($node->methodList)){
+        $node = evaluate($node);
     }
-    $result = '';
-//     var_dump('*************************');
-//     var_dump($argumentList);
-    foreach ($argumentList as $key => $argument){
-        if(isset($argument['result'])){
-            $result .= $argument['result'];
-        }
+    $node->statement = $parser->execMethodList($node->methodList, $node->statement);
+    $node = evaluate($node);
+    if($node->condition === true){
+        $node->result = $node->true;
+    } else {
+        $node->result = $node->false;
     }
-    $parser->argument($argumentList);
-    return $result;
+    $value = str_replace($node->string, $node->result, $value);
+    $value = str_replace('[string_quote]', '', $value);
+    return $value;
 }
 
-function evaluate($argument = array()){
+function evaluate($node = ''){
     /*
      * @todo
      * only own methods can pass and we should add forbidden methods here
      * add elseif statements
      */
-    if(!is_array($argument)){
-        $argument = (array) $argument;
+    if(!is_object($node)){
+        return $node;
     }
     $result = false;
-    $eval = 'if(' . $argument['statement'] .'){ $result = true; } else { $result = false; }';
+    $eval = 'if(' . $node->statement .'){ $result = true; } else { $result = false; }';
     if (version_compare(PHP_VERSION, Parser::PHP_MIN_VERSION) >= 0) {
         error_clear_last();
     }
@@ -79,6 +61,6 @@ function evaluate($argument = array()){
         //add to parser->error();
         print_r(error_get_last());
     }
-    $argument['condition'] = $result;
-    return $argument;
+    $node->condition = $result;
+    return $node;
 }

@@ -32,15 +32,9 @@ $parse = function(){
     $read = $parser->read($url);
     $output = new Parser();
     $output->data('input', $parser->data('test'));
-//     echo 'input:' . PHP_EOL;
-//     echo $this->object($parser->data('test'), 'json') . PHP_EOL;
-//     echo 'output:' . PHP_EOL;
-
     $data = new Data();
     $data->read($url);
-
     chdir($cwd);
-
     $test = $data->data('test');
     if(is_array($test) || is_object($test)){
         foreach($test as $key => $value){
@@ -57,7 +51,6 @@ $parse = function(){
         }
         $output->data('output', $this->data('nodeList'));
         echo $this->object($output->data(), 'json') . PHP_EOL;
-//         echo $this->object($this->data('nodeList'), 'json') . PHP_EOL;
     } else {
         echo 'empty input...' . PHP_EOL;
     }

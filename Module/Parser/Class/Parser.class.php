@@ -137,53 +137,15 @@ class Parser extends Data {
             $init = 0;
             $counter = 0;
             $functionList = $list;
-//             $string = $this->functionList($string, $list); //wrong function in if (true & false)  statements gets executed
-            while($init < 2){
-                $test = array();
-                $test_string = array();
-                $list = $this->controlList($string, 10, $init);
-                if($list === false){
-                    $test[] = false;
-                } else {
-                    $test[] = true;
-                }
-                //why list & not attributeList
-                $string = $this->createStatementList($string, $list, $functionList, $init);
-                $test_string[] = $string;
-                $init++;
-                $list = $this->controlList($string, 20, $init);
-                if($list === false){
-                    $test[] = false;
-                } else {
-                    $test[] = true;
-                }
-                $string = $this->createStatementList($string, $list, $functionList, $init);
-                $test_string[] = $string;
-                foreach($test as $output){
-                    if(!empty($output)){
-                        $init = 0;
-                    }
-                }
-                $counter++;
-                if(reset($test_string) == end ($test_string) && count($test_string) > 1){
-//                     var_dump('hete');
-//                     break;
-                }
-                if($counter > Parser::MAX_ITERATION){
-                    $string = $this->functionList($string, $functionList);
-                    var_dump($string);
-                    /*
-                    var_dump('@@@@@@@@@@@@@@@@@@@@@@@');
-                    var_dump('ineffecient parse');
-
-                    var_dump($test);
-                    var_dump($list);
-                    var_dump($test_string);
-                    */
-                    //variable in if condition
-                    break;
-                }
+            $string = $this->controlIfList($string);
+            $list = $this->data('Parser.Control.If.list');
+            if(empty($list)){
+                $string = $this->functionList($string, $functionList);
+            } else {
+                $string = $this->statementIfList($string, $list);
             }
+
+
             if($string == 'null'){
                 $string = null;
             }
@@ -201,84 +163,138 @@ class Parser extends Data {
         }
     }
 
-    private function createStatementList($string='', $list=array(), $functionList=array(), $init=0){
-        if(empty($list)){
-            $string = $this->FunctionList($string, $functionList);
-            return $string;
-        }
-        $condition_list = array();
-        $tmp = array();
-//         var_dump('-----------------------------');
-//         var_dump($list);
-        foreach($list as $key => $value){
-            if(!is_array($value)){
-                continue;
+    private function controlIfList($string=''){
+        $explode = explode('{/if}', $string, 2);
+        if(count($explode) > 1){
+            $rev = strrev($explode[0]);
+            $rev_explode = explode('fi{', $rev, 2);
+            $tmp_explode= $rev_explode;
+            foreach($tmp_explode as $tmp_nr => $tmp_value){
+                $tmp_explode[$tmp_nr] = strrev($tmp_value);
             }
-//             $tmp = array(); //needed for test 3
-            foreach ($value as $val_key => $val_value){
-                $tmp[$val_key] = $val_value;
-                if($val_key == '{/if}'){
-                    $statement = '';
-                    foreach($tmp as $tmp_key => $tmp_value){
-                        $statement .= $tmp_key;
-                        foreach($tmp_value as $tmp_value_key => $tmp_value_list){
-                            foreach ($tmp_value_list as $tmp_value_list_key => $tmp_value_list_value){
-                                $statement .= $tmp_value_list_value;
-                            }
-                        }
+//             var_dump($tmp_explode);
+            if(count($tmp_explode) > 1){
+                $jid = $this->jid('Parser.Control.If.list');
+                $temp = $tmp_explode[0];
+                $temp = explode('}', $temp, 2);
+                $statement = reset($temp);
+
+                $list = $this->data('Parser.Control.If.list');
+                if(empty($list)){
+                    $list = array();
+                }
+                $record = new stdClass();
+                $record->jid = $jid;
+                $record->statement = trim($statement, ' ');
+                $else = explode('{else}', $tmp_explode[0], 2);
+                if(count($else) > 1){
+                    $record->else = '{else}';
+                    $record->else_replace = '[else id:' . $jid .']';
+                }
+                $record->end_if = '{/if}';
+                $record->if_replace = '[if id:' . $jid .']';
+                $record->end_if_replace = '[/if id:' . $jid . ']';;
+                $list[$jid] = $record;
+                $this->data('Parser.Control.If.list', $list);
+
+                $search = $statement . '}';
+                $tmp_explode[0] = str_replace($search, $record->if_replace, $tmp_explode[0]);
+                if(!empty($record->else_replace)){
+                    $tmp_explode[0] = str_replace('{else}', $record->else_replace, $tmp_explode[0]);
+                }
+            }
+            krsort($tmp_explode);
+            $explode[0] = implode('', $tmp_explode);
+            $string = implode($record->end_if_replace, $explode);
+            $string = $this->controlIfList($string);
+        } else {
+            $list = $this->data('Parser.Control.If.list');
+            if(!empty($list)){
+                $sort = array();
+                $explode = explode('[if id:', $string);
+                foreach($explode as $nr => $part){
+                    $temp = explode(']', $part, 2);
+                    if(count($temp) == 1){
+                        continue;
                     }
-                    $condition_list[] = $statement;
-                    $tmp = array(); //makes one broken
+                    $jid = reset($temp);
+                    if(isset($list[$jid])){
+                        $sort[$jid] = $list[$jid];
+                    }
+                }
+                $list = $this->data('Parser.Control.If.list', $sort);
+                foreach($list as $jid => $node){
+                    $part = explode($node->end_if_replace, $string);
+                    if(!empty($node->else_replace)){
+                        $condition = explode($node->else_replace, $part[0]);
+                        if(count($condition) == 1){
+                            $true = explode($node->if_replace, $part[0]);
+                            $node->true = end($true);
+                            $node->false = '';
+                        } else {
+                            $true = reset($condition);
+                            $true = explode($node->if_replace, $true);
+                            $node->true = end($true);
+                            $node->false = end($condition);
+                        }
+                    } else {
+                        $true = explode($node->if_replace, $part[0]);
+                        $node->true = end($true);
+                        $node->false = '';
+                    }
+                    if(empty($node->else_replace)){
+                        $node->string =
+                        $node->if_replace .
+                        $node->true .
+                        $node->false .
+                        $node->end_if_replace
+                        ;
+                    } else {
+                        $node->string =
+                        $node->if_replace .
+                        $node->true .
+                        $node->else_replace .
+                        $node->false .
+                        $node->end_if_replace
+                        ;
+                    }
+                    $node->statement = str_replace('"[string_quote]', '"', $node->statement);
+                    $node->statement = str_replace('[string_quote]"', '"', $node->statement);
+                    $node->statement = str_replace('"[string_quote]"', 'null', $node->statement);
+                    $node->statement = str_replace('[string_quote][string_quote]', 'null', $node->statement);
+                    $node->statement = str_replace('[string_quote]', '\'', $node->statement);
                 }
             }
         }
-//         var_dump('--------------------------------');
-//         var_dump($condition_list);
-        if(empty($condition_list)){
-            $string = $this->FunctionList($string, $functionList);
+        return $string;
+    }
+
+    private function statementIfList($string='', $list=array()){
+        $temp = explode('[if id:', $string, 2);
+        if(count($temp) == 1){
             return $string;
-//             $methodList = $this->createMethodList($string);
-//             $string = $this->execMethodList($methodList, $string);
-//             return $string;
         }
-        foreach ($condition_list as $condition_key => $condition){
-            $argumentList = $this->createArgumentListIf($condition);
-            if(empty($argumentList)){
+        $function = 'if';
+        $function_key = $function;
+        $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
+        $url = $dir . 'Control.' . ucfirst(strtolower($function)) . '.php';
+        $function = 'control_' . $function;
+
+        if(file_exists($url)){
+            require_once $url;
+        }
+        if(function_exists($function) === false){
+            var_dump('(Parser) (statementList) missing control: ' . $function);
+            //trigger error?
+            return array();
+        }
+        foreach($list as $jid => $node){
+            if(!empty($node->result)){
                 continue;
             }
-            foreach($argumentList as $nr => $argument){
-                $methodList = $this->createMethodList($argument['statement']);
-                $argumentList[$nr]['methodList'] = $methodList;
-                $argumentList[$nr]['string'] = $condition;
-            }
-            $function = 'if';
-            $function_key = $function;
-            $dir = dirname(Parser::DIR) . Application::DS . 'Function' . Application::DS;
-            $url = $dir . 'Control.' . ucfirst(strtolower($function)) . '.php';
-            $function = 'control_' . $function;
-
-            if(file_exists($url)){
-                require_once $url;
-            }
-            if(function_exists($function) === false){
-                var_dump('(Parser) (statementList) missing function: ' . $function);
-                //trigger error?
-                return array();
-            }
-            $condition =  $function($condition, $argumentList, $this);
-            $argumentList = $this->argument();
-//             var_dump(';;;;;;;;;;;;;;;;;;;;;;;;;;;;');
-//             var_dump($argumentList);
-            foreach($argumentList as $nr => $argument){
-                if($argument['condition'] === true){
-                    $string = str_replace($argument['string'], $argument['result'] . $argument['extra'], $string);
-                } elseif($argument['condition'] == 'ignore') {
-                    continue;
-
-                } else{
-                    $string = str_replace($argument['string'], $argument['result'] . $argument['extra'], $string);
-                }
-            }
+            $node->methodList = $this->createMethodList($node->statement);
+            $string = $function($string, $node, $this);
+            return $this->statementIfList($string, $this->data('Parser.Control.If.list'));
         }
         return $string;
     }
@@ -305,7 +321,13 @@ class Parser extends Data {
                     if(file_exists($url)){
                         require_once $url;
                     } else {
-                        var_dump('(Parser) (execMethodList) missing file: ' . $url);
+                        if($type=='functionList'){
+                            $replace = 'null';
+                        } else {
+                            $replace = '0';
+                        }
+                        $string = str_replace($search, $replace, $string);
+                        trigger_error('(Parser) (execMethodList) missing file: ' . $url);
                         //remove {function} ?
                         continue;
                     }
@@ -547,6 +569,7 @@ class Parser extends Data {
             array_shift($args);
             $arguments = reset($args);
             $arguments = strrev($arguments);
+            $arguments = str_replace('[string_quote]', '', $arguments);
             $args = str_getcsv($arguments); //to handle quotes
             $array = false;
             $list = array();
