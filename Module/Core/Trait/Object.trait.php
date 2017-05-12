@@ -13,7 +13,7 @@ use stdClass;
 
 trait Object {
 
-    public function object($input='', $output='object',$type='root'){
+    public static function object($input='', $output='object',$type='root'){
         if(is_string($input)){
             $input = trim($input);
             if($output=='object'){
