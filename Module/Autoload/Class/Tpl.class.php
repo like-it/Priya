@@ -68,13 +68,17 @@ class Tpl extends Autoload {
             $directory = implode(Application::DS, $directory) . Application::DS;
             if(stristr($file, $item['extension']) !== false){
                 $data[] = $item['directory'] . $directory . Application::TEMPLATE . Application::DS . $file;
+                $data[] = $item['directory'] . Application::TEMPLATE . Application::DS . $file;
             } else {
                 $data[] = $item['directory'] . $directory . $file . Application::DS . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
                 $data[] = $item['directory'] . $directory . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
+                $data[] = $item['directory'] . $file . Application::DS . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
+                $data[] = $item['directory'] . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
                 $dir = explode(Application::TEMPLATE, $item['directory'], 2);
                 $dir = implode('', $dir);
                 $dir = rtrim($dir, Application::DS) . Application::DS;
                 $data[] = $dir . $directory . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
+                $data[] = $dir . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
             }
             $data[] = $item['directory'] . $item['baseName'] . Application::DS . Application::TEMPLATE . Application::DS . $item['baseName'] . '.' . $item['extension'];
             $data[] = '[---]';
