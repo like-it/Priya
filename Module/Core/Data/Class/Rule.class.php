@@ -17,7 +17,7 @@ class Rule extends Data {
 
     private $ruleList;
 
-    public function __construct($node, $data){
+    public function __construct($node, $data=''){
         $this->data('node', $node);
         $this->data('data', $data);
     }

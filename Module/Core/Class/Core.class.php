@@ -11,6 +11,7 @@ namespace Priya\Module;
 
 use stdClass;
 use Priya\Application;
+use Priya\Module\Core\Object;
 
 class Core {
     use Core\Object;
@@ -29,8 +30,14 @@ class Core {
     }
 
     public static function handler_exception($exception){
-        var_dump($exception);
-        die;
+        $handler = new Handler();
+        if($handler->contentType() == Handler::CONTENT_TYPE_JSON){
+            echo Core::object($exception, 'json');
+            return true;
+        } else {
+            var_dump($exception);
+            die;
+        }
     }
 
 
@@ -41,8 +48,14 @@ class Core {
         $error['file'] = $file;
         $error['line'] = $line;
         $error['context'] = $context;
-        var_dump($error);
-        die;
+        $handler = new Handler();
+        if($handler->contentType() == Handler::CONTENT_TYPE_JSON){
+            echo Core::object($error, 'json');
+            return true;
+        } else {
+            var_dump($error);
+            die;
+        }
     }
 
     public function handler($handler=null){
