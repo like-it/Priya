@@ -1,20 +1,39 @@
 {
-"title": "Test.Parser.Control.If",
+"title": "Test.Parser.Control.Test",
 "web" : {
     "root" : "http:://{$test.variable}/"
 },
 "test" : {
+    "boolean" : true,
     "value" : "",
+    "int" : 1,
+    "float": 1.3333333333333333333,
     "variable" : "Priya",
-    "control_if_8" : "front{if !file_exists(\"{$dir.vendor}\")}before {if file_read(\"{$dir.vendor}\")}Vendor directory exists {else}endTest{/if}after{else}exists{/if} {if empty({$empty})} is empty {/if}back",
-    "control_if_1" : "{if file_exists(\"{$dir.vendor}\")}Vendor directory exists {/if}{if file_exists({$dir.root})}and also exists here{else}test {file_test(test.variable)}{/if}",
-    "control_if_2" : "{if 1 == 1}{$test.variable} is{if 2 == 2} awesome{if 1 == 1} and {if 5==5}fun {else}not ok{/if}{/if}but there is a lot todo {else}different {/if}end.{else} start with {$test.variable}{/if}"
+    "control_test_1" : "{empty()}",
+    "control_test_2" : "{isset()}",
+    "control_test_3" : "{file_exists({$dir.vendor})}",
+    "control_test_4" : "{permission('','Administrator')}",
+    "control_test_997" : "Memory: {memory_usage(MB)}",
+    "control_test_998" : "Memory: {memory_usage('MB')}",
+    "control_test_999" : "Memory: {memory_usage(\"MB\")}"
+},
+"note" : {
+    "notes" : "U can note down false test results",
+    "control_test_4" : "use parameter user & password to validate",
+    "control_test_997" : "Memory can only be compared to itself"
 },
 "output" : {
     "value" : "",
     "int" : 1,
+    "float": 1.3333333333333,
+    "boolean" : true,
     "variable" : "Priya",
-    "control_if_1" : "Vendor directory exists and also exists here",
-    "control_if_2" : "Priya is awesome and fun but there is a lot todo end."
+    "control_test_1" : true,
+    "control_test_2" : false,
+    "control_test_3" : true,
+    "control_test_4" : false,
+    "control_test_997" : "{$test.control_test_997}",
+    "control_test_998" : "{$test.control_test_997}",
+    "control_test_999" : "{$test.control_test_997}"
 }
 }

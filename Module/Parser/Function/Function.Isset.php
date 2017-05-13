@@ -13,5 +13,6 @@ function function_isset($value=null, $argumentList=array(), $parser=null){
         $argumentList = (array) $argumentList;
     }
     $argument = reset($argumentList);
+//     var_dump($argumentList);
     return isset($argument);
 }

@@ -16,9 +16,7 @@ class Parser extends Data {
     const DIR = __DIR__;
     const LITERAL = 'literal';
     const PHP_MIN_VERSION = '7.0.0';
-    const MAX_ITERATION = 128;
 
-    private $argument;
     private $random;
 
     public function __construct($handler=null, $route=null, $data=null){
@@ -40,7 +38,6 @@ class Parser extends Data {
     private function getRandom(){
         return $this->random;
     }
-
 
     public function compile($string='', $data, $keep=false){
         $input = $string;
@@ -144,21 +141,27 @@ class Parser extends Data {
             } else {
                 $string = $this->statementIfList($string, $list);
             }
-
-
-            if($string == 'null'){
+            if($string === 'null'){
                 $string = null;
             }
-            elseif($string == 'true'){
+            elseif($string === 'true'){
                 $string = true;
             }
-            elseif($string == 'false'){
+            elseif($string === 'false'){
                 $string = false;
+
+            }
+            if($string === null || $string === true || $string === false){
+                return $string;
+            }
+            if(is_float($string) || is_int($string)){
+                return $string;
             }
             $string = str_replace('[' . $this->random() . '[', '{', $string);
             $string = str_replace(']' . $this->random() . ']', '}', $string);
             $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
             $string = str_replace('{/' . Parser::LITERAL . '}', '' , $string);
+
             return $string;
         }
     }
@@ -189,11 +192,11 @@ class Parser extends Data {
                 $else = explode('{else}', $tmp_explode[0], 2);
                 if(count($else) > 1){
                     $record->else = '{else}';
-                    $record->else_replace = '[else id:' . $jid .']';
+                    $record->else_replace = '[' . $this->random() . 'else id:' . $jid .':' . $this->random() . ']';
                 }
                 $record->end_if = '{/if}';
-                $record->if_replace = '[if id:' . $jid .']';
-                $record->end_if_replace = '[/if id:' . $jid . ']';;
+                $record->if_replace = '[' . $this->random() . 'if id:' . $jid .':' . $this->random() .']';
+                $record->end_if_replace = '[' . $this->random() . '/if id:' . $jid .':' . $this->random() . ']';
                 $list[$jid] = $record;
                 $this->data('Parser.Control.If.list', $list);
 
@@ -211,9 +214,9 @@ class Parser extends Data {
             $list = $this->data('Parser.Control.If.list');
             if(!empty($list)){
                 $sort = array();
-                $explode = explode('[if id:', $string);
+                $explode = explode('[' . $this->random() . 'if id:', $string);
                 foreach($explode as $nr => $part){
-                    $temp = explode(']', $part, 2);
+                    $temp = explode(':', $part, 2);
                     if(count($temp) == 1){
                         continue;
                     }
@@ -270,7 +273,7 @@ class Parser extends Data {
     }
 
     private function statementIfList($string='', $list=array()){
-        $temp = explode('[if id:', $string, 2);
+        $temp = explode('[' . $this->random() . 'if id:', $string, 2);
         if(count($temp) == 1){
             return $string;
         }
@@ -574,6 +577,18 @@ class Parser extends Data {
             $array = false;
             $list = array();
             foreach($args  as $key => $value){
+                if($value === null){
+                    $list[] = $value;
+                    continue;
+                }
+                elseif($value === true){
+                    $list[] = $value;
+                    continue;
+                }
+                elseif($value === false){
+                    $list[] = $value;
+                    continue;
+                }
                 $value = ltrim($value, ' '); //added
                 if(substr($value, 0, 1) == '\'' && substr($value, -1, 1) == '\''){
                     $value = substr($value, 1, -1);
@@ -634,109 +649,6 @@ class Parser extends Data {
             $methodList[$statement][] = $function;
         }
         return $methodList;
-    }
-
-    private function createArgumentList($list=array()){
-        if(!is_array($list)){
-            $list = (array) $list;
-        }
-        $attribute = reset($list);
-        if(empty($attribute)){
-            return array();
-        }
-        if(is_array($attribute)){
-            return array();
-        }
-        $attribute = explode('="', $attribute);
-        $argumentList = array();
-        $index = false;
-        foreach($attribute as $key => $value){
-            $index = explode(' ', $value, 2);
-            $temp = array_shift($index);
-            $index = implode(' ', $index);
-            if(empty($index)){
-                continue;
-            }
-            if(isset($attribute[$key+1])){
-                $temp = $attribute[$key+1];
-                $temp = explode('"', str_replace('\"', '__internal_quote', $temp), 2); //maybe add str_Replace('\"', to temp
-                $temp = reset($temp);
-                $temp = str_replace('__internal_quote', '"', $temp);
-                $argumentList[$index] = $temp;
-            }
-        }
-        foreach($argumentList as $key => $value){
-            if(substr($value,0,1) == '[' && substr($value,-1,1) == ']'){
-                $temp = explode(',', substr($value, 1, -1));
-                foreach($temp as $temp_key => $temp_value){
-                    $temp[$temp_key] = trim($temp_value);
-                }
-                $argumentList[$key] = $temp;
-            }
-        }
-        return $argumentList;
-    }
-
-    private function createArgumentListIf($list=array()){
-        if(!is_array($list)){
-            $list = (array) $list;
-        }
-        $attribute = reset($list);
-        if(empty($attribute)){
-            return array();
-        }
-        $attribute = explode('{if', $attribute);
-        if(count($attribute) == 1){
-            return array();
-        }
-        $argumentList = array();
-        $index = false;
-        foreach($attribute as $key => $value){
-            $temp = explode('}', $value, 2);
-            $statement = trim(reset($temp));
-            if(empty($statement)){
-                continue;
-            }
-            if($statement == '{else'){
-                continue;
-            }
-            $else = explode('{else}', end($temp));
-            if(count($else) == 1){
-                $explode = explode('{/if}', reset($else));
-                $true = array_shift($explode);
-                $extra = implode('{/if}', $explode);
-                $false = '';
-            } else {
-                $true = reset($else);
-                $explode = explode('{/if}', end($else));
-                $false = array_shift($explode);
-                $extra = implode('{/if}', $explode);
-            }
-            $argument = array();
-            $argument['original'] = $statement;
-            $argument['statement'] = str_replace('"[string_quote]', '"', $statement);
-            $argument['statement'] = str_replace('[string_quote]"', '"', $argument['statement']);
-            $argument['statement'] = str_replace('"[string_quote]"', 'null', $argument['statement']);
-
-            $argument['statement'] = str_replace('[string_quote][string_quote]', 'null', $argument['statement']);
-            $argument['statement'] = str_replace('[string_quote]', '\'', $argument['statement']);
-            $argument['true'] = str_replace('[string_quote]', '', $true);
-            $argument['false'] = $false;
-            $argument['extra'] = $extra;
-            $argumentList[] = $argument;
-        }
-        /*
-        foreach($argumentList as $key => $value){
-            if(substr($value,0,1) == '[' && substr($value,-1,1) == ']'){
-                $temp = explode(',', substr($value, 1, -1));
-                foreach($temp as $temp_key => $temp_value){
-                    $temp[$temp_key] = trim($temp_value);
-                }
-                $argumentList[$key] = $temp;
-            }
-        }
-        */
-        return $argumentList;
     }
 
     private function attributeList($string=''){
@@ -929,20 +841,5 @@ class Parser extends Data {
             $value = $this->modifier($value, $modifier_value, 'modify');
         }
         return $value;
-    }
-
-    public function argument($argument=null){
-        if($argument !== null){
-            $this->setArgument($argument);
-        }
-        return $this->getArgument();
-    }
-
-    private function setArgument($argument=array()){
-        $this->argument = $argument;
-    }
-
-    private function getArgument(){
-        return $this->argument;
     }
 }

@@ -42,10 +42,21 @@ $parse = function(){
             $result->input__ = $value;
             $result->parser_ = $parser->data('test.' . $key);
             $result->output_ = $parser->data('output.' . $key);
-            if($result->parser_ === $result->output_){
-                $result->success = true;
+            if(is_float($result->parser_)){
+                if (abs(($result->parser_ - $result->output_)/$result->output_) < 0.00001) {
+                    $result->success = true;
+                } else {
+                    $result->success = false;
+                }
             } else {
-                $result->success = false;
+                if($result->parser_ === $result->output_){
+                    $result->success = true;
+                } else {
+                    $result->success = false;
+                }
+            }
+            if(!empty($parser->data('note.' . $key))){
+                $result->note___ = $parser->data('note.' . $key);
             }
             $this->data('nodeList.' . $key, $result);
         }

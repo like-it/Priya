@@ -14,18 +14,18 @@ function function_permission($value=null, $argumentList=array(), $parser=null){
     }
     $groupList = array();
     $ruleList = array();
-    if(isset($argumentList['rule'])){
-        if(is_string($argumentList['rule'])){
-            $ruleList = explode(',', $argumentList['rule']);
+    if(isset($argumentList['0'])){
+        if(is_string($argumentList['0'])){
+            $ruleList = explode(',', $argumentList['0']);
         } else {
-            $ruleList = $argumentList['rule'];
+            $ruleList = $argumentList['0'];
         }
     }
-    if(isset($argumentList['group'])){
-        if(is_string($argumentList['group'])){
-            $groupList = explode(',', $argumentList['group']);
+    if(isset($argumentList['1'])){
+        if(is_string($argumentList['1'])){
+            $groupList = explode(',', $argumentList['1']);
         } else {
-            $groupList = $argumentList['group'];
+            $groupList = $argumentList['1'];
         }
     }
 
