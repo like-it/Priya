@@ -622,6 +622,10 @@ class Parser extends Data {
                     $value = substr($value, 1, -1);
                 }
                 $value = str_replace('\\\'', '\'', $value);
+                if(is_numeric($value)){
+                    $list[] = $value + 0;
+                    continue;
+                }
                 $arg = trim($value);
                 if(strpos($arg, '[') === 0){
                     $array = array();

@@ -38,6 +38,7 @@ class Application extends Parser {
         set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
+        $this->data('dir.ds', Application::DS);
         $this->data('dir.priya.application',
             dirname(Application::DIR) .
             Application::DS
