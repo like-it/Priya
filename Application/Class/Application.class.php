@@ -29,38 +29,17 @@ class Application extends Parser {
     const TEMP = 'Temp';
     const PUBLIC_HTML = 'Public';
     const CONFIG = 'Config.json';
+    const CUSTOM = 'Custom.json';
     const ROUTE = 'Route.json';
     const CREDENTIAL = 'Credential.json';
 
     public function __construct($autoload=null, $data=null){
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
-        $this->data($this->object($data));
-        $this->cli();
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.priya.application',
             dirname(Application::DIR) .
-            Application::DS
-        );
-        $this->data('dir.priya.root',
-            dirname($this->data('dir.priya.application')) .
-               Application::DS
-        );
-        $this->data('dir.priya.module',
-            dirname($this->data('dir.priya.application')) .
-            Application::DS .
-            Application::MODULE .
-            Application::DS
-        );
-        $this->data('dir.priya.data',
-            $this->data('dir.priya.application') .
-            Application::DATA .
-            Application::DS
-        );
-        $this->data('dir.priya.backup',
-            $this->data('dir.priya.data') .
-            Application::BACKUP .
             Application::DS
         );
         $this->data('dir.vendor',
@@ -71,6 +50,38 @@ class Application extends Parser {
             dirname($this->data('dir.vendor')) .
             Application::DS
         );
+        $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG);
+        $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM);
+        $this->data($this->object($data));
+        $this->cli();
+        if(empty($this->data('dir.priya.root'))){
+            $this->data('dir.priya.root',
+                dirname($this->data('dir.priya.application')) .
+                Application::DS
+            );
+        }
+        if(empty($this->data('dir.priya.module'))){
+            $this->data('dir.priya.module',
+                dirname($this->data('dir.priya.application')) .
+                Application::DS .
+                Application::MODULE .
+                Application::DS
+            );
+        }
+        if(empty($this->data('dir.priya.data'))){
+            $this->data('dir.priya.data',
+                $this->data('dir.priya.application') .
+                Application::DATA .
+                Application::DS
+            );
+        }
+        if(empty($this->data('dir.priya.backup'))){
+            $this->data('dir.priya.backup',
+                $this->data('dir.priya.data') .
+                Application::BACKUP .
+                Application::DS
+            );
+        }
         if(empty($this->data('dir.data'))){
             $this->data('dir.data',
                 $this->data('dir.root') .
