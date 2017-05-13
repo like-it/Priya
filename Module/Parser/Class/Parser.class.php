@@ -11,6 +11,7 @@ namespace Priya\Module;
 
 use stdClass;
 use Priya\Application;
+use Priya\Module\Core\Object;
 
 class Parser extends Data {
     const DIR = __DIR__;
@@ -129,6 +130,13 @@ class Parser extends Data {
                 if(is_object($replace)){
                     $replace = $this->object($replace, 'json');
                 }
+                if(is_array($replace)){
+                    $replace = json_encode($replace);
+                    $replace = 'array(' . substr($replace, 1, -1) . ')';
+                }
+                if(is_object($replace)){
+                    $replace = json_encode($replace);
+                }
                 $string = str_replace($search, $replace, $string);
             }
             $init = 0;
@@ -157,6 +165,22 @@ class Parser extends Data {
             if(is_float($string) || is_int($string)){
                 return $string;
             }
+            if(is_numeric($string)){
+                return $string + 0;
+            }
+            if(substr($string, 0, 1) == '[' && substr($string, -1, 1) == ']'){
+                $json = json_decode($string);
+                if(is_array($json)){
+                    return $json;
+                }
+            }
+            if(substr($string, 0, 1) == '{' && substr($string, -1, 1) == '}'){
+                $json = json_decode($string);
+                if(is_object($json)){
+                    return $json;
+                }
+            }
+
             $string = str_replace('[' . $this->random() . '[', '{', $string);
             $string = str_replace(']' . $this->random() . ']', '}', $string);
             $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
@@ -374,6 +398,9 @@ class Parser extends Data {
                             $replace = 1; //in if statement
                         }
                     }
+                    if(is_object($replace) || is_array($replace)){
+                        $replace = $this->object($replace, 'json-line');
+                    }
                     $string = str_replace($search, $replace, $string);
                     $before = explode('(', $search, 2);
                     $count = substr_count($before[0], '!');
@@ -447,9 +474,10 @@ class Parser extends Data {
 
     private function FunctionList($string='', $list=array()){
         $methodList = $this->createMethodList($string, 'functionList');
-//         if(!empty($methodList)){
+        if(!empty($methodList)){
+//             var_dump('---------------------');
 //             var_dump($methodList);
-//         }
+        }
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
     }
@@ -608,7 +636,7 @@ class Parser extends Data {
                         continue;
                     } else {
                         $val = end($val);
-                        if(substr($val, 0, 1) == ('"' || '\'') && substr($val, -1, 1) == ('"' || '\'')){
+                        if(in_array(substr($val, 0, 1), array('"', '\'')) && in_array(substr($val, -1, 1), array('"', '\''))){
                             $value = substr($val, 1, -1);
                         } else {
                             $value = $val;
@@ -628,7 +656,7 @@ class Parser extends Data {
                     $val = strrev($value);
                     $val = explode(')', $val, 2);
                     $val = strrev(end($val));
-                    if(substr($val, 0, 1) == ('"' || '\'') && substr($val, -1, 1) == ('"' || '\'')){
+                    if(in_array(substr($val, 0, 1), array('"', '\'')) && in_array(substr($val, -1, 1), array('"', '\''))){
                         $val = substr($val, 1, -1);
                     }
                     $array[] = $val;

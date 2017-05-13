@@ -194,12 +194,12 @@ class Route extends \Priya\Module\Core\Parser{
         $object->default->controller = 'Priya.Module:' . $module . '.'. implode('.', $name) . '.' .  $method;
         $object->method = array('CLI');
         $object->translate = false;
-        $this->data(strtolower(implode('-',$name)) . '/', $object);
+        $this->data(strtolower(implode('-',$name)), $object);
         if(count($name) > 1){
             $object = $this->copy($object);
             array_shift($name);
             $object->path = implode('/', $name) . '/';
-            $this->data(strtolower(implode('-',$name) . '-shorthand') . '/', $object);
+            $this->data(strtolower(implode('-',$name) . '-shorthand'), $object);
         }
     }
 
@@ -234,12 +234,14 @@ class Route extends \Priya\Module\Core\Parser{
     }
 
     public function route($name='', $attribute=array()){
+        if(empty($name)){
+            return;
+        }
         if(!is_array($attribute)){
             $attribute = (array) $attribute;
         }
         $found = false;
         $data = $this->data();
-
         foreach($data as $routeName => $route){
             if(!isset($route->path)){
                 continue;

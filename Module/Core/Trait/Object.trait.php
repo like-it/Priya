@@ -34,6 +34,9 @@ trait Object {
         }
         if(stristr($output, 'json') !== false && stristr($output, 'data') !== false){
             $data =str_replace('"', '&quot;',json_encode($input));
+        }
+        elseif(stristr($output, 'json') !== false && stristr($output, 'line') !== false){
+            $data = json_encode($input);
         } else {
             $data = json_encode($input, JSON_PRETTY_PRINT);
         }
