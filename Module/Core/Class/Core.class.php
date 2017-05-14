@@ -159,6 +159,14 @@ class Core {
         return $this->handler()->session($attribute, $value);
     }
 
+    public function cookie($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler());
+        }
+        return $this->handler()->cookie($attribute, $value);
+    }
+
     public function module(){
         $module = explode(__NAMESPACE__, get_called_class(), 2);
         if(count($module) == 2){

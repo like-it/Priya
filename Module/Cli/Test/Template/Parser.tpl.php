@@ -50,10 +50,18 @@ $parse = function(){
                     $result->success = false;
                 }
             } else {
-                if($result->parser_ === $result->output_){
-                    $result->success = true;
+                if(is_object($result->output_)){
+                    if($result->output_ == $result->parser_){
+                        $result->success = true;
+                    } else {
+                        $result->success = false;
+                    }
                 } else {
-                    $result->success = false;
+                    if($result->parser_ === $result->output_){
+                        $result->success = true;
+                    } else {
+                        $result->success = false;
+                    }
                 }
             }
             if(!empty($parser->data('note.' . $key))){
