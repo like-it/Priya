@@ -29,6 +29,11 @@
     "control_test_19" : "{is_writeable({$test.link})}",
     "control_test_20" : "{is_executable({$test.link})}",
     "control_test_21" : "{is_file_upload({$test.link})}",
+    "control_test_22" : "{time()}",
+    "control_test_23" : "{time(true)}",
+    "control_test_23" : "{time(1)}",
+    "control_test_24" : "{date(true)}",
+    "control_test_25" : "{date(DATE_COOKIE)}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",
     "control_test_999" : "Memory: {memory_usage(\"MB\")}"
@@ -36,6 +41,7 @@
 "note" : {
     "notes" : "U can note down false test results",
     "control_test_4" : "use parameter user & password to validate",
+    "control_test_22" : "Time will tell...",
     "control_test_997" : "Memory can only be compared to itself"
 },
 "output" : {
@@ -70,6 +76,9 @@
     "control_test_19" : true,
     "control_test_20" : true,
     "control_test_21" : false,
+    "control_test_22" : "{$test.control_test_22}",
+    "control_test_23" : "{$test.control_test_23}",
+    "control_test_24" : "{$test.control_test_24}",
     "control_test_997" : "{$test.control_test_997}",
     "control_test_998" : "{$test.control_test_997}",
     "control_test_999" : "{$test.control_test_997}"

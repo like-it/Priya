@@ -43,7 +43,7 @@ $parse = function(){
             $result->parser_ = $parser->data('test.' . $key);
             $result->output_ = $parser->data('output.' . $key);
 
-            if(is_float($result->parser_)){
+            if(is_float($result->parser_) && $result->output_ <> 0){
                 if (abs(($result->parser_ - $result->output_)/$result->output_) < 0.00001) {
                     $result->success = true;
                 } else {
