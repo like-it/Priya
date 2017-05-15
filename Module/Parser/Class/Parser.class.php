@@ -144,7 +144,7 @@ class Parser extends Data {
             $counter = 0;
             $functionList = $list;
             $string = $this->controlIfList($string);
-            $list = $this->data('Parser.Control.If.list');
+            $list = $this->data($this->random() . '.Parser.Control.If.list');
             if(empty($list)){
                 $string = $this->functionList($string, $functionList);
             } else {
@@ -203,12 +203,12 @@ class Parser extends Data {
             }
 //             var_dump($tmp_explode);
             if(count($tmp_explode) > 1){
-                $jid = $this->jid('Parser.Control.If.list');
+                $jid = $this->jid($this->random() . '.Parser.Control.If.list');
                 $temp = $tmp_explode[0];
                 $temp = explode('}', $temp, 2);
                 $statement = reset($temp);
 
-                $list = $this->data('Parser.Control.If.list');
+                $list = $this->data($this->random() . '.Parser.Control.If.list');
                 if(empty($list)){
                     $list = array();
                 }
@@ -224,7 +224,7 @@ class Parser extends Data {
                 $record->if_replace = '[' . $this->random() . 'if id:' . $jid .':' . $this->random() .']';
                 $record->end_if_replace = '[' . $this->random() . '/if id:' . $jid .':' . $this->random() . ']';
                 $list[$jid] = $record;
-                $this->data('Parser.Control.If.list', $list);
+                $this->data($this->random() . 'Parser.Control.If.list', $list);
 
                 $search = $statement . '}';
                 $tmp_explode[0] = str_replace($search, $record->if_replace, $tmp_explode[0]);
@@ -237,7 +237,7 @@ class Parser extends Data {
             $string = implode($record->end_if_replace, $explode);
             $string = $this->controlIfList($string);
         } else {
-            $list = $this->data('Parser.Control.If.list');
+            $list = $this->data($this->random() . '.Parser.Control.If.list');
             if(!empty($list)){
                 $sort = array();
                 $explode = explode('[' . $this->random() . 'if id:', $string);
@@ -251,7 +251,7 @@ class Parser extends Data {
                         $sort[$jid] = $list[$jid];
                     }
                 }
-                $list = $this->data('Parser.Control.If.list', $sort);
+                $list = $this->data($this->random() . '.Parser.Control.If.list', $sort);
                 foreach($list as $jid => $node){
                     $part = explode($node->end_if_replace, $string);
                     if(!empty($node->else_replace)){
@@ -323,7 +323,7 @@ class Parser extends Data {
             }
             $node->methodList = $this->createMethodList($node->statement);
             $string = $function($string, $node, $this);
-            return $this->statementIfList($string, $this->data('Parser.Control.If.list'));
+            return $this->statementIfList($string, $this->data($this->random() . '.Parser.Control.If.list'));
         }
         return $string;
     }
