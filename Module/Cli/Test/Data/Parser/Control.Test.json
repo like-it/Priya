@@ -62,7 +62,7 @@
     "control_test_39" : "{output({$test.control_test_7})}",
     "control_test_40" : "{output(PHP_EOL)}",
     "control_test_41" : "{output(,show)}",
-    "control_test_42" : "{output({$test.object|json}, 'hide')}",
+    "control_test_42" : "{output({$test.object|json}, 'unhide')}",
     "control_test_43" : "{output(PHP_EOL)}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",

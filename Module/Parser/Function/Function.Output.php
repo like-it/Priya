@@ -17,15 +17,15 @@ function function_output($value=null, $argumentList=array(), $parser=null){
     $string = array_shift($argumentList);
     $hide = array_shift($argumentList);
     $toHide = false;
-    if($hide == 'hide' || $hide === false){
+    if($hide == 'hide' || $hide == 'hidden' || $hide === false){
         $toHide = true;
-        $parser->data($parser->random() . '.Parser.output.hide', true);
+        $parser->data($parser->random() . '.Parser.output.hidden', true);
     }
     elseif($hide == 'show' || $hide == 'unhide' || $hide === true){
-        $parser->data('delete', $parser->random() . '.Parser.output.hide');
+        $parser->data('delete', $parser->random() . '.Parser.output.hidden');
     }
 
-    $hide = $parser->data($parser->random() . '.Parser.output.hide');
+    $hide = $parser->data($parser->random() . '.Parser.output.hidden');
 
     if(is_object($string) && method_exists($string, '__toString')){
         if(empty($hide) || (!empty($hide) && $toHide === true)){
