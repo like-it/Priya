@@ -615,4 +615,24 @@ class Core {
     private function getAutoload(){
         return $this->autoload;
     }
+
+    public function debug($output='',$isExport=false,$isDie=false){
+        if($this->handler()->method() == Handler::METHOD_CLI){
+            echo PHP_EOL;
+            echo '-----------------------------------------------------------';
+            echo PHP_EOL;
+            if(empty($isExport)){
+                var_dump($output);
+            } else {
+                var_export($output);
+            }
+            echo PHP_EOL;
+            echo '-----------------------------------------------------------';
+            echo PHP_EOL;
+            if(!empty($isDie)){
+                die;
+            }
+        }
+
+    }
 }

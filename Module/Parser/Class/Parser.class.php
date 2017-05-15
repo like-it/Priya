@@ -169,6 +169,9 @@ class Parser extends Data {
             if(is_numeric($string)){
                 return $string + 0;
             }
+            if(strpos($string, 'array(') === 0 && substr($string, -1, 1) == ')'){
+                $string = '[' . substr($string, 6, -1) . ']';
+            }
             if(substr($string, 0, 1) == '[' && substr($string, -1, 1) == ']'){
                 $json = json_decode($string);
                 if(is_array($json)){
@@ -475,7 +478,7 @@ class Parser extends Data {
         $methodList = $this->createMethodList($string, 'functionList');
         if(!empty($methodList)){
 //             var_dump('---------------------');
-//             var_dump($methodList);
+//             var_export($methodList);
         }
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
@@ -540,7 +543,7 @@ class Parser extends Data {
     }
 
     private function createMethodList($statement='', $type='statementList'){
-        $temp = $this->explode_single(
+        $parts = $this->explode_single(
             array(
                 '&&',
                 '||',
@@ -563,7 +566,8 @@ class Parser extends Data {
             $statement
          );
         $methodList = array();
-        foreach ($temp as $nr => $part){
+        $temp = explode(')}', $statement);
+        foreach ($parts as $nr => $part){
             $method = explode('(', $part, 2);
             if(empty(reset($method))){
                 continue;
@@ -590,30 +594,35 @@ class Parser extends Data {
             foreach($method as $key => $value){
                 $method[$key] = trim($value);
             }
-            $function_key = ltrim($part, ' ()');	//was trim
-            if(strpos($function_key, '(') !== false){
-//                 $function_key .=  ')';	//see was trim (together)
-            } else {
-                $function_key .=  '()';
+            $function_tmp = array_shift($temp);
+            $function_tmp = explode('{', $function_tmp, 2);
+            if(count($function_tmp) != 2){
+                continue;
             }
+            $function_key = end($function_tmp);
             if($type == 'functionList'){
-                $function_key = '{' . $function_key . '}';
+                $function_key = '{' . $function_key . ')}';
             }
             $function = array();
             $func = array_shift($method);
             if(strpos($func, ' ') !== false){
                 continue; //contains statement
             }
-            $function[$function_key]['function'] = ltrim($func, '{!');
-            $arguments = reset($method);
-            $arguments = strrev($arguments);
-            $args = explode(')', $arguments, 2);
-            array_shift($args);
-            $arguments = reset($args);
-            $arguments = strrev($arguments);
+            $func = ltrim($func, '{!');
+            $function[$function_key]['function'] = $func;
+
+            $tmp = explode($function[$function_key]['function'], $function_key); //has to become the function (multiple functions in statement
+            if(count($tmp) > 1){
+                $arguments = $tmp[1];
+                $arguments = trim($arguments, ' ');
+                $arguments = rtrim($arguments, '}');
+                $arguments = substr($arguments, 1, -1);
+            }
             $arguments = str_replace('[string_quote]', '', $arguments);
             $args = str_getcsv($arguments); //to handle quotes
             $array = false;
+            $object = false;
+            $counter = 0;
             $list = array();
             foreach($args  as $key => $value){
                 if($value === null){
@@ -638,16 +647,42 @@ class Parser extends Data {
                     continue;
                 }
                 $arg = trim($value);
+                if(substr($arg, 0, 1) == '{'){
+                    $count_plus = substr_count($value, '{');
+                    $count_min = substr_count($value, '}');
+                    $counter = $count_plus - $count_min;
+                    $object = array();
+                    $object[$key] = $value;
+                }
+                //test array with 1 value for same bug
+                if(substr($arg, -1, 1) == '}' && !empty($object)){
+                    $count_plus = substr_count($value, '{');
+                    $count_min = substr_count($value, '}');
+                    $counter = $counter + ($count_plus - $count_min);
+                    $object[$key] = $value;
+                    if($counter === 0){
+                        $json = implode(",", $object);
+                        $json = str_replace('\"', '"', $json);
+                        $decode = json_decode($json);
+                        if(is_object($decode)){
+                            $list[] = $decode;
+                        } else {
+                            $list[] = $json;
+                        }
+                        $object = array();
+                    }
+                    continue;
+                }
                 if(strpos($arg, '[') === 0){
                     $array = array();
-                    $array[] = $value;
+                    $array[$key] = $value;
                     continue;
                 }
                 if(strpos($arg, 'array(') === 0){
                     $array = array();
                     $val = explode('array(', $value, 2);
                     if(count($val) == 1){
-                        $array[] = $value;
+                        $array[$key] = $value;
                         continue;
                     } else {
                         $val = end($val);
@@ -656,31 +691,38 @@ class Parser extends Data {
                         } else {
                             $value = $val;
                         }
-                        $array[] = $value;
+                        $array[$key] = $value;
                         continue;
                     }
                 }
                 $arg = strrev($arg);
-                if(strpos($arg, ']') === 0){
-                    $array[] = $value;
+                if(strpos($arg, ']') === 0 && !empty($array)){
+                    $array[$key] = $value;
                     $list[] = $array; //implode(',', $array);
                     $array = false;
                     continue;
                 }
-                if(strpos($arg, ')') === 0){
+                if(strpos($arg, ')') === 0 && !empty($array)){
                     $val = strrev($value);
                     $val = explode(')', $val, 2);
                     $val = strrev(end($val));
                     if(in_array(substr($val, 0, 1), array('"', '\'')) && in_array(substr($val, -1, 1), array('"', '\''))){
                         $val = substr($val, 1, -1);
                     }
-                    $array[] = $val;
+                    $array[$key] = $val;
                     $list[] = $array; //implode(',', $array);
                     $array = false;
                     continue;
                 }
                 if(!empty($array)){
-                    $array[] = $value;
+                    $array[$key] = $value;
+                }
+                elseif(!empty($object)){
+                    $count_plus = substr_count($value, '{');
+                    $count_min = substr_count($value, '}');
+                    $counter = $counter + ($count_plus - $count_min);
+
+                    $object[$key] = $value;
                 } else {
                     $list[] = $value;
                 }
@@ -688,8 +730,14 @@ class Parser extends Data {
             if(!empty($array)){
                 $list[] = implode(',', $array);
             }
+            if(!empty($object)){
+                $list[] = implode(',', $object);
+            }
             $function[$function_key]['argumentList'] = $list;
             $methodList[$statement][] = $function;
+        }
+        if(!empty($methodList)){
+//             $this->debug($methodList, true);
         }
         return $methodList;
     }

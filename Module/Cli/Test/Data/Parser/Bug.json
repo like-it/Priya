@@ -1,0 +1,51 @@
+{
+"title": "Test.Parser.Control.Test",
+"test" : {
+    "control_test_997" : "Memory: {memory_usage(MB)}",
+    "control_test_998" : "Memory: {memory_usage('MB')}",
+    "control_test_999" : "Memory: {memory_usage(\"MB\")}"
+},
+"note" : {
+    "notes" : "U can note down false test results",
+    "control_test_4" : "use parameter user & password to validate",
+    "control_test_22" : "Time will tell...",
+    "control_test_997" : "Memory can only be compared to itself"
+},
+"output" : {
+    "value" : "",
+    "int" : 1,
+    "float": 1.3333333333333,
+    "boolean" : true,
+    "variable" : "Priya",
+    "array" : [
+        "first",
+        "middle",
+        "last"
+    ],
+    "object" : {
+       "test" : true,
+        "water" : {
+            "ocean" : true,
+            "bottle" : false
+        },
+        "beer" : true
+    },
+    "file": "{$test.file}",
+    "control_test_1" : true,
+    "control_test_2" : false,
+    "control_test_3" : true,
+    "control_test_4" : false,
+    "control_test_5" : "3",
+    "control_test_6" : "Application\/Pull",
+    "control_test_7" : [
+        "this",
+        "is",
+        "awesome"
+    ],
+    "control_test_38" : "{$test.control_test_38}",
+    "control_test_41" : "{$test.control_test_41}",
+    "control_test_997" : "{$test.control_test_997}",
+    "control_test_998" : "{$test.control_test_998}",
+    "control_test_999" : "{$test.control_test_999}"
+}
+}

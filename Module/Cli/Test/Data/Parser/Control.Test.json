@@ -13,7 +13,10 @@
     ],
     "object" : {
         "test" : true,
-        "water" : true,
+        "water" : {
+            "ocean" : true,
+            "bottle" : false
+        },
         "beer" : true
     },
     "file": "{$dir.module.data}Parser{$dir.ds}Control.Test.json",
@@ -55,8 +58,10 @@
     "control_test_35" : "{input(prompt: )}",
     "control_test_36" : "{$test.control_test_35}",
     "control_test_37" : "{output({$test.control_test_35}PHP_EOL)}",
-    "control_test_38" : "{output({$test.control_test_7}PHP_EOL)}",
-    "control_test_39" : "{output({$test.object|json}PHP_EOL)}",
+    "control_test_38" : "{output({$test.control_test_7})}",
+    "control_test_39" : "{output(PHP_EOL)}",
+    "control_test_40" : "{output({$test.object|json})}",
+    "control_test_41" : "{output(PHP_EOL)}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",
     "control_test_999" : "Memory: {memory_usage(\"MB\")}"
@@ -79,9 +84,15 @@
         "last"
     ],
     "object" : {
-        "test" : true
+        "test" : true,
+        "water" : {
+            "ocean" : true,
+            "bottle" : false
+        },
+        "beer" : true
     },
     "file": "{$test.file}",
+    "link": "{$test.link}",
     "control_test_1" : true,
     "control_test_2" : false,
     "control_test_3" : true,
@@ -125,6 +136,8 @@
     "control_test_37" : "{$test.control_test_37}",
     "control_test_38" : "{$test.control_test_38}",
     "control_test_39" : "{$test.control_test_39}",
+    "control_test_40" : "{$test.control_test_40}",
+    "control_test_41" : "{$test.control_test_41}",
     "control_test_997" : "{$test.control_test_997}",
     "control_test_998" : "{$test.control_test_998}",
     "control_test_999" : "{$test.control_test_999}"
