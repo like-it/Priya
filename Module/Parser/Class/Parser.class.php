@@ -56,7 +56,6 @@ class Parser extends Data {
         } else {
             $original = $string;
             $string = $this->literalList($string);
-            //input method first ?
             $list =  $this->attributeList($string);
             $attributeList = array();
             $data = $this->object($data);
@@ -477,24 +476,11 @@ class Parser extends Data {
     private function FunctionList($string='', $list=array()){
         $methodList = $this->createMethodList($string, 'functionList');
         if(!empty($methodList)){
-//             var_dump('---------------------');
-//             var_export($methodList);
+//             $this->debug($methodList, true);
         }
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
     }
-
-    private function inputList($string='', $list=array()){
-        $methodList = $this->createMethodList($string, 'functionList');
-        if(!empty($methodList)){
-            //             var_dump('---------------------');
-            //             var_dump($methodList);
-        }
-        $string = $this->execMethodList($methodList, $string, 'functionList');
-        return $string;
-    }
-
-
 
     public function replace($search='', $replace='', $data=''){
         return $data;
@@ -611,7 +597,7 @@ class Parser extends Data {
             $func = ltrim($func, '{!');
             $function[$function_key]['function'] = $func;
 
-            $tmp = explode($function[$function_key]['function'], $function_key); //has to become the function (multiple functions in statement
+            $tmp = explode($function[$function_key]['function'], $function_key, 2);
             if(count($tmp) > 1){
                 $arguments = $tmp[1];
                 $arguments = trim($arguments, ' ');

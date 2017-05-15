@@ -647,21 +647,61 @@ class Core {
     }
 
     public function debug($output='',$isExport=false,$isDie=false){
-        if($this->handler()->method() == Handler::METHOD_CLI){
+        if($this->handler()->contentType() == Handler::CONTENT_TYPE_JSON){
+            echo $this->object($output, 'json');
+        } else {
             echo PHP_EOL;
-            echo '-----------------------------------------------------------';
-            echo PHP_EOL;
-            if(empty($isExport)){
-                var_dump($output);
+            if(
+                in_array($output, array(
+                    '***',
+                    '!!!',
+                    '---',
+                    '+++',
+                    '___',
+                    '===',
+                    '^^^',
+                    '$$$',
+                    '###',
+                    '@@@',
+                    '%%%',
+                    '&&&'
+                ))
+            ){
+                for($i=0; $i< 60; $i++){
+                    echo substr($output, 0, 1);
+                }
             } else {
-                var_export($output);
+                echo '------------------------------------------------------------';
             }
             echo PHP_EOL;
-            echo '-----------------------------------------------------------';
-            echo PHP_EOL;
-            if(!empty($isDie)){
-                die;
+            if(
+                !in_array($output, array(
+                    '***',
+                    '!!!',
+                    '---',
+                    '+++',
+                    '___',
+                    '===',
+                    '^^^',
+                    '$$$',
+                    '###',
+                    '@@@',
+                    '%%%',
+                    '&&&'
+                ))
+            ){
+                if(empty($isExport)){
+                    var_dump($output);
+                } else {
+                    var_export($output);
+                }
+                echo PHP_EOL;
+                echo '------------------------------------------------------------';
+                echo PHP_EOL;
             }
+        }
+        if(!empty($isDie)){
+            die;
         }
 
     }

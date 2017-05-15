@@ -1,6 +1,7 @@
 {
 "title": "Test.Parser.Control.Test",
 "test" : {
+    "control_test_27" : "{request(request)}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",
     "control_test_999" : "Memory: {memory_usage(\"MB\")}"
@@ -42,7 +43,7 @@
         "is",
         "awesome"
     ],
-    "control_test_38" : "{$test.control_test_38}",
+    "control_test_27" : "{$test.control_test_27}",
     "control_test_41" : "{$test.control_test_41}",
     "control_test_997" : "{$test.control_test_997}",
     "control_test_998" : "{$test.control_test_998}",

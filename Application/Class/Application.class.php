@@ -112,7 +112,9 @@ class Application extends Parser {
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
-        chdir($this->data('dir.priya.application'));
+        if(empty($this->data('Parser.Disable.chdir'))){
+//             chdir($this->data('dir.priya.application')); //uncomment causes Parser to create an empty input even in this if statement
+        }
         if(empty($autoload)){
             $autoload = new \Priya\Module\Autoload();
             $autoload->addPrefix('Priya',  dirname(Application::DIR) . Application::DS);
@@ -147,6 +149,9 @@ class Application extends Parser {
 
     public function run(){
         $request = $this->request('request');
+        if($request ===  $this->data('parser.request')){
+            trigger_error('cannot route to SELF', E_USER_ERROR);
+        }
         $url = $this->handler()->url();
         $tmp = explode('?', $url, 2);
         $url = reset($tmp);
@@ -187,6 +192,9 @@ class Application extends Parser {
         $handler = $this->handler();
         $contentType = $handler->request('contentType');
         $result = '';
+        if($contentType == Handler::CONTENT_TYPE_CLI){
+            ob_start();
+        }
         if(!empty($item->controller)){
             $controller = new $item->controller($this->handler(), $this->route(), $this->data());
             if(method_exists($controller, $item->function) === false){
@@ -204,16 +212,16 @@ class Application extends Parser {
                 if($this->route()->error('read')){
                     $handler->request('request', 'Application/Error/');
                     $handler->request('id', 2);
-                    $this->run();
+                    return $this->run();
                 } else {
                     if(empty($request)){
                         $handler->request('request', 'Application/Help/');
-                        $this->run();
+                        return $this->run();
                     } else {
                         $handler->request('route', $handler->request('request'));
                         $handler->request('request', 'Application/Error/');
                         $handler->request('id', 1);
-                        $this->run();
+                        return $this->run();
                     }
                 }
             }
@@ -227,6 +235,10 @@ class Application extends Parser {
         }
         elseif(is_string($result)){
             if($result != Handler::CONTENT_TYPE_CLI){
+                return $result;
+            } else {
+                $result = ob_get_contents();
+                ob_end_clean();
                 return $result;
             }
         } else {
