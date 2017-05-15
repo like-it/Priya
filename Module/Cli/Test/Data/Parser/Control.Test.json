@@ -64,6 +64,9 @@
     "control_test_41" : "{output(,show)}",
     "control_test_42" : "{output({$test.object|json}, 'unhide')}",
     "control_test_43" : "{output(PHP_EOL)}",
+    "control_test_44" : "{error('add', 'fatal', 'error')}",
+    "control_test_45" : "{error('delete', 'fatal')}",
+    "control_test_46" : "{error()}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",
     "control_test_999" : "Memory: {memory_usage(\"MB\")}"

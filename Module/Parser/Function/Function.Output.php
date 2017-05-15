@@ -12,16 +12,28 @@ function function_output($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-//     var_dump('---------------------');
-//     var_dump($argumentList);
     $string = array_shift($argumentList);
     $hide = array_shift($argumentList);
     $toHide = false;
-    if($hide == 'hide' || $hide == 'hidden' || $hide === false){
+    if(
+        in_array($hide, array(
+            'hide',
+            'hidden',
+            'off'
+        )) ||
+        $hide === false
+       ){
         $toHide = true;
         $parser->data($parser->random() . '.Parser.output.hidden', true);
     }
-    elseif($hide == 'show' || $hide == 'unhide' || $hide === true){
+    elseif(
+        in_array($hide, array(
+            'show',
+            'unhide',
+            'on'
+        )) ||
+        $hide === true
+    ){
         $parser->data('delete', $parser->random() . '.Parser.output.hidden');
     }
 

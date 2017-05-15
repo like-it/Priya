@@ -339,7 +339,22 @@ class Core {
             }
             elseif($attribute !== null){
                 if($type == 'delete'){
-                    return $this->deleteError($attribute);
+                    $delete = $this->deleteError($attribute);
+                    //add delete when parent is empty
+                    $nodeList = $this->error('nodeList');
+                    if(!empty($nodeList) && is_array($nodeList)){
+                        foreach($nodeList as $nr => $node){
+                            if($node == $attribute){
+                                unset($nodeList[$nr]);
+                            }
+                        }
+                    }
+                    if(empty($nodeList) && is_array($nodeList)){
+                        $this->error('delete', 'nodeList');
+                    } else {
+                        $this->error('nodeList', $nodeList);
+                    }
+                    return $delete;
                 } else {
                     $error = $this->error();
                     if(is_null($error)){
@@ -433,7 +448,22 @@ class Core {
             }
             elseif($attribute !== null){
                 if($type == 'delete'){
-                    return $this->deleteMessage($attribute);
+                    $delete = $this->deleteMessagedeleteMessage($attribute);
+                    //add delete when parent is empty
+                    $nodeList = $this->message('nodeList');
+                    if(!empty($nodeList) && is_array($nodeList)){
+                        foreach($nodeList as $nr => $node){
+                            if($node == $attribute){
+                                unset($nodeList[$nr]);
+                            }
+                        }
+                    }
+                    if(empty($nodeList) && is_array($nodeList)){
+                        $this->message('delete', 'nodeList');
+                    } else {
+                        $this->message('nodeList', $nodeList);
+                    }
+                    return $delete;
                 } else {
                     $message = $this->message();
                     if(is_null($message)){
