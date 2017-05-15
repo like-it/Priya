@@ -56,6 +56,7 @@ class Parser extends Data {
         } else {
             $original = $string;
             $string = $this->literalList($string);
+            //input method first ?
             $list =  $this->attributeList($string);
             $attributeList = array();
             $data = $this->object($data);
@@ -180,12 +181,10 @@ class Parser extends Data {
                     return $json;
                 }
             }
-
             $string = str_replace('[' . $this->random() . '[', '{', $string);
             $string = str_replace(']' . $this->random() . ']', '}', $string);
             $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
             $string = str_replace('{/' . Parser::LITERAL . '}', '' , $string);
-
             return $string;
         }
     }
@@ -481,6 +480,18 @@ class Parser extends Data {
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
     }
+
+    private function inputList($string='', $list=array()){
+        $methodList = $this->createMethodList($string, 'functionList');
+        if(!empty($methodList)){
+            //             var_dump('---------------------');
+            //             var_dump($methodList);
+        }
+        $string = $this->execMethodList($methodList, $string, 'functionList');
+        return $string;
+    }
+
+
 
     public function replace($search='', $replace='', $data=''){
         return $data;
