@@ -339,6 +339,7 @@ class Core {
             }
             elseif($attribute !== null){
                 if($type == 'delete'){
+                    $this->debug($attribute);
                     $delete = $this->deleteError($attribute);
                     //add delete when parent is empty
                     $nodeList = $this->error('nodeList');

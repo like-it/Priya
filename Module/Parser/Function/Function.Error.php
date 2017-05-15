@@ -15,5 +15,17 @@ function function_error($value=null, $argumentList=array(), $parser=null){
     $type = array_shift($argumentList);
     $attribute = array_shift($argumentList);
     $val = array_shift($argumentList);
-    return $parser->error($type, $parser->random() . '.' . $attribute, $value);
+    $result = $parser->error($type, $parser->random() . '.' . $attribute, $value);
+    $random = $parser->error($parser->random());
+    if(is_object($random)){
+        $hasKey = false;
+        foreach($random as $key){
+            $hasKey = true;
+            break;
+        }
+        if(empty($hasKey)){
+            $parser->error('delete', $parser->random());
+        }
+    }
+    return $result;
 }
