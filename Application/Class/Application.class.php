@@ -39,6 +39,7 @@ class Application extends Parser {
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.ds', Application::DS);
+        $this->data('dir.current', getcwd());
         $this->data('dir.priya.application',
             dirname(Application::DIR) .
             Application::DS
@@ -113,7 +114,7 @@ class Application extends Parser {
         $this->data('web.root', $this->handler()->web());
 
         if(empty($this->data('Parser.Disable.chdir'))){
-//             chdir($this->data('dir.priya.application')); //uncomment causes Parser to create an empty input even in this if statement
+            chdir($this->data('dir.priya.application')); //uncomment causes Parser to create an empty input even in this if statement
         }
         if(empty($autoload)){
             $autoload = new \Priya\Module\Autoload();
@@ -212,38 +213,39 @@ class Application extends Parser {
                 if($this->route()->error('read')){
                     $handler->request('request', 'Application/Error/');
                     $handler->request('id', 2);
-                    return $this->run();
+                    $result = $this->run();
                 } else {
                     if(empty($request)){
                         $handler->request('request', 'Application/Help/');
-                        return $this->run();
+                        $result = $this->run();
                     } else {
                         $handler->request('route', $handler->request('request'));
                         $handler->request('request', 'Application/Error/');
                         $handler->request('id', 1);
-                        return $this->run();
+                        $result = $this->run();
                     }
                 }
             }
         }
         if(is_object($result) && isset($result->html)){
             if($contentType == Handler::CONTENT_TYPE_JSON){
-                return $this->object($result, 'json');
+                $result = $this->object($result, 'json');
             } else {
-                return $result->html;
+                $result = $result->html;
             }
         }
         elseif(is_string($result)){
             if($result != Handler::CONTENT_TYPE_CLI){
-                return $result;
+                $result = $result;
             } else {
                 $result = ob_get_contents();
                 ob_end_clean();
-                return $result;
             }
         } else {
 //          404
         }
+        chdir($this->data('dir.current'));
+        return $result;
     }
 
     private function cli(){
