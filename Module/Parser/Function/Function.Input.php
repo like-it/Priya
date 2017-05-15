@@ -15,10 +15,18 @@ function function_input($value=null, $argumentList=array(), $parser=null){
         $argumentList = (array) $argumentList;
     }
     $input = '';
-    $string = array_shift($argumentList);
-    $string = str_replace('PHP_EOL', PHP_EOL, $string);
+    $text= array_shift($argumentList);
+    $text= str_replace('PHP_EOL', PHP_EOL, $text);
     $hidden = array_shift($argumentList);
+    if(!empty($hidden)){
+        echo $text;
+        system('stty -echo');
+        $input = trim(fgets(STDIN));
+        system('stty echo');
+        echo PHP_EOL;
+    } else {
+        $input = rtrim(readline($text), ' ');
+    }
 
-    $input = readline($string);
     return $input;
 }
