@@ -27,7 +27,7 @@
     "control_test_2" : "{isset()}",
     "control_test_3" : "{file_exists({$dir.vendor})}",
     "control_test_4" : "{literal}{permission('','Administrator')}{/literal}",
-    "control_test_5" : "{round(2.54)}",
+    "control_test_5" : "{math_round(2.54)}",
     "control_test_6" : "{route('priya-pull')}",
     "control_test_7" : "{explode(' ', 'this is awesome')}",
     "control_test_8" : "{implode(' ', array('this', 'is', 'awesome'))}",
