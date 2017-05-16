@@ -205,6 +205,32 @@ class Application extends Parser {
             } else {
                 $controller->autoload($this->autoload());
                 $result = $controller->{$item->function}();
+                if(method_exists($controller, 'message')){
+                    $this->message($controller->message());
+                    if(!empty($random)){
+                        $message = $controller->message();
+                        if(is_object($message)){
+                            foreach($message as $attribute => $value){
+                                $this->message($random . '.' . $attribute, $value);
+                            }
+                        }
+                    } else {
+                        $this->message($controller->error());
+                    }
+                }
+                if(method_exists($controller, 'error')){
+                    $random = $this->parser('object')->random();
+                    if(!empty($random)){
+                        $error =  $controller->error();
+                        if(is_object($error)){
+                            foreach($error as $attribute => $value){
+                                $this->error($random . '.' . $attribute, $value);
+                            }
+                        }
+                    } else {
+                        $this->error($controller->error());
+                    }
+                }
             }
         } else {
             if($contentType == Handler::CONTENT_TYPE_CLI){

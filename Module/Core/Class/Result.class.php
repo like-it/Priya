@@ -223,8 +223,10 @@ class Result extends Parser {
             'libs' .
             Application::DS
         ;
+        //for compose dir_vendor/smarty/smarty ?
         if(!file_exists($dir_smarty) . 'Smarty.class.php'){
             chdir($cwd);
+            $this->error('add', 'smarty.not.found', true);
             return false;
         }
         require_once $dir_smarty . 'Smarty.class.php';

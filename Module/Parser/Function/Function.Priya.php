@@ -14,14 +14,13 @@ function function_priya($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $data = array();
-
     $request = array_shift($argumentList);
     if($request === null){
         return false;
     }
     $contentType = array_shift($argumentList);
     $method = array_shift($argumentList);
+    $data = array_shift($argumentList);
     if(empty($method) && (!empty($contentType) && $contentType != Handler::CONTENT_TYPE_CLI)){
         $method = Handler::METHOD_GET;
     }
@@ -34,6 +33,11 @@ function function_priya($value=null, $argumentList=array(), $parser=null){
         $app->handler()->method($method);
     }
     $app->request('request', $request);
+    $app->parser('object')->random($parser->random());
     $result = $app->run();
+
+    $parser->message($app->message());
+    $parser->error($app->error());
+
     return $result;
 }
