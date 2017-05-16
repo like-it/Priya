@@ -286,6 +286,8 @@ class Handler extends \Priya\Module\Core\Data{
             $contentType = $this->contentType();
             if(stristr($contentType, strtolower(Handler::METHOD_CLI))){
                 $method = Handler::METHOD_CLI;
+            } else {
+                $method = Handler::METHOD_GET;
             }
         }
         return $this->method($method);
