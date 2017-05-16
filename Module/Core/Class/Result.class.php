@@ -225,9 +225,21 @@ class Result extends Parser {
         ;
         //for compose dir_vendor/smarty/smarty ?
         if(!file_exists($dir_smarty . 'Smarty.class.php')){
-            chdir($cwd);
-            $this->error('add', $this->parser('object')->random() . '.' .'smarty-not-found', true);
-            return false;
+            $dir_vendor = dirname($dir_vendor) . Application::DS;
+            $dir_smarty =
+            $dir_vendor .
+            'smarty' .
+            Application::DS .
+            'smarty' .
+            Application::DS .
+            'libs' .
+            Application::DS
+            ;
+            if(!file_exists($dir_smarty . 'Smarty.class.php')){
+                chdir($cwd);
+                $this->error('add', $this->parser('object')->random() . '.' .'smarty-not-found', true);
+                return false;
+            }
         }
         require_once $dir_smarty . 'Smarty.class.php';
         $smarty = new \Smarty();
