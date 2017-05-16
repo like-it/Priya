@@ -43,7 +43,7 @@
     "control_test_18" : "{is_readable({$test.link})}",
     "control_test_19" : "{is_writeable({$test.link})}",
     "control_test_20" : "{is_executable({$test.link})}",
-    "control_test_21" : "{is_file_upload({$test.link})}",
+    "control_test_21" : "{is_upload({$test.link})}",
     "control_test_22" : "{time()}",
     "control_test_23" : "{time(true)}",
     "control_test_24" : "{time(1)}",

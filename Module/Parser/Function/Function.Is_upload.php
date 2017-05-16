@@ -8,7 +8,7 @@
  * 	-	all
  */
 
-function function_is_file_upload($value=null, $argumentList=array(), $parser=null){
+function function_is_upload($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
