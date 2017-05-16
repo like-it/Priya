@@ -8,11 +8,10 @@
  * 	-	all
  */
 
-function function_isset($value=null, $argumentList=array(), $parser=null){
+function function_parameter($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $argument = reset($argumentList);
-//     var_dump($argumentList);
-    return isset($argument);
+    $parameter= array_shift($argumentList);
+    return $parser->parameter($parameter);
 }

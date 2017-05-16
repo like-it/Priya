@@ -159,6 +159,14 @@ class Core {
         return $this->handler()->session($attribute, $value);
     }
 
+    public function cookie($attribute=null, $value=null){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler());
+        }
+        return $this->handler()->cookie($attribute, $value);
+    }
+
     public function module(){
         $module = explode(__NAMESPACE__, get_called_class(), 2);
         if(count($module) == 2){
@@ -331,7 +339,24 @@ class Core {
             }
             elseif($attribute !== null){
                 if($type == 'delete'){
-                    return $this->deleteError($attribute);
+                    $delete = $this->deleteError($attribute);
+                    //add delete when parent is empty
+
+                    $nodeList = $this->error('nodeList');
+                    if(!empty($nodeList) && is_array($nodeList)){
+                        foreach($nodeList as $nr => $node){
+                            if($node == $attribute){
+                                unset($nodeList[$nr]);
+                            }
+                        }
+                    }
+                    if(empty($nodeList) && is_array($nodeList)){
+                        $this->error('delete', 'nodeList');
+                    } else {
+                        $this->error('nodeList', $nodeList);
+                    }
+
+                    return $delete;
                 } else {
                     $error = $this->error();
                     if(is_null($error)){
@@ -425,7 +450,22 @@ class Core {
             }
             elseif($attribute !== null){
                 if($type == 'delete'){
-                    return $this->deleteMessage($attribute);
+                    $delete = $this->deleteMessagedeleteMessage($attribute);
+                    //add delete when parent is empty
+                    $nodeList = $this->message('nodeList');
+                    if(!empty($nodeList) && is_array($nodeList)){
+                        foreach($nodeList as $nr => $node){
+                            if($node == $attribute){
+                                unset($nodeList[$nr]);
+                            }
+                        }
+                    }
+                    if(empty($nodeList) && is_array($nodeList)){
+                        $this->message('delete', 'nodeList');
+                    } else {
+                        $this->message('nodeList', $nodeList);
+                    }
+                    return $delete;
                 } else {
                     $message = $this->message();
                     if(is_null($message)){
@@ -606,5 +646,53 @@ class Core {
 
     private function getAutoload(){
         return $this->autoload;
+    }
+
+    public function debug($output='',$isExport=false,$isDie=false){
+        if($this->handler()->contentType() == Handler::CONTENT_TYPE_JSON){
+            echo $this->object($output, 'json');
+        } else {
+            $cols = 60;
+            echo PHP_EOL;
+            if(
+                is_string($output) &&
+                in_array($output, array(
+                    '***',
+                    '!!!',
+                    '---',
+                    '+++',
+                    '___',
+                    '===',
+                    '^^^',
+                    '$$$',
+                    '###',
+                    '@@@',
+                    '%%%',
+                    '&&&'
+                ))
+            ){
+                $char = substr($output, 0, 1);
+                for($i=0; $i< $cols; $i++){
+                    echo $char;
+                }
+                return;
+            } else {
+                $char = '_';
+                for($i=0; $i< $cols; $i++){
+                    echo $char;
+                }
+            }
+            echo PHP_EOL;
+            if(empty($isExport)){
+                var_dump($output);
+            } else {
+                var_export($output);
+            }
+            echo PHP_EOL;
+        }
+        if(!empty($isDie)){
+            die;
+        }
+
     }
 }

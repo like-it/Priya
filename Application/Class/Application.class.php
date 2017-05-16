@@ -29,38 +29,21 @@ class Application extends Parser {
     const TEMP = 'Temp';
     const PUBLIC_HTML = 'Public';
     const CONFIG = 'Config.json';
+    const CUSTOM = 'Custom.json';
     const ROUTE = 'Route.json';
     const CREDENTIAL = 'Credential.json';
 
+    private $cwd;
+
     public function __construct($autoload=null, $data=null){
+        $this->cwd = getcwd();
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
-        $this->data($this->object($data));
-        $this->cli();
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
+        $this->data('dir.ds', Application::DS);
         $this->data('dir.priya.application',
             dirname(Application::DIR) .
-            Application::DS
-        );
-        $this->data('dir.priya.root',
-            dirname($this->data('dir.priya.application')) .
-               Application::DS
-        );
-        $this->data('dir.priya.module',
-            dirname($this->data('dir.priya.application')) .
-            Application::DS .
-            Application::MODULE .
-            Application::DS
-        );
-        $this->data('dir.priya.data',
-            $this->data('dir.priya.application') .
-            Application::DATA .
-            Application::DS
-        );
-        $this->data('dir.priya.backup',
-            $this->data('dir.priya.data') .
-            Application::BACKUP .
             Application::DS
         );
         $this->data('dir.vendor',
@@ -71,6 +54,38 @@ class Application extends Parser {
             dirname($this->data('dir.vendor')) .
             Application::DS
         );
+        $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG);
+        $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM);
+        $this->data($this->object($data));
+        $this->cli();
+        if(empty($this->data('dir.priya.root'))){
+            $this->data('dir.priya.root',
+                dirname($this->data('dir.priya.application')) .
+                Application::DS
+            );
+        }
+        if(empty($this->data('dir.priya.module'))){
+            $this->data('dir.priya.module',
+                dirname($this->data('dir.priya.application')) .
+                Application::DS .
+                Application::MODULE .
+                Application::DS
+            );
+        }
+        if(empty($this->data('dir.priya.data'))){
+            $this->data('dir.priya.data',
+                $this->data('dir.priya.application') .
+                Application::DATA .
+                Application::DS
+            );
+        }
+        if(empty($this->data('dir.priya.backup'))){
+            $this->data('dir.priya.backup',
+                $this->data('dir.priya.data') .
+                Application::BACKUP .
+                Application::DS
+            );
+        }
         if(empty($this->data('dir.data'))){
             $this->data('dir.data',
                 $this->data('dir.root') .
@@ -100,7 +115,8 @@ class Application extends Parser {
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
-        chdir($this->data('dir.priya.application'));
+        chdir($this->data('dir.priya.application')); //uncomment causes Parser to create an empty input even in this if statement
+
         if(empty($autoload)){
             $autoload = new \Priya\Module\Autoload();
             $autoload->addPrefix('Priya',  dirname(Application::DIR) . Application::DS);
@@ -134,7 +150,11 @@ class Application extends Parser {
     }
 
     public function run(){
+        chdir($this->data('dir.priya.application'));
         $request = $this->request('request');
+        if($request ===  $this->data('parser.request')){
+            trigger_error('cannot route to SELF', E_USER_ERROR);
+        }
         $url = $this->handler()->url();
         $tmp = explode('?', $url, 2);
         $url = reset($tmp);
@@ -175,13 +195,50 @@ class Application extends Parser {
         $handler = $this->handler();
         $contentType = $handler->request('contentType');
         $result = '';
+        if($contentType == Handler::CONTENT_TYPE_CLI){
+            ob_start();
+        }
         if(!empty($item->controller)){
             $controller = new $item->controller($this->handler(), $this->route(), $this->data());
             if(method_exists($controller, $item->function) === false){
                 trigger_error('method (' . $item->function . ') not exists in class: (' . get_class($controller) . ')');
             } else {
-                $controller->autoload($this->autoload());
+                if(method_exists($controller, 'autoload')){
+                    $controller->autoload($this->autoload());
+                }
+                if(method_exists($controller, 'parser')){
+                    $controller->parser('object')->random($this->parser('object')->random());
+                }
                 $result = $controller->{$item->function}();
+                if(method_exists($controller, 'message')){
+                    $this->message($controller->message());
+                    if(!empty($random)){
+                        $message = $controller->message();
+                        if(is_object($message)){
+                            foreach($message as $attribute => $value){
+                                $this->message($random . '.' . $attribute, $value);
+                            }
+                        }
+                    } else {
+                        $this->message($controller->error());
+                    }
+                }
+                if(method_exists($controller, 'error')){
+                    /*
+                    $random = $this->parser('object')->random();
+                    if(!empty($random)){
+                        $error =  $controller->error();
+                        if(is_object($error)){
+                            foreach($error as $attribute => $value){
+                                $this->error($random . '.' . $attribute, $value);
+                            }
+                        }
+                    } else {
+                        $this->error($controller->error());
+                    }
+                    */
+                    $this->error($controller->error());
+                }
             }
         } else {
             if($contentType == Handler::CONTENT_TYPE_CLI){
@@ -192,34 +249,39 @@ class Application extends Parser {
                 if($this->route()->error('read')){
                     $handler->request('request', 'Application/Error/');
                     $handler->request('id', 2);
-                    $this->run();
+                    $result = $this->run();
                 } else {
                     if(empty($request)){
                         $handler->request('request', 'Application/Help/');
-                        $this->run();
+                        $result = $this->run();
                     } else {
                         $handler->request('route', $handler->request('request'));
                         $handler->request('request', 'Application/Error/');
                         $handler->request('id', 1);
-                        $this->run();
+                        $result = $this->run();
                     }
                 }
             }
         }
         if(is_object($result) && isset($result->html)){
             if($contentType == Handler::CONTENT_TYPE_JSON){
-                return $this->object($result, 'json');
+                $result = $this->object($result, 'json');
             } else {
-                return $result->html;
+                $result = $result->html;
             }
         }
         elseif(is_string($result)){
             if($result != Handler::CONTENT_TYPE_CLI){
-                return $result;
+                $result = $result;
+            } else {
+                $result = ob_get_contents();
+                ob_end_clean();
             }
         } else {
 //          404
         }
+        chdir($this->cwd);  //for Parser
+        return $result;
     }
 
     private function cli(){

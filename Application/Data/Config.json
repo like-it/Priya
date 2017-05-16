@@ -1,0 +1,22 @@
+{
+    "environment": "production",
+    "contentType": {
+        "html": "text\/html",
+        "css": "text\/css",
+        "pcss": "text\/css",
+        "js": "application\/javascript",
+        "ico": "image\/x-icon",
+        "png": "image\/png",
+        "jpg": "image\/jpeg",
+        "gif": "image\/gif",
+        "svg": "image\/svg+xml",
+        "woff": "application\/font-woff",
+        "ttf": "font\/ttf",
+        "wav": "audio\/wav",
+        "mp3": "audio\/mp3"
+    },
+    "version": "{$major|default:0}.{$minor|default:0}.{$patch|default:0}",
+    "major": 0,
+    "minor": 1,
+    "patch": 15
+}

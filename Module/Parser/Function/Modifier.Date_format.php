@@ -8,7 +8,6 @@
  */
 
 function modifier_date_format($value=null, $argumentList=array()){
-    var_dump($value);
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }

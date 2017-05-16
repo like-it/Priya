@@ -284,8 +284,8 @@ class Handler extends \Priya\Module\Core\Data{
             $method = $_SERVER['REQUEST_METHOD'];
         } else{
             $contentType = $this->contentType();
-            if(stristr($contentType, 'cli')){
-                $method = 'CLI';
+            if(stristr($contentType, strtolower(Handler::METHOD_CLI))){
+                $method = Handler::METHOD_CLI;
             }
         }
         return $this->method($method);
@@ -836,12 +836,24 @@ class Handler extends \Priya\Module\Core\Data{
         if($attribute !== null){
             if($value !== null){
                 if($attribute == 'delete'){
-                    @setcookie($value, null, 0, "/"); //ends at session
+                    $result = @setcookie($value, null, 0, "/"); //ends at session
+                    if(!empty($result) && $this->method() == Handler::METHOD_CLI){
+                        unset($_COOKIE[$value]);
+                    }
+                    return $result;
                 } else {
                     if($duration === null){
                         $duration = 60*60*24*365*2; // 2 years
                     }
-                    @setcookie($attribute, $value, time() +	 $duration, "/");
+                    $result = @setcookie($attribute, $value, time() +	 $duration, "/");
+                    if(!empty($result) && $this->method() == Handler::METHOD_CLI){
+                        $_COOKIE[$attribute] = $value;
+                    }
+                }
+                if(isset($_COOKIE[$attribute])){
+                    return $_COOKIE[$attribute];
+                } else {
+                    return null;
                 }
             } else {
                 if(isset($_COOKIE[$attribute])){

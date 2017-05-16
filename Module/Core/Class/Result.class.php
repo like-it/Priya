@@ -136,6 +136,9 @@ class Result extends Parser {
     public function createCli($template=''){
         $template_list = (array) $this->locateTemplate($template, 'tpl.php');
         foreach($template_list as $template){
+            if(file_exists($template) === false){
+                continue;
+            }
             require $template;
         }
         return Handler::CONTENT_TYPE_CLI;
@@ -220,6 +223,12 @@ class Result extends Parser {
             'libs' .
             Application::DS
         ;
+        //for compose dir_vendor/smarty/smarty ?
+        if(!file_exists($dir_smarty . 'Smarty.class.php')){
+            chdir($cwd);
+            $this->error('add', $this->parser('object')->random() . '.' .'smarty-not-found', true);
+            return false;
+        }
         require_once $dir_smarty . 'Smarty.class.php';
         $smarty = new \Smarty();
 

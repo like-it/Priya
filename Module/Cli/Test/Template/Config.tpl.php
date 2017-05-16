@@ -18,14 +18,14 @@ use Priya\Module\Data;
 $parse = function(){
     $url = $this->parameter('url') ? $this->parameter('url') : $this->parameter(3);
     $cwd = getcwd();
-    chdir($this->data('dir.module.data') . 'Parser' );
+    chdir($this->data('dir.module.data') . 'Config' );
     while (file_exists($url) === false){
         if(!empty($url)){
             $this->color(0,1);
             $this->write('output', 'File not found (' . $url . ')');
             $this->write('output', PHP_EOL);
         }
-        $url = $this->read('input', 'Please provide the parser file: ');
+        $url = $this->read('input', 'Please provide the config file: ');
     }
     $parser = new Parser($this->data());
     $parser->route($this->route());
@@ -42,26 +42,17 @@ $parse = function(){
             $result->input__ = $value;
             $result->parser_ = $parser->data('test.' . $key);
             $result->output_ = $parser->data('output.' . $key);
-
-            if(is_float($result->parser_) && $result->output_ <> 0){
+            if(is_float($result->parser_)){
                 if (abs(($result->parser_ - $result->output_)/$result->output_) < 0.00001) {
                     $result->success = true;
                 } else {
                     $result->success = false;
                 }
             } else {
-                if(is_object($result->output_)){
-                    if($result->output_ == $result->parser_){
-                        $result->success = true;
-                    } else {
-                        $result->success = false;
-                    }
+                if($result->parser_ === $result->output_){
+                    $result->success = true;
                 } else {
-                    if($result->parser_ === $result->output_){
-                        $result->success = true;
-                    } else {
-                        $result->success = false;
-                    }
+                    $result->success = false;
                 }
             }
             if(!empty($parser->data('note.' . $key))){

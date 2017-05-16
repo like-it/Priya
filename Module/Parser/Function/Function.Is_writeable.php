@@ -8,11 +8,9 @@
  * 	-	all
  */
 
-function function_isset($value=null, $argumentList=array(), $parser=null){
+function function_is_writeable($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $argument = reset($argumentList);
-//     var_dump($argumentList);
-    return isset($argument);
+    return is_writeable(array_shift($argumentList));
 }
