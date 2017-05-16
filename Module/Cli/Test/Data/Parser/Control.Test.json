@@ -1,6 +1,8 @@
 {
 "title": "Test.Parser.Control.Test",
 "test" : {
+    "version" : "{$version}",
+    "patch" : "{$patch}",
     "boolean" : true,
     "value" : "",
     "int" : 1,
@@ -59,8 +61,10 @@
     "control_test_36" : "{$test.control_test_35}",
     "control_test_37" : "{output(,hide)}",
     "control_test_38" : "{route(indent)}",
-    "control_test_39" : "{error('delete', 'smarty.not.found')}",
-    "control_test_40" : "{priya({$test.control_test_38}, 'text/css')}",
+    "control_test_39" : "{priya({$test.control_test_38}, 'text/css')}",
+    "control_test_50" : "{error()}",
+    "control_test_40" : "{error('delete', 'smarty-not-found')}",
+    "control_test_51" : "{error()}",
     "control_test_41" : "{output({$test.control_test_35}PHP_EOL)}",
     "control_test_42" : "{output({$test.control_test_7})}",
     "control_test_43" : "{output(PHP_EOL)}",
@@ -72,8 +76,7 @@
     "control_test_49" : "{error()}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",
-    "control_test_999" : "Memory: {memory_usage(\"MB\")}",
-    "version" : "{$version}"
+    "control_test_999" : "Memory: {memory_usage(\"MB\")}"
 },
 "note" : {
     "notes" : "U can note down false test results",
@@ -82,6 +85,8 @@
     "control_test_997" : "Memory can only be compared to itself"
 },
 "output" : {
+    "version" : "{$version}",
+    "patch" : "{$patch}",
     "value" : "",
     "int" : 1,
     "float": 1.3333333333333,
@@ -154,9 +159,9 @@
     "control_test_46" : "{$test.control_test_46}",
     "control_test_47" : "{$test.control_test_47}",
     "control_test_48" : "{$test.control_test_48}",
+    "control_test_49" : "{$test.control_test_49}",
     "control_test_997" : "{$test.control_test_997}",
     "control_test_998" : "{$test.control_test_998}",
-    "control_test_999" : "{$test.control_test_999}",
-    "version" : "{$version}"
+    "control_test_999" : "{$test.control_test_999}"
 }
 }

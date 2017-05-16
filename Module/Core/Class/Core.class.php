@@ -341,6 +341,7 @@ class Core {
                 if($type == 'delete'){
                     $delete = $this->deleteError($attribute);
                     //add delete when parent is empty
+
                     $nodeList = $this->error('nodeList');
                     if(!empty($nodeList) && is_array($nodeList)){
                         foreach($nodeList as $nr => $node){
@@ -354,6 +355,7 @@ class Core {
                     } else {
                         $this->error('nodeList', $nodeList);
                     }
+
                     return $delete;
                 } else {
                     $error = $this->error();
@@ -653,6 +655,7 @@ class Core {
             $cols = 60;
             echo PHP_EOL;
             if(
+                is_string($output) &&
                 in_array($output, array(
                     '***',
                     '!!!',
@@ -672,6 +675,7 @@ class Core {
                 for($i=0; $i< $cols; $i++){
                     echo $char;
                 }
+                return;
             } else {
                 $char = '_';
                 for($i=0; $i< $cols; $i++){
@@ -679,33 +683,12 @@ class Core {
                 }
             }
             echo PHP_EOL;
-            if(
-                !in_array($output, array(
-                    '***',
-                    '!!!',
-                    '---',
-                    '+++',
-                    '___',
-                    '===',
-                    '^^^',
-                    '$$$',
-                    '###',
-                    '@@@',
-                    '%%%',
-                    '&&&'
-                ))
-            ){
-                if(empty($isExport)){
-                    var_dump($output);
-                } else {
-                    var_export($output);
-                }
-                echo PHP_EOL;
-                for($i=0; $i< $cols; $i++){
-                    echo $char;
-                }
-                echo PHP_EOL;
+            if(empty($isExport)){
+                var_dump($output);
+            } else {
+                var_export($output);
             }
+            echo PHP_EOL;
         }
         if(!empty($isDie)){
             die;

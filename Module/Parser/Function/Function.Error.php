@@ -27,5 +27,6 @@ function function_error($value=null, $argumentList=array(), $parser=null){
             $parser->error('delete', $parser->random());
         }
     }
+//     $parser->debug($result);
     return $result;
 }

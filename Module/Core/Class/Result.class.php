@@ -226,7 +226,7 @@ class Result extends Parser {
         //for compose dir_vendor/smarty/smarty ?
         if(!file_exists($dir_smarty) . 'Smarty.class.php'){
             chdir($cwd);
-            $this->error('add', 'smarty.not.found', true);
+            $this->error('add', $this->parser('object')->random() . '.' .'smarty-not-found', true);
             return false;
         }
         require_once $dir_smarty . 'Smarty.class.php';

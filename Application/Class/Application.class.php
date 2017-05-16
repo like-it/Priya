@@ -203,7 +203,12 @@ class Application extends Parser {
             if(method_exists($controller, $item->function) === false){
                 trigger_error('method (' . $item->function . ') not exists in class: (' . get_class($controller) . ')');
             } else {
-                $controller->autoload($this->autoload());
+                if(method_exists($controller, 'autoload')){
+                    $controller->autoload($this->autoload());
+                }
+                if(method_exists($controller, 'parser')){
+                    $controller->parser('object')->random($this->parser('object')->random());
+                }
                 $result = $controller->{$item->function}();
                 if(method_exists($controller, 'message')){
                     $this->message($controller->message());
@@ -219,6 +224,7 @@ class Application extends Parser {
                     }
                 }
                 if(method_exists($controller, 'error')){
+                    /*
                     $random = $this->parser('object')->random();
                     if(!empty($random)){
                         $error =  $controller->error();
@@ -230,6 +236,8 @@ class Application extends Parser {
                     } else {
                         $this->error($controller->error());
                     }
+                    */
+                    $this->error($controller->error());
                 }
             }
         } else {

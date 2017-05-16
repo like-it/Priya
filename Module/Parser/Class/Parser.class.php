@@ -42,6 +42,15 @@ class Parser extends Data {
 
     public function compile($string='', $data, $keep=false){
         $input = $string;
+        if(
+            is_null($string) ||
+            is_bool($string) ||
+            is_float($string) ||
+            is_int($string) ||
+            is_numeric($string)
+        ){
+            return $string;
+        }
         if (is_array($string)){
             foreach($string as $nr => $line){
                 $string[$nr] = $this->compile($line, $data, $keep);
@@ -124,19 +133,10 @@ class Parser extends Data {
             foreach($attributeList as $search => $replace){
                 $replace = $this->compile($replace, $data, $keep);
                 $compile_list[$search] = $replace;
-                if(empty($replace) && !empty($keep)){
+                if(empty($replace) && ($replace !== 0 || $replace !== '0') && !empty($keep)){
                     continue;
                 }
-                if(is_object($replace)){
-                    $replace = $this->object($replace, 'json');
-                }
-                if(is_array($replace)){
-                    $replace = json_encode($replace);
-                    $replace = 'array(' . substr($replace, 1, -1) . ')';
-                }
-                if(is_object($replace)){
-                    $replace = json_encode($replace);
-                }
+                $replace = $this->handle($replace);
                 $string = str_replace($search, $replace, $string);
             }
             $init = 0;
@@ -149,46 +149,74 @@ class Parser extends Data {
             } else {
                 $string = $this->statementIfList($string, $list);
             }
-            if($string === 'null'){
-                $string = null;
-            }
-            elseif($string === 'true'){
-                $string = true;
-            }
-            elseif($string === 'false'){
-                $string = false;
-
-            }
-            if($string === null || $string === true || $string === false){
-                return $string;
-            }
-            if(is_float($string) || is_int($string)){
-                return $string;
-            }
-            if(is_numeric($string)){
-                return $string + 0;
-            }
-            if(strpos($string, 'array(') === 0 && substr($string, -1, 1) == ')'){
-                $string = '[' . substr($string, 6, -1) . ']';
-            }
-            if(substr($string, 0, 1) == '[' && substr($string, -1, 1) == ']'){
-                $json = json_decode($string);
-                if(is_array($json)){
-                    return $json;
-                }
-            }
-            if(substr($string, 0, 1) == '{' && substr($string, -1, 1) == '}'){
-                $json = json_decode($string);
-                if(is_object($json)){
-                    return $json;
-                }
-            }
-            $string = str_replace('[' . $this->random() . '[', '{', $string);
-            $string = str_replace(']' . $this->random() . ']', '}', $string);
-            $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
-            $string = str_replace('{/' . Parser::LITERAL . '}', '' , $string);
+            $string = $this->handle($string, true);
             return $string;
         }
+    }
+
+    private function handle($string, $return=false){
+        if(empty($return)){
+            if($string === null){
+                $string = 'null';
+            }
+            elseif($string === true){
+                $string = 'true';
+            }
+            elseif($string === false){
+                $string = 'false';
+            }
+            elseif(is_null($string)){
+                $string = 'null';
+            }
+            elseif(is_array($string)){
+                $string = json_encode($string);
+                $string = 'array(' . substr($string, 1, -1) . ')';
+            }
+            elseif(is_object($string)){
+                $string = $this->object($string, 'json');
+            }
+            //nothing on is_int or is_float or is_numeric
+            return $string;
+
+        }
+        $string = str_replace('[' . $this->random() . '[', '{', $string);
+        $string = str_replace(']' . $this->random() . ']', '}', $string);
+        $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
+        $string = str_replace('{/' . Parser::LITERAL . '}', '' , $string);
+        if($string === 'null'){
+            $string = null;
+        }
+        elseif($string === 'true'){
+            $string = true;
+        }
+        elseif($string === 'false'){
+            $string = false;
+        }
+        if($string === null || $string === true || $string === false){
+            return $string;
+        }
+        if(is_float($string) || is_int($string)){
+            return $string;
+        }
+        if(is_numeric($string)){
+            return $string + 0;
+        }
+        if(strpos($string, 'array(') === 0 && substr($string, -1, 1) == ')'){
+            $string = '[' . substr($string, 6, -1) . ']';
+        }
+        if(substr($string, 0, 1) == '[' && substr($string, -1, 1) == ']'){
+            $json = json_decode($string);
+            if(is_array($json)){
+                return $json;
+            }
+        }
+        if(substr($string, 0, 1) == '{' && substr($string, -1, 1) == '}'){
+            $json = json_decode($string);
+            if(is_object($json)){
+                return $json;
+            }
+        }
+        return $string;
     }
 
     private function controlIfList($string=''){
