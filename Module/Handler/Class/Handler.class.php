@@ -371,6 +371,10 @@ class Handler extends \Priya\Module\Core\Data{
         if(empty($data) && !empty($argv)){
             $attribute = $argv;
             foreach($attribute as $nr => $value){
+                if($value=== '""' || $value=== ''){
+                    unset($attribute[$nr]);
+                    continue;
+                }
                 $attribute[$nr] = trim(escapeshellarg($value), '\'');
             }
             $data = new stdClass();
