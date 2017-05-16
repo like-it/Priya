@@ -224,7 +224,7 @@ class Result extends Parser {
             Application::DS
         ;
         //for compose dir_vendor/smarty/smarty ?
-        if(!file_exists($dir_smarty) . 'Smarty.class.php'){
+        if(!file_exists($dir_smarty . 'Smarty.class.php')){
             chdir($cwd);
             $this->error('add', $this->parser('object')->random() . '.' .'smarty-not-found', true);
             return false;
