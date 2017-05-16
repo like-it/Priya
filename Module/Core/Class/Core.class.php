@@ -339,7 +339,6 @@ class Core {
             }
             elseif($attribute !== null){
                 if($type == 'delete'){
-                    $this->debug($attribute);
                     $delete = $this->deleteError($attribute);
                     //add delete when parent is empty
                     $nodeList = $this->error('nodeList');
@@ -651,6 +650,7 @@ class Core {
         if($this->handler()->contentType() == Handler::CONTENT_TYPE_JSON){
             echo $this->object($output, 'json');
         } else {
+            $cols = 60;
             echo PHP_EOL;
             if(
                 in_array($output, array(
@@ -668,11 +668,15 @@ class Core {
                     '&&&'
                 ))
             ){
-                for($i=0; $i< 60; $i++){
-                    echo substr($output, 0, 1);
+                $char = substr($output, 0, 1);
+                for($i=0; $i< $cols; $i++){
+                    echo $char;
                 }
             } else {
-                echo '------------------------------------------------------------';
+                $char = '_';
+                for($i=0; $i< $cols; $i++){
+                    echo $char;
+                }
             }
             echo PHP_EOL;
             if(
@@ -697,7 +701,9 @@ class Core {
                     var_export($output);
                 }
                 echo PHP_EOL;
-                echo '------------------------------------------------------------';
+                for($i=0; $i< $cols; $i++){
+                    echo $char;
+                }
                 echo PHP_EOL;
             }
         }

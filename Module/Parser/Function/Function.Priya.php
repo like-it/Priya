@@ -1,8 +1,4 @@
 <?php
-
-use Priya\Application;
-use Priya\Module\Handler;
-
 /**
  * @author 		Remco van der Velde
  * @since 		2017-04-20
@@ -11,13 +7,15 @@ use Priya\Module\Handler;
  * 	-	all
  */
 
+use Priya\Application;
+use Priya\Module\Handler;
+
 function function_priya($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
     $data = array();
-    $data['testing'] = true;
-    $data['parser']['request'] = $parser->request('request');
+
     $request = array_shift($argumentList);
     if($request === null){
         return false;
@@ -25,7 +23,7 @@ function function_priya($value=null, $argumentList=array(), $parser=null){
     $contentType = array_shift($argumentList);
     $method = array_shift($argumentList);
     if(empty($method) && (!empty($contentType) && $contentType != Handler::CONTENT_TYPE_CLI)){
-        $method = 'GET';
+        $method = Handler::METHOD_GET;
     }
     $app = new Application($parser->autoload(), $data);
     if(!empty($contentType)){

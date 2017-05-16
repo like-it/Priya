@@ -33,13 +33,15 @@ class Application extends Parser {
     const ROUTE = 'Route.json';
     const CREDENTIAL = 'Credential.json';
 
+    private $cwd;
+
     public function __construct($autoload=null, $data=null){
+        $this->cwd = getcwd();
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.ds', Application::DS);
-        $this->data('dir.current', getcwd());
         $this->data('dir.priya.application',
             dirname(Application::DIR) .
             Application::DS
@@ -113,9 +115,8 @@ class Application extends Parser {
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
-        if(empty($this->data('Parser.Disable.chdir'))){
-            chdir($this->data('dir.priya.application')); //uncomment causes Parser to create an empty input even in this if statement
-        }
+        chdir($this->data('dir.priya.application')); //uncomment causes Parser to create an empty input even in this if statement
+
         if(empty($autoload)){
             $autoload = new \Priya\Module\Autoload();
             $autoload->addPrefix('Priya',  dirname(Application::DIR) . Application::DS);
@@ -149,6 +150,7 @@ class Application extends Parser {
     }
 
     public function run(){
+        chdir($this->data('dir.priya.application'));
         $request = $this->request('request');
         if($request ===  $this->data('parser.request')){
             trigger_error('cannot route to SELF', E_USER_ERROR);
@@ -244,7 +246,7 @@ class Application extends Parser {
         } else {
 //          404
         }
-        chdir($this->data('dir.current'));
+        chdir($this->cwd);  //for Parser
         return $result;
     }
 

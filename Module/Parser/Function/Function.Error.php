@@ -15,7 +15,7 @@ function function_error($value=null, $argumentList=array(), $parser=null){
     $type = array_shift($argumentList);
     $attribute = array_shift($argumentList);
     $val = array_shift($argumentList);
-    $result = $parser->error($type, $parser->random() . '.' . $attribute, $value);
+    $result = $parser->error($type, $parser->random() . '.' . $attribute, $val);
     $random = $parser->error($parser->random());
     if(is_object($random)){
         $hasKey = false;

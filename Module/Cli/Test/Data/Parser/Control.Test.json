@@ -61,17 +61,18 @@
     "control_test_38" : "{route(indent)}",
     "control_test_39" : "{priya({$test.control_test_38}, 'text/css')}",
     "control_test_40" : "{output({$test.control_test_35}PHP_EOL)}",
-    "control_test_40" : "{output({$test.control_test_7})}",
-    "control_test_41" : "{output(PHP_EOL)}",
-    "control_test_42" : "{output(,show)}",
-    "control_test_43" : "{output({$test.object|json}, 'unhide')}",
-    "control_test_44" : "{output(PHP_EOL)}",
-    "control_test_45" : "{error('add', 'fatal', 'error')}",
-    "control_test_46" : "{error('delete', 'fatal')}",
-    "control_test_47" : "{error()}",
+    "control_test_41" : "{output({$test.control_test_7})}",
+    "control_test_42" : "{output(PHP_EOL)}",
+    "control_test_43" : "{output(,show)}",
+    "control_test_44" : "{output({$test.object|json}, 'unhide')}",
+    "control_test_45" : "{output(PHP_EOL)}",
+    "control_test_46" : "{error('add', 'fatal', 'error')}",
+    "control_test_47" : "{error('delete', 'fatal')}",
+    "control_test_48" : "{error()}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",
-    "control_test_999" : "Memory: {memory_usage(\"MB\")}"
+    "control_test_999" : "Memory: {memory_usage(\"MB\")}",
+    "version" : "{$version}"
 },
 "note" : {
     "notes" : "U can note down false test results",
@@ -147,8 +148,14 @@
     "control_test_41" : "{$test.control_test_41}",
     "control_test_42" : "{$test.control_test_42}",
     "control_test_43" : "{$test.control_test_43}",
+    "control_test_44" : "{$test.control_test_44}",
+    "control_test_45" : "{$test.control_test_45}",
+    "control_test_46" : "{$test.control_test_46}",
+    "control_test_47" : "{$test.control_test_47}",
+    "control_test_48" : "{$test.control_test_48}",
     "control_test_997" : "{$test.control_test_997}",
     "control_test_998" : "{$test.control_test_998}",
-    "control_test_999" : "{$test.control_test_999}"
+    "control_test_999" : "{$test.control_test_999}",
+    "version" : "{$version}"
 }
 }
