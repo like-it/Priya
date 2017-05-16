@@ -18,5 +18,5 @@
     "version": "{$major|default:0}.{$minor|default:0}.{$patch|default:0}",
     "major": 0,
     "minor": 1,
-    "patch": 14
+    "patch": 15
 }
