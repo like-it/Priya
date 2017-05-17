@@ -12,5 +12,12 @@
 namespace Priya;
 
 $this->autoload()->expose(true);
-$this->autoload()->locate($this->parameter(2));
+
+$route = $this->route()->route($this->parameter(2));
+
+if(empty($route)){
+    $this->autoload()->locate($this->parameter(2));
+} else {
+    $this->autoload()->locate($route);
+}
 echo PHP_EOL;

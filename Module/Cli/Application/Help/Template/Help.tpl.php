@@ -28,4 +28,4 @@ echo "  " . 'restore --list             	(this will show available restore point
 echo "  " . 'route --list               	(this will show available cli routes)' . PHP_EOL;
 echo "  " . 'route --list-all           	(this will show all available routes)' . PHP_EOL;
 echo "  " . 'test parser <file>         	(this will test the parser with <file>)' . PHP_EOL;
-echo "  " . 'locate <route>         	(this will list all available locations of the class <route>)' . PHP_EOL;
+echo "  " . 'locate <route>         	(this will list all available locations of the class <route> name)' . PHP_EOL;
