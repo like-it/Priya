@@ -17,6 +17,7 @@ use Priya\Module\Core\Cli;
 class Core {
     use Core\Object;
 
+    private $cwd;
     private $mail;
     private $handler;
     private $route;
@@ -142,6 +143,13 @@ class Core {
             }
             return false;
         }
+    }
+
+    protected function cwd($cwd=''){
+        if(!empty($cwd)){
+            $this->cwd = $cwd;
+        }
+        return $this->cwd;
     }
 
     public function csrf(){

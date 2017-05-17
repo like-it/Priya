@@ -92,10 +92,10 @@ class Parser extends Data {
                     }
                     if(
                         strpos($value, '|') !== false &&
-                        strpos($value, 'string_quote') > strpos($value, '|') &&
-                        strpos($value, ':') > strpos($value, 'string_quote')
+                        strpos($value, 'quote') > strpos($value, '|') &&
+                        strpos($value, ':') > strpos($value, 'quote')
                     ){
-                      //if should be fine (has string_quote)
+                      //if should be fine (has quote)
                     } elseif(strpos($key_previous, $value) !== false) {
                         if($modify === null){
 //                             var_dump($modify);
@@ -106,7 +106,7 @@ class Parser extends Data {
 
                         } else {
                             //  if should have a string_quote in case of string variable
-                            $value .= '|string_quote:"[string_quote]":"\\\'"';
+                            $value .= '|quote:"[quote]":"\\\'"';
                             $list[$key] = $value;
                         }
                     }
@@ -315,11 +315,11 @@ class Parser extends Data {
                         $node->end_if_replace
                         ;
                     }
-                    $node->statement = str_replace('"[string_quote]', '"', $node->statement);
-                    $node->statement = str_replace('[string_quote]"', '"', $node->statement);
-                    $node->statement = str_replace('"[string_quote]"', 'null', $node->statement);
-                    $node->statement = str_replace('[string_quote][string_quote]', 'null', $node->statement);
-                    $node->statement = str_replace('[string_quote]', '\'', $node->statement);
+                    $node->statement = str_replace('"[quote]', '"', $node->statement);
+                    $node->statement = str_replace('[quote]"', '"', $node->statement);
+                    $node->statement = str_replace('"[quote]"', 'null', $node->statement);
+                    $node->statement = str_replace('[quote][quote]', 'null', $node->statement);
+                    $node->statement = str_replace('[quote]', '\'', $node->statement);
                 }
             }
         }
@@ -633,7 +633,7 @@ class Parser extends Data {
                 $arguments = rtrim($arguments, '}');
                 $arguments = substr($arguments, 1, -1);
             }
-            $arguments = str_replace('[string_quote]', '', $arguments);
+            $arguments = str_replace('[quote]', '', $arguments);
             $args = str_getcsv($arguments); //to handle quotes
             $array = false;
             $object = false;

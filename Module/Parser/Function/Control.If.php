@@ -36,7 +36,7 @@ function control_if($value=null, $node='', $parser=null){
         $node->result = $node->false;
     }
     $value = str_replace($node->string, $node->result, $value);
-    $value = str_replace('[string_quote]', '', $value);
+    $value = str_replace('[quote]', '', $value);
     return $value;
 }
 

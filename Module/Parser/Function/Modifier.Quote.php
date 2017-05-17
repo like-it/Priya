@@ -7,7 +7,7 @@
  * 	-	all
  */
 
-function modifier_string_quote($value=null, $argumentList=array()){
+function modifier_quote($value=null, $argumentList=array()){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
