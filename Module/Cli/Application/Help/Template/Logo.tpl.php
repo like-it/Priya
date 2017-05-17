@@ -16,20 +16,18 @@ $rows = $this->tput('rows');
 
 if($rows > 50){
     $this->output(str_repeat('-', $cols) . PHP_EOL);
-    $this->output('                                                             ' . PHP_EOL);
+    $this->output('                                                               ' . PHP_EOL);
     $this->output('    ########       #######     ##    ##       ##    #######    ' . PHP_EOL);
-    $this->output('   ##       ##    ##     ##     ##   ##      ##    ##     ##  ' . PHP_EOL);
+    $this->output('   ##       ##    ##     ##     ##   ##      ##    ##     ##   ' . PHP_EOL);
     $this->output('   ##       ##   ##      ##     ##    ##    ##    ##       ##  ' . PHP_EOL);
     $this->output('   ##       ##   ##      ##     ##     ##  ##     ##       ##  ' . PHP_EOL);
-    $this->output('   ##       ##   ##     ##      ##      ####      ###########   ' . PHP_EOL);
+    $this->output('   ##       ##   ##     ##      ##      ####      ###########  ' . PHP_EOL);
     $this->output('   #########     ##    ##       ##       ##       ##       ##  ' . PHP_EOL);
     $this->output('   ##            ##     ##      ##       ##       ##       ##  ' . PHP_EOL);
     $this->output('   ##            ##      ##     ##       ##       ##       ##  ' . PHP_EOL);
     $this->output('   ##            ##      ##    ##       ##        ##       ##  ' . PHP_EOL);
-    $this->output('                                                             ' . PHP_EOL);
-    $this->output('                                                     ' . $this->data('version') . PHP_EOL);
-    $this->output('                                                             ' . PHP_EOL);
+    $this->output('                                                               ' . PHP_EOL);
+    $this->output('                                                       ' . $this->data('version') . PHP_EOL);
+    $this->output('                                                               ' . PHP_EOL);
     $this->output(str_repeat('-', $cols) . PHP_EOL);
 }
-
-$test = 'test';
