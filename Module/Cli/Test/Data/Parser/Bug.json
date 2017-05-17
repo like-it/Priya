@@ -1,6 +1,7 @@
 {
 "title": "Test.Parser.Control.Test",
 "test" : {
+    "control_test_26" : "{if \"water\" == \"water\"}water{else}sea{/if}",
     "control_test_27" : "{request(request)}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",

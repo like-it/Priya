@@ -228,7 +228,6 @@ class Parser extends Data {
             foreach($tmp_explode as $tmp_nr => $tmp_value){
                 $tmp_explode[$tmp_nr] = strrev($tmp_value);
             }
-//             var_dump($tmp_explode);
             if(count($tmp_explode) > 1){
                 $jid = $this->jid($this->random() . '.Parser.Control.If.list');
                 $temp = $tmp_explode[0];
@@ -251,13 +250,15 @@ class Parser extends Data {
                 $record->if_replace = '[' . $this->random() . 'if id:' . $jid .':' . $this->random() .']';
                 $record->end_if_replace = '[' . $this->random() . '/if id:' . $jid .':' . $this->random() . ']';
                 $list[$jid] = $record;
-                $this->data($this->random() . 'Parser.Control.If.list', $list);
-
+                $this->data($this->random() . '.Parser.Control.If.list', $list);
                 $search = $statement . '}';
                 $tmp_explode[0] = str_replace($search, $record->if_replace, $tmp_explode[0]);
                 if(!empty($record->else_replace)){
                     $tmp_explode[0] = str_replace('{else}', $record->else_replace, $tmp_explode[0]);
                 }
+            }
+            if(empty($record)){
+                return $string;
             }
             krsort($tmp_explode);
             $explode[0] = implode('', $tmp_explode);

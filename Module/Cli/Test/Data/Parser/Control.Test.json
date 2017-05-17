@@ -109,7 +109,7 @@
     "control_test_2" : false,
     "control_test_3" : true,
     "control_test_4" : false,
-    "control_test_5" : "3",
+    "control_test_5" : 3,
     "control_test_6" : "Application\/Pull",
     "control_test_7" : [
         "this",
