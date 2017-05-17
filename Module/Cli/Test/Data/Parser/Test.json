@@ -84,6 +84,7 @@
     "control_test_58" : "{str_scan(January 01 2000 00:01, %s %d %d %d:%d)}",
     "control_test_59" : "{str_translate('abicdefghi','ghi', 'aao')}",
     "control_test_60" : "{str_translate('month year day',{$test.control_test_57})}",
+    "control_test_61" : "{str_reverse('dlrow olleh')}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",
     "control_test_999" : "Memory: {memory_usage(\"MB\")}"
@@ -181,6 +182,7 @@
     "control_test_58" : "{$test.control_test_58}",
     "control_test_59" : "{$test.control_test_59}",
     "control_test_60" : "{$test.control_test_60}",
+    "control_test_61" : "hello world",
     "control_test_997" : "{$test.control_test_997}",
     "control_test_998" : "{$test.control_test_998}",
     "control_test_999" : "{$test.control_test_999}"
