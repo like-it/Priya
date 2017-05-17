@@ -134,6 +134,8 @@ class Application extends Parser {
             $this->handler(),
             clone $this->data()
         ));
+        $this->route()->create('Application.Version');
+        $this->route()->create('Application.Locate');
         $this->route()->create('Application.Config');
         $this->route()->create('Application.Help');
         $this->route()->create('Application.Error');
