@@ -173,12 +173,14 @@ class Parser extends Data {
                 $string = 'array(' . substr($string, 1, -1) . ')';
             }
             elseif(is_object($string)){
-                $string = $this->object($string, 'json');
+                $string = '{object}' .$this->object($string, 'json-line') . '{/object}';
             }
             //nothing on is_int or is_float or is_numeric
             return $string;
 
         }
+        $string = str_replace('{object}', '', $string);
+        $string = str_replace('{/object}', '', $string);
         $string = str_replace('[' . $this->random() . '[', '{', $string);
         $string = str_replace(']' . $this->random() . ']', '}', $string);
         $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
@@ -634,6 +636,7 @@ class Parser extends Data {
                 $arguments = substr($arguments, 1, -1);
             }
             $arguments = str_replace('[quote]', '', $arguments);
+            $arguments = $this->createObjectList($arguments);
             $args = str_getcsv($arguments); //to handle quotes
             $array = false;
             $object = false;
@@ -652,6 +655,15 @@ class Parser extends Data {
                     $list[] = $value;
                     continue;
                 }
+                $explode = explode('[object id:', $value, 2);
+                if(count($explode) == 2){
+                    $jid = explode(']', end($explode), 2);
+                    if(count($jid) == 2){
+                        $jid = array_shift($jid);
+                        $list[] = $this->data($this->random() . '.Parser.Control.Object.list.' . $jid);
+                        continue;
+                    }
+                }
                 $value = ltrim($value, ' '); //added
                 if(substr($value, 0, 1) == '\'' && substr($value, -1, 1) == '\''){
                     $value = substr($value, 1, -1);
@@ -662,6 +674,7 @@ class Parser extends Data {
                     continue;
                 }
                 $arg = trim($value);
+                /*
                 if(substr($arg, 0, 1) == '{'){
                     $count_plus = substr_count($value, '{');
                     $count_min = substr_count($value, '}');
@@ -669,7 +682,9 @@ class Parser extends Data {
                     $object = array();
                     $object[$key] = $value;
                 }
+                */
                 //test array with 1 value for same bug
+                /*
                 if(substr($arg, -1, 1) == '}' && !empty($object)){
                     $count_plus = substr_count($value, '{');
                     $count_min = substr_count($value, '}');
@@ -688,6 +703,7 @@ class Parser extends Data {
                     }
                     continue;
                 }
+                */
                 if(strpos($arg, '[') === 0){
                     $array = array();
                     $array[$key] = $value;
@@ -731,22 +747,19 @@ class Parser extends Data {
                 }
                 if(!empty($array)){
                     $array[$key] = $value;
-                }
-                elseif(!empty($object)){
-                    $count_plus = substr_count($value, '{');
-                    $count_min = substr_count($value, '}');
-                    $counter = $counter + ($count_plus - $count_min);
-
-                    $object[$key] = $value;
                 } else {
                     $list[] = $value;
                 }
             }
             if(!empty($array)){
-                $list[] = implode(',', $array);
-            }
-            if(!empty($object)){
-                $list[] = implode(',', $object);
+                $json = implode(",", $array);
+                $json = str_replace('\"', '"', $json);
+                $decode = json_decode($json);
+                if(is_object($decode)){
+                    $list[] = $decode;
+                } else {
+                    $list[] = $json;
+                }
             }
             $function[$function_key]['argumentList'] = $list;
             $methodList[$statement][] = $function;
@@ -755,6 +768,25 @@ class Parser extends Data {
 //             $this->debug($methodList, true);
         }
         return $methodList;
+    }
+
+    private function createObjectList($arguments=''){
+
+        $explode = explode('{object}', $arguments, 2);
+        if(count($explode) == 2){
+            $json= explode('{/object}', end($explode), 2);
+            $json= array_shift($json);
+            $object = json_decode($json);
+
+            $jid = $this->jid($this->random() . '.Parser.Control.Object.list');
+
+            $this->data($this->random() . '.Parser.Control.Object.list.' . $jid, $object);
+            $arguments = str_replace('{object}', '[object id:'. $jid . ']', $arguments);
+            $arguments = str_replace('{/object}', '[/object id:'. $jid . ']', $arguments);
+            $arguments = str_replace($json, '', $arguments);
+            $arguments = $this->createObjectList($arguments);
+        }
+        return $arguments;
     }
 
     private function attributeList($string=''){
