@@ -9,8 +9,6 @@
  *  - In Smarty bash coloring isn't working.
  */
 
-// version_compare($version1, $version2)
-
 namespace Priya;
 
 $this->autoload()->expose(true);
