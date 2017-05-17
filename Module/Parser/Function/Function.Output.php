@@ -34,6 +34,8 @@ function function_output($value=null, $argumentList=array(), $parser=null){
         )) ||
         $hide === true
     ){
+//         $parser->debug('!!!');
+//         $parser->debug($string);
         $parser->data('delete', $parser->random() . '.Parser.output.hidden');
     }
 

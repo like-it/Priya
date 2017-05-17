@@ -33,6 +33,7 @@
     "control_test_8" : "{implode(' ', array('this', 'is', 'awesome'))}",
     "control_test_9" : "{implode(' ', {$test.control_test_7})}",
     "control_test_10" : "{is_array({$test.control_test_7})}",
+    "control_test_0" : "{is_object({$test.object})}",
     "control_test_11" : "{is_string({$test.variable})}",
     "control_test_12" : "{is_int({$test.int})}",
     "control_test_13" : "{is_float({$test.float})}",

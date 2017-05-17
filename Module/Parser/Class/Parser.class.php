@@ -136,7 +136,7 @@ class Parser extends Data {
                 if(empty($replace) && ($replace !== 0 || $replace !== '0') && !empty($keep)){
                     continue;
                 }
-                $replace = $this->handle($replace);
+                $replace = $this->handle($replace, 'attribute');
                 $string = str_replace($search, $replace, $string);
             }
             $init = 0;
@@ -155,7 +155,7 @@ class Parser extends Data {
     }
 
     private function handle($string, $return=false){
-        if(empty($return)){
+        if(empty($return) || $return == 'attribute' && $return !== true){
             if($string === null){
                 $string = 'null';
             }

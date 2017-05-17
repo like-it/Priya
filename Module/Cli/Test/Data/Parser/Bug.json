@@ -1,6 +1,15 @@
 {
 "title": "Test.Parser.Control.Test",
 "test" : {
+    "object" : {
+        "test" : true,
+        "water" : {
+            "oce\\an" : true,
+            "bottle" : false
+        },
+        "beer" : true
+    },
+    "control_test_45" : "{output({$test.object|json}, 'unhide')}",
     "control_test_25" : "{date(true)}",
     "control_test_31" : "{session(id)}",
     "control_test_32" : "{cookie(PHPSESSID, {$test.control_test_31})}",
