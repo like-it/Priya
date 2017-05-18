@@ -1,8 +1,8 @@
 <?php
 /*
-Priya 0.1.16 (built: 2017-05-17 18:54:21)
+Priya 0.1.17 (built: 2017-05-18 23:06:21)
 Copyright (c) 2015-2017 Remco van der Velde
-Generated File (do not modify) (built: 2017-05-18 11:49:24)
+Generated File (do not modify) (built: 2017-05-18 23:14:13)
 */
 
 /**
@@ -881,6 +881,61 @@ function function_session($value=null, $argumentList=array(), $parser=null){
  * 	-	all
  */
 
+function function_str_chr($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $ascii= array_shift($argumentList);
+    return chr($ascii);
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_crc32($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $string = array_shift($argumentList);
+    return crc32($string);
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_crypt($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $string = array_shift($argumentList);
+    $salt = array_shift($argumentList);
+    if(!empty($salt)){
+        return crypt($string, $salt);
+    }
+    return crypt($string);
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
 function function_str_format($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
@@ -899,6 +954,54 @@ function function_str_format($value=null, $argumentList=array(), $parser=null){
         array_shift($argumentList)
     );
     return $string;
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_ioccurence($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $haystack = array_shift($argumentList);
+    $needle = array_shift($argumentList);
+    $before_needle = array_shift($argumentList);
+    if(empty($before_needle)){
+        $before_needle = false;
+    }
+    return stristr($haystack, $needle, $before_needle);
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_ireplace($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $search = array_shift($argumentList);
+    $replace = array_shift($argumentList);
+    $subject = array_shift($argumentList);
+    $attribute = array_shift($argumentList);
+    if(!empty($attribute) && substr($attribute,0,1) == '$'){
+        $subject = str_ireplace($search, $replace, $subject, $count);
+        $parser->data(substr($attribute, 1), $count);
+    } else {
+        $subject = str_ireplace($search, $replace, $subject);
+    }
+    return $subject;
 }
 
 
@@ -971,12 +1074,182 @@ function function_str_lc_word($value=null, $argumentList=array(), $parser=null){
  * 	-	all
  */
 
+function function_str_md5($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $string = array_shift($argumentList);
+    $raw_output = array_shift($argumentList);
+    return md5($string, $raw_output);
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_occurence($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $haystack = array_shift($argumentList);
+    $needle = array_shift($argumentList);
+    $before_needle = array_shift($argumentList);
+    if(empty($before_needle)){
+        $before_needle = false;
+    }
+    return strstr($haystack, $needle, $before_needle);
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_ord($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $string= array_shift($argumentList);
+    return ord($string);
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_pad($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $input = array_shift($argumentList);
+    $pad_length = array_shift($argumentList);
+    $pad_string = array_shift($argumentList);
+    $pad_type = array_shift($argumentList);
+    if(empty($pad_string)){
+        $pad_string = ' ';
+    }
+    if(empty($pad_type)){
+        $pad_type= STR_PAD_RIGHT;
+    } else {
+        $pad_type = constant($pad_type);
+    }
+    return str_pad($input, $pad_length, $pad_string, $pad_type);
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_random($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $length = array_shift($argumentList) + 0;
+    $string = '';
+
+    for($i=0; $i < $length; $i++){
+        $char = rand(32, 126);
+        $char = chr($char);
+        $string .= $char;
+    }
+    return $string;
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_repeat($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $input = array_shift($argumentList);
+    $multiplier = array_shift($argumentList);
+    return str_repeat($input, $multiplier);
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_replace($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $search = array_shift($argumentList);
+    $replace = array_shift($argumentList);
+    $subject = array_shift($argumentList);
+    $attribute = array_shift($argumentList);
+    if(!empty($attribute) && substr($attribute,0,1) == '$'){
+        $subject = str_replace($search, $replace, $subject, $count);
+        $parser->data(substr($attribute, 1), $count);
+    } else {
+        $subject = str_replace($search, $replace, $subject);
+    }
+    return $subject;
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
 function function_str_reverse($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
     $string = array_shift($argumentList);
     return strrev($string);
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_rot13($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $string = array_shift($argumentList);
+    return str_rot13($string);
 }
 
 
@@ -1003,6 +1276,50 @@ function function_str_scan($value=null, $argumentList=array(), $parser=null){
         return $object;
     }
     return $scan;
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_split($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $string = array_shift($argumentList);
+    $length = array_shift($argumentList);
+    if(empty($length)){
+        return str_split($string);
+    } else {
+        return str_split($string, $length);
+    }
+}
+
+
+/**
+ * @author 		Remco van der Velde
+ * @since 		2017-04-20
+ * @version		1.0
+ * @changeLog
+ * 	-	all
+ */
+
+function function_str_token($value=null, $argumentList=array(), $parser=null){
+    if(!is_array($argumentList)){
+        $argumentList = (array) $argumentList;
+    }
+    $string = array_shift($argumentList);
+    $token = array_shift($argumentList);
+    if($token === null){
+        $token = $string;
+        return strtok($token);
+    }
+    return strtok($string, $token);
 }
 
 
