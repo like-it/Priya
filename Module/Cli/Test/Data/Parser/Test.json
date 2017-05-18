@@ -1,7 +1,7 @@
 {
 "title": "Test.Parser.Control.Test",
 "test" : {
-    "control_test_35" : "{input(prompt: )}",
+    "control_test_35" : "{literal}{input(prompt: )}{/literal}",
     "start" : "{time(true)}",
     "version" : "{$version}",
     "patch" : "{$patch}",
@@ -60,12 +60,12 @@
     "control_test_32" : "{cookie(PHPSESSID, {$test.control_test_31})}",
     "control_test_33" : "{cookie(DATE, {$test.control_test_25})}",
     "control_test_34" : "{cookie()}",
-    "control_test_36" : "{$test.control_test_35}",
+    "control_test_36" : "{literal}{$test.control_test_35}{/literal}",
     "control_test_37" : "{output(,hide)}",
     "control_test_38" : "{route(indent)}",
     "control_test_39" : "{priya({$test.control_test_38}, 'text/css')}",
     "control_test_40" : "{error('delete', 'smarty-not-found')}",
-    "control_test_41" : "{output({$test.control_test_35}PHP_EOL)}",
+    "control_test_41" : "{literal}{output({$test.control_test_35}PHP_EOL)}{/literal}",
     "control_test_42" : "{output({$test.control_test_7})}",
     "control_test_43" : "{output(PHP_EOL)}",
     "control_test_44" : "{output(,show)}",
@@ -96,7 +96,7 @@
     "control_test_4" : "use parameter user & password to validate",
     "control_test_22" : "Time will tell...",
     "control_test_997" : "Memory can only be compared to itself",
-    "end" : "{$test.start}"
+    "end" : "{$time.start}"
 },
 "output" : {
     "version" : "{$version}",
@@ -159,13 +159,12 @@
     "control_test_32" : "{$test.control_test_31}",
     "control_test_33" : "{$test.control_test_25}",
     "control_test_34" : "{$test.control_test_34}",
-    "control_test_35" : "{$test.control_test_35}",
-    "control_test_36" : "{$test.control_test_35}",
+    "control_test_36" : "{literal}{$test.control_test_36}{/literal}",
     "control_test_37" : "{$test.control_test_37}",
     "control_test_38" : "{$test.control_test_38}",
     "control_test_39" : "{$test.control_test_39}",
     "control_test_40" : "{$test.control_test_40}",
-    "control_test_41" : "{$test.control_test_41}",
+    "control_test_41" : "{literal}{$test.control_test_41}{/literal}",
     "control_test_42" : "{$test.control_test_42}",
     "control_test_43" : "{$test.control_test_43}",
     "control_test_44" : "{$test.control_test_44}",

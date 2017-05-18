@@ -9,6 +9,7 @@
         },
         "beer" : true
     },
+    "control_test_35" : "{literal}{input(prompt: )}{/literal}",
     "control_test_45" : "{output({$test.object|json}, 'unhide')}",
     "control_test_25" : "{date(true)}",
     "control_test_31" : "{session(id)}",

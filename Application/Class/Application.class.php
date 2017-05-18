@@ -37,6 +37,7 @@ class Application extends Parser {
         $this->cwd(getcwd());
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
+        $this->data('time.start', microtime(true));
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.ds', Application::DS);
@@ -145,6 +146,7 @@ class Application extends Parser {
         $this->route()->create('Application.Push');
         $this->route()->create('Application.Build');
         $this->route()->create('Application.Install');
+        $this->route()->create('Application.Parser');
         $this->route()->create('Test');
         $this->route()->create('Application.Cache.Clear');
     }
