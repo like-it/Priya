@@ -64,6 +64,9 @@ class Parser extends Data {
             }
             return $string;
         } else {
+            if(strpos($string, '{') === false && strpos($string, '}') === false){
+                return $string;
+            }
             $original = $string;
             $string = $this->literalList($string);
             $list =  $this->attributeList($string);
@@ -125,12 +128,15 @@ class Parser extends Data {
                     $modify = $this->modify($modify, $modifierList);
                 }
                 if($modify===false){
+                    $attributeList[$key] = $modify;
+                    $key_previous = $key;
                     continue;
                 }
                 $list[$key] = $modify;
                 $attributeList[$key] = $modify;
                 $key_previous = $key;
             }
+
             foreach($attributeList as $search => $replace){
                 $replace = $this->compile($replace, $data, $keep);
                 $compile_list[$search] = $replace;
@@ -202,6 +208,10 @@ class Parser extends Data {
             return $string;
         }
         if(is_numeric($string)){
+            $pos = strpos($string ,'0');
+            if($pos === 0 && is_numeric(substr($string, 1, 1))){
+                return $string;
+            }
             return $string + 0;
         }
         if(strpos($string, 'array(') === 0 && substr($string, -1, 1) == ')'){
