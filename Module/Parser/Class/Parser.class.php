@@ -17,6 +17,7 @@ class Parser extends Data {
     const DIR = __DIR__;
     const LITERAL = 'literal';
     const PHP_MIN_VERSION = '7.0.0';
+    const FUNCTION_LIST = 'Function.List.php';
 
     private $random;
 
@@ -339,8 +340,13 @@ class Parser extends Data {
         $url = $dir . 'Control.' . ucfirst(strtolower($function)) . '.php';
         $function = 'control_' . $function;
 
-        if(file_exists($url)){
-            require_once $url;
+        if(function_exists($function) === false){
+            if(file_exists($dir . Parser::FUNCTION_LIST)){
+                require_once $url;
+            }
+            elseif(file_exists($url)){
+                require_once $url;
+            }
         }
         if(function_exists($function) === false){
             var_dump('(Parser) (statementList) missing control: ' . $function);
@@ -377,20 +383,24 @@ class Parser extends Data {
                     $url = $dir . 'Function.' . ucfirst(strtolower($function)) . '.php';
                     $function = 'function_' . $function;
 
-                    if(file_exists($url)){
-                        require_once $url;
-                    } else {
-                        if($type=='functionList'){
-                            $replace = 'null';
-                        } else {
-                            $replace = '0';
+                    if(function_exists($function) === false){
+                        if(file_exists($dir . Parser::FUNCTION_LIST)){
+                            require_once $url;
                         }
-                        $string = str_replace($search, $replace, $string);
-                        trigger_error('(Parser) (execMethodList) missing file: ' . $url);
-                        //remove {function} ?
-                        continue;
+                        elseif(file_exists($url)){
+                            require_once $url;
+                        } else {
+                            if($type=='functionList'){
+                                $replace = 'null';
+                            } else {
+                                $replace = '0';
+                            }
+                            $string = str_replace($search, $replace, $string);
+                            trigger_error('(Parser) (execMethodList) missing file: ' . $url);
+                            //remove {function} ?
+                            continue;
+                        }
                     }
-
                     if(function_exists($function) === false){
                         var_dump('(Parser) (execMethodList) missing function: ' . $function);
                         //trigger error?
@@ -506,9 +516,6 @@ class Parser extends Data {
 
     private function FunctionList($string='', $list=array()){
         $methodList = $this->createMethodList($string, 'functionList');
-        if(!empty($methodList)){
-//             $this->debug($methodList, true);
-        }
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
     }
