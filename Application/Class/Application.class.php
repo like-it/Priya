@@ -55,7 +55,8 @@ class Application extends Parser {
         );
         $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG);
         $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM);
-        $this->data($this->object($data));
+
+        $this->data($this->object_merge($this->data(),$this->object($data)));
         $this->cli();
         if(empty($this->data('dir.priya.root'))){
             $this->data('dir.priya.root',
@@ -154,7 +155,7 @@ class Application extends Parser {
     public function run(){
         chdir($this->data('dir.priya.application'));
         $request = $this->request('request');
-        if($request ===  $this->data('parser.request')){
+        if($request ===  $this->data('parser.request') && $request !== null){
             trigger_error('cannot route to SELF', E_USER_ERROR);
         }
         $url = $this->handler()->url();
