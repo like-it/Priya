@@ -1,6 +1,25 @@
 {
 "title": "Test.Parser.Control.Test",
 "test" : {
+    "object" : {
+        "test" : true,
+        "water" : {
+            "oce\\an" : true,
+            "bottle" : false
+        },
+        "beer" : true
+    },
+    "control_test_56" : "{str_format(%'09d, 123)}",
+    "control_test_35" : "{literal}{input(prompt: )}{/literal}",
+    "control_test_45" : "{output({$test.object|json}, 'unhide')}",
+    "control_test_25" : "{date(true)}",
+    "control_test_31" : "{session(id)}",
+    "control_test_32" : "{cookie(PHPSESSID, {$test.control_test_31})}",
+    "control_test_33" : "{cookie(DATE, {$test.control_test_25})}",
+    "control_test_34" : "{cookie()}",
+    "control_test_57" : "{str_scan(01 2000 00:01 January, %d %d %d:%d %s, month, da:y, ye{ar, hour, minute)}",
+    "control_test_58" : "{str_translate('month ye{ar da:y',month, water)}",
+    "control_test_26" : "{if \"water\" == \"water\"}water{else}sea{/if}",
     "control_test_27" : "{request(request)}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",
@@ -43,6 +62,7 @@
         "is",
         "awesome"
     ],
+    "control_test_34" : "{$test.control_test_34}",
     "control_test_27" : "{$test.control_test_27}",
     "control_test_41" : "{$test.control_test_41}",
     "control_test_997" : "{$test.control_test_997}",

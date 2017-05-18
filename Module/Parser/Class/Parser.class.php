@@ -17,6 +17,7 @@ class Parser extends Data {
     const DIR = __DIR__;
     const LITERAL = 'literal';
     const PHP_MIN_VERSION = '7.0.0';
+    const FUNCTION_LIST = 'Function.List.php';
 
     private $random;
 
@@ -63,6 +64,9 @@ class Parser extends Data {
             }
             return $string;
         } else {
+            if(strpos($string, '{') === false && strpos($string, '}') === false){
+                return $string;
+            }
             $original = $string;
             $string = $this->literalList($string);
             $list =  $this->attributeList($string);
@@ -92,10 +96,10 @@ class Parser extends Data {
                     }
                     if(
                         strpos($value, '|') !== false &&
-                        strpos($value, 'string_quote') > strpos($value, '|') &&
-                        strpos($value, ':') > strpos($value, 'string_quote')
+                        strpos($value, 'quote') > strpos($value, '|') &&
+                        strpos($value, ':') > strpos($value, 'quote')
                     ){
-                      //if should be fine (has string_quote)
+                      //if should be fine (has quote)
                     } elseif(strpos($key_previous, $value) !== false) {
                         if($modify === null){
 //                             var_dump($modify);
@@ -106,7 +110,7 @@ class Parser extends Data {
 
                         } else {
                             //  if should have a string_quote in case of string variable
-                            $value .= '|string_quote:"[string_quote]":"\\\'"';
+                            $value .= '|quote:"[quote]":"\\\'"';
                             $list[$key] = $value;
                         }
                     }
@@ -124,19 +128,22 @@ class Parser extends Data {
                     $modify = $this->modify($modify, $modifierList);
                 }
                 if($modify===false){
+                    $attributeList[$key] = $modify;
+                    $key_previous = $key;
                     continue;
                 }
                 $list[$key] = $modify;
                 $attributeList[$key] = $modify;
                 $key_previous = $key;
             }
+
             foreach($attributeList as $search => $replace){
                 $replace = $this->compile($replace, $data, $keep);
                 $compile_list[$search] = $replace;
                 if(empty($replace) && ($replace !== 0 || $replace !== '0') && !empty($keep)){
                     continue;
                 }
-                $replace = $this->handle($replace);
+                $replace = $this->handle($replace, 'attribute');
                 $string = str_replace($search, $replace, $string);
             }
             $init = 0;
@@ -155,7 +162,7 @@ class Parser extends Data {
     }
 
     private function handle($string, $return=false){
-        if(empty($return)){
+        if(empty($return) || $return == 'attribute' && $return !== true){
             if($string === null){
                 $string = 'null';
             }
@@ -173,12 +180,14 @@ class Parser extends Data {
                 $string = 'array(' . substr($string, 1, -1) . ')';
             }
             elseif(is_object($string)){
-                $string = $this->object($string, 'json');
+                $string = '{object}' .$this->object($string, 'json-line') . '{/object}';
             }
             //nothing on is_int or is_float or is_numeric
             return $string;
 
         }
+        $string = str_replace('{object}', '', $string);
+        $string = str_replace('{/object}', '', $string);
         $string = str_replace('[' . $this->random() . '[', '{', $string);
         $string = str_replace(']' . $this->random() . ']', '}', $string);
         $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
@@ -199,6 +208,10 @@ class Parser extends Data {
             return $string;
         }
         if(is_numeric($string)){
+            $pos = strpos($string ,'0');
+            if($pos === 0 && is_numeric(substr($string, 1, 1))){
+                return $string;
+            }
             return $string + 0;
         }
         if(strpos($string, 'array(') === 0 && substr($string, -1, 1) == ')'){
@@ -228,7 +241,6 @@ class Parser extends Data {
             foreach($tmp_explode as $tmp_nr => $tmp_value){
                 $tmp_explode[$tmp_nr] = strrev($tmp_value);
             }
-//             var_dump($tmp_explode);
             if(count($tmp_explode) > 1){
                 $jid = $this->jid($this->random() . '.Parser.Control.If.list');
                 $temp = $tmp_explode[0];
@@ -251,13 +263,15 @@ class Parser extends Data {
                 $record->if_replace = '[' . $this->random() . 'if id:' . $jid .':' . $this->random() .']';
                 $record->end_if_replace = '[' . $this->random() . '/if id:' . $jid .':' . $this->random() . ']';
                 $list[$jid] = $record;
-                $this->data($this->random() . 'Parser.Control.If.list', $list);
-
+                $this->data($this->random() . '.Parser.Control.If.list', $list);
                 $search = $statement . '}';
                 $tmp_explode[0] = str_replace($search, $record->if_replace, $tmp_explode[0]);
                 if(!empty($record->else_replace)){
                     $tmp_explode[0] = str_replace('{else}', $record->else_replace, $tmp_explode[0]);
                 }
+            }
+            if(empty($record)){
+                return $string;
             }
             krsort($tmp_explode);
             $explode[0] = implode('', $tmp_explode);
@@ -314,11 +328,11 @@ class Parser extends Data {
                         $node->end_if_replace
                         ;
                     }
-                    $node->statement = str_replace('"[string_quote]', '"', $node->statement);
-                    $node->statement = str_replace('[string_quote]"', '"', $node->statement);
-                    $node->statement = str_replace('"[string_quote]"', 'null', $node->statement);
-                    $node->statement = str_replace('[string_quote][string_quote]', 'null', $node->statement);
-                    $node->statement = str_replace('[string_quote]', '\'', $node->statement);
+                    $node->statement = str_replace('"[quote]', '"', $node->statement);
+                    $node->statement = str_replace('[quote]"', '"', $node->statement);
+                    $node->statement = str_replace('"[quote]"', 'null', $node->statement);
+                    $node->statement = str_replace('[quote][quote]', 'null', $node->statement);
+                    $node->statement = str_replace('[quote]', '\'', $node->statement);
                 }
             }
         }
@@ -336,8 +350,13 @@ class Parser extends Data {
         $url = $dir . 'Control.' . ucfirst(strtolower($function)) . '.php';
         $function = 'control_' . $function;
 
-        if(file_exists($url)){
-            require_once $url;
+        if(function_exists($function) === false){
+            if(file_exists($dir . Parser::FUNCTION_LIST)){
+                require_once $url;
+            }
+            elseif(file_exists($url)){
+                require_once $url;
+            }
         }
         if(function_exists($function) === false){
             var_dump('(Parser) (statementList) missing control: ' . $function);
@@ -374,20 +393,24 @@ class Parser extends Data {
                     $url = $dir . 'Function.' . ucfirst(strtolower($function)) . '.php';
                     $function = 'function_' . $function;
 
-                    if(file_exists($url)){
-                        require_once $url;
-                    } else {
-                        if($type=='functionList'){
-                            $replace = 'null';
-                        } else {
-                            $replace = '0';
+                    if(function_exists($function) === false){
+                        if(file_exists($dir . Parser::FUNCTION_LIST)){
+                            require_once $url;
                         }
-                        $string = str_replace($search, $replace, $string);
-                        trigger_error('(Parser) (execMethodList) missing file: ' . $url);
-                        //remove {function} ?
-                        continue;
+                        elseif(file_exists($url)){
+                            require_once $url;
+                        } else {
+                            if($type=='functionList'){
+                                $replace = 'null';
+                            } else {
+                                $replace = '0';
+                            }
+                            $string = str_replace($search, $replace, $string);
+                            trigger_error('(Parser) (execMethodList) missing file: ' . $url);
+                            //remove {function} ?
+                            continue;
+                        }
                     }
-
                     if(function_exists($function) === false){
                         var_dump('(Parser) (execMethodList) missing function: ' . $function);
                         //trigger error?
@@ -503,9 +526,6 @@ class Parser extends Data {
 
     private function FunctionList($string='', $list=array()){
         $methodList = $this->createMethodList($string, 'functionList');
-        if(!empty($methodList)){
-//             $this->debug($methodList, true);
-        }
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
     }
@@ -632,7 +652,8 @@ class Parser extends Data {
                 $arguments = rtrim($arguments, '}');
                 $arguments = substr($arguments, 1, -1);
             }
-            $arguments = str_replace('[string_quote]', '', $arguments);
+            $arguments = str_replace('[quote]', '', $arguments);
+            $arguments = $this->createObjectList($arguments);
             $args = str_getcsv($arguments); //to handle quotes
             $array = false;
             $object = false;
@@ -651,6 +672,15 @@ class Parser extends Data {
                     $list[] = $value;
                     continue;
                 }
+                $explode = explode('[object id:', $value, 2);
+                if(count($explode) == 2){
+                    $jid = explode(']', end($explode), 2);
+                    if(count($jid) == 2){
+                        $jid = array_shift($jid);
+                        $list[] = $this->data($this->random() . '.Parser.Control.Object.list.' . $jid);
+                        continue;
+                    }
+                }
                 $value = ltrim($value, ' '); //added
                 if(substr($value, 0, 1) == '\'' && substr($value, -1, 1) == '\''){
                     $value = substr($value, 1, -1);
@@ -661,6 +691,7 @@ class Parser extends Data {
                     continue;
                 }
                 $arg = trim($value);
+                /*
                 if(substr($arg, 0, 1) == '{'){
                     $count_plus = substr_count($value, '{');
                     $count_min = substr_count($value, '}');
@@ -668,7 +699,9 @@ class Parser extends Data {
                     $object = array();
                     $object[$key] = $value;
                 }
+                */
                 //test array with 1 value for same bug
+                /*
                 if(substr($arg, -1, 1) == '}' && !empty($object)){
                     $count_plus = substr_count($value, '{');
                     $count_min = substr_count($value, '}');
@@ -687,6 +720,7 @@ class Parser extends Data {
                     }
                     continue;
                 }
+                */
                 if(strpos($arg, '[') === 0){
                     $array = array();
                     $array[$key] = $value;
@@ -730,22 +764,19 @@ class Parser extends Data {
                 }
                 if(!empty($array)){
                     $array[$key] = $value;
-                }
-                elseif(!empty($object)){
-                    $count_plus = substr_count($value, '{');
-                    $count_min = substr_count($value, '}');
-                    $counter = $counter + ($count_plus - $count_min);
-
-                    $object[$key] = $value;
                 } else {
                     $list[] = $value;
                 }
             }
             if(!empty($array)){
-                $list[] = implode(',', $array);
-            }
-            if(!empty($object)){
-                $list[] = implode(',', $object);
+                $json = implode(",", $array);
+                $json = str_replace('\"', '"', $json);
+                $decode = json_decode($json);
+                if(is_object($decode)){
+                    $list[] = $decode;
+                } else {
+                    $list[] = $json;
+                }
             }
             $function[$function_key]['argumentList'] = $list;
             $methodList[$statement][] = $function;
@@ -754,6 +785,25 @@ class Parser extends Data {
 //             $this->debug($methodList, true);
         }
         return $methodList;
+    }
+
+    private function createObjectList($arguments=''){
+
+        $explode = explode('{object}', $arguments, 2);
+        if(count($explode) == 2){
+            $json= explode('{/object}', end($explode), 2);
+            $json= array_shift($json);
+            $object = json_decode($json);
+
+            $jid = $this->jid($this->random() . '.Parser.Control.Object.list');
+
+            $this->data($this->random() . '.Parser.Control.Object.list.' . $jid, $object);
+            $arguments = str_replace('{object}', '[object id:'. $jid . ']', $arguments);
+            $arguments = str_replace('{/object}', '[/object id:'. $jid . ']', $arguments);
+            $arguments = str_replace($json, '', $arguments);
+            $arguments = $this->createObjectList($arguments);
+        }
+        return $arguments;
     }
 
     private function attributeList($string=''){

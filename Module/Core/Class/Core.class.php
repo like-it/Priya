@@ -12,10 +12,12 @@ namespace Priya\Module;
 use stdClass;
 use Priya\Application;
 use Priya\Module\Core\Object;
+use Priya\Module\Core\Cli;
 
 class Core {
     use Core\Object;
 
+    private $cwd;
     private $mail;
     private $handler;
     private $route;
@@ -42,6 +44,9 @@ class Core {
 
 
     public static function handler_error($number, $message, $file='', $line=null, $context=array()){
+        if($number == 2){
+            return;
+        }
         $error = array();
         $error['number'] = $number;
         $error['message'] = $message;
@@ -141,6 +146,13 @@ class Core {
             }
             return false;
         }
+    }
+
+    protected function cwd($cwd=''){
+        if(!empty($cwd)){
+            $this->cwd = $cwd;
+        }
+        return $this->cwd;
     }
 
     public function csrf(){
@@ -652,37 +664,42 @@ class Core {
         if($this->handler()->contentType() == Handler::CONTENT_TYPE_JSON){
             echo $this->object($output, 'json');
         } else {
-            $cols = 60;
-            echo PHP_EOL;
-            if(
-                is_string($output) &&
-                in_array($output, array(
-                    '***',
-                    '!!!',
-                    '---',
-                    '+++',
-                    '___',
-                    '===',
-                    '^^^',
-                    '$$$',
-                    '###',
-                    '@@@',
-                    '%%%',
-                    '&&&'
-                ))
-            ){
-                $char = substr($output, 0, 1);
-                for($i=0; $i< $cols; $i++){
-                    echo $char;
+            if($this->handler()->method() == Handler::METHOD_CLI){
+                $cli = new Cli();
+                $cols = $cli->tput('columns');
+                $rows = $cli->tput('rows');
+
+                echo PHP_EOL;
+                if(
+                        is_string($output) &&
+                        in_array($output, array(
+                                '***',
+                                '!!!',
+                                '---',
+                                '+++',
+                                '___',
+                                '===',
+                                '^^^',
+                                '$$$',
+                                '###',
+                                '@@@',
+                                '%%%',
+                                '&&&'
+                        ))
+                        ){
+                            $char = substr($output, 0, 1);
+                            for($i=0; $i< $cols; $i++){
+                                echo $char;
+                            }
+                            return;
+                } else {
+                    $char = '_';
+                    for($i=0; $i< $cols; $i++){
+                        echo $char;
+                    }
                 }
-                return;
-            } else {
-                $char = '_';
-                for($i=0; $i< $cols; $i++){
-                    echo $char;
-                }
+                echo PHP_EOL;
             }
-            echo PHP_EOL;
             if(empty($isExport)){
                 var_dump($output);
             } else {

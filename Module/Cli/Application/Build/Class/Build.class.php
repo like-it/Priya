@@ -24,7 +24,7 @@ class Build extends Cli {
         $this->request('package', $this->parameter(2));
         $this->request('target', $this->parameter(3));
 
-        if(empty($this->request('package'))){
+        while(empty($this->request('package'))){
             $this->request('package', $this->read('input', 'Package: '));
         }
         while(file_exists($this->request('package')) === false){

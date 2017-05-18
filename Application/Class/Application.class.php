@@ -33,12 +33,11 @@ class Application extends Parser {
     const ROUTE = 'Route.json';
     const CREDENTIAL = 'Credential.json';
 
-    private $cwd;
-
     public function __construct($autoload=null, $data=null){
-        $this->cwd = getcwd();
+        $this->cwd(getcwd());
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
+        $this->data('time.start', microtime(true));
         $this->data('environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.ds', Application::DS);
@@ -56,7 +55,8 @@ class Application extends Parser {
         );
         $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG);
         $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM);
-        $this->data($this->object($data));
+
+        $this->data($this->object_merge($this->data(),$this->object($data)));
         $this->cli();
         if(empty($this->data('dir.priya.root'))){
             $this->data('dir.priya.root',
@@ -136,6 +136,8 @@ class Application extends Parser {
             $this->handler(),
             clone $this->data()
         ));
+        $this->route()->create('Application.Version');
+        $this->route()->create('Application.Locate');
         $this->route()->create('Application.Config');
         $this->route()->create('Application.Help');
         $this->route()->create('Application.Error');
@@ -145,6 +147,7 @@ class Application extends Parser {
         $this->route()->create('Application.Push');
         $this->route()->create('Application.Build');
         $this->route()->create('Application.Install');
+        $this->route()->create('Application.Parser');
         $this->route()->create('Test');
         $this->route()->create('Application.Cache.Clear');
     }
@@ -152,7 +155,7 @@ class Application extends Parser {
     public function run(){
         chdir($this->data('dir.priya.application'));
         $request = $this->request('request');
-        if($request ===  $this->data('parser.request')){
+        if($request ===  $this->data('parser.request') && $request !== null){
             trigger_error('cannot route to SELF', E_USER_ERROR);
         }
         $url = $this->handler()->url();
@@ -167,6 +170,7 @@ class Application extends Parser {
         $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
         $allowed_contentType = $this->data('contentType');
         if(isset($allowed_contentType->{$ext})){
+            $result = null;
             $contentType = $allowed_contentType->{$ext};
             if(file_exists($url) && strstr(strtolower($url), strtolower($this->data('public_html'))) !== false){
                 if(!headers_sent()){
@@ -181,11 +185,15 @@ class Application extends Parser {
                     $data->read($read);
                     $parser = new Parser();
                     $file = new File();
-                    return $parser->data('object')->compile($file->read($url), $data->data());
+                    $result = $parser->data('object')->compile($file->read($url), $data->data());
                 } else {
                     $file = new File();
-                    return $file->read($url);
+                    $result = $file->read($url);
                 }
+            }
+            if($result !== null){
+                chdir($this->cwd());
+                return $result;
             }
         }
         if(!headers_sent()){
@@ -280,7 +288,7 @@ class Application extends Parser {
         } else {
 //          404
         }
-        chdir($this->cwd);  //for Parser
+        chdir($this->cwd());  //for Parser
         return $result;
     }
 

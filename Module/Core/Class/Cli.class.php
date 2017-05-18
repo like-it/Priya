@@ -14,10 +14,30 @@ class Cli extends Result {
         parent::__construct($handler, $route, $data);
     }
 
+    public function tput($tput=''){
+        switch(strtolower($tput)){
+            case 'rows':
+                $tput = 'lines';
+                break;
+            case 'columns':
+                $tput = 'cols';
+            break;
+            case 'default':
+                $tput  = 'sgr0';
+            break;
+        }
+        ob_start();
+        $result = system('tput ' . $tput);
+        ob_end_clean();
+        return $result;
+    }
+
     public function color($color='', $background=''){
+        ob_flush();
         if(!empty($color) || ($color === 0 || $color ==  '0')){
             if($color == 'reset'){
                 echo "\e[0m";
+//                 echo "\007";
             } else {
                 echo "\e[38;5;" . intval($color) . 'm';
             }
@@ -43,6 +63,7 @@ class Cli extends Result {
     }
 
     public function read($url='', $text='', $read=''){
+        ob_flush();
         if($url=='input'){
             readline_completion_function(array($this, 'complete'));
 //             $this->color('reset');
@@ -52,6 +73,7 @@ class Cli extends Result {
         }
         elseif($url=='input-hidden'){
             echo $text;
+            ob_flush();
             system('stty -echo');
             $input = trim(fgets(STDIN));
             system('stty echo');
@@ -71,11 +93,24 @@ class Cli extends Result {
             }
             echo $text;
             $this->color('reset');
+            ob_flush();
         } else {
             return parent::write($url);
         }
     }
 
+    public function input($text='', $hidden=false, $timout=false){
+        if(empty($hidden)){
+            return $this->read('input', $text, $timout);
+        } else {
+            return $this->read('input-hidden', $text, $timout);
+        }
+    }
+
+    public function output($text='', $class=''){
+        return $this->write('output', $text, $class);
+
+    }
 
     public function complete($text=''){
         if(empty($text)){

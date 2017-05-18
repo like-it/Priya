@@ -19,6 +19,8 @@ class Autoload{
     const EXT_CLASS_PHP = 'class.php';
     const EXT_TRAIT_PHP = 'trait.php';
 
+    private $expose;
+
     public $prefixList = array();
     public $environment = 'production';
 
@@ -183,7 +185,7 @@ class Autoload{
                     ));
                     $item['dirName'] = dirname($item['file']);
                     $fileList = $this->fileList($item);
-                    if(is_array($fileList)){
+                    if(is_array($fileList) && empty($this->expose())){
                         foreach($fileList as $nr => $file){
                             if(file_exists($file)){
                                 return $file;
@@ -194,14 +196,20 @@ class Autoload{
                 }
             }
         }
-        if($this->environment()=='development'){
+        if($this->environment()=='development' || !empty($this->expose())){
             $object = new stdClass();
-            $object->{'Priya\Module\Exception\Error'} = $list;
+            $attribute = 'Priya\Module\Exception\Error';
+            if(!empty($this->expose())){
+                $attribute = $load;
+            }
+            $object->{$attribute} = $list;
             echo json_encode($object, JSON_PRETTY_PRINT);
             if(ob_get_level() !== 0){
                 ob_flush();
             }
-            die;
+            if(empty($this->expose())){
+                die;
+            }
         }
         return false;
     }
@@ -216,5 +224,12 @@ class Autoload{
             $filename = implode($ext, $filename);
         }
         return $filename;
+    }
+
+    public function expose($expose=null){
+        if(!empty($expose) || $expose === false){
+            $this->expose = (bool) $expose;
+        }
+        return $this->expose;
     }
 }
