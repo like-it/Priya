@@ -7,7 +7,7 @@
  * 	-	all
  */
 
-function modifier_dir_name($value=null, $argumentList=array()){
+function modifier_dirname($value=null, $argumentList=array()){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }

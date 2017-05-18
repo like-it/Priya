@@ -44,6 +44,9 @@ class Core {
 
 
     public static function handler_error($number, $message, $file='', $line=null, $context=array()){
+        if($number == 2){
+            return;
+        }
         $error = array();
         $error['number'] = $number;
         $error['message'] = $message;
