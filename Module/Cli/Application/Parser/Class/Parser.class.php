@@ -64,6 +64,7 @@ class Parser extends Cli {
                 if($node->type != 'file'){
                     continue;
                 }
+                $this->output(lcfirst(str_ireplace(array('control.', 'function.', 'modifier.', '.php'), '', $node->name)) . PHP_EOL);
                 $tmp = $file->read($node->url);
                 $tmp = str_replace('<?php', '', $tmp);
                 $write .= $tmp;
