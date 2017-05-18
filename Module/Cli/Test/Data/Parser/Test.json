@@ -1,6 +1,8 @@
 {
 "title": "Test.Parser.Control.Test",
 "test" : {
+    "control_test_35" : "{input(prompt: )}",
+    "start" : "{time(true)}",
     "version" : "{$version}",
     "patch" : "{$patch}",
     "boolean" : true,
@@ -58,7 +60,6 @@
     "control_test_32" : "{cookie(PHPSESSID, {$test.control_test_31})}",
     "control_test_33" : "{cookie(DATE, {$test.control_test_25})}",
     "control_test_34" : "{cookie()}",
-    "control_test_35" : "{input(prompt: )}",
     "control_test_36" : "{$test.control_test_35}",
     "control_test_37" : "{output(,hide)}",
     "control_test_38" : "{route(indent)}",
@@ -87,13 +88,15 @@
     "control_test_61" : "{str_reverse('dlrow olleh')}",
     "control_test_997" : "Memory: {memory_usage(MB)}",
     "control_test_998" : "Memory: {memory_usage('MB')}",
-    "control_test_999" : "Memory: {memory_usage(\"MB\")}"
+    "control_test_999" : "Memory: {memory_usage(\"MB\")}",
+    "end": "{time(true)}"
 },
 "note" : {
     "notes" : "U can note down false test results",
     "control_test_4" : "use parameter user & password to validate",
     "control_test_22" : "Time will tell...",
-    "control_test_997" : "Memory can only be compared to itself"
+    "control_test_997" : "Memory can only be compared to itself",
+    "end" : "{$test.start}"
 },
 "output" : {
     "version" : "{$version}",
@@ -185,6 +188,8 @@
     "control_test_61" : "hello world",
     "control_test_997" : "{$test.control_test_997}",
     "control_test_998" : "{$test.control_test_998}",
-    "control_test_999" : "{$test.control_test_999}"
+    "control_test_999" : "{$test.control_test_999}",
+    "start" : "{$test.start}",
+    "end" : "{time(true)}"
 }
 }
