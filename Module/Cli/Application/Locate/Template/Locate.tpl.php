@@ -16,7 +16,7 @@ $this->autoload()->expose(true);
 $route = $this->route()->route($this->parameter(2));
 
 if(empty($route)){
-    $this->autoload()->locate($this->parameter(2));
+    $this->autoload()->locate(ucfirst($this->parameter(2)));
 } else {
     $this->autoload()->locate($route);
 }
