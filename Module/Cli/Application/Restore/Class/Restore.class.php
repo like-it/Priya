@@ -307,11 +307,14 @@ class Restore extends Cli {
             if($write !== false){
                 chmod($node->url, File::CHMOD);
                 touch($node->url, $stats['mtime']);
+            } else {
+                $error[] = $file;
             }
             $this->output($node->url . PHP_EOL);
             $count++;
         }
         $this->output('Total files extracted: ' . $count . PHP_EOL);
         $this->output('Total files skipped: ' . $skip . PHP_EOL);
+        $this->output('Error(s): ' . count($error) . PHP_EOL);
     }
 }
