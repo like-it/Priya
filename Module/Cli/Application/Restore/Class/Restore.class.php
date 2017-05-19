@@ -167,7 +167,7 @@ class Restore extends Cli {
                 $node->mtime = filemtime($node->url);
             }
             $this->data('nodeList', $read);
-            $this->sort('nodeList', 'mtime', 'DESC');
+            $this->data('object')->sort('nodeList', 'mtime', 'DESC');
         }
         return $this->data('nodeList');
     }

@@ -26,6 +26,7 @@ class Application extends Parser {
     const BACKUP = 'Backup';
     const RESTORE = 'Restore';
     const UPDATE = 'Update';
+    const VENDOR = 'Vendor';
     const TEMP = 'Temp';
     const PUBLIC_HTML = 'Public';
     const CONFIG = 'Config.json';
@@ -49,10 +50,18 @@ class Application extends Parser {
             dirname(dirname($this->data('dir.priya.application'))) .
             Application::DS
         );
-        $this->data('dir.root',
-            dirname($this->data('dir.vendor')) .
-            Application::DS
-        );
+        if(stristr($this->data('dir.vendor'), Application::VENDOR) === false){
+            $this->data('dir.vendor',
+                dirname($this->data('dir.priya.application')) .
+                Application::DS
+            );
+            $this->data('dir.root', $this->data('dir.vendor'));
+        } else {
+            $this->data('dir.root',
+                dirname($this->data('dir.vendor')) .
+                Application::DS
+            );
+        }
         $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG);
         $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM);
 
