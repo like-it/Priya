@@ -299,6 +299,14 @@ class Restore extends Cli {
                     }
                 }
             }
+            $dir = dirname($node->url);
+            if(file_exists($dir) && !is_dir($dir)){
+                unlink($dir);
+                mkdir($dir, Dir::CHMOD, true);
+            }
+            if(file_exists($dir) === false){
+                mkdir($dir, Dir::CHMOD, true);
+            }
             if(file_exists($node->url)){
                 unlink($node->url);
             }
