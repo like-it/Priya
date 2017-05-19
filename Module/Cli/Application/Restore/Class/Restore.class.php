@@ -256,6 +256,7 @@ class Restore extends Cli {
         $path = rtrim(str_replace(array('\\', '/'), '/', $path), '/') . '/';
         $zip = new ZipArchive();
         $zip->open($url);
+        $this->output('Reading zip-archive:' . PHP_EOL);
         $dirList = array();
         $fileList = array();
         for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -275,13 +276,18 @@ class Restore extends Cli {
                 $fileList[] = $node;
             }
         }
+        $this->output('Files found: ' . count($fileList) . PHP_EOL);
+        $this->output('Directories found: ' . count($dirList) . PHP_EOL);
+        $this->output('Creating directories...' . PHP_EOL);
         foreach($dirList as $dir){
             if(is_dir($dir->url) === false){
                 mkdir($dir->url, Dir::CHMOD, true);
             }
         }
         $skip = 0;
+        $count = 0;
         $error = array();
+        $this->output('Extracting files...' . PHP_EOL);
         foreach($fileList as $node){
             $stats = $zip->statIndex($node->index);
             if(!empty($update)){
@@ -302,7 +308,10 @@ class Restore extends Cli {
                 chmod($node->url, File::CHMOD);
                 touch($node->url, $stats['mtime']);
             }
+            $this->output($node->url . PHP_EOL);
+            $count++;
         }
-        echo 'skipped: ' . $skip . PHP_EOL;
+        $this->output('Total files extracted: ' . $count . PHP_EOL);
+        $this->output('Total files skipped: ' . $skip . PHP_EOL);
     }
 }
