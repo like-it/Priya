@@ -666,20 +666,21 @@ class Parser extends Data {
             $arguments = str_replace('[quote]', '', $arguments);
             $arguments = $this->createObjectList($arguments);
             $args = str_getcsv($arguments); //to handle quotes
+            $this->debug($args);
             $array = false;
             $object = false;
             $counter = 0;
             $list = array();
             foreach($args  as $key => $value){
-                if($value === null){
+                if($value === null && !is_array($array)){
                     $list[] = $value;
                     continue;
                 }
-                elseif($value === true){
+                elseif($value === true && !is_array($array)){
                     $list[] = $value;
                     continue;
                 }
-                elseif($value === false){
+                elseif($value === false && !is_array($array)){
                     $list[] = $value;
                     continue;
                 }
@@ -697,44 +698,16 @@ class Parser extends Data {
                     $value = substr($value, 1, -1);
                 }
                 $value = str_replace('\\\'', '\'', $value);
-                if(is_numeric($value)){
+                if(is_numeric($value) && !is_array($array)){
                     $list[] = $value + 0;
                     continue;
                 }
                 $arg = trim($value);
-                /*
-                if(substr($arg, 0, 1) == '{'){
-                    $count_plus = substr_count($value, '{');
-                    $count_min = substr_count($value, '}');
-                    $counter = $count_plus - $count_min;
-                    $object = array();
-                    $object[$key] = $value;
-                }
-                */
-                //test array with 1 value for same bug
-                /*
-                if(substr($arg, -1, 1) == '}' && !empty($object)){
-                    $count_plus = substr_count($value, '{');
-                    $count_min = substr_count($value, '}');
-                    $counter = $counter + ($count_plus - $count_min);
-                    $object[$key] = $value;
-                    if($counter === 0){
-                        $json = implode(",", $object);
-                        $json = str_replace('\"', '"', $json);
-                        $decode = json_decode($json);
-                        if(is_object($decode)){
-                            $list[] = $decode;
-                        } else {
-                            $list[] = $json;
-                        }
-                        $object = array();
-                    }
-                    continue;
-                }
-                */
                 if(strpos($arg, '[') === 0){
                     $array = array();
-                    $array[$key] = $value;
+                    $explode = explode('[', $value, 2);
+                    $explode = explode(']', end($explode), 2);
+                    $array[$key] = reset($explode);
                     continue;
                 }
                 if(strpos($arg, 'array(') === 0){
@@ -744,7 +717,8 @@ class Parser extends Data {
                         $array[$key] = $value;
                         continue;
                     } else {
-                        $val = end($val);
+                        $val = explode(')', end($val), 2);
+                        $val = reset($val);
                         if(in_array(substr($val, 0, 1), array('"', '\'')) && in_array(substr($val, -1, 1), array('"', '\''))){
                             $value = substr($val, 1, -1);
                         } else {
@@ -756,7 +730,8 @@ class Parser extends Data {
                 }
                 $arg = strrev($arg);
                 if(strpos($arg, ']') === 0 && !empty($array)){
-                    $array[$key] = $value;
+                    $explode = explode(']', $value, 2);
+                    $array[$key] = reset($explode);
                     $list[] = $array; //implode(',', $array);
                     $array = false;
                     continue;

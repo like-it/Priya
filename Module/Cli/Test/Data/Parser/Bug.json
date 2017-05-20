@@ -9,6 +9,8 @@
         },
         "beer" : true
     },
+    "control_math_test_24" : "{math.max(array(1,2,3))}",
+    "control_math_test_25" : "{math.max(1,6,8,4,9,88,,7,5,666)}",
     "control_math_test_1" : "{math.hex2bin('FF')}",
     "control_test_997" : "Memory: {memory.usage(MB)}",
     "control_test_998" : "Memory: {memory.usage('MB')}",
