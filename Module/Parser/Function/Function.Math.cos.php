@@ -8,10 +8,10 @@
  * 	-	all
  */
 
-function function_isset($value=null, $argumentList=array(), $parser=null){
+function function_math_cos($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $argument = reset($argumentList);
-    return isset($argument);
+    $float = array_shift($argumentList);
+    return cos($float);
 }

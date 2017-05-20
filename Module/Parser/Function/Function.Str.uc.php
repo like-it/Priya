@@ -8,10 +8,10 @@
  * 	-	all
  */
 
-function function_isset($value=null, $argumentList=array(), $parser=null){
+function function_str_uc($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $argument = reset($argumentList);
-    return isset($argument);
+    $string = array_shift($argumentList);
+    return strtoupper($string);
 }

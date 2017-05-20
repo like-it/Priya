@@ -391,7 +391,7 @@ class Parser extends Data {
                     }
                     $function = $method['function'];
                     $url = $dir . 'Function.' . ucfirst(strtolower($function)) . '.php';
-                    $function = 'function_' . $function;
+                    $function = 'function_' . str_replace('.', '_', $function);
 
                     if(function_exists($function) === false){
                         if(file_exists($dir . Parser::FUNCTION_LIST)){
@@ -453,7 +453,15 @@ class Parser extends Data {
                     if(is_object($replace) || is_array($replace)){
                         $replace = $this->object($replace, 'json-line');
                     }
-                    $string = str_replace($search, $replace, $string);
+                    $string = str_replace($search, $replace, $string, $is_replace);
+                    /*
+                    if(empty($is_replace)){
+                        $before= explode('(', $search, 2);
+                        $before[0] = str_replace('_', '.', $before[0]);
+                        $search = implode('(', $before);
+                        $string = str_replace($search, $replace, $string, $is_replace);
+                    }
+                    */
                     $before = explode('(', $search, 2);
                     $count = substr_count($before[0], '!');
                     for($i=0; $i < $count; $i++){
@@ -643,6 +651,9 @@ class Parser extends Data {
                 continue; //contains statement
             }
             $func = ltrim($func, '{!');
+
+//             $function_key = str_replace('.', '_', $function_key);
+//             $func = str_replace('.', '_', ltrim($func, '{!'));
             $function[$function_key]['function'] = $func;
 
             $tmp = explode($function[$function_key]['function'], $function_key, 2);
@@ -931,7 +942,8 @@ class Parser extends Data {
             var_dump('(Parser) modifier (' . $modifier . ') not found');
             return $value;
         }
-        $function = 'modifier_' . $modifier;
+        $function = 'modifier_' . str_replace('.', '_', $modifier);
+//         $function = 'modifier_' . $modifier;
         if(function_exists($function) === false){
             //trigger error?
             return $value;
