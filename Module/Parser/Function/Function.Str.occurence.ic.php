@@ -8,7 +8,7 @@
  * 	-	all
  */
 
-function function_str_ic_occurence($value=null, $argumentList=array(), $parser=null){
+function function_str_occurence_ic($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }

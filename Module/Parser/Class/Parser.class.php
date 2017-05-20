@@ -666,7 +666,6 @@ class Parser extends Data {
             $arguments = str_replace('[quote]', '', $arguments);
             $arguments = $this->createObjectList($arguments);
             $args = str_getcsv($arguments); //to handle quotes
-            $this->debug($args);
             $array = false;
             $object = false;
             $counter = 0;

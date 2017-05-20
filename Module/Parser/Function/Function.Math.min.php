@@ -8,7 +8,7 @@
  * 	-	all
  */
 
-function function_math_max($value=null, $argumentList=array(), $parser=null){
+function function_math_min($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
@@ -17,5 +17,5 @@ function function_math_max($value=null, $argumentList=array(), $parser=null){
         array_unshift($argumentList, $array);
         $array = $argumentList;
     }
-    return max($array);
+    return min($array);
 }
