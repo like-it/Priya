@@ -108,6 +108,9 @@ class Cli extends Result {
     }
 
     public function output($text='', $class=''){
+        if(is_array($text) || is_object($text)){
+            $text = json_encode($text, JSON_PRETTY_PRINT);
+        }
         return $this->write('output', $text, $class);
 
     }
