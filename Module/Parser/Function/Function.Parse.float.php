@@ -8,13 +8,10 @@
  * 	-	all
  */
 
-function function_is_int($value=null, $argumentList=array(), $parser=null){
+function function_parse_float($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $int = array_shift($argumentList);
-    if(strtolower($int) == 'nan'){
-        $int= NAN;
-    }
-    return is_int($int);
+    $var = array_shift($argumentList);
+    return floatval($var);
 }

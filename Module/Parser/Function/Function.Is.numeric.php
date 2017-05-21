@@ -12,5 +12,9 @@ function function_is_numeric($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    return is_numeric(array_shift($argumentList));
+    $numeric = array_shift($argumentList);
+    if(strtolower($numeric) == 'nan'){
+        $numeric= NAN;
+    }
+    return is_numeric($numeric);
 }

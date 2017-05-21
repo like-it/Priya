@@ -8,10 +8,14 @@
  * 	-	all
  */
 
-function function_math_hex2bin($value=null, $argumentList=array(), $parser=null){
+function function_str_trim_left($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
     $string = array_shift($argumentList);
-    return base_convert($string, 16, 2);
+    $mask = array_shift($argumentList);
+    if($mask === null){
+        $mask = " \t\n\r\0\x0B";
+    }
+    return ltrim($string, $mask);
 }

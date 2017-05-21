@@ -8,13 +8,10 @@
  * 	-	all
  */
 
-function function_is_int($value=null, $argumentList=array(), $parser=null){
+function function_math_dec_bin($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $int = array_shift($argumentList);
-    if(strtolower($int) == 'nan'){
-        $int= NAN;
-    }
-    return is_int($int);
+    $string = array_shift($argumentList);
+    return base_convert($string, 10, 2);
 }

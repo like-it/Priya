@@ -12,5 +12,9 @@ function function_is_float($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    return is_float(array_shift($argumentList));
+    $float = array_shift($argumentList);
+    if(strtolower($float) == 'nan'){
+        $float= NAN;
+    }
+    return is_float($float);
 }

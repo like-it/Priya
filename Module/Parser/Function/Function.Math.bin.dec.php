@@ -8,10 +8,10 @@
  * 	-	all
  */
 
-function function_math_dec2bin($value=null, $argumentList=array(), $parser=null){
+function function_math_bin_dec($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
     $string = array_shift($argumentList);
-    return base_convert($string, 10, 2);
+    return base_convert($string, 2, 10);
 }

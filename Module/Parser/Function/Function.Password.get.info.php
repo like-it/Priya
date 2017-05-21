@@ -8,13 +8,10 @@
  * 	-	all
  */
 
-function function_is_int($value=null, $argumentList=array(), $parser=null){
+function function_password_get_info($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $int = array_shift($argumentList);
-    if(strtolower($int) == 'nan'){
-        $int= NAN;
-    }
-    return is_int($int);
+    $hash = array_shift($argumentList);
+    return password_get_info($hash);
 }

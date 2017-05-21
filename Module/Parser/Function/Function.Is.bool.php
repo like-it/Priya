@@ -8,10 +8,9 @@
  * 	-	all
  */
 
-function function_math_bin2hex($value=null, $argumentList=array(), $parser=null){
+function function_is_bool($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $string = array_shift($argumentList);
-    return base_convert($string, 2, 16);
+    return is_bool(array_shift($argumentList));
 }

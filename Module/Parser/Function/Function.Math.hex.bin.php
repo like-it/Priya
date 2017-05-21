@@ -8,10 +8,10 @@
  * 	-	all
  */
 
-function function_math_dec2hex($value=null, $argumentList=array(), $parser=null){
+function function_math_hex_bin($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
     $string = array_shift($argumentList);
-    return base_convert($string, 10, 16);
+    return base_convert($string, 16, 2);
 }
