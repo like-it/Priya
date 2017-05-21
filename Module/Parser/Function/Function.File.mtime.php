@@ -8,10 +8,10 @@
  * 	-	all
  */
 
-function function_file_exists($value=null, $argumentList=array(), $parser=null){
+function function_file_mtime($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $url = array_shift($argumentList);
-    return file_exists($url);
+    $url = reset($argumentList);
+    return filemtime($url);
 }

@@ -116,6 +116,13 @@ class Application extends Parser {
                 Application::DS
             );
         }
+        if(empty($this->data('dir.priya.public'))){
+            $this->data('dir.priya.public',
+                $this->data('dir.priya.root') .
+                Application::PUBLIC_HTML .
+                Application::DS
+           );
+        }
         $this->read($this->data('dir.data') . Application::CONFIG);
         if(empty($this->data('public_html'))){
             $this->data('public_html', Application::PUBLIC_HTML);

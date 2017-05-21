@@ -13,8 +13,5 @@ function function_is_nan($value=null, $argumentList=array(), $parser=null){
         $argumentList = (array) $argumentList;
     }
     $nan = array_shift($argumentList);
-    if(strtolower($nan) == 'nan'){
-        $nan = NAN;
-    }
     return is_nan($nan);
 }

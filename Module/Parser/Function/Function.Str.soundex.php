@@ -8,10 +8,10 @@
  * 	-	all
  */
 
-function function_file_exists($value=null, $argumentList=array(), $parser=null){
+function function_str_soundex($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $url = array_shift($argumentList);
-    return file_exists($url);
+    $string = array_shift($argumentList);
+    return soundex($string);
 }

@@ -683,6 +683,10 @@ class Parser extends Data {
                     $list[] = $value;
                     continue;
                 }
+                elseif(($value === NAN || strtoupper($value) == 'NAN') && !is_array($array)){
+                    $list[] = NAN;
+                    continue;
+                }
                 $explode = explode('[object id:', $value, 2);
                 if(count($explode) == 2){
                     $jid = explode(']', end($explode), 2);
