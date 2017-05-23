@@ -210,7 +210,7 @@
     "control_str_test_32" : "{str.slash.add.c({$test.control_str_test_30}, wasdgd)}",
     "control_file_test_9" : "{file.cache.clear())}",
     "control_file_test_10" : "{file.base.name({$dir.public}index.priya, '.priya')}",
-    "control_file_test_11" : "{file.link(testlink, {$dir.root})}",
+    "control_file_test_11" : "{file.link({$dir.module.data}Temp{$dir.ds}testlink, {$dir.root})}",
     "control_mem_test_1" : "Memory: {memory.usage(MB)}",
     "control_mem_test_2" : "Memory: {memory.usage('MB')}",
     "control_mem_test_3" : "Memory: {memory.usage(\"MB\")}",
