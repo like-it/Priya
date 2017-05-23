@@ -14,6 +14,12 @@ function function_file_link($value=null, $argumentList=array(), $parser=null){
     }
     $link = array_shift($argumentList);
     $target = array_shift($argumentList);
+    if(!file_exists($target)){
+        return false;
+    }
+    if(file_exists($link)){
+        return false;
+    }
     system('ln -s ' . escapeshellarg($target) . ' ' . escapeshellarg($link), $output);
     if(empty($output)){
         return true;

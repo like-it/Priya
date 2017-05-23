@@ -190,8 +190,6 @@ class Parser extends Data {
         $string = str_replace('{/object}', '', $string);
         $string = str_replace('[' . $this->random() . '[', '{', $string);
         $string = str_replace(']' . $this->random() . ']', '}', $string);
-        $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
-        $string = str_replace('{/' . Parser::LITERAL . '}', '' , $string);
         if($string === 'null'){
             $string = null;
         }
@@ -223,12 +221,18 @@ class Parser extends Data {
                 return $json;
             }
         }
-        if(substr($string, 0, 1) == '{' && substr($string, -1, 1) == '}'){
+        if(
+            substr($string, 0, 1) == '{' &&
+            substr($string, -1, 1) == '}' &&
+            substr($string, 0, (strlen(Parser::LITERAL)+2)) !== '{' . Parser::LITERAL . '}'
+        ){
             $json = json_decode($string);
             if(is_object($json)){
                 return $json;
             }
         }
+        $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
+        $string = str_replace('{/' . Parser::LITERAL . '}', '' , $string);
         return $string;
     }
 

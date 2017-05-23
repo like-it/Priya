@@ -18,8 +18,11 @@ function function_file_read($value=null, $argumentList=array(), $parser=null){
     if(strtoupper($encode) == 'BASE64_ENCODE'){
         $read = $file->read($url);
         return base64_encode($read);
+    }
+    elseif(strtoupper($encode) == 'LITERAL'){
+        $read = $file->read($url);
+        return '{literal}' . $read . '{/literal}';
     } else {
-
         return $file->read($url);
     }
 }
