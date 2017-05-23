@@ -14,6 +14,7 @@ use Priya\Module\Handler;
 use Priya\Module\Core\Parser;
 use Priya\Module\Core\Data;
 use Priya\Module\Core\Object;
+use Priya\Module\File\Dir;
 
 class Application extends Parser {
     const DS = DIRECTORY_SEPARATOR;
@@ -62,9 +63,14 @@ class Application extends Parser {
                 Application::DS
             );
         }
-        $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG);
-        $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM);
-
+        $url = dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG;
+        if(file_exists($url)){
+            $this->read($url);
+        }
+        $url = dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM;
+        if(file_exists($url)){
+            $this->read($url);
+        }
         $this->data($this->object_merge($this->data(),$this->object($data)));
         $this->cli();
         if(empty($this->data('dir.priya.root'))){
@@ -123,7 +129,11 @@ class Application extends Parser {
                 Application::DS
            );
         }
-        $this->read($this->data('dir.data') . Application::CONFIG);
+        $url = $this->data('dir.data') . Application::CONFIG;
+        if(file_exists($url)){
+            $this->read($url);
+        }
+
         if(empty($this->data('public_html'))){
             $this->data('public_html', Application::PUBLIC_HTML);
             $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);
