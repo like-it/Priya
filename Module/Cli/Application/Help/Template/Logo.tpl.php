@@ -27,7 +27,7 @@ if($rows > 50){
     $this->output('   ##            ##      ##     ##       ##       ##       ##  ' . PHP_EOL);
     $this->output('   ##            ##      ##    ##       ##        ##       ##  ' . PHP_EOL);
     $this->output('                                                               ' . PHP_EOL);
-    $this->output('   (c) 2015-'. date('Y') . ' Remco van der Velde                   ' . $this->data('version') . PHP_EOL);
+    $this->output('   (c) 2015-'. date('Y') . ' Remco van der Velde                   ' . $this->data('priya.version') . PHP_EOL);
     $this->output('                                                               ' . PHP_EOL);
     $this->output(str_repeat('-', $cols) . PHP_EOL);
 }

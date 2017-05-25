@@ -53,7 +53,7 @@ class Parser extends Cli {
             $write = array();
             $write[] = '<?php';
             $write[] = '/*';
-            $write[] = 'Priya ' . $this->data('version') . ' (built: ' . $this->data('built') . ')';
+            $write[] = 'Priya ' . $this->data('priya.version') . ' (built: ' . $this->data('priya.built') . ')';
             $write[] = 'Copyright (c) 2015-' . date('Y') . ' Remco van der Velde';
             $write[] = 'Generated File (do not modify) (built: ' . date('Y-m-d H:i:s') . ')';
             $write[] = '*/';

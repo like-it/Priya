@@ -421,7 +421,7 @@ class Result extends Parser {
         }
         $tpl->addPrefix($namespace, $directory, $extension);
 
-        $environment = $this->data('environment');
+        $environment = $this->data('priya.environment');
         if(!empty($environment)){
             $tpl->environment($environment);
         }

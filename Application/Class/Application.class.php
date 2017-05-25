@@ -40,7 +40,7 @@ class Application extends Parser {
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->data('time.start', microtime(true));
-        $this->data('environment', Application::ENVIRONMENT);
+        $this->data('priya.environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
         $this->data('dir.ds', Application::DS);
         $this->data('dir.priya.application',
@@ -148,7 +148,7 @@ class Application extends Parser {
             $autoload->addPrefix('Priya',  dirname(Application::DIR) . Application::DS);
             $autoload->register();
         }
-        $autoload->environment($this->data('environment'));
+        $autoload->environment($this->data('priya.environment'));
         $this->autoload($autoload);
         $this->autoload()->addPrefix('Vendor', $this->data('dir.vendor'));
 

@@ -18,6 +18,6 @@ if($this->error('package')){
     $this->write('output', 'File not found (' . $this->request('package') . ') ', 'style.package');
     $this->write('output', PHP_EOL);
 } else {
-    echo 'Build in "' .$this->request('target') . '" with version (' . $this->data('version') . ')' . PHP_EOL;
+    echo 'Build in "' .$this->request('target') . '" with version (' . $this->data('priya.version') . ')' . PHP_EOL;
 
 }

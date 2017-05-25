@@ -41,7 +41,7 @@ if($this->error() && $this->handler()->method() == Handler::METHOD_POST){
         echo 'Patch already exists, first pull the server... (cannot push to localhost)' . PHP_EOL;
     } else {
         if($this->data('step') == 'create'){
-            echo 'Creating restore point patch (' . $this->data('patch') . ') for version (' . $this->data('version') . ')...' . PHP_EOL;
+            echo 'Creating restore point patch (' . $this->data('priya.patch') . ') for version (' . $this->data('priya.version') . ')...' . PHP_EOL;
         }
         if($this->data('step') == 'push'){
             echo 'Uploading to the server (' . $this->data('server.url') . ')...' . PHP_EOL;
