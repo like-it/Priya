@@ -13,18 +13,72 @@ use Priya\Module\Core\Cli;
 use Priya\Module\File;
 use DOMDocument;
 use DOMXPath;
+use Priya\Application;
+use Priya\Module\File\Zip;
 
 class Update extends Cli {
     const DIR = __DIR__;
 
     public function run(){
-        $list = $this->createNode();
-        $this->debug($list);
+        $list = $this->createNodeList();
+        $wanted= $this->parameter('version');
+        $force = $this->parameter('force');
+        if(empty($wanted)){
+            $highest = $this->data('priya.version');
+            $update = false;
+            foreach($list as $version => $url){
+                $compare = version_compare($version, $highest, '==');
+                if($compare === true){
+                    $update = $url;
+                    break;
+                }
+            }
+            foreach($list as $version => $url){
+                $compare = version_compare($version, $highest, '>');
+                if($compare === true){
+                    $highest = $version;
+                    $update = $url;
+                }
+            }
+            if(version_compare($highest, $this->data('priya.version'), '==') && empty($force)){
+                $this->output('You are already on this version (' . $this->data('priya.version') . ')' . PHP_EOL);
+                $this->output('If you want to force this, use --force' . PHP_EOL);
+            } else {
+                $this->update($update);
+            }
+        } else {
+            if(version_compare($wanted, $this->data('priya.version'), '==') && empty($force)){
+                $this->output('You are already on this version (' . $this->data('priya.version') . ')' . PHP_EOL);
+                $this->output('If you want to force this, use --force' . PHP_EOL);
+            }
+            foreach($list as $version => $url){
+                $compare = version_compare($wanted, $version, '==');
+                if($compare === true){
+                    $this->update($url);
+                }
+            }
+        }
         return $this->result('cli');
     }
 
-    private function createNode(){
+    private function update($url=''){
         $file = new File();
+        $this->output('Downloading (' . $url .')...' . PHP_EOL);
+        $read = $file->read($url);
+        $archive = $this->data('dir.priya.update') . basename($url);
+        $file->write($archive, $read);
+        $this->output('Download complete.' . PHP_EOL);
+        $target = $this->data('dir.priya.root');
+        $zip = new Zip();
+        $this->output('Extracting archive....' . PHP_EOL);
+        $zip->extract($archive, $target);
+        $this->output('Extracting complete....' . PHP_EOL);
+
+    }
+
+    private function createNodeList(){
+        $file = new File();
+        $this->output('Reading releases...' . PHP_EOL);
         $read = $file->read('https://github.com/like-it/Priya/releases');
         $doc = new DOMDocument();
         $error = libxml_use_internal_errors(true);
