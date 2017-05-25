@@ -9,12 +9,13 @@
 
 namespace Priya\Module\Cli\Application;
 
-use Priya\Module\Core\Cli;
-use Priya\Module\File;
-use DOMDocument;
 use DOMXPath;
+use ZipArchive;
+use DOMDocument;
 use Priya\Application;
-use Priya\Module\File\Zip;
+use Priya\Module\File;
+use Priya\Module\File\Dir;
+use Priya\Module\Core\Cli;
 
 class Update extends Cli {
     const DIR = __DIR__;
@@ -69,12 +70,78 @@ class Update extends Cli {
         $file->write($archive, $read);
         $this->output('Download complete.' . PHP_EOL);
         $target = $this->data('dir.priya.root');
-        $zip = new Zip();
+        $this->extract($archive, $target, 'priya-' .basename($url, '.zip'));
         $this->output('Extracting archive....' . PHP_EOL);
-        $zip->extract($archive, $target);
+
         $this->output('Extracting complete....' . PHP_EOL);
 
     }
+
+    private function extract($archive='', $target='', $strip='', $update=false){
+        if(file_exists($archive) === false){
+            return false;
+        }
+        $target= rtrim(str_replace(array('\\', '/'), DIRECTORY_SEPARATOR, $target), '/\\') . DIRECTORY_SEPARATOR;
+        $zip = new ZipArchive();
+        $zip->open($archive);
+        $dirList = array();
+        $fileList = array();
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $node = new stdClass();
+            $node->name = $zip->getNameIndex($i);
+            if(substr($node->name, -1) == '/'){
+                $node->type = 'dir';
+            } else {
+                $node->type = 'file';
+            }
+            $node->index = $i;
+            $node->url = $target . str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, str_replace($strip, '', $node->name));
+            if($node->type == 'dir'){
+                $dirList[] = $node;
+            } else {
+                $fileList[] = $node;
+            }
+        }
+        foreach($dirList as $dir){
+            if(is_dir($dir->url) === false){
+                mkdir($dir->url, Dir::CHMOD, true);
+            }
+        }
+        $result = array();
+        foreach($fileList as $node){
+            $stats = $zip->statIndex($node->index);
+            if(!empty($update)){
+                if(file_exists($node->url)){
+                    $mtime = filemtime($node->url);
+                    if($stats['mtime'] <= $mtime){
+                        $result['skip'][] = $node->url;
+                        continue;
+                    }
+                }
+            }
+            $dir = dirname($node->url);
+            if(file_exists($dir) && !is_dir($dir)){
+                unlink($dir);
+                mkdir($dir, Dir::CHMOD, true);
+            }
+            if(file_exists($dir) === false){
+                mkdir($dir, Dir::CHMOD, true);
+            }
+            if(file_exists($node->url)){
+                unlink($node->url);
+            }
+            $file = new File();
+            $write = $file->write($node->url, $zip->getFromIndex($node->index));
+            if($write !== false){
+                chmod($node->url, File::CHMOD);
+                touch($node->url, $stats['mtime']);
+            } else {
+                $result['error'][] = $node->url;
+            }
+            $result['extract'][] = $node->url;
+        }
+    }
+
 
     private function createNodeList(){
         $file = new File();
