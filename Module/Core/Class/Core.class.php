@@ -143,6 +143,7 @@ class Core {
                     }
                     return true;
                 }
+                $value = null;
             }
             return false;
         }
