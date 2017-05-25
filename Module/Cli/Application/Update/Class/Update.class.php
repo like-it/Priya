@@ -9,6 +9,7 @@
 
 namespace Priya\Module\Cli\Application;
 
+use stdClass;
 use DOMXPath;
 use ZipArchive;
 use DOMDocument;
