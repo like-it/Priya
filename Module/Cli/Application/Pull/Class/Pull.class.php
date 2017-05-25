@@ -43,7 +43,7 @@ class Pull extends Cli {
             if ($this->permission('has', $this->permission('read'))){
                 header("Connection: Keep-alive");
                 $restore = new Restore($this->handler(), $this->route(), $this->data());
-                $file = $restore->create($this->data('version') . '.zip');
+                $file = $restore->create($this->data('priya.version') . '.zip');
                 if(file_exists($file)){
                     header("Content-Type: application/zip");
                     header("Content-Transfer-Encoding: Binary");
@@ -104,7 +104,7 @@ class Pull extends Cli {
             if(is_dir($this->data('dir.priya.update')) === false){
                 mkdir($this->data('dir.priya.update'), Dir::CHMOD, true);
             }
-            $url = $this->data('dir.priya.update') . $this->data('version') . '.zip';
+            $url = $this->data('dir.priya.update') . $this->data('priya.version') . '.zip';
             $file = new File();
             $file->write($url, $result);
             return $url;

@@ -24,17 +24,17 @@ class Push extends Cli {
         if($this->handler()->method() == Handler::METHOD_CLI){
             $data = new Data();
             $data->read($this->data('dir.data') . Application::CONFIG);
-            $major = $data->data('major') ? $data->data('major') : 0;
-            $minor = $data->data('minor') ? $data->data('minor') : 0;
-            $patch = $data->data('patch') ? $data->data('patch') : -1;
+            $major = $data->data('priya.major') ? $data->data('major') : 0;
+            $minor = $data->data('priya.minor') ? $data->data('minor') : 0;
+            $patch = $data->data('priya.patch') ? $data->data('patch') : -1;
             $patch++;
-            $this->data('major', $major);
-            $this->data('minor', $minor);
-            $this->data('patch', $patch);
-            $this->data('version', $this->data('major') . '.' . $this->data('minor') . '.' . $this->data('patch'));
-            $data->data('major', $major);
-            $data->data('minor', $minor);
-            $data->data('patch', $patch);
+            $this->data('priya.major', $major);
+            $this->data('priya.minor', $minor);
+            $this->data('priya.patch', $patch);
+            $this->data('priya.version', $this->data('priya.major') . '.' . $this->data('priya.minor') . '.' . $this->data('priya.patch'));
+            $data->data('priya.major', $major);
+            $data->data('priya.minor', $minor);
+            $data->data('priya.patch', $patch);
             $write = $data->write();
             if($write === false){
                 $this->error('patch', true);
@@ -101,7 +101,7 @@ class Push extends Cli {
             $this->error('server', true);
             return false;
         }
-        $filename = $this->data('version') . '.zip';
+        $filename = $this->data('priya.version') . '.zip';
         if(file_exists($this->data('dir.priya.restore') . $filename) === false){
             $this->error('point', true);
             return false;

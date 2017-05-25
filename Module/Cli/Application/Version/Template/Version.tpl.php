@@ -13,7 +13,7 @@ namespace Priya;
 
 $this->autoload()->expose(true);
 
-$version = 'Priya ' . $this->data('version') . ' (built: ' . $this->data('built').')' . PHP_EOL;
+$version = 'Priya ' . $this->data('priya.version') . ' (built: ' . $this->data('priya.built').')' . PHP_EOL;
 $copyright = 'Copyright (c) 2015-' . date('Y') . ' Remco van der Velde' . PHP_EOL;
 $php = 'PHP ' . PHP_VERSION . ' Copyright (c) The PHP Group' . PHP_EOL;
 

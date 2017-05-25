@@ -11,7 +11,7 @@
 
 namespace Priya;
 
-echo "\t" . 'Version: ' . $this->data('version') . PHP_EOL;
+echo "\t" . 'Version: ' . $this->data('priya.version') . PHP_EOL;
 echo "\t" . 'Options:' . PHP_EOL;
 echo "\t" . 'test all                   (testing all available tests)' . PHP_EOL;
 echo "\t" . 'test parser                (testing parser)' . PHP_EOL;

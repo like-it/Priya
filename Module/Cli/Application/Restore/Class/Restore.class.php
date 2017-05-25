@@ -48,7 +48,7 @@ class Restore extends Cli {
 
     public function create($filename=''){
         if(empty($filename)){
-            $version = $this->data('version');
+            $version = $this->data('priya.version');
             if(empty($version)){
                 return false;
             }
