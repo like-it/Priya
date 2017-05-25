@@ -18,6 +18,6 @@
     "version": "{$major|default:0}.{$minor|default:0}.{$patch|default:0}",
     "major": 0,
     "minor": 1,
-    "patch": 18,
-    "built": "2017-05-18 23:26:21"
+    "patch": 19,
+    "built": "2017-05-25 12:16:12"
 }
