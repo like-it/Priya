@@ -52,6 +52,14 @@ class File {
         return implode('',file($url));
     }
 
+    public function copy($source='', $destination=''){
+        return copy($source, $destination);
+    }
+
+    public function delete($url=''){
+        return unlink($url);
+    }
+
     public function extension($url=''){
         $ext = explode('.', $url);
         if(count($ext)==1){

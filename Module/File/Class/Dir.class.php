@@ -16,6 +16,21 @@ class Dir {
 
     private $node;
 
+    public static function create($url='', $chmod=''){
+        if(file_exists($url) && !is_dir($url)){
+            unlink($url);
+        }
+        elseif(file_exists($url) && is_dir($url)){
+            return true;
+        } else {
+            if(empty($chmod)){
+                return mkdir($url, DIR::CHMOD, true);
+            } else {
+                return mkdir($url, $chmod, true);
+            }
+        }
+    }
+
     public function ignore($ignore=null, $attribute=null){
         $node = $this->node();
         if(!isset($node)){

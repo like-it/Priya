@@ -14,6 +14,7 @@ use Priya\Module\Handler;
 use Priya\Module\Core\Parser;
 use Priya\Module\Core\Data;
 use Priya\Module\Core\Object;
+use Priya\Module\File\Dir;
 
 class Application extends Parser {
     const DS = DIRECTORY_SEPARATOR;
@@ -26,6 +27,7 @@ class Application extends Parser {
     const BACKUP = 'Backup';
     const RESTORE = 'Restore';
     const UPDATE = 'Update';
+    const VENDOR = 'Vendor';
     const TEMP = 'Temp';
     const PUBLIC_HTML = 'Public';
     const CONFIG = 'Config.json';
@@ -49,13 +51,26 @@ class Application extends Parser {
             dirname(dirname($this->data('dir.priya.application'))) .
             Application::DS
         );
-        $this->data('dir.root',
-            dirname($this->data('dir.vendor')) .
-            Application::DS
-        );
-        $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG);
-        $this->read(dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM);
-
+        if(stristr($this->data('dir.vendor'), Application::VENDOR) === false){
+            $this->data('dir.vendor',
+                dirname($this->data('dir.priya.application')) .
+                Application::DS
+            );
+            $this->data('dir.root', $this->data('dir.vendor'));
+        } else {
+            $this->data('dir.root',
+                dirname($this->data('dir.vendor')) .
+                Application::DS
+            );
+        }
+        $url = dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG;
+        if(file_exists($url)){
+            $this->read($url);
+        }
+        $url = dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM;
+        if(file_exists($url)){
+            $this->read($url);
+        }
         $this->data($this->object_merge($this->data(),$this->object($data)));
         $this->cli();
         if(empty($this->data('dir.priya.root'))){
@@ -107,7 +122,18 @@ class Application extends Parser {
                 Application::DS
             );
         }
-        $this->read($this->data('dir.data') . Application::CONFIG);
+        if(empty($this->data('dir.priya.public'))){
+            $this->data('dir.priya.public',
+                $this->data('dir.priya.root') .
+                Application::PUBLIC_HTML .
+                Application::DS
+           );
+        }
+        $url = $this->data('dir.data') . Application::CONFIG;
+        if(file_exists($url)){
+            $this->read($url);
+        }
+
         if(empty($this->data('public_html'))){
             $this->data('public_html', Application::PUBLIC_HTML);
             $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);
@@ -147,9 +173,12 @@ class Application extends Parser {
         $this->route()->create('Application.Push');
         $this->route()->create('Application.Build');
         $this->route()->create('Application.Install');
+        $this->route()->create('Application.Update');
         $this->route()->create('Application.Parser');
-        $this->route()->create('Test');
+        $this->route()->create('Application.Sdl');
+        $this->route()->create('Application.Gui');
         $this->route()->create('Application.Cache.Clear');
+        $this->route()->create('Test');
     }
 
     public function run(){

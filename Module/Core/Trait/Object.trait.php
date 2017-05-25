@@ -61,10 +61,10 @@ trait Object {
         $result = array();
         if(is_array($delimiter)){
             foreach($delimiter as $nr => $delim){
-                $tmp = $this->explode_single($delim, $string, $result);
-                if(count($tmp)==1){
-                    continue;
+                if(strpos($string, $delim) === false){
+                    continue; //speed... & always >=2
                 }
+                $tmp = $this->explode_single($delim, $string, $result);
                 foreach ($tmp as $tmp_nr => $tmp_value){
                     $result[] = $tmp_value;
                 }
@@ -73,10 +73,10 @@ trait Object {
             foreach ($result as $nr => $part){
                 $splitted = false;
                 foreach ($delimiter as $delim){
-                    $tmp = explode($delim, $part);
-                    if(count($tmp) == 1){
-                        continue;
+                    if(strpos($part, $delim) === false){
+                        continue; //speed... & always >=2
                     }
+                    $tmp = explode($delim, $part);
                     $splitted = true;
                     foreach($tmp as $part_splitted){
                         $list[$part_splitted][] = $part_splitted;
