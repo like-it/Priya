@@ -29,7 +29,7 @@ $this->data('module.' . $jid . '.name', 'sdl');
 // $url = $this->data('dir.module.data') . 'claxon.wav';
 //audio($url);
 
-$url = $this->data('dir.public') . 'Image' . Application::DS . 'Priya.bmp';
+$url = $this->data('dir.priya.public') . 'Image' . Application::DS . 'Priya.bmp';
 
 function waitForInput()
 {

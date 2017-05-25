@@ -5,8 +5,6 @@
  * @version		1.0
  * @changeLog
  * 	-	all
- *
- *  DISPLAY=:0; export DISPLAY
  */
 
 namespace Priya\Module\Cli\Application;
@@ -14,12 +12,12 @@ namespace Priya\Module\Cli\Application;
 use Priya\Module\Core\Cli;
 use ReflectionExtension;
 
-class Sdl extends Cli {
+class Gui extends Cli {
     const DIR = __DIR__;
 
     public function run(){
-        if($this->check('sdl') === false){
-            $this->install('sdl');
+        if($this->check('wxWidgets') === false){
+            $this->install('wxWidgets');
         } else {
             return $this->result('cli');
         }
@@ -29,6 +27,7 @@ class Sdl extends Cli {
         if(empty($module)){
             return false;
         }
+        echo phpversion();
         $loaded = extension_loaded($module);
         return $loaded;
     }
