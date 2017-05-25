@@ -71,7 +71,7 @@ class Update extends Cli {
         $file->write($archive, $read);
         $this->output('Download complete.' . PHP_EOL);
         $target = $this->data('dir.priya.root');
-        $this->extract($archive, $target, 'priya-' .basename($url, '.zip'));
+        $this->extract($archive, $target, 'Priya-' .basename($url, '.zip'));
         $this->output('Extracting archive....' . PHP_EOL);
 
         $this->output('Extracting complete....' . PHP_EOL);
