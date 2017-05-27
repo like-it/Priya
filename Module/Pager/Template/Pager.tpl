@@ -33,7 +33,7 @@
     </script>
 {/capture}
 {capture append="link"}
-    <link rel="stylesheet" href="{$web.root}Priya/Module/Pager/Public/Css/Pager.css?{$revision|default:"$version"}">
+    <link rel="stylesheet" href="{$web.root}Priya/Module/Pager/Public/Css/Pager.css?{$priya.revision|default:"{$priya.version}"}">
 {/capture}
 <ul class="pager">
     <li class="item">
