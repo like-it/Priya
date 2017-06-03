@@ -4,16 +4,15 @@
     "object" : {
         "test" : true,
         "water" : {
-            "oce\\an" : true,
+            "ocean" : true,
             "bottle" : false
         },
         "beer" : true
     },
     "config2": "{$dir.priya.application}Data{$dir.ds}Config.json",
-    "control_file_test_12" : "{file.read({$test.config2}, literal)}",
-    "control_math_test_24" : "{math.max(array(1,2,3))}",
-    "control_math_test_25" : "{math.max(1,6,8,4,9,88,,7,5,666)}",
-    "control_math_test_1" : "{math.hex.bin('FF')}",
+    "control_array_test_2" : "{object.count({$test.object})}",
+    "control_array_test_3" : "{unset({$test.object.water.ocean},{$test.object.test})}",
+    "control_array_test_4" : "{object.count({$test.object})}",
     "control_test_997" : "Memory: {memory.usage(MB)}",
     "control_test_998" : "Memory: {memory.usage('MB')}",
     "control_test_999" : "Memory: {memory.usage(\"MB\")}"

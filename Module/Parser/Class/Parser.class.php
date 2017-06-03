@@ -121,7 +121,7 @@ class Parser extends Data {
                 if($keep === 'disable-modify'){
                     $modifierList = array();
                 }
-                $modify = $this->object_get($attribute, $data);
+//                 $modify = $this->object_get($attribute, $data); // up in the row
                 if($modify === null){
                     $modify = $this->modify('', $modifierList);
                 } else {
@@ -136,7 +136,7 @@ class Parser extends Data {
                 $attributeList[$key] = $modify;
                 $key_previous = $key;
             }
-
+            //add unset here
             foreach($attributeList as $search => $replace){
                 $replace = $this->compile($replace, $data, $keep);
                 $compile_list[$search] = $replace;
@@ -152,7 +152,7 @@ class Parser extends Data {
             $string = $this->controlIfList($string);
             $list = $this->data($this->random() . '.Parser.Control.If.list');
             if(empty($list)){
-                $string = $this->functionList($string, $functionList);
+                $string = $this->functionList($string, $functionList, $attributeList);
             } else {
                 $string = $this->statementIfList($string, $list);
             }
@@ -343,7 +343,7 @@ class Parser extends Data {
         return $string;
     }
 
-    private function statementIfList($string='', $list=array()){
+    private function statementIfList($string='', $list=array(), $attributeList=array()){
         $temp = explode('[' . $this->random() . 'if id:', $string, 2);
         if(count($temp) == 1){
             return $string;
@@ -371,7 +371,7 @@ class Parser extends Data {
             if(!empty($node->result)){
                 continue;
             }
-            $node->methodList = $this->createMethodList($node->statement);
+            $node->methodList = $this->createMethodList($node->statement, 'statementlist', $attributeList);
             $string = $function($string, $node, $this);
             return $this->statementIfList($string, $this->data($this->random() . '.Parser.Control.If.list'));
         }
@@ -536,8 +536,8 @@ class Parser extends Data {
         return $string;
     }
 
-    private function FunctionList($string='', $list=array()){
-        $methodList = $this->createMethodList($string, 'functionList');
+    private function FunctionList($string='', $list=array(), $attributeList=array()){
+        $methodList = $this->createMethodList($string, 'functionList', $attributeList);
         $string = $this->execMethodList($methodList, $string, 'functionList');
         return $string;
     }
@@ -588,7 +588,7 @@ class Parser extends Data {
         return $list;
     }
 
-    private function createMethodList($statement='', $type='statementList'){
+    private function createMethodList($statement='', $type='statementList', $attributeList=array()){
         $parts = $this->explode_single(
             array(
                 '&&',
@@ -769,6 +769,12 @@ class Parser extends Data {
                     $list[] = $decode;
                 } else {
                     $list[] = $json;
+                }
+            }
+            if($func == 'unset'){
+                foreach ($list as $list_nr => $list_value){
+                    $list[$list_nr] = key($attributeList);
+                    array_shift($attributeList);
                 }
             }
             $function[$function_key]['argumentList'] = $list;
