@@ -668,12 +668,15 @@ class Parser extends Data {
                 $arguments = substr($arguments, 1, -1);
             }
             $arguments = str_replace('[quote]', '', $arguments);
+            $arguments = $this->fixBrackets($arguments);
             $arguments = $this->createObjectList($arguments);
             $args = str_getcsv($arguments); //to handle quotes
             $array = false;
             $object = false;
             $counter = 0;
             $list = array();
+//             $this->debug('***');
+//             $this->debug($arguments);
             foreach($args  as $key => $value){
                 if($value === null && !is_array($array)){
                     $list[] = $value;
@@ -710,7 +713,9 @@ class Parser extends Data {
                     continue;
                 }
                 $arg = trim($value);
+                $form_simple = false;
                 if(strpos($arg, '[') === 0){
+                    $form_simple = true;
                     $array = array();
                     $explode = explode('[', $value, 2);
                     $explode = explode(']', $explode[1], 2);
@@ -732,15 +737,27 @@ class Parser extends Data {
                             $value = $val;
                         }
                         $array[$key] = $value;
+                        $arg = strrev($arg);
+                        if(strpos($arg, ']') === 0){
+                            $list[] = $array;
+                            $array = false;
+                            continue;
+                        }
+                        if(strpos($arg, ')') === 0){
+                            $list[] = $array;
+                            $array = false;
+                            continue;
+                        }
                         continue;
                     }
                 }
                 $arg = strrev($arg);
-                if(strpos($arg, ']') === 0 && !empty($array)){
+                if(strpos($arg, ']') === 0 && !empty($array) && !empty($form_simple)){
                     $explode = explode(']', $value, 2);
                     $array[$key] = $explode[0];
                     $list[] = $array;
                     $array = false;
+                    $form_simple = false;
                     continue;
                 }
                 if(strpos($arg, ')') === 0 && !empty($array)){
@@ -762,6 +779,13 @@ class Parser extends Data {
                 }
             }
             if(!empty($array)){
+                $list[] = $array;
+                $array = false;
+            }
+            /*
+            if(!empty($array)){
+                $this->debug('***');
+                $this->debug($array);
                 $json = implode(",", $array);
                 $json = str_replace('\"', '"', $json);
                 $decode = json_decode($json);
@@ -771,20 +795,78 @@ class Parser extends Data {
                     $list[] = $json;
                 }
             }
-            $function_special = array();
-            $function_special[] = 'unset';
-            $function_special[] = 'array.pop';
-            $function_special[] = 'array.shift';
-            if(in_array($func, $function_special)){
+            */
+            /*
+            if(stristr($arguments, '[bracket-close]') !== false){
+                $this->debug($list);
+                $this->debug($arguments);
+            }
+            */
+            if(in_array($func, array( //first argument is reference
+                'array.pop',
+                'array.shift',
+                'array.push',
+                'array.unshift'
+            ))){
+                foreach ($list as $list_nr => $list_value){
+                    $list[$list_nr] = key($attributeList);
+                    array_shift($attributeList);
+                    break;
+                }
+            }
+            if(in_array($func, array( //every argument is reference
+                'unset'
+            ))){
                 foreach ($list as $list_nr => $list_value){
                     $list[$list_nr] = key($attributeList);
                     array_shift($attributeList);
                 }
             }
+            foreach($list as $list_nr => $list_value){
+                if(is_string($list_value)){
+                    if(strpos($list_value, '[bracket-close]') !== false){
+                        $list[$list_nr] = str_replace('[bracket-close]',')', $list_value);
+                    }
+                }
+            }
             $function[$function_key]['argumentList'] = $list;
             $methodList[$statement][] = $function;
         }
+//         $this->debug($methodList, true);
         return $methodList;
+    }
+
+    private function fixBrackets($string='', $right=false){
+        $string = str_replace('\"', '[quote]', $string);
+        $explode = explode('"', $string, 2);
+        if(count($explode) === 2){
+            if(empty($right)){
+                $string = implode('[quote-left]', $explode);
+            } else {
+                $string = implode('[quote-right]', $explode);
+            }
+            $right = !$right;
+            $string = $this->fixBrackets($string, $right);
+        }
+        $string = $this->brackets($string);
+        $string = str_replace('[quote]', '\"', $string);
+        $string = str_replace('[quote-left]', '"', $string);
+        $string = str_replace('[quote-right]', '"', $string);
+        return $string;
+    }
+
+    private function brackets($string=''){
+        $explode = explode('[quote-left]', $string);
+        foreach($explode as $nr => $value){
+            $bracket = strpos($value, ')');
+            $quote_right = strpos($value, '[quote-right]');
+            if($bracket !== false && $bracket < $quote_right){
+                $explode[$nr] = substr_replace($value, '[bracket-close]', $bracket, 1);
+                $string = implode('[quote-left]', $explode);
+                $string = $this->brackets($string);
+            }
+        }
+        return $string;
     }
 
     private function createObjectList($arguments=''){
