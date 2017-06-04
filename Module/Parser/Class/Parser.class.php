@@ -771,7 +771,11 @@ class Parser extends Data {
                     $list[] = $json;
                 }
             }
-            if($func == 'unset'){
+            $function_special = array();
+            $function_special[] = 'unset';
+            $function_special[] = 'array.pop';
+            $function_special[] = 'array.shift';
+            if(in_array($func, $function_special)){
                 foreach ($list as $list_nr => $list_value){
                     $list[$list_nr] = key($attributeList);
                     array_shift($attributeList);
