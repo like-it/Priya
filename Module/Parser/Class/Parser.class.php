@@ -675,8 +675,6 @@ class Parser extends Data {
             $object = false;
             $counter = 0;
             $list = array();
-//             $this->debug('***');
-//             $this->debug($arguments);
             foreach($args  as $key => $value){
                 if($value === null && !is_array($array)){
                     $list[] = $value;
@@ -782,26 +780,6 @@ class Parser extends Data {
                 $list[] = $array;
                 $array = false;
             }
-            /*
-            if(!empty($array)){
-                $this->debug('***');
-                $this->debug($array);
-                $json = implode(",", $array);
-                $json = str_replace('\"', '"', $json);
-                $decode = json_decode($json);
-                if(is_object($decode)){
-                    $list[] = $decode;
-                } else {
-                    $list[] = $json;
-                }
-            }
-            */
-            /*
-            if(stristr($arguments, '[bracket-close]') !== false){
-                $this->debug($list);
-                $this->debug($arguments);
-            }
-            */
             if(in_array($func, array( //first argument is reference
                 'array.pop',
                 'array.shift',
@@ -824,8 +802,8 @@ class Parser extends Data {
             }
             foreach($list as $list_nr => $list_value){
                 if(is_string($list_value)){
-                    if(strpos($list_value, '[bracket-close]') !== false){
-                        $list[$list_nr] = str_replace('[bracket-close]',')', $list_value);
+                    if(strpos($list_value, '[' . $this->random() .'-bracket-close]') !== false){
+                        $list[$list_nr] = str_replace('[' . $this->random() .'-bracket-close]',')', $list_value);
                     }
                 }
             }
@@ -837,32 +815,32 @@ class Parser extends Data {
     }
 
     private function fixBrackets($string='', $right=false){
-        $string = str_replace('\"', '[quote]', $string);
+        $string = str_replace('\"', '[' . $this->random() .'-quote]', $string);
         $explode = explode('"', $string, 2);
         if(count($explode) === 2){
             if(empty($right)){
-                $string = implode('[quote-left]', $explode);
+                $string = implode('[' . $this->random() .'-quote-left]', $explode);
             } else {
-                $string = implode('[quote-right]', $explode);
+                $string = implode('[' . $this->random() .'-quote-right]', $explode);
             }
             $right = !$right;
             $string = $this->fixBrackets($string, $right);
         }
         $string = $this->brackets($string);
-        $string = str_replace('[quote]', '\"', $string);
-        $string = str_replace('[quote-left]', '"', $string);
-        $string = str_replace('[quote-right]', '"', $string);
+        $string = str_replace('[' . $this->random() .'-quote]', '\"', $string);
+        $string = str_replace('[' . $this->random() .'-quote-left]', '"', $string);
+        $string = str_replace('[' . $this->random() .'-quote-right]', '"', $string);
         return $string;
     }
 
     private function brackets($string=''){
-        $explode = explode('[quote-left]', $string);
+        $explode = explode('[' . $this->random() .'-quote-left]', $string);
         foreach($explode as $nr => $value){
             $bracket = strpos($value, ')');
-            $quote_right = strpos($value, '[quote-right]');
+            $quote_right = strpos($value, '[' . $this->random() .'-quote-right]');
             if($bracket !== false && $bracket < $quote_right){
-                $explode[$nr] = substr_replace($value, '[bracket-close]', $bracket, 1);
-                $string = implode('[quote-left]', $explode);
+                $explode[$nr] = substr_replace($value, '[' . $this->random() .'-bracket-close]', $bracket, 1);
+                $string = implode('[' . $this->random() .'-quote-left]', $explode);
                 $string = $this->brackets($string);
             }
         }
