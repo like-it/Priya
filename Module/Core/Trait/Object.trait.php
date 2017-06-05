@@ -14,6 +14,9 @@ use stdClass;
 trait Object {
 
     public static function object($input='', $output='object',$type='root'){
+        if(is_array($input) && $output == 'object'){
+            return self::array_object($input);
+        }
         if(is_string($input)){
             $input = trim($input);
             if($output=='object'){
@@ -55,6 +58,28 @@ trait Object {
         } else {
             trigger_error('unknown output in object');
         }
+    }
+
+    public static function array_object($array=array()){
+        $object = new stdClass();
+        foreach ($array as $key => $value){
+            if(is_array($value)){
+                $object->{$key} = self::array_object($value);
+            } else {
+                $object->{$key} = $value;
+            }
+        }
+        return $object;
+    }
+
+    public static function is_nested_array($array=array()){
+        $array = (array) $array;
+        foreach($array as $key => $value){
+            if(is_array($value)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public function explode_single($delimiter=array(), $string='', $internal=array()){

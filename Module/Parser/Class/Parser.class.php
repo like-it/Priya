@@ -455,17 +455,17 @@ class Parser extends Data {
                         }
                     }
                     if(is_object($replace) || is_array($replace)){
+                        if(
+                            is_array($replace) &&
+                            $this->is_nested_array($replace)
+                        ){
+                            foreach($replace as $replace_key => $replace_value){
+                                $replace[$replace_key] = $this->array_object($replace_value);
+                            }
+                        }
                         $replace = $this->object($replace, 'json-line');
                     }
                     $string = str_replace($search, $replace, $string, $is_replace);
-                    /*
-                    if(empty($is_replace)){
-                        $before= explode('(', $search, 2);
-                        $before[0] = str_replace('_', '.', $before[0]);
-                        $search = implode('(', $before);
-                        $string = str_replace($search, $replace, $string, $is_replace);
-                    }
-                    */
                     $before = explode('(', $search, 2);
                     $count = substr_count($before[0], '!');
                     for($i=0; $i < $count; $i++){
@@ -734,13 +734,9 @@ class Parser extends Data {
                         } else {
                             $value = $val;
                         }
+                        $value = $this->replaceBracketClose($value);
                         $array[$key] = $value;
                         $arg = strrev($arg);
-                        if(strpos($arg, ']') === 0){
-                            $list[] = $array;
-                            $array = false;
-                            continue;
-                        }
                         if(strpos($arg, ')') === 0){
                             $list[] = $array;
                             $array = false;
@@ -765,12 +761,14 @@ class Parser extends Data {
                     if(in_array(substr($val, 0, 1), array('"', '\'')) && in_array(substr($val, -1, 1), array('"', '\''))){
                         $val = substr($val, 1, -1);
                     }
+                    $val = $this->replaceBracketClose($val);
                     $array[$key] = $val;
                     $list[] = $array;
                     $array = false;
                     continue;
                 }
                 if(!empty($array)){
+                    $value = $this->replaceBracketClose($value);
                     $array[$key] = $value;
                 } else {
                     $list[] = $value;
@@ -784,7 +782,15 @@ class Parser extends Data {
                 'array.pop',
                 'array.shift',
                 'array.push',
-                'array.unshift'
+                'array.unshift',
+                'array.current',
+                'array.next',
+                'array.previous',
+                'array.reset',
+                'array.end',
+                'array.key',
+                'array.object',
+                'is.array.nested'
             ))){
                 foreach ($list as $list_nr => $list_value){
                     $list[$list_nr] = key($attributeList);
@@ -800,18 +806,18 @@ class Parser extends Data {
                     array_shift($attributeList);
                 }
             }
-            foreach($list as $list_nr => $list_value){
-                if(is_string($list_value)){
-                    if(strpos($list_value, '[' . $this->random() .'-bracket-close]') !== false){
-                        $list[$list_nr] = str_replace('[' . $this->random() .'-bracket-close]',')', $list_value);
-                    }
-                }
-            }
             $function[$function_key]['argumentList'] = $list;
             $methodList[$statement][] = $function;
         }
 //         $this->debug($methodList, true);
         return $methodList;
+    }
+
+    private function replaceBracketClose($string=''){
+        if(strpos($string, '[' . $this->random() .'-bracket-close]') !== false){
+            $string= str_replace('[' . $this->random() .'-bracket-close]',')', $string);
+        }
+        return $string;
     }
 
     private function fixBrackets($string='', $right=false){
