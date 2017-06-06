@@ -701,7 +701,12 @@ class Parser extends Data {
                         continue;
                     }
                 }
-                $value = ltrim($value, ' '); //added
+                $value = ltrim($value, ' ');
+                if(substr($value,0,1) == '$'){
+                    $selector = substr($value, 1);
+                    $list[] = $this->data($selector);
+                    continue;
+                }
                 if(substr($value, 0, 1) == '\'' && substr($value, -1, 1) == '\''){
                     $value = substr($value, 1, -1);
                 }
