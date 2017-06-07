@@ -182,6 +182,7 @@ class Application extends Parser {
     }
 
     public function run(){
+        $this->autoload()->environment($this->data('priya.environment'));
         chdir($this->data('dir.priya.application'));
         $request = $this->request('request');
         if($request ===  $this->data('parser.request') && $request !== null){

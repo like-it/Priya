@@ -37,8 +37,12 @@ class Core {
             echo Core::object($exception, 'json');
             return true;
         } else {
-            var_dump($exception);
-            die;
+            if(isset($exception->xdebug_message)){
+                echo $exception->xdebug_message;
+            } else {
+                var_dump($exception);
+                die;
+            }
         }
     }
 

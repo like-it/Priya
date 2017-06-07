@@ -25,7 +25,7 @@ class Autoload{
     public $environment = 'production';
 
     public function register($method='load', $prepend=false){
-        $this->environment('development');
+//         $this->environment('development');
         $functions = spl_autoload_functions();
         if(is_array($functions)){
             foreach($functions as $function){
@@ -196,7 +196,7 @@ class Autoload{
                 }
             }
         }
-        if($this->environment()=='development' || !empty($this->expose())){
+        if($this->environment() == 'development' || !empty($this->expose())){
             $object = new stdClass();
             $attribute = 'Priya\Module\Exception\Error';
             if(!empty($this->expose())){
