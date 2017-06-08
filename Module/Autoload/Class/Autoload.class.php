@@ -142,7 +142,15 @@ class Autoload{
         $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
         $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
-        return $data;
+
+        $result = array();
+        foreach($data as $nr => $file){
+            if($file === '[---]'){
+                $file = $file . $nr;
+            }
+            $result[$file] = $file;
+        }
+        return $result;
     }
 
     public function locate($load=null){
@@ -175,6 +183,8 @@ class Autoload{
                     $item['file'] = $load;
                 }
                 if(!empty($item['file'])){
+                    $item['file'] = str_replace('\\', DIRECTORY_SEPARATOR, $item['file']);
+                    $item['file'] = str_replace('.'  . DIRECTORY_SEPARATOR , DIRECTORY_SEPARATOR, $item['file']);
                     $item['baseName'] = basename(
                         $this->removeExtension($item['file'],
                             array(
@@ -183,6 +193,8 @@ class Autoload{
 
                             )
                     ));
+                    $item['baseName'] = explode(DIRECTORY_SEPARATOR, $item['baseName'], 2);
+                    $item['baseName'] = end($item['baseName']);
                     $item['dirName'] = dirname($item['file']);
                     $fileList = $this->fileList($item);
                     if(is_array($fileList) && empty($this->expose())){
