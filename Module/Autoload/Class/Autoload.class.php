@@ -20,7 +20,7 @@ class Autoload{
     const EXT_TRAIT_PHP = 'trait.php';
 
     private $expose;
-    private $fileList;
+    protected $fileList;
 
     public $prefixList = array();
     public $environment = 'production';
