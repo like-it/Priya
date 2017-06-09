@@ -29,6 +29,7 @@ class Application extends Parser {
     const UPDATE = 'Update';
     const VENDOR = 'Vendor';
     const TEMP = 'Temp';
+    const CACHE = 'Cache';
     const PUBLIC_HTML = 'Public';
     const CONFIG = 'Config.json';
     const CUSTOM = 'Custom.json';

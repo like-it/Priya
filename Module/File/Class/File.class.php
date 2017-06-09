@@ -16,6 +16,22 @@ class File {
         return str_replace('\\\/', DIRECTORY_SEPARATOR, rtrim($directory,'\\\/')) . DIRECTORY_SEPARATOR;
     }
 
+    public static function chown($url='', $owner=null, $group=null){
+        if($owner === null){
+            $owner = 'root:root';
+        }
+        if($group == null){
+            $explode = explode(':', $owner, 2);
+            if(count($explode) == 1){
+                $group = $owner;
+            } else {
+                $owner = $explode[0];
+                $group = $explode[1];
+            }
+        }
+        exec('chown ' . $owner . ':' . $group . ' ' . $url, $output);
+    }
+
     public function write($url='', $data=''){
         $url = (string) $url;
         $data = (string) $data;

@@ -20,6 +20,7 @@ class Autoload{
     const EXT_TRAIT_PHP = 'trait.php';
 
     private $expose;
+    private $fileList;
 
     public $prefixList = array();
     public $environment = 'production';
@@ -129,11 +130,20 @@ class Autoload{
         $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
         $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_CLASS_PHP;
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
-        $data[] =  '[---]';
+        if(empty($item['dirName'])){
+            $data[] = $item['directory'] . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_CLASS_PHP;
+            $data[] = $item['directory'] . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
+            $data[] = $item['directory'] . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
+            $data[] = $item['directory'] . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
+            $data[] =  '[---]';
+        } else {
+            $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_CLASS_PHP;
+            $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
+            $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
+            $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
+            $data[] =  '[---]';
+        }
+
         $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_CLASS_PHP;
         $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_TRAIT_PHP;
         $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_PHP;
@@ -142,6 +152,8 @@ class Autoload{
         $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
         $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
+
+        $this->fileList[$item['baseName']][] = $data;
 
         $result = array();
         foreach($data as $nr => $file){
@@ -156,7 +168,6 @@ class Autoload{
     public function locate($load=null){
         $load = ltrim($load, '\\');
         $prefixList = $this->getPrefixList();
-        $list = array();
         if(!empty($prefixList)){
             foreach($prefixList as $nr => $item){
                 if(empty($item['prefix'])){
@@ -196,6 +207,9 @@ class Autoload{
                     $item['baseName'] = explode(DIRECTORY_SEPARATOR, $item['baseName'], 2);
                     $item['baseName'] = end($item['baseName']);
                     $item['dirName'] = dirname($item['file']);
+                    if($item['dirName'] == '.'){
+                        unset($item['dirName']);
+                    }
                     $fileList = $this->fileList($item);
                     if(is_array($fileList) && empty($this->expose())){
                         foreach($fileList as $nr => $file){
@@ -204,7 +218,6 @@ class Autoload{
                             }
                         }
                     }
-                    $list[] = $fileList;
                 }
             }
         }
@@ -214,7 +227,9 @@ class Autoload{
             if(!empty($this->expose())){
                 $attribute = $load;
             }
-            $object->{$attribute} = $list;
+            if(isset($this->fileList[$item['baseName']])){
+                $object->{$attribute} = $this->fileList[$item['baseName']];
+            }
             echo json_encode($object, JSON_PRETTY_PRINT);
             if(ob_get_level() !== 0){
                 ob_flush();
