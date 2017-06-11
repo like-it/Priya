@@ -90,7 +90,7 @@ class Memory extends Data{
 
     public function keyList(){
         $this->keyList = $this->memory->getAllKeys();
-        return $this->keyList();
+        return $this->keyList;
     }
 
     public function nodeList($attribute=''){
