@@ -308,6 +308,9 @@ trait Object {
     public function object_merge(){
         $objects = func_get_args();
         $main = array_shift($objects);
+        if(empty($main)){
+            $main = new stdClass();
+        }
         foreach($objects as $nr => $object){
             if(is_array($object)){
                 foreach($object as $key => $value){
