@@ -38,7 +38,7 @@ function smarty_block_content($params, $content, $template, &$repeat)
                 trigger_error("content_block: unknown attribute '$_key'");
         }
     }
-    if($trim == 'html' || $trim == 'svg' || $trim == 'canvas-svg'){
+    if($trim == 'html' || $trim == 'html-line' || $trim == 'svg' || $trim == 'canvas-svg'){
         $content = trim($content, "\r\n\s\t");
         $data = explode('<', $content);
         foreach ($data as $nr => $row){
@@ -78,7 +78,7 @@ function smarty_block_content($params, $content, $template, &$repeat)
     $priya .= $content;
     $priya .= '<!-- </priya-' . str_replace('_', '-', $assign) . '> //-->' . "\r\n";
 
-    if($trim == 'svg' || $trim == 'canvas-svg'){
+    if($trim == 'html-line' || $trim == 'svg' || $trim == 'canvas-svg'){
         $priya = $content;
         $priya = str_replace(array("\t","\n", "\r", "\r\n"),'', $priya);
     }

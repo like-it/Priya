@@ -73,12 +73,16 @@ class Tpl extends Autoload {
                 $data[] = $item['directory'] . $directory . $file . Application::DS . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
                 $data[] = $item['directory'] . $directory . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
                 $data[] = $item['directory'] . $file . Application::DS . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
-//                 $data[] = $item['directory'] . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension']; //not allowed
+                //$data[] = $item['directory'] . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension']; //not allowed
                 $dir = explode(Application::TEMPLATE, $item['directory'], 2);
                 $dir = implode('', $dir);
                 $dir = rtrim($dir, Application::DS) . Application::DS;
                 $data[] = $dir . $directory . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
 //                 $data[] = $dir . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension']; //not allowed
+                if(count(explode(Application::DS, $item['dirName'], 3)) === 3){ //allowed
+                    $data[] = $item['directory'] . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
+                    $data[] = $dir . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
+                }
             }
             $data[] = $item['directory'] . $item['baseName'] . Application::DS . Application::TEMPLATE . Application::DS . $item['baseName'] . '.' . $item['extension'];
             $data[] = '[---]';

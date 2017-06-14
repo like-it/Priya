@@ -51,6 +51,12 @@ priya.prototype.select = function(selector){
             var selected;
             if(typeof selector == 'object'){
                 selected = selector.tagName;
+                if(typeof selected == 'undefined' && selector instanceof HTMLDocument){
+                    var priya = this.attach(this.create('element', selector));
+                    priya.data('selector', selector);
+                    //add to document for retries?
+                    return priya;
+                }
                 selected = selected.toLowerCase();
                 if(selector.id){
                     selected += ' #' + selector.id;
@@ -241,14 +247,16 @@ priya.prototype.html = function (html, where){
 }
 
 priya.prototype.closest = function (selector, node){
-    if(typeof node === false){
-        return false;
-    }
     var parent;
     if(typeof node == 'undefined'){
         parent = this.parent();
     } else {
         parent = node.parent();
+    }
+    if(parent === false){
+        var priya = this.attach(this.create('element', selector));
+        priya.data('selector', selector);
+        return priya;
     }
     var select = parent.select(selector);
     if(typeof select == 'object' && select.tagName == 'PRIYA-NODE'){
