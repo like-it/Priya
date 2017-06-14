@@ -39,6 +39,68 @@ priya.prototype.dom = function(data){
     return this.init(data);
 }
 
+priya.prototype.find = function(selector) {
+    var list = this.querySelectorAll(selector);
+    return list;
+    console.log('find');
+    console.log(selector);
+    if (!this.id) {
+        this.id = this.attribute('id', 'priya-find-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999));
+//            this.id = 'ID_' + new Date().getTime();
+        console.log(this.id);
+        var removeId = true;
+    }
+    selector = '#' + this.id + ' > ' + selector;
+    var list = document.querySelectorAll(selector);
+    if(list.length == 0){
+        var priya = this.attach(this.create('element', selector));
+        priya.data('selector', selector);
+        //add to document for retries?
+        return priya;
+    }
+    else if(list.length == 1){
+        list = this.attach(list[0]);
+    } else {
+        for(item in list){
+            list[item] = this.attach(list[item]);
+        }
+    }
+/*
+    if(list.length == 0){
+        var priya = this.attach(this.create('element', selector));
+        priya.data('selector', selector);
+        //add to document for retries?
+        return priya;
+    }
+    else if(list.length == 1){
+        return this.attach(list[0]);
+    } else {
+        for(item in list){
+            list[item] = this.attach(list[item]);
+        }
+        return this.attach(list);
+    }
+*/
+
+    if (removeId) {
+//            this.id = null;
+    }
+    if(this.is_nodeList(list)){
+        var index;
+        for(index = 0; index < list.length; index++){
+            var item = list[index];
+            if(!item.id){
+                item.id = item.attribute('id', 'priya-find-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999));
+            }
+        }
+    } else {
+        if(!list.id){
+            list.id = list.attribute('id', 'priya-find-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999));
+        }
+    }
+    return this.attach(list);
+};
+
 priya.prototype.select = function(selector){
     if(typeof selector == 'undefined' || selector === null){
         return false;
@@ -103,7 +165,8 @@ priya.prototype.select = function(selector){
     }
     if(Object.prototype.toString.call( selector ) === '[object Array]'){
         if(typeof this.querySelectorAll == 'function' && oldSelector != matchSelector){
-            var list = this.querySelectorAll(matchSelector);
+            var list = this.find(matchSelector);
+//            var list = this.querySelectorAll(matchSelector);
         } else if(oldSelector != matchSelector){
             var list = document.querySelectorAll(matchSelector);
         }
@@ -137,7 +200,8 @@ priya.prototype.select = function(selector){
             list.push(selector);
         } else {
             if(typeof this.querySelectorAll == 'function'){
-                var list = this.querySelectorAll(selector);
+                console.log(this.id);
+                var list = this.find(selector);
             } else {
                 var list = document.querySelectorAll(selector);
             }
@@ -193,6 +257,23 @@ priya.prototype.parentNode = function (parent){
 priya.prototype.calculate = function (calculate){
     var result = null;
     switch(calculate){
+        case 'all':
+            result = {};
+            result.window = {};
+            result.window.width = window.innerWidth;
+            result.window.height = window.innerHeight;
+            var className = this.className;
+            this.addClass('display-block overflow-auto');
+            result.left = this.offsetLeft;
+            result.right = this.offsetRight;
+            result.top = this.offsetTop;
+            result.bottom = this.offsetBottom
+            result.parent = this.offsetParent;
+            result.width = this.offsetWidth;
+            result.height =  this.offsetHeight;
+            this.className = className;
+            return result;
+        break;
         case 'window-width':
             result =  window.innerWidth;
             return result;
@@ -1101,7 +1182,9 @@ priya.prototype.attach = function (element){
             "mtime": this.microtime(true),
             "dom" : dom
     };
-    element.data('mtime', element['Priya']['mtime']);
+    if(typeof element.tagName != 'undefined'){
+        element.data('mtime', element['Priya']['mtime']);
+    }
     return element;
 }
 
@@ -1679,6 +1762,9 @@ priya.prototype.is_array = function (mixedVar) {
 }
 
 priya.prototype.is_nodeList = function (nodes){
+    if(typeof nodes == 'undefined'){
+        nodes = this;
+    }
     var stringRepr = Object.prototype.toString.call(nodes);
 
     return typeof nodes === 'object' &&
