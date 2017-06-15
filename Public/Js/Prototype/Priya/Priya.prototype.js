@@ -258,20 +258,99 @@ priya.prototype.calculate = function (calculate){
     var result = null;
     switch(calculate){
         case 'all':
-            result = {};
+            //var className = this.className;
+            //this.addClass('display-block overflow-auto');
+            var rect = this.getBoundingClientRect();
+            var result = {};
             result.window = {};
+            result.dimension = {};
             result.window.width = window.innerWidth;
             result.window.height = window.innerHeight;
-            var className = this.className;
-            this.addClass('display-block overflow-auto');
-            result.left = this.offsetLeft;
-            result.right = this.offsetRight;
-            result.top = this.offsetTop;
-            result.bottom = this.offsetBottom
-            result.parent = this.offsetParent;
-            result.width = this.offsetWidth;
-            result.height =  this.offsetHeight;
-            this.className = className;
+            for (attribute in rect){
+                result['dimension'][attribute] = rect[attribute];
+            }
+            var style = window.getComputedStyle(this);
+            result.margin = {
+                left: parseInt(style["margin-left"]),
+                right: parseInt(style["margin-right"]),
+                top: parseInt(style["margin-top"]),
+                bottom: parseInt(style["margin-bottom"])
+            };
+            result.padding = {
+                left: parseInt(style["padding-left"]),
+                right: parseInt(style["padding-right"]),
+                top: parseInt(style["padding-top"]),
+                bottom: parseInt(style["padding-bottom"])
+            };
+            result.border = {
+                left: parseInt(style["border-left-width"]),
+                right: parseInt(style["border-right-width"]),
+                top: parseInt(style["border-top-width"]),
+                bottom: parseInt(style["border-bottom-width"])
+            };
+            result.top = result.dimension.top;
+            result.bottom = result.dimension.bottom;
+            result.height = result.dimension.height;
+            result.width = result.dimension.width;
+            result.left = result.dimension.left;
+            result.right = result.dimension.right;
+            /*
+            result.top =
+                result.dimension.top +
+                window.pageYOffset -
+                this.clientTop -
+                result.padding.top -
+                result.border.top
+            ;
+            result.bottom =
+                result.dimension.bottom +
+                window.pageYOffset -
+                this.clientTop -
+                result.padding.bottom -
+                result.border.bottom
+            ;
+            result.left =
+                result.dimension.left +
+                window.pageXOffset -
+                this.clientLeft -
+                result.padding.left -
+                result.border.left
+            ;
+            result.right =
+                result.dimension.right +
+                window.pageXOffset -
+                this.clientLeft -
+                result.padding.right -
+                result.border.right
+            ;
+            result.height =
+                result.dimension.height +
+                result.padding.bottom +
+                result.padding.top +
+                result.border.top +
+                result.border.bottom
+            ;
+            result.width =
+                result.dimension.width +
+                result.padding.left +
+                result.padding.right +
+                result.border.left +
+                result.border.right
+            ;
+            */
+//            result.top -= result.height;
+
+            var elem = this.create('element', 'point');
+            elem.css('position', 'absolute');
+            elem.css('z-index', '5');
+            elem.css('left', result.left + 'px');
+            elem.css('top', result.top - 100 - 40 + 'px');
+            elem.css('width', '100px');
+            elem.css('height', '100px');
+            elem.css('background-color', 'rgba(255, 0, 0, 1)');
+            elem.css('display', 'block');
+            document.body.appendChild(elem);
+            //this.className = className;
             return result;
         break;
         case 'window-width':
@@ -441,12 +520,19 @@ priya.prototype.clone = function (deep){
 
 priya.prototype.create = function (type, create){
     switch(type.toLowerCase()){
+        case 'div':
+            var element = document.createElement('DIV');
+            element.id = 'className';
+            element.className = this.str_replace('.', ' ', create);
+            element.className = this.str_replace('#', '', element.className);
+            return this.attach(element);
+        break;
         case 'element':
             var element = document.createElement('PRIYA-NODE');
             element.id = 'className';
             element.className = this.str_replace('.', ' ', create);
             element.className = this.str_replace('#', '', element.className);
-            return element;
+            return this.attach(element);
         break;
         case 'nodelist' :
               var fragment = document.createDocumentFragment();
