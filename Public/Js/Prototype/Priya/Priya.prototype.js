@@ -39,66 +39,33 @@ priya.prototype.dom = function(data){
     return this.init(data);
 }
 
-priya.prototype.find = function(selector) {
-    var list = this.querySelectorAll(selector);
-    return list;
-    console.log('find');
-    console.log(selector);
+priya.prototype.find = function(selector, attach) {
     if (!this.id) {
         this.id = this.attribute('id', 'priya-find-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999));
-//            this.id = 'ID_' + new Date().getTime();
-        console.log(this.id);
         var removeId = true;
     }
-    selector = '#' + this.id + ' > ' + selector;
+    selector = '#' + this.id + ' ' + selector;
     var list = document.querySelectorAll(selector);
-    if(list.length == 0){
-        var priya = this.attach(this.create('element', selector));
-        priya.data('selector', selector);
-        //add to document for retries?
-        return priya;
-    }
-    else if(list.length == 1){
-        list = this.attach(list[0]);
-    } else {
-        for(item in list){
-            list[item] = this.attach(list[item]);
-        }
-    }
-/*
-    if(list.length == 0){
-        var priya = this.attach(this.create('element', selector));
-        priya.data('selector', selector);
-        //add to document for retries?
-        return priya;
-    }
-    else if(list.length == 1){
-        return this.attach(list[0]);
-    } else {
-        for(item in list){
-            list[item] = this.attach(list[item]);
-        }
-        return this.attach(list);
-    }
-*/
-
     if (removeId) {
-//            this.id = null;
+        this.attribute('remove', 'id');
     }
-    if(this.is_nodeList(list)){
-        var index;
-        for(index = 0; index < list.length; index++){
-            var item = list[index];
-            if(!item.id){
-                item.id = item.attribute('id', 'priya-find-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999));
+    if(attach){
+        if(list.length == 0){
+            var priya = this.attach(this.create('element', selector));
+            priya.data('selector', selector);
+            //add to document for retries?
+            return priya;
+        }
+        else if(list.length == 1){
+            return this.attach(list[0]);
+        } else {
+            for(item in list){
+                list[item] = this.attach(list[item]);
             }
-        }
-    } else {
-        if(!list.id){
-            list.id = list.attribute('id', 'priya-find-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999));
+            return this.attach(list);
         }
     }
-    return this.attach(list);
+    return list;
 };
 
 priya.prototype.select = function(selector){
@@ -200,7 +167,6 @@ priya.prototype.select = function(selector){
             list.push(selector);
         } else {
             if(typeof this.querySelectorAll == 'function'){
-                console.log(this.id);
                 var list = this.find(selector);
             } else {
                 var list = document.querySelectorAll(selector);
@@ -289,68 +255,17 @@ priya.prototype.calculate = function (calculate){
                 bottom: parseInt(style["border-bottom-width"])
             };
             result.top = result.dimension.top;
-            result.bottom = result.dimension.bottom;
+            result.bottom = result.window.height - result.dimension.bottom;
             result.height = result.dimension.height;
             result.width = result.dimension.width;
             result.left = result.dimension.left;
             result.right = result.dimension.right;
-            /*
-            result.top =
-                result.dimension.top +
-                window.pageYOffset -
-                this.clientTop -
-                result.padding.top -
-                result.border.top
-            ;
-            result.bottom =
-                result.dimension.bottom +
-                window.pageYOffset -
-                this.clientTop -
-                result.padding.bottom -
-                result.border.bottom
-            ;
-            result.left =
-                result.dimension.left +
-                window.pageXOffset -
-                this.clientLeft -
-                result.padding.left -
-                result.border.left
-            ;
-            result.right =
-                result.dimension.right +
-                window.pageXOffset -
-                this.clientLeft -
-                result.padding.right -
-                result.border.right
-            ;
-            result.height =
-                result.dimension.height +
-                result.padding.bottom +
-                result.padding.top +
-                result.border.top +
-                result.border.bottom
-            ;
-            result.width =
-                result.dimension.width +
-                result.padding.left +
-                result.padding.right +
-                result.border.left +
-                result.border.right
-            ;
-            */
-//            result.top -= result.height;
 
-            var elem = this.create('element', 'point');
-            elem.css('position', 'absolute');
-            elem.css('z-index', '5');
-            elem.css('left', result.left + 'px');
-            elem.css('top', result.top - 100 - 40 + 'px');
-            elem.css('width', '100px');
-            elem.css('height', '100px');
-            elem.css('background-color', 'rgba(255, 0, 0, 1)');
-            elem.css('display', 'block');
-            document.body.appendChild(elem);
-            //this.className = className;
+            result.offset = {};
+            result.offset.parent = this.createSelector(this.offsetParent);
+            result.offset.left = this.offsetLeft;
+            result.offset.top = this.offsetTop;
+            this.data(result);
             return result;
         break;
         case 'window-width':
@@ -376,6 +291,28 @@ priya.prototype.calculate = function (calculate){
             return result;
         break;
     }
+}
+
+priya.prototype.createSelector = function(element){
+    if(this.empty(element)){
+        return '';
+    }
+    selector = element.tagName;
+    if(typeof selector == 'undefined' && element instanceof HTMLDocument){
+        /*
+        var priya = this.attach(this.create('element', selector));
+        priya.data('selector', selector);
+        */
+        return element;
+    }
+    selector = selector.toLowerCase();
+    if(element.id){
+        selector += ' #' + element.id;
+    }
+    if(element.className){
+        selector += ' .' + this.str_replace(' ','.',element.className);
+    }
+    return selector;
 }
 
 priya.prototype.html = function (html, where){
@@ -522,14 +459,12 @@ priya.prototype.create = function (type, create){
     switch(type.toLowerCase()){
         case 'div':
             var element = document.createElement('DIV');
-            element.id = 'className';
             element.className = this.str_replace('.', ' ', create);
             element.className = this.str_replace('#', '', element.className);
             return this.attach(element);
         break;
         case 'element':
             var element = document.createElement('PRIYA-NODE');
-            element.id = 'className';
             element.className = this.str_replace('.', ' ', create);
             element.className = this.str_replace('#', '', element.className);
             return this.attach(element);
@@ -858,6 +793,11 @@ priya.prototype.data = function (attribute, value){
 
             }
             return value;
+        }
+        else if(typeof attribute == 'object'){
+            for(attr in attribute){
+                this.data(attr, attribute[attr]);
+            }
         } else {
             return this.attribute('data-' + attribute, value);
         }
@@ -1191,7 +1131,35 @@ priya.prototype.attribute = function (attribute, value){
         }
     } else {
         if (typeof this.setAttribute == 'function'){
-            this.setAttribute(attribute, value);
+            if(value === null){
+                this.setAttribute(attribute, value);
+            }
+            else if(typeof value == 'object' && typeof value.nodeType != 'undefined'){
+                selector = value.tagName;
+                if(typeof selector == 'undefined' && value instanceof HTMLDocument){
+                    /*
+                    var priya = this.attach(this.create('element', selector));
+                    priya.data('selector', selector);
+                    */
+                    return value;
+                }
+                selector = selector.toLowerCase();
+                if(value.id){
+                    selector += ' #' + value.id;
+                }
+                if(value.className){
+                    selector += ' .' + this.str_replace(' ','.',value.className);
+                }
+                this.setAttribute(attribute, selector);
+            }
+            else if(typeof value == 'object'){
+                for(attr in value){
+                    this.attribute(attribute + '-' + attr, value[attr]);
+                }
+            } else {
+                this.setAttribute(attribute, value);
+            }
+
         }
         return value;
     }
@@ -1270,6 +1238,7 @@ priya.prototype.attach = function (element){
     };
     if(typeof element.tagName != 'undefined'){
         element.data('mtime', element['Priya']['mtime']);
+        element.data('random', this.rand(1000, 9999));
     }
     return element;
 }
