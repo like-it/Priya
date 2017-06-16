@@ -350,15 +350,38 @@ class Result extends Parser {
                 if(is_string($variable['link'])){
                     $variable['link'] = (array) $variable['link'];
                 }
-                $object->link = $variable['link'];
+                $link = array();
+                foreach($variable['link'] as $nr => $item){
+                    $tmp = explode('<lin', $item);
+                    foreach($tmp as $tmp_nr => $tmp_value){
+                        $tmp_value = trim($tmp_value);
+                        if(empty($tmp_value)){
+                            continue;
+                        }
+                        $link[] = '<lin' . $tmp_value;
+                    }
+                }
+                $object->link = $link;
             } else {
                 $object->link = array();
             }
             if(isset($variable['script'])){
                 if(is_string($variable['script'])){
                     $variable['script'] = (array) $variable['script'];
+
                 }
-                $object->script = $variable['script'];
+                $script = array();
+                foreach($variable['script'] as $nr => $item){
+                    $tmp = explode('</script>', $item);
+                    foreach($tmp as $tmp_nr => $tmp_value){
+                        $tmp_value = trim($tmp_value);
+                        if(empty($tmp_value)){
+                            continue;
+                        }
+                        $script[] = $tmp_value . '</script>';
+                    }
+                }
+                $object->script = $script;
             } else {
                 $object->script = array();
             }
