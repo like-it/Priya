@@ -39,6 +39,50 @@ priya.prototype.dom = function(data){
     return this.init(data);
 }
 
+priya.prototype.debug = function(data){
+    var debug = this.run('.debug .tab-body.tab-debug');
+    if(!debug){
+        var node = this.create('div', 'dialog no-select debug');
+        node.html('<div class="head"><i class="icon icon-bug"></i><h2>Debug</h2></div><div class="menu"><ul class="tab-head"><li class="tab-debug selected"><p>Debug</p></li><li class="tab-collection"><p>Collection</p></li></ul></div><div class="body"><div class="tab tab-body tab-debug selected"></div><div class="tab tab-body tab-collection"></div></div><div class="footer"><button type="button" class="button-default button-close">Close</button></div></div>');
+        this.dom('body').append(node);
+        var debug = this.run('.debug .tab-body.tab-debug');
+    }
+    if(typeof data == 'string'){
+        var node = this.create('pre', '');
+        node.html(data);
+        debug.append(node);
+        var scrollable = debug.closest('has', 'scrollbar', 'vertical');
+        scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
+    }
+    var node = this.run('.debug');
+    node.dom('div.head').closest('.debug').addClass('has-head');
+    node.dom('div.menu').closest('.debug').addClass('has-menu');
+    node.dom('div.icon').closest('.debug').addClass('has-icon');
+    node.dom('div.footer').closest('.debug').addClass('has-footer');
+    node.addClass('display-block');
+    node.dom('.button-close').on('click', function(){
+        console.log('remove');
+        priya.dom('.debug').removeClass('display-block');
+    });
+    node.dom('.tab-head .tab-collection').on('click', function(){
+        priya.dom('.tab-head li').removeClass('selected');
+        priya.dom('.tab-body').removeClass('selected');
+        var node = priya.dom('.tab-body.tab-collection');
+        node.addClass('selected');
+        node.html('<pre>' + this.dump(priya.collection()) + '</pre>');
+        this.addClass('selected');
+    });
+    node.dom('.tab-head .tab-debug').on('click', function(){
+        priya.dom('.tab-head li').removeClass('selected');
+        priya.dom('.tab-body').removeClass('selected');
+        var node = priya.dom('.tab-body.tab-debug');
+        node.addClass('selected');
+        var scrollable = node.closest('has', 'scrollbar', 'vertical');
+        scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
+        this.addClass('selected');
+    });
+}
+
 priya.prototype.find = function(selector, attach) {
     if (!this.id) {
         this.id = this.attribute('id', 'priya-find-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999));
@@ -268,6 +312,15 @@ priya.prototype.calculate = function (calculate){
             this.data(result);
             return result;
         break;
+        case 'offset':
+            var result = {};
+            result.offset = {};
+            result.offset.parent = this.createSelector(this.offsetParent);
+            result.offset.left = this.offsetLeft;
+            result.offset.top = this.offsetTop;
+            this.data(result);
+            return result.offset;
+        break;
         case 'window-width':
             result =  window.innerWidth;
             return result;
@@ -290,6 +343,48 @@ priya.prototype.calculate = function (calculate){
             this.className = className;
             return result;
         break;
+    }
+}
+
+priya.prototype.scrollbar = function(attribute, type){
+    if(attribute == 'y' || attribute == 'top'){
+        return this.data('scrollbar-y', this.scrollTop);
+    }
+    if(attribute == 'x' || attribute == 'left'){
+        return this.data('scrollbar-x', this.scrollLeft);
+    }
+    if(attribute == 'width'){
+        return this.data('scrollbar-width', this.scrollWidth);
+    }
+    if(attribute == 'height'){
+        return this.data('scrollbar-height', this.scrollHeight);
+    }
+    if(attribute == 'all'){
+        var scrollbar = {
+                'y': this.scrollTop,
+                'x': this.scrollLeft,
+                'width': this.scrollWidth,
+                'height': this.scrollHeight
+        };
+        return this.data('scrollbar', scrollbar);
+    }
+    if(attribute == 'to'){
+        this.scrollTo(type.x, type.y);
+    }
+    if(attribute == 'has'){
+        if(type && type == 'horizontal'){
+            return this.scrollWidth > this.clientWidth;
+        }
+        else if (type && type == 'vertical'){
+            return this.scrollHeight > this.clientHeight;
+        } else {
+            var hasHorizontalScrollbar = this.scrollWidth > this.clientWidth;
+            var hasVerticalScrollbar = this.scrollHeight > this.clientHeight;
+            if(hasHorizontalScrollbar || hasVerticalScrollbar){
+                return true;
+            }
+            return false;
+        }
     }
 }
 
@@ -343,27 +438,42 @@ priya.prototype.html = function (html, where){
     }
 }
 
-priya.prototype.closest = function (selector, node){
+priya.prototype.closest = function (attribute, node, type){
     var parent;
-    if(typeof node == 'undefined'){
+    if(this.function_exists(node)){
         parent = this.parent();
+        if(parent === false){
+            var priya = this.attach(this.create('element', attribute));
+            priya.data('selector', attribute);
+            return priya;
+        }
+        var bool = parent[node](attribute, type);
+        if(bool === false){
+            parent = parent.closest(attribute, node, type);
+        }
+        return parent;
     } else {
-        parent = node.parent();
+        if(typeof node == 'undefined'){
+            parent = this.parent();
+        } else {
+            parent = node.parent();
+        }
+        if(parent === false){
+            var priya = this.attach(this.create('element', attribute));
+            priya.data('selector', attribute);
+            return priya;
+        }
+        var select = parent.select(attribute);
+        if(typeof select == 'object' && select.tagName == 'PRIYA-NODE'){
+            delete select;
+            select = parent.closest(attribute, parent);
+        }
+        if(select === false){
+            select = parent.closest(attribute, parent);
+        }
+        return select;
+
     }
-    if(parent === false){
-        var priya = this.attach(this.create('element', selector));
-        priya.data('selector', selector);
-        return priya;
-    }
-    var select = parent.select(selector);
-    if(typeof select == 'object' && select.tagName == 'PRIYA-NODE'){
-        delete select;
-        select = parent.closest(selector, parent);
-    }
-    if(select === false){
-        select = parent.closest(selector, parent);
-    }
-    return select;
 }
 
 priya.prototype.previous = function (node){
@@ -457,11 +567,34 @@ priya.prototype.clone = function (deep){
 
 priya.prototype.create = function (type, create){
     switch(type.toLowerCase()){
-        case 'div':
-            var element = document.createElement('DIV');
-            element.className = this.str_replace('.', ' ', create);
-            element.className = this.str_replace('#', '', element.className);
-            return this.attach(element);
+        case 'id':
+            if(typeof create == 'undefined'){
+                create = 'priya';
+            }
+            var data = priya.collection('id.' + create);
+            if(this.empty(data)){
+                data = [];
+            }
+            var id = 1;
+            var index;
+            for(index =0; index < data.length; index++){
+                if(index >= id){
+                    id = index + 1;
+                }
+            }
+            data[id] = {"id": create + '-' + id};
+            priya.collection('id.' + create, data);
+            return create + '-' + id;
+        break;
+        case 'link':
+            var element = document.createElement('LINK');
+            element.rel = 'stylesheet';
+            if(typeof create == 'string'){
+                element.href = create;
+            } else {
+                alert('todo');
+            }
+            return element;
         break;
         case 'element':
             var element = document.createElement('PRIYA-NODE');
@@ -471,7 +604,7 @@ priya.prototype.create = function (type, create){
         break;
         case 'nodelist' :
               var fragment = document.createDocumentFragment();
-              if(Object.prototype.toString.call( create ) === '[object Array]'){
+              if(Object.prototype.toString.call(create) === '[object Array]'){
                   var i;
                   for(i=0; i < create.length; i++){
                       fragment.appendChild(create[i]);
@@ -488,7 +621,12 @@ priya.prototype.create = function (type, create){
               return fragment.childNodes;
         break;
         default :
-            console.log('type (' +  type + ') note defined in priya.create()');
+            var element = document.createElement(type.toUpperCase());
+            if(create){
+                element.className = this.str_replace('.', ' ', create);
+                element.className = this.str_replace('#', '', element.className);
+            }
+            return this.attach(element);
     }
     return false;
 }
@@ -602,15 +740,29 @@ priya.prototype.hasClass = function (className){
     return false;
 }
 
+priya.prototype.computedStyle = function(attribute){
+     if(!this.Priya.style){
+         this.Priya.style = window.getComputedStyle(this);
+     }
+     if(attribute){
+         return this.Priya.style[attribute];
+     } else {
+         return this.Priya.style;
+     }
+}
+
 priya.prototype.css = function(attribute, value){
     if(this.empty(value)){
         if(typeof this.style == 'undefined'){
             return '';
         }
-        if(this.empty(this.style[attribute])){
-            return '';
-        }
-        return this.style[attribute];
+        return this.computedStyle(attribute);
+    }
+    if(attribute == 'has'){
+        return !!this.style[value];
+    }
+    if(attribute == 'delete'){
+        this.style[value] = '';
     }
     if(this.is_nodeList(this)){
         var index;
@@ -888,23 +1040,40 @@ priya.prototype.refresh = function (data){
     return data;
 }
 
-priya.prototype.link = function (data){
+priya.prototype.link = function (data, func){
     if(typeof data == 'undefined'){
         return;
     }
-    if(!this.isset(data.link)){
-        return data;
-    }
-    var index;
-    for(index in data.link){
-        var link = {
-            "method":"append",
-            "target":"head",
-            "html":data.link[index]
+    if(typeof data == 'string'){
+        var data = {
+            link : [data]
         };
-        this.content(link);
     }
-    return this;
+    if(this.isset(data.href)){
+        priya.dom('head').appendChild(data);
+        if(func){
+            data.addEventListener('load', function(event){
+                func();
+            }, false);
+        }
+        return data;
+    } else {
+        if(!this.isset(data.link)){
+            return data;
+        }
+        var index;
+        for(index in data.link){
+            var link = {
+                "method":"append",
+                "target":"head",
+                "html":data.link[index]
+            };
+            this.content(link);
+//            var element =s
+        }
+        return this;
+    }
+
 }
 
 priya.prototype.script = function (data){
@@ -1252,6 +1421,19 @@ priya.prototype.init = function (data, configuration){
         return element;
     }
     return data;
+}
+
+priya.prototype.jid = function (list){
+    if(typeof list == 'undefined'){
+        list = 'priya';
+    }
+    var data = this.collection(list);
+    if(this.empty(data)){
+        return "1";
+    } else{
+        console.log(data);
+    }
+
 }
 
 priya.prototype.collection = function (attribute, value){
