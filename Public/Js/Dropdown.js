@@ -23,7 +23,7 @@ dropdown.prototype.run = function(){
             this.item(item);
         }
     } else {
-        node.item(node);
+        this.item(node);
     }
 }
 
@@ -112,7 +112,6 @@ dropdown.prototype.enable = function(element){
             ul.css('top', (parseFloat(element.data('offset-top')) - parseFloat(scrollable.scrollbar('y')) - parseFloat(ul.css('height'))) + 'px');
         }
     }
-    priya.debug('haha');
     console.log(ul.dom('li:first-child'));
     ul.dom('li:first-child').addClass('.selected');
 }

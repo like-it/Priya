@@ -43,7 +43,7 @@ priya.prototype.debug = function(data){
     var debug = this.run('.debug .tab-body.tab-debug');
     if(!debug){
         var node = this.create('div', 'dialog no-select debug');
-        node.html('<div class="head"><i class="icon icon-bug"></i><h2>Debug</h2></div><div class="menu"><ul class="tab-head"><li class="tab-debug selected"><p>Debug</p></li><li class="tab-collection"><p>Collection</p></li></ul></div><div class="body"><div class="tab tab-body tab-debug selected"></div><div class="tab tab-body tab-collection"></div></div><div class="footer"><button type="button" class="button-default button-close">Close</button></div></div>');
+        node.html('<div class="head"><i class="icon icon-bug"></i><h2>Debug</h2></div><div class="menu"><ul class="tab-head"><li class="tab-debug selected"><p>Debug</p></li><li class="tab-collection"><p>Collection</p></li></ul></div><div class="body"><div class="tab tab-body tab-debug selected"></div><div class="tab tab-body tab-collection"></div></div><div class="footer"><button type="button" class="button-default button-close">Close</button><button type="button" class="button-default button-clear"><i class="icon-trash"></i></button></div></div>');
         this.dom('body').append(node);
         var debug = this.run('.debug .tab-body.tab-debug');
     }
@@ -61,8 +61,11 @@ priya.prototype.debug = function(data){
     node.dom('div.footer').closest('.debug').addClass('has-footer');
     node.addClass('display-block');
     node.dom('.button-close').on('click', function(){
-        console.log('remove');
         priya.dom('.debug').removeClass('display-block');
+    });
+    node.dom('.button-clear').on('click', function(){
+        var debug = priya.run('.debug .tab-body.tab-debug');
+        debug.html('');
     });
     node.dom('.tab-head .tab-collection').on('click', function(){
         priya.dom('.tab-head li').removeClass('selected');
@@ -1093,6 +1096,56 @@ priya.prototype.script = function (data){
 
 priya.prototype.exception = function (data, except){
     if(data == 'write' || data == 'replace'){
+        this.debug(except);
+        /*
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"replace",
+            "html":"<pre>"+ except +"</pre>"
+        }
+        exception.content(content);
+        */
+    }
+    else if(data == 'append'){
+        this.debug(except);
+        /*
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"append",
+            "html":"<pre>"+ except +"</pre>"
+        }
+        exception.content(content);
+        */
+    }
+    else {
+        var index;
+        var found = false;
+        for (index in data){
+            if(this.stristr(index,'\\exception')){
+                found = true;
+            }
+        }
+        if(this.empty(found)){
+            return;
+        }
+        this.debug(JSON.stringify(data, null, 2));
+        /*
+        var exception = this.dom('.exception');
+        var content = {
+            "target": ".exception",
+            "method":"append",
+            "html":"<pre>"+ JSON.stringify(data, null, 4) +"</pre>"
+        }
+        exception.content(content);
+        */
+    }
+}
+
+/*
+priya.prototype.exception = function (data, except){
+    if(data == 'write' || data == 'replace'){
         var exception = this.dom('.exception');
         var content = {
             "target": ".exception",
@@ -1130,6 +1183,7 @@ priya.prototype.exception = function (data, except){
         exception.content(content);
     }
 }
+*/
 
 priya.prototype.addScriptSrc = function (data){
     var tag = this.readTag(data)
