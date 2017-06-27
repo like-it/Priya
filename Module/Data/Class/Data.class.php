@@ -15,8 +15,8 @@ use Priya\Application;
 class Data extends Core {
     const DIR = __DIR__;
 
-    private $url;
-    private $data;
+    public $url;
+    public $data;
 
     public function __construct($handler=null, $route=null, $data=null){
         $this->data($this->object_merge($this->data(), $handler));
@@ -202,6 +202,8 @@ class Data extends Core {
         if($url !== false){
             $this->url($url);
         }
+
+
         $file = new File();
         $read = $file->read($url);
         $read = $this->object($read);

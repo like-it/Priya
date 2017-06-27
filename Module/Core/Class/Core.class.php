@@ -667,7 +667,10 @@ class Core {
 
     public function debug($output='',$isExport=false,$isDie=false){
         if($this->handler()->contentType() == Handler::CONTENT_TYPE_JSON){
-            echo $this->object($output, 'json');
+            $object = new stdClass();
+            $attribute = 'Priya\Module\Debug';
+            $object->{$attribute} = $output;
+            echo $this->object($object, 'json');
         } else {
             if($this->handler()->method() == Handler::METHOD_CLI){
                 $cli = new Cli();

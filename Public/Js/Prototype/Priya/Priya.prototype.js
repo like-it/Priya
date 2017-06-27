@@ -54,6 +54,25 @@ priya.prototype.debug = function(data){
         var scrollable = debug.closest('has', 'scrollbar', 'vertical');
         scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
     }
+    else if(typeof data == 'object'){
+        var index;
+        var found = false;
+        for (index in data){
+            if(this.stristr(index,'\\debug')){
+                found = true;
+                data = data[index];
+            }
+        }
+        if(this.empty(found)){
+            return;
+        }
+        data = JSON.stringify(data, null, 2);
+        var node = this.create('pre', '');
+        node.html(data);
+        debug.append(node);
+        var scrollable = debug.closest('has', 'scrollbar', 'vertical');
+        scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
+    }
     var node = this.run('.debug');
     node.dom('div.head').closest('.debug').addClass('has-head');
     node.dom('div.menu').closest('.debug').addClass('has-menu');
@@ -794,6 +813,48 @@ priya.prototype.data = function (attribute, value){
     if(attribute == 'remove'){
         return this.attribute('remove','data-' + value);
     }
+    else if (attribute == 'clear' && value == 'error'){
+        if(this.tagName == 'FORM'){
+            //clear errors from form
+            var input = this.select('input');
+            var textarea = this.select('textarea');
+            var select = this.select('select');
+            var dropdown = this.select('.dropdown');
+            var index;
+            if(this.is_nodeList(input)){
+                for(index=0; index < input.length; index++){
+                    var elem = input[index];
+                    elem.removeClass('error');
+                }
+            } else {
+                input.removeClass('error');
+            }
+            if(this.is_nodeList(textarea)){
+                 for(index=0; index < textarea.length; index++){
+                     var elem = textarea[index];
+                     elem.removeClass('error');
+                 }
+            } else {
+                textarea.removeClass('error');
+            }
+            if(this.is_nodeList(select)){
+                for(index=0; index < select.length; index++){
+                    var elem = select[index];
+                    elem.removeClass('error');
+                }
+            } else {
+                select.removeClass('error');
+            }
+            if(this.is_nodeList(dropdown)){
+                for(index=0; index < dropdown.length; index++){
+                    var elem = select[index];
+                    elem.removeClass('error');
+                }
+            } else {
+                dropdown.removeClass('error');
+            }
+        }
+    }
     else if (attribute == 'serialize'){
         if(this.tagName == 'FORM'){
             //return all data for form
@@ -1014,6 +1075,7 @@ priya.prototype.request = function (url, data, script){
             priya.content(data);
             priya.refresh(data);
             priya.exception(data);
+            priya.debug(data);
         }
     };
     if(type == 'GET'){
@@ -1088,6 +1150,7 @@ priya.prototype.script = function (data){
     }
     var index;
     for(index in data.script){
+        //this.debug(data.script[index]);
         this.addScriptSrc(data.script[index]);
         this.addScriptText(data.script[index]);
     }
@@ -1125,6 +1188,7 @@ priya.prototype.exception = function (data, except){
         for (index in data){
             if(this.stristr(index,'\\exception')){
                 found = true;
+                data = data[index];
             }
         }
         if(this.empty(found)){
