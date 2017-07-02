@@ -798,15 +798,11 @@ priya.prototype.css = function(attribute, value){
 }
 
 priya.prototype.val = function (value){
-    if(!this.empty(value)){
-        this.value = value
-        return this.value;
-    } else {
-        if(typeof this.value == 'undefined'){
-            return false;
-        }
-        return this.value;
+    if(typeof this.value == 'undefined'){
+        return false;
     }
+    this.value = value
+    return this.value;
 }
 
 priya.prototype.data = function (attribute, value){
