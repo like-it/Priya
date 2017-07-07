@@ -57,7 +57,6 @@
 }
 
 .dropdown p {
-    background-color: rgba(255, 255, 255, 1);
     width: calc(100% - 50px);
     height: 20px;
     padding: 0;

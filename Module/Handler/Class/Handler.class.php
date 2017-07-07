@@ -361,8 +361,12 @@ class Handler extends \Priya\Module\Core\Data{
             if(!isset($old->nodeList)){
                 $input = new stdClass();
                 $input->nodeList = array();
-                foreach($old as $node){
-                    $input->nodeList[] = $node;
+                foreach($old as $key => $node){
+                    if(is_numeric($key)){
+                        $input->nodeList[] = $node;
+                    } else {
+                        $input->nodeList[] = array($key => $node);
+                    }
                 }
                 $input = json_encode($input);
             }

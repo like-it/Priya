@@ -20,6 +20,8 @@
 var priya = function (id){
     this.collect = {};
     this.parent = this;
+    this.loader = 0;
+    this.hit = 0;
 };
 
 priya.prototype.run = function (data){
@@ -286,6 +288,10 @@ priya.prototype.parentNode = function (parent){
     }
 }
 
+priya.prototype.active = function (){
+    return document.activeElement;
+}
+
 priya.prototype.calculate = function (calculate){
     var result = null;
     switch(calculate){
@@ -375,18 +381,24 @@ priya.prototype.scrollbar = function(attribute, type){
     if(attribute == 'x' || attribute == 'left'){
         return this.data('scrollbar-x', this.scrollLeft);
     }
+    var width = this.offsetWidth - this.clientWidth;
+    var height = this.offsetHeight - this.clientHeight;
     if(attribute == 'width'){
+        return this.data('scrollbar-width', width);
+        //other (width without scrollbars)
         return this.data('scrollbar-width', this.scrollWidth);
     }
     if(attribute == 'height'){
+        return this.data('scrollbar-height', height);
+        //other (height without scrollbars)
         return this.data('scrollbar-height', this.scrollHeight);
     }
     if(attribute == 'all'){
         var scrollbar = {
                 'y': this.scrollTop,
                 'x': this.scrollLeft,
-                'width': this.scrollWidth,
-                'height': this.scrollHeight
+                'width': width,
+                'height': height
         };
         return this.data('scrollbar', scrollbar);
     }
@@ -1102,6 +1114,7 @@ priya.prototype.refresh = function (data){
 }
 
 priya.prototype.link = function (data, func){
+    console.log(data);
     if(typeof data == 'undefined'){
         return;
     }
@@ -1112,6 +1125,11 @@ priya.prototype.link = function (data, func){
     }
     if(this.isset(data.href)){
         priya.dom('head').appendChild(data);
+        console.log('appended');
+        priya.loader++;
+        data.addEventListener('load', function(event){
+            priya.loader--;
+        }, false);
         if(func){
             data.addEventListener('load', function(event){
                 func();
@@ -1137,9 +1155,21 @@ priya.prototype.link = function (data, func){
 
 }
 
-priya.prototype.script = function (data){
+priya.prototype.script = function (data, attempt){
     if(typeof data == 'undefined'){
         return;
+    }
+    if(typeof attempt == 'undefined'){
+        attempt = 0;
+    }
+    if(parseInt(priya.loader) != 0 && attempt < 500){
+         setTimeout(function(){
+             priya.script(data, ++attempt);
+             priya.hit++;
+             console.log(priya.loader);
+             console.log(priya.hit);
+         }, parseFloat(1/30));
+         return data;
     }
     if(!this.isset(data.script)){
         return data;
