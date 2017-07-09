@@ -16,6 +16,8 @@ class Memory extends Data{
     const DEFAULT_PORT = 11211;
     const DEFAULT_WEIGHT = 1;
 
+    const NOT_FOUND = 16;
+
     private $id;
     private $memory;
     private $nodeList;
@@ -53,6 +55,19 @@ class Memory extends Data{
         if($this->id === null){
             $this->stop();
         }
+        $this->stop();
+    }
+
+    public function result($result='code'){
+        if($result == 'code'){
+            return $this->memory->getResultCode();
+        }
+    }
+
+    public function restart(){
+//         exec('service memcached stop');
+//         exec('service memcached start');
+        exec('service memcached restart');
     }
 
     private function createServer($server=''){
