@@ -14,8 +14,6 @@ function function_array_diff($value=null, $argumentList=array(), $parser=null){
     }
     $array = array_shift($argumentList);
     $array_compare = array_shift($argumentList);
-    var_dump($array);
-    var_dump($array_compare);
     $diff = array_diff($array, $array_compare);
     if(empty($argumentList)){
         return $diff;

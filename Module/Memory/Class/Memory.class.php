@@ -17,6 +17,7 @@ class Memory extends Data{
     const DEFAULT_WEIGHT = 1;
 
     const NOT_FOUND = 16;
+    const TIMEOUT = 32;
 
     private $id;
     private $memory;
