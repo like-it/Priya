@@ -62,29 +62,29 @@ function function_math($value=null, $argumentList=array(), $parser=null){
             return false;
         }
     }
-    $equation = str_replace('math.deg.rad', 'deg2rad', $equation);
-    $equation = str_replace('math.rad.deg', 'rad2deg', $equation);
-    $equation = str_replace('math.dec.bin', 'decbin', $equation);
-    $equation = str_replace('math.bin.dec', 'bindec', $equation);
-    $equation = str_replace('math.dec.hex', 'dechex', $equation);
-    $equation = str_replace('math.hex.dec', 'hexdec', $equation);
-    $equation = str_replace('math.dec.oct', 'decoct', $equation);
-    $equation = str_replace('math.oct.dec', 'octdec', $equation);
-    $equation = str_replace('math.cos.arc.inv', 'acosh', $equation);
-    $equation = str_replace('math.cos.arc', 'acos', $equation);
-    $equation = str_replace('math.cos.inv', 'cosh', $equation);
-    $equation = str_replace('math.sin.arc.inv', 'asinh', $equation);
-    $equation = str_replace('math.sin.arc', 'asin', $equation);
-    $equation = str_replace('math.sin.inv', 'sinh', $equation);
-    $equation = str_replace('math.tan.arc.inv', 'atanh', $equation);
-    $equation = str_replace('math.tan.arc', 'atan', $equation);
-    $equation = str_replace('math.tan.inv', 'tanh', $equation);
+    $equation = str_ireplace('math.deg.rad', 'deg2rad', $equation);
+    $equation = str_ireplace('math.rad.deg', 'rad2deg', $equation);
+    $equation = str_ireplace('math.dec.bin', 'decbin', $equation);
+    $equation = str_ireplace('math.bin.dec', 'bindec', $equation);
+    $equation = str_ireplace('math.dec.hex', 'dechex', $equation);
+    $equation = str_ireplace('math.hex.dec', 'hexdec', $equation);
+    $equation = str_ireplace('math.dec.oct', 'decoct', $equation);
+    $equation = str_ireplace('math.oct.dec', 'octdec', $equation);
+    $equation = str_ireplace('math.cos.arc.inv', 'acosh', $equation);
+    $equation = str_ireplace('math.cos.arc', 'acos', $equation);
+    $equation = str_ireplace('math.cos.inv', 'cosh', $equation);
+    $equation = str_ireplace('math.sin.arc.inv', 'asinh', $equation);
+    $equation = str_ireplace('math.sin.arc', 'asin', $equation);
+    $equation = str_ireplace('math.sin.inv', 'sinh', $equation);
+    $equation = str_ireplace('math.tan.arc.inv', 'atanh', $equation);
+    $equation = str_ireplace('math.tan.arc', 'atan', $equation);
+    $equation = str_ireplace('math.tan.inv', 'tanh', $equation);
     if(version_compare(PHP_VERSION, $parser::PHP_MIN_VERSION, '>=')){
-        $equation = str_replace('math.random', 'random_int', $equation);
+        $equation = str_ireplace('math.random', 'random_int', $equation);
     } else {
-        $equation = str_replace('math.random', 'rand', $equation);
+        $equation = str_ireplace('math.random', 'rand', $equation);
     }
-    $equation = str_replace('math.', '', $equation);
+    $equation = str_ireplace('math.', '', $equation);
     $result = false;
     eval("\$result = " . $equation . ";");
     return $result;
