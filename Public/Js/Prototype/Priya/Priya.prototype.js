@@ -1114,7 +1114,6 @@ priya.prototype.refresh = function (data){
 }
 
 priya.prototype.link = function (data, func){
-    console.log(data);
     if(typeof data == 'undefined'){
         return;
     }
@@ -1376,6 +1375,9 @@ priya.prototype.content = function (data){
             else if (method == 'replace-with'){
                 node.html(data['html'], 'outer');
             }
+            else if(method == 'replace-or-add-to-body'){
+                priya.debug(target);
+            }
             else if(method == 'append' || method == 'beforeend'){
                 node.insertAdjacentHTML('beforeend',data['html']);
             }
@@ -1397,6 +1399,9 @@ priya.prototype.content = function (data){
         }
         else if(method == 'replace-with'){
             target.html(data['html'], 'outer');
+        }
+        else if(method == 'replace-or-add-to-body'){
+            priya.debug(target);
         }
         else if(method == 'append' || method == 'beforeend'){
             target.insertAdjacentHTML('beforeend',data['html']);
