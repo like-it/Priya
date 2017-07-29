@@ -386,12 +386,12 @@ priya.prototype.scrollbar = function(attribute, type){
     if(attribute == 'width'){
         return this.data('scrollbar-width', width);
         //other (width without scrollbars)
-        return this.data('scrollbar-width', this.scrollWidth);
+        //return this.data('scrollbar-width', this.scrollWidth);
     }
     if(attribute == 'height'){
         return this.data('scrollbar-height', height);
         //other (height without scrollbars)
-        return this.data('scrollbar-height', this.scrollHeight);
+        //return this.data('scrollbar-height', this.scrollHeight);
     }
     if(attribute == 'all'){
         var scrollbar = {
@@ -1058,6 +1058,11 @@ priya.prototype.request = function (url, data, script){
     if(this.empty(url)){
         return;
     }
+    var body = priya.run('body');
+    var load = priya.create('element', 'priya-loader');
+    load.innerHTML = '<div class="priya-gui-loader"></div>';
+    body.append(load);
+
     if(this.empty(data)){
         data = this.data();
     }
@@ -1077,13 +1082,21 @@ priya.prototype.request = function (url, data, script){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
-            var data = JSON.parse(xhttp.responseText);
-            priya.link(data);
-            priya.script(data);
-            priya.content(data);
-            priya.refresh(data);
-            priya.exception(data);
-            priya.debug(data);
+            if(xhttp.responseText.substr(0, 1) == '{' && xhttp.responseText.substr(-1) == '}'){
+                var data = JSON.parse(xhttp.responseText);
+                priya.link(data);
+                priya.script(data);
+                priya.content(data);
+                priya.refresh(data);
+                priya.exception(data);
+                priya.debug(data);
+                priya.dom('.priya-gui-loader').addClass('fade-out');
+                setTimeout(function(){
+                    priya.dom('.priya-loader').remove();
+                }, 10000);
+            } else {
+                priya.debug(xhttp.responseText);
+            }
         }
     };
     if(type == 'GET'){
@@ -1275,7 +1288,7 @@ priya.prototype.exception = function (data, except){
 */
 
 priya.prototype.addScriptSrc = function (data){
-    var tag = this.readTag(data)
+    var tag = this.readTag(data);
     if(!this.isset(tag['tagName']) || tag['tagName'] != 'script'){
         return;
     }
@@ -1329,7 +1342,8 @@ priya.prototype.addScriptText = function (data){
 }
 
 priya.prototype.readTag = function (data){
-    temp = this.explode(' ', this.trim(data));
+    var temp = this.explode('>', this.trim(data));
+    temp = this.explode(' ', this.trim(temp[0]));
     var index;
     var tag = {
         "tagName": temp[0].substr(1)
@@ -1375,8 +1389,21 @@ priya.prototype.content = function (data){
             else if (method == 'replace-with'){
                 node.html(data['html'], 'outer');
             }
-            else if(method == 'replace-or-add-to-body'){
-                priya.debug(target);
+            else if(method == 'replace-or-append-to-body'){
+                if(node.nodeName == 'PRIYA-NODE'){
+                    var node = priya.dom('body');
+                    node.insertAdjacentHTML('beforeend',data['html']);
+                } else {
+                    node.html(data['html']);
+                }
+            }
+            else if(method == 'replace-with-or-append-to-body'){
+                if(node.nodeName == 'PRIYA-NODE'){
+                    var node = priya.dom('body');
+                    node.insertAdjacentHTML('beforeend',data['html']);
+                } else {
+                    node.html(data['html'], 'outer');
+                }
             }
             else if(method == 'append' || method == 'beforeend'){
                 node.insertAdjacentHTML('beforeend',data['html']);
@@ -1400,8 +1427,21 @@ priya.prototype.content = function (data){
         else if(method == 'replace-with'){
             target.html(data['html'], 'outer');
         }
-        else if(method == 'replace-or-add-to-body'){
-            priya.debug(target);
+        else if(method == 'replace-or-append-to-body'){
+            if(target.nodeName == 'PRIYA-NODE'){
+                var target = priya.dom('body');
+                target.insertAdjacentHTML('beforeend',data['html']);
+            } else {
+                target.html(data['html']);
+            }
+        }
+        else if(method == 'replace-with-or-append-to-body'){
+            if(target.nodeName == 'PRIYA-NODE'){
+                var target = priya.dom('body');
+                target.insertAdjacentHTML('beforeend',data['html']);
+            } else {
+                target.html(data['html'], 'outer');
+            }
         }
         else if(method == 'append' || method == 'beforeend'){
             target.insertAdjacentHTML('beforeend',data['html']);

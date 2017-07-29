@@ -15,6 +15,8 @@ use Priya\Module\Core\Data;
 
 class Pager extends Data {
     const LENGTH = 20;
+    const METHOD = 'replace-with';
+    const TARGET = 'body';
 
     private $recordStart;
     private $recordLength;
@@ -26,10 +28,15 @@ class Pager extends Data {
 
     private $content;
 
+    private $method;
+    private $target;
+
     public function __construct($handler=null, $route=null, $data=null){
         parent::__construct($handler, $route, $data);
         $this->recordStart(0);
         $this->recordLength(Pager::LENGTH);
+        $this->method(Pager::METHOD);
+        $this->target(Pager::TARGET);
     }
 
     public function run(){
@@ -68,6 +75,36 @@ class Pager extends Data {
 
     private function getPage(){
         return $this->page;
+    }
+
+    public function method($method=null){
+        if($method!== null){
+            $this->setMethod($method);
+        }
+        return $this->getMethod();
+    }
+
+    private function setMethod($method=''){
+        $this->method = $method;
+    }
+
+    private function getMethod(){
+        return $this->method;
+    }
+
+    public function target($target=null){
+        if($target!== null){
+            $this->setTarget($target);
+        }
+        return $this->getTarget();
+    }
+
+    private function setTarget($target=''){
+        $this->target = $target;
+    }
+
+    private function getTarget(){
+        return $this->target;
     }
 
     public function route($route=null, $attribute=null){
@@ -282,6 +319,8 @@ class Pager extends Data {
         $node->page->current = $this->page();
         $node->page->amount = $this->amount();
         $node->page->length = $this->length();
+        $node->method = $this->method();
+        $node->target = $this->target();
         $node->nodeList = $this->object($content);
         return $this->content($node);
     }
