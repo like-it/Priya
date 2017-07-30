@@ -9,6 +9,7 @@
 
 namespace Priya;
 
+use stdClass;
 use Priya\Module\File;
 use Priya\Module\Handler;
 use Priya\Module\Core\Parser;
@@ -23,6 +24,7 @@ class Application extends Parser {
     const MODULE = 'Module';
     const TEMPLATE = 'Template';
     const PLUGIN = 'Plugin';
+    const PAGE = 'Page';
     const DATA = 'Data';
     const BACKUP = 'Backup';
     const RESTORE = 'Restore';
@@ -318,6 +320,43 @@ class Application extends Parser {
 //          404
         }
         chdir($this->cwd());  //for Parser
+        return $result;
+    }
+
+    public function page($request=''){
+        $this->data('request', $request);
+        $this->data('dir.priya.page', $this->data('dir.priya.root') . Application::PAGE . Application::DS);
+        $this->data('dir.module.page', $this->data('dir.module.root') . Application::PAGE . Application::DS);
+
+        $result = new stdClass();
+
+        $parser = new \Priya\Module\Parser();
+        $parser->data($this->data());
+        $file = new \Priya\Module\File();
+        $url = $this->data('dir.module.page') . 'Request.priya';
+        if(file_exists($url)){
+            var_dump('parse this one');
+        } else {
+            $url = $this->data('dir.priya.page') . 'Request.priya';
+            if(file_exists($url)){
+                $parser->data('input', $file->read($url));
+                $parser->data($parser->compile($parser->data(), $parser->data()));
+
+                var_Dump($parser->data());
+                die;
+
+                $result->script[] = $parser->data('input');
+
+                if($this->data('request.contentType') == Handler::CONTENT_TYPE_JSON){
+                    $result = $this->object($result, 'json');
+                } else {
+
+                }
+
+            } else {
+                var_dump('parse not found');
+            }
+        }
         return $result;
     }
 

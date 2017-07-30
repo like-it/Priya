@@ -468,6 +468,9 @@ class Handler extends \Priya\Module\Core\Data{
         }
     }
     public function session($attribute=null, $value=null){
+        if($attribute == 'has'){
+            return isset($_SESSION);
+        }
         if(!isset($_SESSION)){
             session_start();
             $_SESSION['id'] = session_id();

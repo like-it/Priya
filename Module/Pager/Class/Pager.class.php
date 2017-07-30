@@ -49,7 +49,21 @@ class Pager extends Data {
             $page = 1;
         }
         $this->calculateRecordStart($page);
-        return $this->content('create');
+        $result = $this->content('create');
+        $this->save($result);
+        return $result;
+    }
+
+    private function save($result=''){
+        if(empty($this->session('has'))){
+            return false;
+        }
+        $session = new stdClass();
+        $session->page = $result->page;
+        $session->method = $result->method;
+        $session->target = $result->target;
+        $this->session(str_replace('-','.', $result->route), $session);
+        return true;
     }
 
     public function data($attribute=null, $value=null){

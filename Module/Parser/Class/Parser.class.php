@@ -68,6 +68,8 @@ class Parser extends Data {
                 return $string;
             }
             $original = $string;
+            $string = str_replace("\r", '[' . $this->random() . '][return]', $string);
+            $string = str_replace("\n", '[' . $this->random() . '][newline]', $string);
             $string = $this->literalList($string);
             $list =  $this->attributeList($string);
             $attributeList = array();
@@ -146,6 +148,7 @@ class Parser extends Data {
                 $replace = $this->handle($replace, 'attribute');
                 $string = str_replace($search, $replace, $string);
             }
+            $string = $this->keep($string);
             $init = 0;
             $counter = 0;
             $functionList = $list;
@@ -156,9 +159,33 @@ class Parser extends Data {
             } else {
                 $string = $this->statementIfList($string, $list);
             }
+            $string = $this->capture($string);
             $string = $this->handle($string, true);
             return $string;
         }
+    }
+
+    private function keep($string=''){
+        $explode = explode('[keep[', $string);
+        if(count($explode) == 1){
+            return $string;
+        }
+        $temp = explode(']]', $explode[1], 2);
+        $key = $temp[0];
+        $replace = '{' . $key .'}';
+        $search = '[keep[' . $key . ']]';
+        $string = str_replace($search, $replace, $string);
+        return $string;
+    }
+
+    private function capture($string=''){
+        $append = $this->data('capture.append');
+//         $this->debug($append);
+        foreach($append as $capture){
+            $string = function_capture_append($string, $capture, $this);
+        }
+        $this->data('delete', 'capture.append');
+        return $string;
     }
 
     private function handle($string, $return=false){
@@ -231,6 +258,9 @@ class Parser extends Data {
                 return $json;
             }
         }
+        $string = str_replace('[' . $this->random() . '][return]', "\r", $string);
+        $string = str_replace('[' . $this->random() . '][newline]', "\n", $string);
+
         $string = str_replace('{' . Parser::LITERAL . '}', '' , $string);
         $string = str_replace('{/' . Parser::LITERAL . '}', '' , $string);
         return $string;
@@ -409,7 +439,7 @@ class Parser extends Data {
                             } else {
                                 $replace = '0';
                             }
-                            $string = str_replace($search, $replace, $string);
+//                             $string = str_replace($search, $replace, $string);
                             trigger_error('(Parser) (execMethodList) missing file: ' . $url);
                             //remove {function} ?
                             continue;
@@ -435,7 +465,24 @@ class Parser extends Data {
                             $argList[$arg_nr] = null;
                         }
                     }
-                    $replace =  $function($search, $argList, $this);
+                    if($function == 'function_capture_append'){
+                        $string = function_capture_append($string, $argList, $this);
+                        $key = reset($argList);
+                        $search = '{$' . $key . '}';
+                        $replace = $this->object($this->data($key), 'json');
+                        $string = str_replace($search, $replace, $string);
+
+                        /*
+                        $capture_append = $this->data('capture.append');
+                        if(empty($capture_append)){
+                            $capture_append = array();
+                        }
+                        $capture_append[] = $argList;
+                        $this->data('capture.append', $capture_append);
+                        */
+                        continue;
+                    }
+                    $replace = $function($search, $argList, $this);
                     if($type == 'functionList'){
                         if($replace === null){
                             $replace = 'null';
@@ -666,6 +713,8 @@ class Parser extends Data {
                 $arguments = trim($arguments, ' ');
                 $arguments = rtrim($arguments, '}');
                 $arguments = substr($arguments, 1, -1);
+            } else {
+                return $methodList;
             }
             $arguments = str_replace('[quote]', '', $arguments);
             $arguments = $this->fixBrackets($arguments);
@@ -878,9 +927,12 @@ class Parser extends Data {
     }
 
     private function attributeList($string=''){
+        $attributeList = array();
         $function = explode('function(', $string);
         foreach($function as $function_nr => $content){
-            $attributeList = array();
+            if(strpos($content, '[' . $this->random() . '[' . Parser::LITERAL . ']' .  $this->random() . ']') !== false){
+                return $attributeList;
+            }
             $list = explode('{', $string);
 
             if(empty($list)){
@@ -893,34 +945,42 @@ class Parser extends Data {
                 if(count($tmp) > 1){
                     $tmpAttribute = trim(array_shift($tmp));
                 }
-                if(!empty($tmpAttribute)){
-                    if(substr($tmpAttribute,0,1) == '$'){
-                        $variable = true;
-                        $tmpAttribute = substr($tmpAttribute, 1);
-                    }
-                    if(empty($variable)){
-                        $key = '{' . $tmpAttribute . '}';
-                    } else {
-                        $key = '{$' . $tmpAttribute . '}';
-                    }
-                    $oldString = $string;
-                    $string = str_replace($key, '[[' . $tmpAttribute . ']]', $string);
-
-                    if($string != $oldString){
-                        $tmpAttributeList = $this->attributeList($string);
-                    }
-                    if(!empty($tmpAttributeList)){
-                        foreach($tmpAttributeList as $tmp_nr => $tmp_record){
-                            $tmp_key = str_replace('[[' . $tmpAttribute . ']]', '{$' . $tmpAttribute . '}', $tmp_nr);
-                            $tmpAttributeList[$tmp_key] = str_replace('[[' . $tmpAttribute . ']]', '{$' . $tmpAttribute . '}', $tmp_record);
-                            unset($tmpAttributeList[$tmp_nr]);
-                        }
-                        foreach($tmpAttributeList as $tmp_nr => $tmp_record){
-                            $attributeList[$tmp_nr] = $tmp_record;
-                        }
-                    }
-                    $attributeList[$key] = $tmpAttribute;
+                if(stristr($tmpAttribute, '[' . $this->random() . '][newline]') !== false){
+                    continue;
                 }
+                if(stristr($tmpAttribute, '[' . $this->random() . '][return]') !== false){
+                    continue;
+                }
+                //also literal ?
+                if(empty($tmpAttribute)){
+                    continue;
+                }
+                if(substr($tmpAttribute,0,1) == '$'){
+                    $variable = true;
+                    $tmpAttribute = substr($tmpAttribute, 1);
+                }
+                if(empty($variable)){
+                    $key = '{' . $tmpAttribute . '}';
+                } else {
+                    $key = '{$' . $tmpAttribute . '}';
+                }
+                $oldString = $string;
+                $string = str_replace($key, '[[' . $tmpAttribute . ']]', $string);
+
+                if($string != $oldString){
+                    $tmpAttributeList = $this->attributeList($string);
+                }
+                if(!empty($tmpAttributeList)){
+                    foreach($tmpAttributeList as $tmp_nr => $tmp_record){
+                        $tmp_key = str_replace('[[' . $tmpAttribute . ']]', '{$' . $tmpAttribute . '}', $tmp_nr);
+                        $tmpAttributeList[$tmp_key] = str_replace('[[' . $tmpAttribute . ']]', '{$' . $tmpAttribute . '}', $tmp_record);
+                        unset($tmpAttributeList[$tmp_nr]);
+                    }
+                    foreach($tmpAttributeList as $tmp_nr => $tmp_record){
+                        $attributeList[$tmp_nr] = $tmp_record;
+                    }
+                }
+                $attributeList[$key] = $tmpAttribute;
             }
         }
         return $attributeList;
