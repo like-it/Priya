@@ -638,6 +638,7 @@ class Parser extends Data {
     private function createMethodList($statement='', $type='statementList', $attributeList=array()){
         $parts = $this->explode_single(
             array(
+                '{',	//was not here, moved to top for bugfix
                 '&&',
                 '||',
                 ' and ',
@@ -654,10 +655,9 @@ class Parser extends Data {
                 '>=',
                 '<=>',
                 '}',		//was '};'
-                '{',	//was not here
             ),
             $statement
-         );
+        );
         $methodList = array();
         $temp = explode(')}', $statement);
         foreach ($parts as $nr => $part){
@@ -706,7 +706,6 @@ class Parser extends Data {
 //             $function_key = str_replace('.', '_', $function_key);
 //             $func = str_replace('.', '_', ltrim($func, '{!'));
             $function[$function_key]['function'] = $func;
-
             $tmp = explode($function[$function_key]['function'], $function_key, 2);
             if(count($tmp) > 1){
                 $arguments = $tmp[1];
@@ -714,7 +713,7 @@ class Parser extends Data {
                 $arguments = rtrim($arguments, '}');
                 $arguments = substr($arguments, 1, -1);
             } else {
-                return $methodList;
+                continue;
             }
             $arguments = str_replace('[quote]', '', $arguments);
             $arguments = $this->fixBrackets($arguments);
@@ -863,7 +862,6 @@ class Parser extends Data {
             $function[$function_key]['argumentList'] = $list;
             $methodList[$statement][] = $function;
         }
-//         $this->debug($methodList, true);
         return $methodList;
     }
 

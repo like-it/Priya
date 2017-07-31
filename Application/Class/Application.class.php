@@ -342,7 +342,9 @@ class Application extends Parser {
                 $parser->data('input', $file->read($url));
                 $parser->data($parser->compile($parser->data(), $parser->data()));
 
-                var_Dump($parser->data());
+                var_dump($parser->data());
+
+                var_Dump($parser->data('script'));
                 die;
 
                 $result->script[] = $parser->data('input');
