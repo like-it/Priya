@@ -31,14 +31,9 @@ function function_capture_append($value=null, $argumentList=array(), $parser=nul
             }
             $parser->test = true;
             $tmp[1] = $parser->compile($tmp[1], $parser->data());
-            var_dump('&&&&&&&&&&&&&&&&&&&&&&&&');
-            var_dump($tmp[1]);
-            var_dump('&&&&&&&&&&&&&&&&&&&&&&&&');
             $array[] = $tmp[1];
             $parser->data($key, $array);
-
             $search = '{capture.append' . $string . '{/capture}';
-
             $value = str_replace($search, '', $value);
         }
     }

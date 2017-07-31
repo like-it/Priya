@@ -17,11 +17,12 @@
  *  -	all
  */
 
-var priya = function (id){
+var priya = function (url){
     this.collect = {};
     this.parent = this;
-    this.loader = 0;
+    this.load = 0;
     this.hit = 0;
+    this.collection('url', url);
 };
 
 priya.prototype.run = function (data){
@@ -42,19 +43,95 @@ priya.prototype.dom = function(data){
 }
 
 priya.prototype.debug = function(data){
-    var debug = this.run('.debug .tab-body.tab-debug');
-    if(!debug){
+    var string = 'Opening debug...';
+    var node = this.run('.debug');
+    if(!node){
         var node = this.create('div', 'dialog no-select debug');
-        node.html('<div class="head"><i class="icon icon-bug"></i><h2>Debug</h2></div><div class="menu"><ul class="tab-head"><li class="tab-debug selected"><p>Debug</p></li><li class="tab-collection"><p>Collection</p></li></ul></div><div class="body"><div class="tab tab-body tab-debug selected"></div><div class="tab tab-body tab-collection"></div></div><div class="footer"><button type="button" class="button-default button-close">Close</button><button type="button" class="button-default button-clear"><i class="icon-trash"></i></button></div></div>');
+        node.html('<div class="head"><i class="icon icon-bug"></i><h2>Debug</h2></div><div class="menu"><ul class="tab-head"><li class="tab-debug selected"><p>Debug</p></li><li class="tab-collection"><p>Collection</p></li><li class="tab-session"><p>Session</p></li></ul></div><div class="body"><div class="tab tab-body tab-debug selected"></div><div class="tab tab-body tab-collection"></div><div class="tab tab-body tab-session"></div></div><div class="footer"><button type="button" class="button-default button-close">Close</button><button type="button" class="button-default button-debug-clear"><i class="icon-trash"></i></button></div></div>');
         this.dom('body').append(node);
-        var debug = this.run('.debug .tab-body.tab-debug');
+
+        node.on('open', function(){
+            node.dom('div.head').closest('.debug').addClass('has-head');
+            node.dom('div.menu').closest('.debug').addClass('has-menu');
+            node.dom('div.icon').closest('.debug').addClass('has-icon');
+            node.dom('div.footer').closest('.debug').addClass('has-footer');
+            node.addClass('display-block');
+            node.loader('remove');
+        });
+        node.on('close', function(){
+            priya.dom('.debug').removeClass('display-block');
+        });
+        node.on('debug', function(){
+            priya.dom('.tab-head li').removeClass('selected');
+            priya.dom('.tab-body').removeClass('selected');
+            var node = priya.dom('.tab-body.tab-debug');
+            node.addClass('selected');
+            var scrollable = node.closest('has', 'scrollbar', 'vertical');
+            scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
+        });
+        node.on('debug-clear', function(){
+            var debug = priya.run('.debug .tab-body.tab-debug');
+            debug.html('');
+        });
+        node.on('collection', function(){
+            priya.dom('.tab-head li').removeClass('selected');
+            priya.dom('.tab-body').removeClass('selected');
+            var node = priya.dom('.tab-body.tab-collection');
+            node.addClass('selected');
+            node.html('<pre>' + this.dump(priya.collection()) + '</pre>');
+            console.log(node.html());
+        });
+        node.on('session', function(){
+            priya.dom('.tab-head li').removeClass('selected');
+            priya.dom('.tab-body').removeClass('selected');
+            var node = priya.dom('.tab-body.tab-session');
+            node.addClass('selected');
+
+            var request = {};
+            request.method = 'replace';
+            request.target = '.tab-body.tab-session';
+
+            priya.request(priya.collection('url') + 'Priya.System.Session', request);
+
+            node.html('<pre>Retrieving session...</pre>');
+        });
+
+        node.dom('.button-close').on('click', function(){
+            node.trigger('close');
+        });
+        node.dom('.button-debug-clear').on('click', function(){
+            node.trigger('debug-clear');
+        });
+        node.dom('.tab-head .tab-collection').on('click', function(){
+            node.trigger('collection');
+            this.addClass('selected');
+        });
+        node.dom('.tab-head .tab-debug').on('click', function(){
+            node.trigger('debug');
+            this.addClass('selected');
+        });
+        node.dom('.tab-head .tab-session').on('click', function(){
+            node.trigger('session');
+            this.addClass('selected');
+        });
+
     }
+    var debug = this.run('.debug .tab-body.tab-debug');
     if(typeof data == 'string'){
-        var node = this.create('pre', '');
-        node.html(data);
-        debug.append(node);
+        if(data == 'run'){
+            data = string;
+        }
+        var item = this.create('pre', '');
+        item.html(data);
+        debug.append(item);
         var scrollable = debug.closest('has', 'scrollbar', 'vertical');
         scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
+        node.trigger('open');
+        if(data == string){
+            setTimeout(function(){
+                item.remove();
+            }, 1500);
+        }
     }
     else if(typeof data == 'object'){
         var index;
@@ -69,42 +146,16 @@ priya.prototype.debug = function(data){
             return;
         }
         data = JSON.stringify(data, null, 2);
-        var node = this.create('pre', '');
-        node.html(data);
-        debug.append(node);
+        var item = this.create('pre', '');
+        item.html(data);
+        debug.append(item);
         var scrollable = debug.closest('has', 'scrollbar', 'vertical');
         scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
+        node.trigger('open');
+    } else {
+        node.trigger('open');
+        node.loader('remove');
     }
-    var node = this.run('.debug');
-    node.dom('div.head').closest('.debug').addClass('has-head');
-    node.dom('div.menu').closest('.debug').addClass('has-menu');
-    node.dom('div.icon').closest('.debug').addClass('has-icon');
-    node.dom('div.footer').closest('.debug').addClass('has-footer');
-    node.addClass('display-block');
-    node.dom('.button-close').on('click', function(){
-        priya.dom('.debug').removeClass('display-block');
-    });
-    node.dom('.button-clear').on('click', function(){
-        var debug = priya.run('.debug .tab-body.tab-debug');
-        debug.html('');
-    });
-    node.dom('.tab-head .tab-collection').on('click', function(){
-        priya.dom('.tab-head li').removeClass('selected');
-        priya.dom('.tab-body').removeClass('selected');
-        var node = priya.dom('.tab-body.tab-collection');
-        node.addClass('selected');
-        node.html('<pre>' + this.dump(priya.collection()) + '</pre>');
-        this.addClass('selected');
-    });
-    node.dom('.tab-head .tab-debug').on('click', function(){
-        priya.dom('.tab-head li').removeClass('selected');
-        priya.dom('.tab-body').removeClass('selected');
-        var node = priya.dom('.tab-body.tab-debug');
-        node.addClass('selected');
-        var scrollable = node.closest('has', 'scrollbar', 'vertical');
-        scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
-        this.addClass('selected');
-    });
 }
 
 priya.prototype.find = function(selector, attach) {
@@ -1058,11 +1109,6 @@ priya.prototype.request = function (url, data, script){
     if(this.empty(url)){
         return;
     }
-    var body = priya.run('body');
-    var load = priya.create('element', 'priya-loader');
-    load.innerHTML = '<div class="priya-gui-loader"></div>';
-    body.append(load);
-
     if(this.empty(data)){
         data = this.data();
     }
@@ -1090,10 +1136,6 @@ priya.prototype.request = function (url, data, script){
                 priya.refresh(data);
                 priya.exception(data);
                 priya.debug(data);
-                priya.dom('.priya-gui-loader').addClass('fade-out');
-                setTimeout(function(){
-                    priya.dom('.priya-loader').remove();
-                }, 10000);
             } else {
                 priya.debug(xhttp.responseText);
             }
@@ -1110,6 +1152,20 @@ priya.prototype.request = function (url, data, script){
         xhttp.send(send);
     }
     priya.script(script);
+}
+
+priya.prototype.loader = function(data){
+    if(data == 'remove'){
+         priya.dom('.priya-gui-loader').addClass('fade-out');
+         setTimeout(function(){
+             priya.dom('.priya-loader').remove();
+         }, 10000);
+         return;
+    }
+    var body = priya.run('body');
+    var load = priya.create('element', 'priya-loader');
+    load.innerHTML = '<div class="priya-gui-loader"></div>';
+    body.append(load);
 }
 
 priya.prototype.refresh = function (data){
@@ -1138,9 +1194,9 @@ priya.prototype.link = function (data, func){
     if(this.isset(data.href)){
         priya.dom('head').appendChild(data);
         console.log('appended');
-        priya.loader++;
+        priya.load++;
         data.addEventListener('load', function(event){
-            priya.loader--;
+            priya.load--;
         }, false);
         if(func){
             data.addEventListener('load', function(event){
@@ -1174,11 +1230,11 @@ priya.prototype.script = function (data, attempt){
     if(typeof attempt == 'undefined'){
         attempt = 0;
     }
-    if(parseInt(priya.loader) != 0 && attempt < 500){
+    if(parseInt(priya.load) != 0 && attempt < 500){
          setTimeout(function(){
              priya.script(data, ++attempt);
              priya.hit++;
-             console.log(priya.loader);
+             console.log(priya.load);
              console.log(priya.hit);
          }, parseFloat(1/30));
          return data;
@@ -2351,6 +2407,7 @@ priya.prototype.dump = function () {
     for (i = 1; i < arguments.length; i++) {
       output += '\n' + _formatArray(arguments[i], 0, padVal, padChar)
     }
+    console.log(output)
     // Not how PHP does it, but helps us test:
     return output
   }

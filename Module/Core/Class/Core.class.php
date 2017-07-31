@@ -173,6 +173,9 @@ class Core {
         if(empty($handler)){
             $this->handler(new Handler());
         }
+        if($attribute == 'delete'){
+            var_dump($value);
+        }
         return $this->handler()->session($attribute, $value);
     }
 

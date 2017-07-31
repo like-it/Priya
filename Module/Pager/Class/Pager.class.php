@@ -58,11 +58,11 @@ class Pager extends Data {
         if(empty($this->session('has'))){
             return false;
         }
-        $session = new stdClass();
-        $session->page = $result->page;
-        $session->method = $result->method;
-        $session->target = $result->target;
-        $this->session(str_replace('-','.', $result->route), $session);
+        $attribute = str_replace('-','.', $result->route);
+
+        $this->session($attribute . '.page', $result->page);
+        $this->session($attribute . '.method', $result->method);
+        $this->session($attribute . '.target', $result->target);
         return true;
     }
 

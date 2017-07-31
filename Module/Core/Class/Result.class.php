@@ -79,7 +79,11 @@ class Result extends Parser {
         }
         elseif($type == 'cli'){
             return $this->result($this->cli('create', $result));
-        } else {
+        }
+        elseif($type == 'page'){
+            return $this->result($this->page('create', $result));
+        }
+        else {
             $this->setResult($type);
         }
         return $this->getResult();
@@ -111,37 +115,6 @@ class Result extends Parser {
 
     private function getTemplate(){
         return $this->template;
-    }
-
-    public function cli($cli=null, $template=null){
-        if($cli !== null){
-            if($cli == 'create'){
-                $this->setCli($this->createCli($template));
-                return $this->getCli();
-            } else {
-                $this->setCli($cli);
-            }
-        }
-        return $this->getCli();
-    }
-
-    private function setCli($cli=''){
-        $this->cli = $cli;
-    }
-
-    private function getCli(){
-        return $this->cli;
-    }
-
-    public function createCli($template=''){
-        $template_list = (array) $this->locateTemplate($template, 'tpl.php');
-        foreach($template_list as $template){
-            if(file_exists($template) === false){
-                continue;
-            }
-            require $template;
-        }
-        return Handler::CONTENT_TYPE_CLI;
     }
 
     public function createTemplate($template=''){
@@ -453,6 +426,102 @@ class Result extends Parser {
             return false;
         } else {
             return $url;
+        }
+    }
+
+    public function cli($cli=null, $template=null){
+        if($cli !== null){
+            if($cli == 'create'){
+                $this->setCli($this->createCli($template));
+                return $this->getCli();
+            } else {
+                $this->setCli($cli);
+            }
+        }
+        return $this->getCli();
+    }
+
+    private function setCli($cli=''){
+        $this->cli = $cli;
+    }
+
+    private function getCli(){
+        return $this->cli;
+    }
+
+    public function createCli($template=''){
+        $template_list = (array) $this->locateTemplate($template, 'tpl.php');
+        foreach($template_list as $template){
+            if(file_exists($template) === false){
+                continue;
+            }
+            require $template;
+        }
+        return Handler::CONTENT_TYPE_CLI;
+    }
+
+    public function page($page=null, $template=null){
+        if($page!== null){
+            if($page== 'create'){
+                $this->setPage($this->createPage($template));
+                return $this->getPage();
+            } else {
+                $this->setPage($page);
+            }
+        }
+        return $this->getPage();
+    }
+
+    private function setPage($page=''){
+        $this->page = $page;
+    }
+
+    private function getPage(){
+        return $this->page;
+    }
+
+    public function createPage($template=''){
+        $contentType = $this->request('contentType');
+        $template_list = (array) $this->locateTemplate($template, 'tpl.priya');
+
+        $result = new stdClass();
+
+        $parser = new \Priya\Module\Parser();
+        $parser->data($this->data());
+        $file = new \Priya\Module\File();
+
+        foreach($template_list as $template){
+            if(file_exists($template) === false){
+                continue;
+            }
+            $this->data('input', $file->read($template));
+            $this->data('output', $this->parser($this->data('input'), $parser->data()));
+            if($contentType == Handler::CONTENT_TYPE_JSON){
+                $object = new stdClass();
+                $object->html = $this->data('output');
+                $object->script = $this->data('script');
+                $object->link = $this->data('link');
+                $object->target = $this->data('target');
+                if(empty($object->target)){
+                    $object->target = $this->request('target');
+                }
+                if(empty($object->target)){
+                    $object->target = 'body';
+                }
+                $object->method = $this->data('method');
+                if(empty($object->method)){
+                    $object->method= $this->request('method');
+                }
+                if(empty($object->method)){
+                    $object->method= 'append';
+                }
+                if($this->data('refresh')){
+                    $object->refresh = $this->data('refresh');
+                }
+                return $this->page($object);
+            } else {
+                return $this->page($this->data('output'));
+            }
         }
     }
 

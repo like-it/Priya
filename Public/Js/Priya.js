@@ -96,7 +96,7 @@ var priya;
     var web = window.location.protocol + '//' + window.location.host + '/';
     var node = include(web + 'Priya/Public/Js/Prototype/Priya/Priya.prototype.js');
     node.addEventListener('load', function(event){
-        priya = new priya();
+        priya = new priya(web);
         priya.run();
     }, false);
 })();
