@@ -635,6 +635,11 @@ class Parser extends Data {
         return $list;
     }
 
+    /**
+     *
+     * @bugs
+     *      - not every method gets extracted
+     */
     private function createMethodList($statement='', $type='statementList', $attributeList=array()){
         $parts = $this->explode_single(
             array(

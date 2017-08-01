@@ -37,10 +37,11 @@ Pager
     color: #000000;
 }
 
-.pager .item.page span {
-    margin-top: 5px;
+.pager .item.page span.page span {
+    margin: 0;
+    vertical-align: middle;
+    height: 20px;
 }
-
 
 .pager li.page input[type="text"] {
     background: transparent;
@@ -49,10 +50,11 @@ Pager
     color: #ffffff;
     padding: 0;
     margin: 0;
+    font-size: 20px;
 }
 
 .pager li.page span span {
     margin: 0;
     padding: 0;
     height: 16px;
-    padding-top: 8px;
+}

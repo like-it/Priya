@@ -485,17 +485,17 @@ class Result extends Parser {
         $template_list = (array) $this->locateTemplate($template, 'tpl.priya');
 
         $result = new stdClass();
-
-        $parser = new \Priya\Module\Parser();
-        $parser->data($this->data());
         $file = new \Priya\Module\File();
+        $this->data('request', $this->request());
+        $this->data('session', $this->session());
+
 
         foreach($template_list as $template){
             if(file_exists($template) === false){
                 continue;
             }
             $this->data('input', $file->read($template));
-            $this->data('output', $this->parser($this->data('input'), $parser->data()));
+            $this->data('output', $this->parser($this->data('input'), $this->data()));
             if($contentType == Handler::CONTENT_TYPE_JSON){
                 $object = new stdClass();
                 $object->html = $this->data('output');
