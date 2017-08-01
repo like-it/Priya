@@ -42,6 +42,7 @@
 {capture append="link"}
     <link rel="stylesheet" href="{$web.root}Priya/Module/Pager/Public/Css/Pager.css?{$priya.revision|default:"{$priya.version}"}">
 {/capture}
+{content name="html" trim="html-line"}
 <ul class="pager">
     <li class="item">
     </li>
@@ -59,3 +60,4 @@
         <span class="option issue-next">next page</span>
     </li>
 </ul>
+{/content}{$html}
