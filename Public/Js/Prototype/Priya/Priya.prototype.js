@@ -1074,9 +1074,24 @@ priya.prototype.data = function (attribute, value){
                 this.data(attr, attribute[attr]);
             }
         } else {
-            return this.attribute('data-' + attribute, value);
+            var data = this.attribute('data-' + attribute, value);
+            if(this.empty(data) && !this.empty(attribute)){
+                data = this.data();
+                var collection = {};
+                for(key in data){
+                    if(this.stristr(key, attribute) !== false){
+                        collection[this.str_replace(attribute + '-', '', key)] = data[key];
+                    }
+                }
+                if(this.empty(collection)){
+                    return null;
+                } else {
+                    return collection;
+                }
+            } else {
+                return data;
+            }
         }
-
     }
 }
 
@@ -1579,36 +1594,52 @@ priya.prototype.attribute = function (attribute, value){
     }
 }
 
-priya.prototype.on = function (event, action){
+priya.prototype.on = function (event, action, capture){
     if(typeof this['Priya']['eventListener'] != 'object'){
         this['Priya']['eventListener'] = {};
     }
     if(typeof this['Priya']['eventListener'][event] == 'undefined'){
         this['Priya']['eventListener'][event] = new Array();
     }
+    if(this.empty(capture)){
+        capture = false;
+    } else {
+        capture = true;
+    }
     this['Priya']['eventListener'][event].push(action);
     if(this.is_nodeList(this)){
         var index;
         for (index=0; index < this.length; index++){
             var node = this[index];
-            node.addEventListener(event, action);
+            node.addEventListener(event, action, capture);
         }
     } else {
-        this.addEventListener(event, action);
+        this.addEventListener(event, action, capture);
     }
     return this;
 }
 
 priya.prototype.off = function (event, action){
+    console.log(this['Priya']['eventListener']);
     this.removeEventListener(event, action)
 }
 
-priya.prototype.trigger = function (trigger){
+priya.prototype.trigger = function (trigger, bubble, cancel){
+    if(this.empty(bubble)){
+        bubble = false;
+    } else {
+        bubble = true;
+    }
+    if(this.empty(cancel)){
+        cancel = false;
+    } else {
+        cancel = true;
+    }
     var event = new Event(trigger, {
-        'bubbles'    : true, // Whether the event will bubble up through the DOM or not
-        'cancelable' : true  // Whether the event may be canceled or not
+        'bubbles'    : bubble, // Whether the event will bubble up through the DOM or not
+        'cancelable' : cancel  // Whether the event may be canceled or not
     });
-    event.initEvent(trigger, true, true);
+    //event.initEvent(trigger, true, true);
     event.synthetic = true;
     this.dispatchEvent(event, true);
 }
