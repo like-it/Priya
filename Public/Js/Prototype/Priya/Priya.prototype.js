@@ -1208,7 +1208,6 @@ priya.prototype.link = function (data, func){
     }
     if(this.isset(data.href)){
         priya.dom('head').appendChild(data);
-        console.log('appended');
         priya.load++;
         data.addEventListener('load', function(event){
             priya.load--;
