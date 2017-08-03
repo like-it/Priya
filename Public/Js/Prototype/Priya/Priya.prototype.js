@@ -874,13 +874,22 @@ priya.prototype.data = function (attribute, value){
             return this.attribute('remove','data-' + value);
         } else {
             var data = this.data(value);
-            var attr;
-            var result = false;
-            for(attr in data){
-                this.data('remove', value + '-' + attr);
-                result = true;
+            if(typeof data == 'object'){
+                var attr;
+                var result = false;
+                for(attr in data){
+                    this.data('remove', value + '-' + attr);
+                    result = true;
+                }
+                return result;
+            } else {
+                console.log('error...');
+                console.log(this.attribute('has', 'data-' + value));
+                console.log(value);
+                console.log(data);
+                return
+                //return this.attribute('remove')
             }
-            return result;
         }
     }
     else if (attribute == 'clear' && value == 'error'){
@@ -1545,7 +1554,6 @@ priya.prototype.content = function (data){
 priya.prototype.attribute = function (attribute, value){
     if(attribute == 'has'){
         var attr;
-        value = {};
         for (attr in this.attributes){
             if(typeof this.attributes[attr].value == 'undefined'){
                 continue;
