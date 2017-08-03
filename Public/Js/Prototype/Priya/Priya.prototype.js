@@ -870,7 +870,18 @@ priya.prototype.val = function (value){
 
 priya.prototype.data = function (attribute, value){
     if(attribute == 'remove'){
-        return this.attribute('remove','data-' + value);
+        if(this.attribute('has', 'data-' + value)){
+            return this.attribute('remove','data-' + value);
+        } else {
+            var data = this.data(value);
+            var attr;
+            var result = false;
+            for(attr in data){
+                this.data('remove', value + '-' + attr);
+                result = true;
+            }
+            return result;
+        }
     }
     else if (attribute == 'clear' && value == 'error'){
         if(this.tagName == 'FORM'){
@@ -1532,7 +1543,20 @@ priya.prototype.content = function (data){
 }
 
 priya.prototype.attribute = function (attribute, value){
-    if(attribute == 'remove'){
+    if(attribute == 'has'){
+        var attr;
+        value = {};
+        for (attr in this.attributes){
+            if(typeof this.attributes[attr].value == 'undefined'){
+                continue;
+            }
+            if(this.attributes[attr].name == value){
+                return true;
+            }
+        }
+        return false;
+    }
+    else if(attribute == 'remove'){
         this.removeAttribute(value);
         return;
     }
