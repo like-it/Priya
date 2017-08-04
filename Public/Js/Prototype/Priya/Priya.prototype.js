@@ -134,16 +134,8 @@ priya.prototype.debug = function(data){
         }
     }
     else if(typeof data == 'object'){
-        var index;
-        var found = false;
-        for (index in data){
-            if(this.stristr(index,'\\debug')){
-                found = true;
-                data = data[index];
-            }
-        }
-        if(this.empty(found)){
-            return;
+        if (typeof JSON.decycle == "function") {
+            data = JSON.decycle(data);
         }
         data = JSON.stringify(data, null, 2);
         var item = this.create('pre', '');
@@ -1170,7 +1162,6 @@ priya.prototype.request = function (url, data, script){
                 priya.content(data);
                 priya.refresh(data);
                 priya.exception(data);
-                priya.debug(data);
             } else {
                 priya.debug(xhttp.responseText);
             }
@@ -1183,6 +1174,7 @@ priya.prototype.request = function (url, data, script){
     } else {
         xhttp.open("POST", url, true);
         xhttp.setRequestHeader("Content-Type", "application/json");
+        console.log(data);
         var send = JSON.stringify(data);
         xhttp.send(send);
     }
