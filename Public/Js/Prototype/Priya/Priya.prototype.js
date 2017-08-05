@@ -78,7 +78,12 @@ priya.prototype.debug = function(data){
             priya.dom('.tab-body').removeClass('selected');
             var node = priya.dom('.tab-body.tab-collection');
             node.addClass('selected');
-            node.html('<pre>' + this.dump(priya.collection()) + '</pre>');
+            var collection = priya.collection();
+            if (typeof JSON.decycle == "function") {
+                collection = JSON.decycle(collection);
+            }
+            collection = JSON.stringify(collection, null, 2);
+            node.html('<pre>' + collection + '</pre>');
             console.log(node.html());
         });
         node.on('session', function(){
@@ -134,6 +139,14 @@ priya.prototype.debug = function(data){
         }
     }
     else if(typeof data == 'object'){
+        var remove = this.collection('debug');
+        if(remove){
+            var index;
+            for(index in remove){
+                priya.debug(index);
+                delete data.index;
+            }
+        }
         if (typeof JSON.decycle == "function") {
             data = JSON.decycle(data);
         }
@@ -1738,7 +1751,7 @@ priya.prototype.jid = function (list){
 priya.prototype.collection = function (attribute, value){
     if(typeof attribute != 'undefined'){
         if(typeof value != 'undefined'){
-            if(attribute == 'delete'){
+            if(attribute == 'delete' || attribute == 'remove'){
                 return this.deleteCollection(value);
             } else {
                 this.object_delete(attribute, this.collection());
