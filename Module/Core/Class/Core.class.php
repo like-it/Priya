@@ -467,7 +467,7 @@ class Core {
             }
             elseif($attribute !== null){
                 if($type == 'delete'){
-                    $delete = $this->deleteMessagedeleteMessage($attribute);
+                    $delete = $this->deleteMessage($attribute);
                     //add delete when parent is empty
                     $nodeList = $this->message('nodeList');
                     if(!empty($nodeList) && is_array($nodeList)){
