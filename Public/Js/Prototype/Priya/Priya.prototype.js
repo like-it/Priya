@@ -686,6 +686,16 @@ priya.prototype.create = function (type, create){
             }
             return element;
         break;
+        case 'script':
+            var element = document.createElement('SCRIPT');
+            element.type = 'text/javascript';
+            if(typeof create == 'string'){
+                element.src = create;
+            } else {
+                alert('todo');
+            }
+            return element;
+        break;
         case 'element':
             var element = document.createElement('PRIYA-NODE');
             element.className = this.str_replace('.', ' ', create);
@@ -1264,14 +1274,29 @@ priya.prototype.link = function (data, func){
 
 }
 
-priya.prototype.script = function (data, attempt){
+priya.prototype.script = function (data, func){
     if(typeof data == 'undefined'){
         return;
+    }
+    if(this.isset(data.src) && this.isset(data.type) && data.type == 'text/javascript'){
+        priya.dom('head').appendChild(data);
+        priya.load++;
+        data.addEventListener('load', function(event){
+            priya.load--;
+        }, false);
+        if(func){
+            data.addEventListener('load', function(event){
+                func();
+            }, false);
+        }
+        return data;
     }
     if(typeof attempt == 'undefined'){
         attempt = 0;
     }
     if(parseInt(priya.load) != 0 && attempt < 500){
+        priya.debug('not loaded');
+        /*
          setTimeout(function(){
              priya.script(data, ++attempt);
              priya.hit++;
@@ -1279,6 +1304,7 @@ priya.prototype.script = function (data, attempt){
              console.log(priya.hit);
          }, parseFloat(1/30));
          return data;
+         */
     }
     if(!this.isset(data.script)){
         return data;
