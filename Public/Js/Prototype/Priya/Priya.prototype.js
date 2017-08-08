@@ -558,7 +558,17 @@ priya.prototype.closest = function (attribute, node, type){
         return parent;
     } else {
         if(typeof node == 'undefined'){
-            parent = this.parent();
+            if(typeof this.parent != 'function'){
+                console.log('no parent');
+                console.log(this);
+                console.log(attribute);
+                var priya = this.attach(this.create('element', attribute));
+                priya.data('selector', attribute);
+                return priya;
+            } else {
+                parent = this.parent();
+            }
+
         } else {
             parent = node.parent();
         }
@@ -1681,6 +1691,13 @@ priya.prototype.attribute = function (attribute, value){
 }
 
 priya.prototype.on = function (event, action, capture){
+    if(typeof this['Priya'] == 'undefined'){
+        console.log('Priya undefined');
+        console.log(this);
+        console.log(event);
+        console.log(action);
+        return this;
+    }
     if(typeof this['Priya']['eventListener'] != 'object'){
         this['Priya']['eventListener'] = {};
     }
