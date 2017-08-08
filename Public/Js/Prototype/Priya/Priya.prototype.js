@@ -1310,6 +1310,14 @@ priya.prototype.script = function (data, func){
     }
     if(parseInt(priya.load) != 0 && attempt < 500){
         priya.debug('not loaded');
+        setTimeout(function(){
+            priya.script(data, ++attempt);
+            priya.hit++;
+            priya.debug('waiting on load...');
+            console.log(priya.load);
+            console.log(priya.hit);
+        }, parseFloat(1/30));
+        return data;
         /*
          setTimeout(function(){
              priya.script(data, ++attempt);
