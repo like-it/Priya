@@ -43,6 +43,10 @@ priya.prototype.dom = function (data){
 }
 
 priya.prototype.namespace = function (namespace) {
+    if(typeof namespace == 'undefined'){
+        priya.debug('undefined namespace');
+        return;
+    }
     var object = this, tokens = namespace.split("."), token;
     while (tokens.length > 0) {
         token = tokens.shift();
