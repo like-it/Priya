@@ -563,9 +563,6 @@ priya.prototype.closest = function (attribute, node, type){
     } else {
         if(typeof node == 'undefined'){
             if(typeof this.parent != 'function'){
-                console.log('no parent');
-                console.log(this);
-                console.log(attribute);
                 var priya = this.attach(this.create('element', attribute));
                 priya.data('selector', attribute);
                 return priya;
@@ -1180,6 +1177,13 @@ priya.prototype.request = function (url, data, script){
     if(typeof url == 'object'){
         data = url;
         url = '';
+        if (typeof data.altKey != "undefined") {//event
+            priya.debug('event');
+            var event = data;
+            url = this.data('request');
+            data = this.data();
+            delete data.request;
+        }
     }
     if(this.empty(url)){
         url = this.data('request');
@@ -1328,8 +1332,6 @@ priya.prototype.script = function (data, func){
             priya.script(data, ++attempt);
             priya.hit++;
             priya.debug('waiting on load...');
-            console.log(priya.load);
-            console.log(priya.hit);
         }, parseFloat(1/30));
         return data;
         /*
