@@ -1327,22 +1327,12 @@ priya.prototype.script = function (data, func){
         attempt = 0;
     }
     if(parseInt(priya.load) != 0 && attempt < 500){
-        priya.debug('not loaded');
         setTimeout(function(){
             priya.script(data, ++attempt);
             priya.hit++;
             priya.debug('waiting on load...');
         }, parseFloat(1/30));
         return data;
-        /*
-         setTimeout(function(){
-             priya.script(data, ++attempt);
-             priya.hit++;
-             console.log(priya.load);
-             console.log(priya.hit);
-         }, parseFloat(1/30));
-         return data;
-         */
     }
     if(!this.isset(data.script)){
         return data;
