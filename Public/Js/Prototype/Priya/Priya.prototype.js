@@ -92,9 +92,9 @@ priya.prototype.debug = function(data){
             debug.html('');
         });
         node.on('collection', function(){
-            priya.dom('.tab-head li').removeClass('selected');
-            priya.dom('.tab-body').removeClass('selected');
-            var node = priya.dom('.tab-body.tab-collection');
+            priya.dom('.debug .tab-head li').removeClass('selected');
+            priya.dom('.debug .tab-body').removeClass('selected');
+            var node = priya.dom('.debug .tab-body.tab-collection');
             node.addClass('selected');
             var collection = priya.collection();
             if (typeof JSON.decycle == "function") {
@@ -105,9 +105,9 @@ priya.prototype.debug = function(data){
             console.log(node.html());
         });
         node.on('session', function(){
-            priya.dom('.tab-head li').removeClass('selected');
-            priya.dom('.tab-body').removeClass('selected');
-            var node = priya.dom('.tab-body.tab-session');
+            priya.dom('.debug .tab-head li').removeClass('selected');
+            priya.dom('.debug .tab-body').removeClass('selected');
+            var node = priya.dom('.debug .tab-body.tab-session');
             node.addClass('selected');
 
             var request = {};
