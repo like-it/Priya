@@ -904,7 +904,10 @@ priya.prototype.val = function (value){
     if(typeof this.value == 'undefined'){
         return false;
     }
-    this.value = value
+    if(typeof value != 'undefined'){
+        this.value = value
+    }
+
     return this.value;
 }
 
@@ -1697,25 +1700,33 @@ priya.prototype.on = function (event, action, capture){
     if(typeof this['Priya']['eventListener'] != 'object'){
         this['Priya']['eventListener'] = {};
     }
-    if(typeof this['Priya']['eventListener'][event] == 'undefined'){
-        this['Priya']['eventListener'][event] = new Array();
-    }
-    if(this.empty(capture)){
-        capture = false;
-    } else {
-        capture = true;
-    }
-    this['Priya']['eventListener'][event].push(action);
-    if(this.is_nodeList(this)){
+    if(typeof event == 'object'){
         var index;
-        for (index=0; index < this.length; index++){
-            var node = this[index];
-            node.addEventListener(event, action, capture);
+        for (index=0; index < event.length; index++){
+            this.on(event[index], action, capture);
         }
+        return this;
     } else {
-        this.addEventListener(event, action, capture);
+        if(typeof this['Priya']['eventListener'][event] == 'undefined'){
+            this['Priya']['eventListener'][event] = new Array();
+        }
+        if(this.empty(capture)){
+            capture = false;
+        } else {
+            capture = true;
+        }
+        this['Priya']['eventListener'][event].push(action);
+        if(this.is_nodeList(this)){
+            var index;
+            for (index=0; index < this.length; index++){
+                var node = this[index];
+                node.addEventListener(event, action, capture);
+            }
+        } else {
+            this.addEventListener(event, action, capture);
+        }
+        return this;
     }
-    return this;
 }
 
 priya.prototype.off = function (event, action){
