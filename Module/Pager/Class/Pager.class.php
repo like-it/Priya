@@ -58,8 +58,10 @@ class Pager extends Data {
         if(empty($this->session('has'))){
             return false;
         }
-        $attribute = str_replace('-','.', $result->route);
-
+        $attribute = str_replace(array('-', '/'),'.', $result->route);
+        $attribute = str_replace('....', '.', $attribute);
+        $attribute = str_replace('...', '.', $attribute);
+        $attribute = str_replace('..', '.', $attribute);
         $this->session($attribute . '.page', $result->page);
         $this->session($attribute . '.method', $result->method);
         $this->session($attribute . '.target', $result->target);
