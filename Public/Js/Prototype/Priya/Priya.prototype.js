@@ -79,10 +79,10 @@ priya.prototype.debug = function(data){
         node.on('close', function(){
             priya.dom('.debug').removeClass('display-block');
         });
-        node.on('debug', function(){
-            priya.dom('.tab-head li').removeClass('selected');
-            priya.dom('.tab-body').removeClass('selected');
-            var node = priya.dom('.tab-body.tab-debug');
+        node.on('debug', function(){        	
+            priya.dom('.debug .tab-head li').removeClass('selected');
+            priya.dom('.debug .tab-body').removeClass('selected');
+            var node = priya.dom('.debug .tab-body.tab-debug');
             node.addClass('selected');
             var scrollable = node.closest('has', 'scrollbar', 'vertical');
             scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
