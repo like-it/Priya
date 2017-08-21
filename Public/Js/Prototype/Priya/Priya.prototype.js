@@ -50,11 +50,9 @@ priya.prototype.namespace = function (namespace) {
     var object = this, tokens = namespace.split("."), token;
     while (tokens.length > 0) {
         token = tokens.shift();
-
         if (typeof object[token] === "undefined") {
             object[token] = {};
         }
-
         object = object[token];
     }
     return object;
@@ -79,7 +77,7 @@ priya.prototype.debug = function(data){
         node.on('close', function(){
             priya.dom('.debug').removeClass('display-block');
         });
-        node.on('debug', function(){        	
+        node.on('debug', function(){
             priya.dom('.debug .tab-head li').removeClass('selected');
             priya.dom('.debug .tab-body').removeClass('selected');
             var node = priya.dom('.debug .tab-body.tab-debug');
