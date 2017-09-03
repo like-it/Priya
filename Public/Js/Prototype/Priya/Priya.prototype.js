@@ -23,11 +23,34 @@ var priya = function (url){
     this.load = 0;
     this.hit = 0;
     this.collection('url', url);
+    var expose = {};
+    //expose.select = '$';
+    //expose.run = '$$';
+    expose.namespace = '_';
+    expose.require = 'require';
+    //expose.empty = 'empty';
+    //expose.empty = 'empty';
+    //expose.empty = 'empty';
+    //expose.empty = 'empty';
+    //expose.empty = 'empty';
+    this.collection('expose', expose);
+    this.expose();
+
+    var base = url + 'Priya/Public/Js/Prototype/';
+
+    this.require([
+        base + 'Empty/Empty.prototype.js'
+    ], function(){
+        priya.expose('prototype');
+    });
+
+
+
 };
 
 priya.prototype.run = function (data){
-    var element = this.dom(data);
-    if(element.tagName == 'PRIYA-NODE'){
+    var element = this.select(data);
+    if(element.tagName == 'PRIYA-NODE' || element === false){
         return;
     }
     var request = element.data('request');
@@ -39,7 +62,26 @@ priya.prototype.run = function (data){
 }
 
 priya.prototype.dom = function (data){
+    console.log('deprecated, use priya.select or priya.run');
     return this.init(data);
+}
+
+priya.prototype.expose = function (collection){
+    if(typeof collection == 'undefined'){
+        var expose = this.collection('expose');
+    } else {
+        console.log(collection);
+        console.log(this);
+        console.log(window);
+        priya.debug('expose prototypes');
+        return;
+    }
+    var index;
+    for(index in expose){
+        var name = expose[index];
+        window[name] = this[index].bind(window);
+    }
+    console.log(window);
 }
 
 priya.prototype.namespace = function (namespace) {
@@ -47,16 +89,119 @@ priya.prototype.namespace = function (namespace) {
         priya.debug('undefined namespace');
         return;
     }
-    var object = this, tokens = namespace.split("."), token;
+    if(Object.prototype.toString.call(priya) == '[object Function]'){
+        var object = this;
+    } else {
+        var object = priya;
+    }
+
+    var tokens = namespace.split('.');
+    if(tokens.length == 1){
+        tokens = namespace.split('-');
+    }
+    var token;
     while (tokens.length > 0) {
         token = tokens.shift();
-        if (typeof object[token] === "undefined") {
+        if (typeof object[token] === 'undefined') {
             object[token] = {};
         }
         object = object[token];
     }
-    return object;
+    if(Object.prototype.toString.call(priya) == '[object Function]'){
+        return this.attach(object);
+    } else {
+        return priya.attach(object);
+    }
 }
+
+priya.prototype.requireElement= function(url, closure){
+    var element = document.createElement('script');
+    if(Object.prototype.toString.call(priya) == '[object Function]'){
+        element = this.attach(element);
+    } else {
+        element = priya.attach(element);
+    }
+    element.attribute('defer', 'defer');
+    element.data('require-once', true);
+    element.on('load', function(event){
+        var file = priya.collection('require.file') ? priya.collection('require.file') : [];
+        file.push(this.attribute('src'));
+        priya.collection('require.file', file);
+        var loaded = priya.collection('require.loaded') ? priya.collection('require.loaded') : 0;
+        priya.collection('require.loaded', ++loaded);
+        if(priya.collection('require.loaded') == priya.collection('require.toLoad')){
+            priya.debug('trigger closure');
+            closure();
+        }
+    });
+    element.attribute('src', url);
+    document.getElementsByTagName("head")[0].appendChild(element);
+    if(Object.prototype.toString.call(priya) == '[object Function]'){
+        var toLoad = this.collection('require.toLoad') ? this.collection('require.toLoad') : 0;
+        this.collection('require.toLoad', ++toLoad);
+    } else {
+        var toLoad = priya.collection('require.toLoad') ? priya.collection('require.toLoad') : 0;
+        priya.collection('require.toLoad', ++toLoad);
+    }
+}
+
+priya.prototype.require= function(url, closure){
+    var script = document.querySelectorAll('script');
+    var call = Object.prototype.toString.call(url);
+    if(call === '[object Array]'){
+        var i;
+        for(i=0; i < url.length; i++){
+            var item = url[i];
+            var found = false;
+            var index;
+            for(index = 0; index < script.length; index++){
+                if(Object.prototype.toString.call(priya) == '[object Function]'){
+                    var node = this.attach(script[index]);
+                } else {
+                    var node = priya.attach(script[index]);
+                }
+                if(node.attribute('data-require-once') == 'true' && node.attribute('src') == item){
+                    found = true;
+                    break;
+                }
+            }
+            if(found === false){
+                if(Object.prototype.toString.call(priya) == '[object Function]'){
+                    this.requireElement(item, closure);
+                } else {
+                    priya.requireElement(item, closure);
+                }
+            }
+        }
+        return true;
+
+    } else {
+        var item = url;
+        var found = false;
+        var index;
+        for(index = 0; index < script.length; index++){
+            if(Object.prototype.toString.call(priya) == '[object Function]'){
+                var node = this.attach(script[index]);
+            } else {
+                var node = priya.attach(script[index]);
+            }
+            if(node.attribute('data-require-once') == 'true' && node.attribute('src') == item){
+                found = true;
+            }
+        }
+        if(found === false){
+            if(Object.prototype.toString.call(priya) == '[object Function]'){
+                this.requireElement(item, closure);
+            } else {
+                priya.requireElement(item, closure);
+            }
+        } else {
+            return true;
+        }
+    }
+
+}
+
 
 priya.prototype.debug = function(data){
     var string = 'Opening debug...';
@@ -64,35 +209,36 @@ priya.prototype.debug = function(data){
     if(!node){
         var node = this.create('div', 'dialog no-select debug');
         node.html('<div class="head"><i class="icon icon-bug"></i><h2>Debug</h2></div><div class="menu"><ul class="tab-head"><li class="tab-debug selected"><p>Debug</p></li><li class="tab-collection"><p>Collection</p></li><li class="tab-session"><p>Session</p></li></ul></div><div class="body"><div class="tab tab-body tab-debug selected"></div><div class="tab tab-body tab-collection"></div><div class="tab tab-body tab-session"></div></div><div class="footer"><button type="button" class="button-default button-close">Close</button><button type="button" class="button-default button-debug-clear"><i class="icon-trash"></i></button></div></div>');
-        this.dom('body').append(node);
+        this.select('body').append(node);
 
         node.on('open', function(){
-            node.dom('div.head').closest('.debug').addClass('has-head');
-            node.dom('div.menu').closest('.debug').addClass('has-menu');
-            node.dom('div.icon').closest('.debug').addClass('has-icon');
-            node.dom('div.footer').closest('.debug').addClass('has-footer');
+            node.select('div.head').closest('.debug').addClass('has-head');
+            node.select('div.menu').closest('.debug').addClass('has-menu');
+            node.select('div.icon').closest('.debug').addClass('has-icon');
+            node.select('div.footer').closest('.debug').addClass('has-footer');
             node.addClass('display-block');
             node.loader('remove');
         });
         node.on('close', function(){
-            priya.dom('.debug').removeClass('display-block');
+            priya.select('.debug').removeClass('display-block');
         });
         node.on('debug', function(){
-            priya.dom('.debug .tab-head li').removeClass('selected');
-            priya.dom('.debug .tab-body').removeClass('selected');
-            var node = priya.dom('.debug .tab-body.tab-debug');
+            priya.select('.debug .tab-head li').removeClass('selected');
+            priya.select('.debug .tab-body').removeClass('selected');
+            var node = priya.select('.debug .tab-body.tab-debug');
             node.addClass('selected');
-            var scrollable = node.closest('has', 'scrollbar', 'vertical');
-            scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
+            //wrong syntax
+            //var scrollable = node.closest('has', 'scrollbar', 'vertical');
+            //scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
         });
         node.on('debug-clear', function(){
             var debug = priya.run('.debug .tab-body.tab-debug');
             debug.html('');
         });
         node.on('collection', function(){
-            priya.dom('.debug .tab-head li').removeClass('selected');
-            priya.dom('.debug .tab-body').removeClass('selected');
-            var node = priya.dom('.debug .tab-body.tab-collection');
+            priya.select('.debug .tab-head li').removeClass('selected');
+            priya.select('.debug .tab-body').removeClass('selected');
+            var node = priya.select('.debug .tab-body.tab-collection');
             node.addClass('selected');
             var collection = priya.collection();
             if (typeof JSON.decycle == "function") {
@@ -103,9 +249,9 @@ priya.prototype.debug = function(data){
             console.log(node.html());
         });
         node.on('session', function(){
-            priya.dom('.debug .tab-head li').removeClass('selected');
-            priya.dom('.debug .tab-body').removeClass('selected');
-            var node = priya.dom('.debug .tab-body.tab-session');
+            priya.select('.debug .tab-head li').removeClass('selected');
+            priya.select('.debug .tab-body').removeClass('selected');
+            var node = priya.select('.debug .tab-body.tab-session');
             node.addClass('selected');
 
             var request = {};
@@ -117,21 +263,21 @@ priya.prototype.debug = function(data){
             node.html('<pre>Retrieving session...</pre>');
         });
 
-        node.dom('.button-close').on('click', function(){
+        node.select('.button-close').on('click', function(){
             node.trigger('close');
         });
-        node.dom('.button-debug-clear').on('click', function(){
+        node.select('.button-debug-clear').on('click', function(){
             node.trigger('debug-clear');
         });
-        node.dom('.tab-head .tab-collection').on('click', function(){
+        node.select('.tab-head .tab-collection').on('click', function(){
             node.trigger('collection');
             this.addClass('selected');
         });
-        node.dom('.tab-head .tab-debug').on('click', function(){
+        node.select('.tab-head .tab-debug').on('click', function(){
             node.trigger('debug');
             this.addClass('selected');
         });
-        node.dom('.tab-head .tab-session').on('click', function(){
+        node.select('.tab-head .tab-session').on('click', function(){
             node.trigger('session');
             this.addClass('selected');
         });
@@ -145,8 +291,9 @@ priya.prototype.debug = function(data){
         var item = this.create('pre', '');
         item.html(data);
         debug.append(item);
-        var scrollable = debug.closest('has', 'scrollbar', 'vertical');
-        scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
+        //wrong syntax
+        //var scrollable = debug.closest('has', 'scrollbar', 'vertical');
+        //scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
         node.trigger('open');
         if(data == string){
             setTimeout(function(){
@@ -184,6 +331,10 @@ priya.prototype.find = function(selector, attach) {
         this.id = this.attribute('id', 'priya-find-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999));
         var removeId = true;
     }
+    if(typeof selector == 'object'){
+        console.log(selector);
+        //return;
+    }
     selector = '#' + this.id + ' ' + selector;
     var list = document.querySelectorAll(selector);
     if (removeId) {
@@ -208,6 +359,182 @@ priya.prototype.find = function(selector, attach) {
     return list;
 };
 
+priya.prototype.select = function(selector){
+
+    if(typeof selector == 'undefined' || selector === null){
+        return false;
+    }
+    var call = Object.prototype.toString.call(selector);
+    if(call === '[object HTMLDocument]'){
+         var priya = this.attach(this.create('element', selector));
+         priya.data('selector', selector);
+         return priya;
+    }
+    else if(call === '[object HTMLBodyElement]'){
+        if(typeof this['Priya'] == 'object'){
+            return this;
+        } else {
+            console.log('error, cannot attach ??? with priya.attach(this)');
+        }
+   }
+    else if(call === '[object String]'){
+        if(typeof this.querySelectorAll == 'function'){
+            //console.log(this);
+            //console.log(selector);
+            var list = this.find(selector);
+        } else {
+            var list = document.querySelectorAll(selector);
+        }
+        var index;
+        for (index = 0; index < list.length; index++){
+            var node = list[index];
+            if(typeof node['Priya'] != 'object'){
+                node = this.attach(node);
+            }
+            list[index] = node;
+        }
+        if (list.length == 0){
+            var priya = this.attach(this.create('element', selector));
+            priya.data('selector', selector);
+            return priya;
+        }
+        else if(list.length == 1){
+            return node;
+        } else {
+            return this.attach(list);
+        }
+
+    } else {
+         if(typeof this['Priya'] == 'object'){
+             return this;
+         } else {
+             console.log('error, cannot attach ??? with priya.attach(this)');
+         }
+    }
+
+    if(typeof selector == 'undefined' || selector === null){
+        return false;
+    }
+    if(typeof this['Priya'] != 'undefined'){
+        if(typeof this['Priya']['dom'] != 'undefined'){
+            if(typeof this['Priya']['dom']['selected'] == 'undefined'){
+                this['Priya']['dom']['selected'] = {};
+            }
+            var selected;
+            if(typeof selector == 'object'){
+                selected = selector.tagName;
+                if(typeof selected == 'undefined' && selector instanceof HTMLDocument){
+                    var priya = this.attach(this.create('element', selector));
+                    priya.data('selector', selector);
+                    //add to document for retries?
+                    return priya;
+                }
+                selected = selected.toLowerCase();
+                if(selector.id){
+                    selected += ' #' + selector.id;
+                }
+                if(selector.className){
+                    selected += ' .' + this.str_replace(' ','.',selector.className);
+                }
+            } else {
+                selected = selector;
+            }
+            if(typeof this['Priya']['dom']['selected'][selected] == 'undefined'){
+                var counter = 1;
+            } else {
+                var counter = this['Priya']['dom']['selected'][selected]++;
+            }
+            this['Priya']['dom']['selected'][selected] = counter;
+        }
+    }
+    var oldSelector;
+    var matchSelector;
+    if(typeof selector == 'string'){
+        var oldSelector = this.trim(selector);
+        var not = this.explode(':not(', selector);
+        if(not.length >= 2){
+            var index;
+            for(index in not){
+                var temp = this.explode(')', not[index]);
+                if(temp.length >= 2){
+                    var subSelector = temp[0];
+                    if(subSelector.substr(0,1) == '#'){
+                        subSelector = '[id="' + subSelector.substr(1) + '"]' + ')'; // + implode(')', temp);
+                    } else if (subSelector.substr(0,1) == '.'){
+                        subSelector = '[class="' + subSelector.substr(1) + '"]' + ')'; // + implode(')', temp);
+                    } else {
+                        subSelector = temp[0] + ')'; //implode(')', temp);
+                    }
+                    not[index] = subSelector;
+                }
+            }
+            selector = this.implode(':not(', not);
+        }
+        matchSelector = this.trim(selector);
+        selector = this.trim(selector).split(' ');
+    }
+    if(Object.prototype.toString.call(selector) === '[object Array]'){
+        if(typeof this.querySelectorAll == 'function' && oldSelector != matchSelector){
+            var list = this.find(matchSelector);
+//            var list = this.querySelectorAll(matchSelector);
+        } else if(oldSelector != matchSelector){
+            var list = document.querySelectorAll(matchSelector);
+        }
+        if(typeof list == 'undefined'){
+            list = new Array();
+        }
+        if(list.length == 0 && selector.length > 1){
+            var index;
+            for(index = 0; index < selector.length; index++){
+                if(typeof select == 'undefined'){
+                    var select = this.select(selector[index]);
+                    continue;
+                }
+                var select = select.select(selector[index]);
+
+                if(select.tagName == 'PRIYA-NODE'){
+                    select.data('selector', matchSelector);
+                    //add to document for retries?
+                    return select;
+                }
+            }
+            return select;
+        } else {
+            selector = selector.join(' ');
+        }
+
+    }
+    if(typeof list == 'undefined' || (typeof list != 'undefined' && list.length == 0)){
+        if(typeof selector == 'object'){
+            var list = new Array();
+            list.push(selector);
+        } else {
+            if(typeof this.querySelectorAll == 'function'){
+                var list = this.find(selector);
+            } else {
+                var list = document.querySelectorAll(selector);
+            }
+        }
+    }
+
+    if(list.length == 0){
+        var priya = this.attach(this.create('element', selector));
+        priya.data('selector', selector);
+        //add to document for retries?
+        return priya;
+    }
+    else if(list.length == 1){
+        return this.attach(list[0]);
+    } else {
+        for(item in list){
+            list[item] = this.attach(list[item]);
+        }
+        return this.attach(list);
+    }
+}
+
+
+/*
 priya.prototype.select = function(selector){
     if(typeof selector == 'undefined' || selector === null){
         return false;
@@ -329,6 +656,7 @@ priya.prototype.select = function(selector){
         return this.attach(list);
     }
 }
+*/
 
 priya.prototype.methods = function (){
     var result = {};
@@ -576,6 +904,9 @@ priya.prototype.closest = function (attribute, node, type){
             priya.data('selector', attribute);
             return priya;
         }
+        if(this === parent && parent === node){
+            parent = this.attach(this.parentNode);
+        }
         var select = parent.select(attribute);
         if(typeof select == 'object' && select.tagName == 'PRIYA-NODE'){
             delete select;
@@ -585,7 +916,6 @@ priya.prototype.closest = function (attribute, node, type){
             select = parent.closest(attribute, parent);
         }
         return select;
-
     }
 }
 
@@ -723,6 +1053,7 @@ priya.prototype.create = function (type, create){
             var element = document.createElement('PRIYA-NODE');
             element.className = this.str_replace('.', ' ', create);
             element.className = this.str_replace('#', '', element.className);
+            element.className = this.trim(element.className);
             return this.attach(element);
         break;
         case 'nodelist' :
@@ -1241,9 +1572,9 @@ priya.prototype.request = function (url, data, script){
 
 priya.prototype.loader = function(data){
     if(data == 'remove'){
-         priya.dom('.priya-gui-loader').addClass('fade-out');
+         priya.select('.priya-gui-loader').addClass('fade-out');
          setTimeout(function(){
-             priya.dom('.priya-loader').remove();
+             priya.select('.priya-loader').remove();
          }, 10000);
          return;
     }
@@ -1267,7 +1598,7 @@ priya.prototype.refresh = function (data){
     return data;
 }
 
-priya.prototype.link = function (data, func){
+priya.prototype.link = function (data, closure){
     if(typeof data == 'undefined'){
         return;
     }
@@ -1277,14 +1608,14 @@ priya.prototype.link = function (data, func){
         };
     }
     if(this.isset(data.href)){
-        priya.dom('head').appendChild(data);
+        priya.select('head').appendChild(data);
         priya.load++;
         data.addEventListener('load', function(event){
             priya.load--;
         }, false);
-        if(func){
+        if(closure){
             data.addEventListener('load', function(event){
-                func();
+                closure();
             }, false);
         }
         return data;
@@ -1307,19 +1638,19 @@ priya.prototype.link = function (data, func){
 
 }
 
-priya.prototype.script = function (data, func){
+priya.prototype.script = function (data, closure){
     if(typeof data == 'undefined'){
         return;
     }
     if(this.isset(data.src) && this.isset(data.type) && data.type == 'text/javascript'){
-        priya.dom('head').appendChild(data);
+        priya.select('head').appendChild(data);
         priya.load++;
         data.addEventListener('load', function(event){
             priya.load--;
         }, false);
-        if(func){
+        if(closure){
             data.addEventListener('load', function(event){
-                func();
+                closure();
             }, false);
         }
         return data;
@@ -1351,7 +1682,7 @@ priya.prototype.exception = function (data, except){
     if(data == 'write' || data == 'replace'){
         this.debug(except);
         /*
-        var exception = this.dom('.exception');
+        var exception = this.select('.exception');
         var content = {
             "target": ".exception",
             "method":"replace",
@@ -1363,7 +1694,7 @@ priya.prototype.exception = function (data, except){
     else if(data == 'append'){
         this.debug(except);
         /*
-        var exception = this.dom('.exception');
+        var exception = this.select('.exception');
         var content = {
             "target": ".exception",
             "method":"append",
@@ -1386,7 +1717,7 @@ priya.prototype.exception = function (data, except){
         }
         this.debug(JSON.stringify(data, null, 2));
         /*
-        var exception = this.dom('.exception');
+        var exception = this.select('.exception');
         var content = {
             "target": ".exception",
             "method":"append",
@@ -1400,7 +1731,7 @@ priya.prototype.exception = function (data, except){
 /*
 priya.prototype.exception = function (data, except){
     if(data == 'write' || data == 'replace'){
-        var exception = this.dom('.exception');
+        var exception = this.select('.exception');
         var content = {
             "target": ".exception",
             "method":"replace",
@@ -1409,7 +1740,7 @@ priya.prototype.exception = function (data, except){
         exception.content(content);
     }
     else if(data == 'append'){
-        var exception = this.dom('.exception');
+        var exception = this.select('.exception');
         var content = {
             "target": ".exception",
             "method":"append",
@@ -1428,7 +1759,7 @@ priya.prototype.exception = function (data, except){
         if(this.empty(found)){
             return;
         }
-        var exception = this.dom('.exception');
+        var exception = this.select('.exception');
         var content = {
             "target": ".exception",
             "method":"append",
@@ -1529,7 +1860,7 @@ priya.prototype.content = function (data){
     if(typeof data['html'] == 'undefined' && (data['method'] != 'replace' && data['method'] != 'unwrap')){
         return;
     }
-    var target = priya.dom(data['target']);
+    var target = priya.select(data['target']);
     var method = data['method'];
     if(this.is_nodeList(target)){
         var i = 0;
@@ -1543,7 +1874,7 @@ priya.prototype.content = function (data){
             }
             else if(method == 'replace-or-append-to-body'){
                 if(node.nodeName == 'PRIYA-NODE'){
-                    var node = priya.dom('body');
+                    var node = priya.select('body');
                     node.insertAdjacentHTML('beforeend',data['html']);
                 } else {
                     node.html(data['html']);
@@ -1551,7 +1882,7 @@ priya.prototype.content = function (data){
             }
             else if(method == 'replace-with-or-append-to-body'){
                 if(node.nodeName == 'PRIYA-NODE'){
-                    var node = priya.dom('body');
+                    var node = priya.select('body');
                     node.insertAdjacentHTML('beforeend',data['html']);
                 } else {
                     node.html(data['html'], 'outer');
@@ -1581,7 +1912,7 @@ priya.prototype.content = function (data){
         }
         else if(method == 'replace-or-append-to-body'){
             if(target.nodeName == 'PRIYA-NODE'){
-                var target = priya.dom('body');
+                var target = priya.select('body');
                 target.insertAdjacentHTML('beforeend',data['html']);
             } else {
                 target.html(data['html']);
@@ -1589,7 +1920,7 @@ priya.prototype.content = function (data){
         }
         else if(method == 'replace-with-or-append-to-body'){
             if(target.nodeName == 'PRIYA-NODE'){
-                var target = priya.dom('body');
+                var target = priya.select('body');
                 target.insertAdjacentHTML('beforeend',data['html']);
             } else {
                 target.html(data['html'], 'outer');
@@ -1718,6 +2049,10 @@ priya.prototype.on = function (event, action, capture){
             var index;
             for (index=0; index < this.length; index++){
                 var node = this[index];
+                if(typeof action == 'undefined'){
+                    console.log('action undefined with event:');
+                    console.log(event);
+                }
                 node.addEventListener(event, action, capture);
             }
         } else {
@@ -1797,6 +2132,7 @@ priya.prototype.attach = function (element){
 }
 
 priya.prototype.init = function (data, configuration){
+    console.log('deprecated, use priya.select or priya.run');
     if(typeof data == 'undefined'){
         return this;
     }
