@@ -13,7 +13,12 @@
     function ready() {
         //need to add .wait or similar for all includes
         if(typeof priya == 'undefined'){
-            setTimeout(ready,1);
+            setTimeout(ready, 1/30);
+            return;
+        }
+        var require = priya.collection('require');
+        if(require.toLoad != require.loaded){
+            setTimeout(ready, 1/30);
             return;
         }
         if (!readyFired) {
@@ -97,6 +102,14 @@ var priya;
     var node = include(web + 'Priya/Public/Js/Prototype/Priya/Priya.prototype.js');
     node.addEventListener('load', function(event){
         priya = new priya(web);
-        priya.run();
+        //ready();
+        /*
+        var require = priya.collection('require');
+        if(require.toLoad != require.loaded){
+            setTimeout(function(){
+                priya.wait();
+            }, 1/30);
+        }
+        */
     }, false);
 })();

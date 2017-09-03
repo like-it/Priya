@@ -24,64 +24,82 @@ var priya = function (url){
     this.hit = 0;
     this.collection('url', url);
     var expose = {};
-    //expose.select = '$';
-    //expose.run = '$$';
-    expose.namespace = '_';
-    expose.require = 'require';
-    //expose.empty = 'empty';
-    //expose.empty = 'empty';
-    //expose.empty = 'empty';
-    //expose.empty = 'empty';
-    //expose.empty = 'empty';
-    this.collection('expose', expose);
+    this.collection('expose', {
+        'namespace' : '_',
+        'require' : 'require',
+        'select' : 'select'
+    });
+    this.collection('expose.prototype', {
+        'empty' : 'empty',
+        'isset' : 'isset',
+        'microtime' : 'microtime',
+        'run' : 'run'
+    });
+
     this.expose();
 
-    var base = url + 'Priya/Public/Js/Prototype/';
+    var prototype = url + 'Priya/Public/Js/Prototype/';
 
     this.require([
-        base + 'Empty/Empty.prototype.js'
+        prototype + 'Empty.prototype.js',
+        prototype + 'Isset.prototype.js',
+        prototype + 'Microtime.prototype.js',
+        prototype + 'Run.prototype.js',
     ], function(){
         priya.expose('prototype');
     });
-
-
-
+    console.log(window);
 };
 
+/*
 priya.prototype.run = function (data){
-    var element = this.select(data);
-    if(element.tagName == 'PRIYA-NODE' || element === false){
-        return;
+    var require = this.collection('require');
+    if(require.toLoad == require.loaded){
+        var element = this.select(data);
+        if(element.tagName == 'PRIYA-NODE' || element === false){
+            return;
+        }
+        var request = element.data('request');
+        if(!this.empty(request)){
+            return element.request(request);
+        }
+        if(typeof microtime == 'undefined'){
+            priya.expose('prototype');
+        }
+        element.data('mtime', microtime(true));
+        return element;
+    } else {
+        setTimeout(function(){
+            priya.run(data);
+        }, 1/30);
     }
-    var request = element.data('request');
-    if(!this.empty(request)){
-        return element.request(request);
-    }
-    element.data('mtime', this.microtime(true));
-    return element;
 }
+*/
 
 priya.prototype.dom = function (data){
-    console.log('deprecated, use priya.select or priya.run');
+    console.log('deprecated, use select or run');
     return this.init(data);
 }
 
 priya.prototype.expose = function (collection){
     if(typeof collection == 'undefined'){
         var expose = this.collection('expose');
+        var index;
+        for(index in expose){
+            if(index == 'prototype'){
+                continue;
+            }
+            var name = expose[index];
+            window[name] = this[index].bind(window);
+        }
     } else {
-        console.log(collection);
-        console.log(this);
-        console.log(window);
-        priya.debug('expose prototypes');
-        return;
+        var expose = this.collection('expose.' + collection);
+        var index;
+        for(index in expose){
+            var name = expose[index];
+            window[name] = _(collection)[index].bind(window);
+        }
     }
-    var index;
-    for(index in expose){
-        var name = expose[index];
-        window[name] = this[index].bind(window);
-    }
-    console.log(window);
 }
 
 priya.prototype.namespace = function (namespace) {
@@ -130,7 +148,6 @@ priya.prototype.requireElement= function(url, closure){
         var loaded = priya.collection('require.loaded') ? priya.collection('require.loaded') : 0;
         priya.collection('require.loaded', ++loaded);
         if(priya.collection('require.loaded') == priya.collection('require.toLoad')){
-            priya.debug('trigger closure');
             closure();
         }
     });
@@ -205,7 +222,7 @@ priya.prototype.require= function(url, closure){
 
 priya.prototype.debug = function(data){
     var string = 'Opening debug...';
-    var node = this.run('.debug');
+    var node = run('.debug');
     if(!node){
         var node = this.create('div', 'dialog no-select debug');
         node.html('<div class="head"><i class="icon icon-bug"></i><h2>Debug</h2></div><div class="menu"><ul class="tab-head"><li class="tab-debug selected"><p>Debug</p></li><li class="tab-collection"><p>Collection</p></li><li class="tab-session"><p>Session</p></li></ul></div><div class="body"><div class="tab tab-body tab-debug selected"></div><div class="tab tab-body tab-collection"></div><div class="tab tab-body tab-session"></div></div><div class="footer"><button type="button" class="button-default button-close">Close</button><button type="button" class="button-default button-debug-clear"><i class="icon-trash"></i></button></div></div>');
@@ -232,7 +249,7 @@ priya.prototype.debug = function(data){
             //scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
         });
         node.on('debug-clear', function(){
-            var debug = priya.run('.debug .tab-body.tab-debug');
+            var debug = run('.debug .tab-body.tab-debug');
             debug.html('');
         });
         node.on('collection', function(){
@@ -283,7 +300,7 @@ priya.prototype.debug = function(data){
         });
 
     }
-    var debug = this.run('.debug .tab-body.tab-debug');
+    var debug = run('.debug .tab-body.tab-debug');
     if(typeof data == 'string'){
         if(data == 'run'){
             data = string;
@@ -360,28 +377,37 @@ priya.prototype.find = function(selector, attach) {
 };
 
 priya.prototype.select = function(selector){
-
     if(typeof selector == 'undefined' || selector === null){
         return false;
     }
+    if(typeof this == 'undefined' ){
+        var object = window.priya;
+    }
+    else if(Object.prototype.toString.call(this) == '[object Function]'){
+        var object = this;
+    }
+    else if(Object.prototype.toString.call(this) == '[object Object]'){
+        var object = this;
+    } else {
+        //console.log(Object.prototype.toString.call(this));
+        var object = window.priya;
+    }
     var call = Object.prototype.toString.call(selector);
     if(call === '[object HTMLDocument]'){
-         var priya = this.attach(this.create('element', selector));
+         var priya = object.attach(object.create('element', selector));
          priya.data('selector', selector);
          return priya;
     }
     else if(call === '[object HTMLBodyElement]'){
-        if(typeof this['Priya'] == 'object'){
-            return this;
+        if(typeof object['Priya'] == 'object'){
+            return object;
         } else {
-            console.log('error, cannot attach ??? with priya.attach(this)');
+            console.log('error, cannot attach ??? with priya.attach(object)');
         }
    }
     else if(call === '[object String]'){
-        if(typeof this.querySelectorAll == 'function'){
-            //console.log(this);
-            //console.log(selector);
-            var list = this.find(selector);
+        if(typeof object.querySelectorAll == 'function'){
+            var list = object.find(selector);
         } else {
             var list = document.querySelectorAll(selector);
         }
@@ -389,29 +415,29 @@ priya.prototype.select = function(selector){
         for (index = 0; index < list.length; index++){
             var node = list[index];
             if(typeof node['Priya'] != 'object'){
-                node = this.attach(node);
+                node = object.attach(node);
             }
             list[index] = node;
         }
         if (list.length == 0){
-            var priya = this.attach(this.create('element', selector));
+            var priya = object.attach(object.create('element', selector));
             priya.data('selector', selector);
             return priya;
         }
         else if(list.length == 1){
             return node;
         } else {
-            return this.attach(list);
+            return object.attach(list);
         }
 
     } else {
-         if(typeof this['Priya'] == 'object'){
-             return this;
+         if(typeof object['Priya'] == 'object'){
+             return object;
          } else {
-             console.log('error, cannot attach ??? with priya.attach(this)');
+             console.log('error, cannot attach ??? with priya.attach(object)');
          }
     }
-
+    /*
     if(typeof selector == 'undefined' || selector === null){
         return false;
     }
@@ -531,6 +557,7 @@ priya.prototype.select = function(selector){
         }
         return this.attach(list);
     }
+    */
 }
 
 
@@ -1506,9 +1533,13 @@ priya.prototype.remove = function (){
 }
 
 priya.prototype.request = function (url, data, script){
-    if(typeof url == 'object'){
+    if(typeof url == 'object' && url !== null){
         data = url;
+        console.log(url);
+        console.log(typeof null);
+        console.log(typeof url);
         url = '';
+        console.log(data);
         if (typeof data.altKey != "undefined") {//event
             priya.debug('event');
             var event = data;
@@ -1578,7 +1609,7 @@ priya.prototype.loader = function(data){
          }, 10000);
          return;
     }
-    var body = priya.run('body');
+    var body = run('body');
     var load = priya.create('element', 'priya-loader');
     load.innerHTML = '<div class="priya-gui-loader"></div>';
     body.append(load);
@@ -2132,7 +2163,7 @@ priya.prototype.attach = function (element){
 }
 
 priya.prototype.init = function (data, configuration){
-    console.log('deprecated, use priya.select or priya.run');
+    console.log('deprecated, use select or run');
     if(typeof data == 'undefined'){
         return this;
     }
