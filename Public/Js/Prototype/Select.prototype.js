@@ -123,11 +123,9 @@ _('prototype').select = function(selector){
 }
 */
 _('prototype').select = function(selector){
-    console.log('@SELECT@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-    console.log(this);
-    console.log(this.nodeName);
-    console.log(selector);
-    console.log(priya);
+    if(this.nodeName){
+        console.log('NODENAME_________________________________:' + this.nodeName);
+    }
     if(Object.prototype.toString.call(priya) == '[object Function]'){
         //console.log('has a priya..............................');
         //console.log(this);

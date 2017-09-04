@@ -55,8 +55,12 @@ var priya = function (url){
         prototype + 'Content.prototype.js',
     ], function(){
         priya.expose('prototype');
-        //priya.expose('priya');
-        priya.select =  priya.namespace('prototype').select.bind(priya);
+        priya.expose('priya');
+        /*
+        console.log('bind select from prototype+++++++++++++++++++++++');
+        console.log(priya.namespace('prototype').select);
+        console.log(_('prototype').select);
+        priya.select =  _('prototype').select;
         priya.closest = _('prototype').closest;
         priya.trim = _('prototype').trim;
         priya.content = _('prototype').content;
@@ -99,7 +103,7 @@ priya.prototype.dom = function (data){
     return this.init(data);
 }
 
-priya.prototype.expose = function (collection){
+priya.prototype.expose = function (collection, attribute){
     if(typeof collection == 'undefined'){
         var expose = this.collection('expose');
         var index;
@@ -114,14 +118,31 @@ priya.prototype.expose = function (collection){
             window[name] = this[index].bind(window);
         }
     } else {
-        var expose = this.collection('expose.' + collection);
-        var index;
-        for(index in expose){
-            var name = expose[index];
-            if(collection == 'priya'){
-                this[name] = _('prototype')[index].bind(this);
+        if(typeof attribute == 'undefined'){
+            var expose = this.collection('expose.' + collection);
+            var index;
+            if(expose.length == 0){
+                console.log('**COLLECTION**********************************************************************************');
+                console.log(collection);
             } else {
-                window[name] = _(collection)[index].bind(window);
+                for(index in expose){
+                    var name = expose[index];
+                    if(collection == 'priya'){
+                        if(typeof this[name] == 'undefined'){
+                            this[name] = _('prototype')[index];
+                        }
+                    } else {
+                        window[name] = _(collection)[index].bind(window);
+                    }
+                }
+            }
+        } else {
+            if(collection == 'priya'){
+                if(typeof this[attribute] == 'undefined'){
+                    this[attribute] = _('prototype')[attribute];
+                    console.log('NEW ASSIGN+=================================');
+                    console.log(attribute);
+                }
             }
         }
     }
@@ -213,6 +234,8 @@ priya.prototype.require= function(url, closure){
                 } else {
                     priya.requireElement(item, closure);
                 }
+            } else {
+                closure();
             }
         }
         return true;
@@ -238,6 +261,7 @@ priya.prototype.require= function(url, closure){
                 priya.requireElement(item, closure);
             }
         } else {
+            closure();
             return true;
         }
     }
@@ -1993,9 +2017,6 @@ priya.prototype.attach = function (element){
     if(typeof element != 'object'){
         return false;
     }
-    console.log('&&ATTACH&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-    console.log(element);
-    console.log(typeof element['Priya']);
     if(typeof element['Priya'] == 'object'){
         return element;
     }
@@ -2011,8 +2032,6 @@ priya.prototype.attach = function (element){
     } else {
         dom = this;
     }
-    console.log('^^DOM^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-    console.log(dom);
     for(property in dom){
         if(typeof dom[property] != 'function'){
             continue;
@@ -2021,10 +2040,7 @@ priya.prototype.attach = function (element){
             continue;
         }
         element[property] = dom[property].bind(element);
-        console.log(property);
     }
-    console.log(element);
-    element.select('.test');
     element['parent'] = dom['parentNode'].bind(element);
     element['Priya'] = {
             "version": '0.0.1',
