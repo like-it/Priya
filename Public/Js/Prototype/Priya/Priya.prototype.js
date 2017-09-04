@@ -55,7 +55,11 @@ var priya = function (url){
         prototype + 'Content.prototype.js',
     ], function(){
         priya.expose('prototype');
-        priya.expose('priya');
+        //priya.expose('priya');
+        priya.select =  priya.namespace('prototype').select.bind(priya);
+        priya.closest = _('prototype').closest;
+        priya.trim = _('prototype').trim;
+        priya.content = _('prototype').content;
         /*
         priya.select = _('prototype').select;
         priya.closest = _('prototype').closest;
@@ -116,8 +120,6 @@ priya.prototype.expose = function (collection){
             var name = expose[index];
             if(collection == 'priya'){
                 this[name] = _('prototype')[index].bind(this);
-                console.log(name);
-                console.log(this);
             } else {
                 window[name] = _(collection)[index].bind(window);
             }
@@ -1991,6 +1993,9 @@ priya.prototype.attach = function (element){
     if(typeof element != 'object'){
         return false;
     }
+    console.log('&&ATTACH&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+    console.log(element);
+    console.log(typeof element['Priya']);
     if(typeof element['Priya'] == 'object'){
         return element;
     }
@@ -2006,6 +2011,8 @@ priya.prototype.attach = function (element){
     } else {
         dom = this;
     }
+    console.log('^^DOM^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+    console.log(dom);
     for(property in dom){
         if(typeof dom[property] != 'function'){
             continue;
@@ -2014,7 +2021,10 @@ priya.prototype.attach = function (element){
             continue;
         }
         element[property] = dom[property].bind(element);
+        console.log(property);
     }
+    console.log(element);
+    element.select('.test');
     element['parent'] = dom['parentNode'].bind(element);
     element['Priya'] = {
             "version": '0.0.1',

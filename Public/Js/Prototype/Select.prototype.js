@@ -123,10 +123,15 @@ _('prototype').select = function(selector){
 }
 */
 _('prototype').select = function(selector){
+    console.log('@SELECT@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    console.log(this);
+    console.log(this.nodeName);
+    console.log(selector);
+    console.log(priya);
     if(Object.prototype.toString.call(priya) == '[object Function]'){
-        console.log('has a priya..............................');
-        console.log(this);
-        var object = this;
+        //console.log('has a priya..............................');
+        //console.log(this);
+        //var object = this;
     } else {
         if(Object.prototype.toString.call(this) == '[object Window]'){
             object = window.priya;
