@@ -90,3 +90,5 @@ _('prototype').strftime = function (sFormat, date) {
     }[sMatch] || sMatch;
   });
 }
+
+priya.strftime = _('prototype').strftime;
