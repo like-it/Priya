@@ -1,5 +1,9 @@
 _('prototype').closest = function(attribute, node, type){
     console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$CLOSEST');
+    console.log(this);
+    console.log(node);
+    console.log(priya);
+    console.log(window.priya);
     var parent;
     if(this.function_exists(node)){
         parent = this.parent();

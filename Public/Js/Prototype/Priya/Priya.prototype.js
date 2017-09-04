@@ -36,7 +36,12 @@ var priya = function (url){
         'run' : 'run',
         'select' : 'select',
     });
-
+    this.collection('expose.priya', {
+        'select' : 'select',
+        'closest': 'closest',
+        'trim' : 'trim',
+        'content' : 'content'
+    });
     this.expose();
 
     var prototype = url + 'Priya/Public/Js/Prototype/';
@@ -47,13 +52,16 @@ var priya = function (url){
         prototype + 'Select.prototype.js',
         prototype + 'Run.prototype.js',
         prototype + 'Closest.prototype.js',
+        prototype + 'Content.prototype.js',
     ], function(){
         priya.expose('prototype');
+        priya.expose('priya');
+        /*
         priya.select = _('prototype').select;
-        //window.select = priya.select;
-
         priya.closest = _('prototype').closest;
         priya.trim = _('prototype').trim;
+        priya.content = _('prototype').content;
+        */
     });
 };
 
@@ -92,6 +100,9 @@ priya.prototype.expose = function (collection){
         var expose = this.collection('expose');
         var index;
         for(index in expose){
+            if(index == 'priya'){
+                continue;
+            }
             if(index == 'prototype'){
                 continue;
             }
@@ -103,7 +114,13 @@ priya.prototype.expose = function (collection){
         var index;
         for(index in expose){
             var name = expose[index];
-            window[name] = _(collection)[index].bind(window);
+            if(collection == 'priya'){
+                this[name] = _('prototype')[index].bind(this);
+                console.log(name);
+                console.log(this);
+            } else {
+                window[name] = _(collection)[index].bind(window);
+            }
         }
     }
 }
@@ -1724,6 +1741,7 @@ priya.prototype.readTag = function (data){
     return tag;
 }
 
+/*
 priya.prototype.content = function (data){
     if(typeof data == 'undefined'){
         console.log('json.content failed (data)');
@@ -1822,6 +1840,7 @@ priya.prototype.content = function (data){
     }
     return target;
 }
+*/
 
 priya.prototype.attribute = function (attribute, value){
     if(attribute == 'has'){
