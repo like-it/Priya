@@ -136,6 +136,8 @@ _('prototype').select = function(selector){
                     return false;
                 }
             }
+            console.log(Object.prototype.toString.call(this));
+            console.log(this);
             object = this;
         }
     }
