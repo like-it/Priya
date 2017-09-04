@@ -218,6 +218,9 @@ class Application extends Parser {
                     $file = new File();
                     $result = $parser->data('object')->compile($file->read($url), $data->data());
                 } else {
+                    if($ext == 'js'){
+//                         sleep(rand(1, 10)); //testing async
+                    }
                     $file = new File();
                     $result = $file->read($url);
                 }

@@ -27,28 +27,34 @@ var priya = function (url){
     this.collection('expose', {
         'namespace' : '_',
         'require' : 'require',
-        'select' : 'select'
+        'empty' : 'empty'
     });
     this.collection('expose.prototype', {
-        'empty' : 'empty',
         'isset' : 'isset',
         'microtime' : 'microtime',
-        'run' : 'run'
+        'trim' : 'trim',
+        'run' : 'run',
+        'select' : 'select',
     });
 
     this.expose();
 
     var prototype = url + 'Priya/Public/Js/Prototype/';
-
     this.require([
-        prototype + 'Empty.prototype.js',
         prototype + 'Isset.prototype.js',
         prototype + 'Microtime.prototype.js',
+        prototype + 'Trim.prototype.js',
+        prototype + 'Select.prototype.js',
         prototype + 'Run.prototype.js',
+        prototype + 'Closest.prototype.js',
     ], function(){
         priya.expose('prototype');
+        priya.select = _('prototype').select;
+        //window.select = priya.select;
+
+        priya.closest = _('prototype').closest;
+        priya.trim = _('prototype').trim;
     });
-    console.log(window);
 };
 
 /*
@@ -376,314 +382,149 @@ priya.prototype.find = function(selector, attach) {
     return list;
 };
 
-priya.prototype.select = function(selector){
-    if(typeof selector == 'undefined' || selector === null){
-        return false;
-    }
-    if(typeof this == 'undefined' ){
-        var object = window.priya;
-    }
-    else if(Object.prototype.toString.call(this) == '[object Function]'){
-        var object = this;
-    }
-    else if(Object.prototype.toString.call(this) == '[object Object]'){
-        var object = this;
-    } else {
-        //console.log(Object.prototype.toString.call(this));
-        var object = window.priya;
-    }
-    var call = Object.prototype.toString.call(selector);
-    if(call === '[object HTMLDocument]'){
-         var priya = object.attach(object.create('element', selector));
-         priya.data('selector', selector);
-         return priya;
-    }
-    else if(call === '[object HTMLBodyElement]'){
-        if(typeof object['Priya'] == 'object'){
-            return object;
-        } else {
-            console.log('error, cannot attach ??? with priya.attach(object)');
-        }
-   }
-    else if(call === '[object String]'){
-        if(typeof object.querySelectorAll == 'function'){
-            var list = object.find(selector);
-        } else {
-            var list = document.querySelectorAll(selector);
-        }
-        var index;
-        for (index = 0; index < list.length; index++){
-            var node = list[index];
-            if(typeof node['Priya'] != 'object'){
-                node = object.attach(node);
-            }
-            list[index] = node;
-        }
-        if (list.length == 0){
-            var priya = object.attach(object.create('element', selector));
-            priya.data('selector', selector);
-            return priya;
-        }
-        else if(list.length == 1){
-            return node;
-        } else {
-            return object.attach(list);
-        }
 
-    } else {
-         if(typeof object['Priya'] == 'object'){
-             return object;
-         } else {
-             console.log('error, cannot attach ??? with priya.attach(object)');
-         }
-    }
-    /*
-    if(typeof selector == 'undefined' || selector === null){
-        return false;
-    }
-    if(typeof this['Priya'] != 'undefined'){
-        if(typeof this['Priya']['dom'] != 'undefined'){
-            if(typeof this['Priya']['dom']['selected'] == 'undefined'){
-                this['Priya']['dom']['selected'] = {};
-            }
-            var selected;
-            if(typeof selector == 'object'){
-                selected = selector.tagName;
-                if(typeof selected == 'undefined' && selector instanceof HTMLDocument){
-                    var priya = this.attach(this.create('element', selector));
-                    priya.data('selector', selector);
-                    //add to document for retries?
-                    return priya;
-                }
-                selected = selected.toLowerCase();
-                if(selector.id){
-                    selected += ' #' + selector.id;
-                }
-                if(selector.className){
-                    selected += ' .' + this.str_replace(' ','.',selector.className);
-                }
-            } else {
-                selected = selector;
-            }
-            if(typeof this['Priya']['dom']['selected'][selected] == 'undefined'){
-                var counter = 1;
-            } else {
-                var counter = this['Priya']['dom']['selected'][selected]++;
-            }
-            this['Priya']['dom']['selected'][selected] = counter;
-        }
-    }
-    var oldSelector;
-    var matchSelector;
-    if(typeof selector == 'string'){
-        var oldSelector = this.trim(selector);
-        var not = this.explode(':not(', selector);
-        if(not.length >= 2){
-            var index;
-            for(index in not){
-                var temp = this.explode(')', not[index]);
-                if(temp.length >= 2){
-                    var subSelector = temp[0];
-                    if(subSelector.substr(0,1) == '#'){
-                        subSelector = '[id="' + subSelector.substr(1) + '"]' + ')'; // + implode(')', temp);
-                    } else if (subSelector.substr(0,1) == '.'){
-                        subSelector = '[class="' + subSelector.substr(1) + '"]' + ')'; // + implode(')', temp);
-                    } else {
-                        subSelector = temp[0] + ')'; //implode(')', temp);
-                    }
-                    not[index] = subSelector;
-                }
-            }
-            selector = this.implode(':not(', not);
-        }
-        matchSelector = this.trim(selector);
-        selector = this.trim(selector).split(' ');
-    }
-    if(Object.prototype.toString.call(selector) === '[object Array]'){
-        if(typeof this.querySelectorAll == 'function' && oldSelector != matchSelector){
-            var list = this.find(matchSelector);
-//            var list = this.querySelectorAll(matchSelector);
-        } else if(oldSelector != matchSelector){
-            var list = document.querySelectorAll(matchSelector);
-        }
-        if(typeof list == 'undefined'){
-            list = new Array();
-        }
-        if(list.length == 0 && selector.length > 1){
-            var index;
-            for(index = 0; index < selector.length; index++){
-                if(typeof select == 'undefined'){
-                    var select = this.select(selector[index]);
-                    continue;
-                }
-                var select = select.select(selector[index]);
-
-                if(select.tagName == 'PRIYA-NODE'){
-                    select.data('selector', matchSelector);
-                    //add to document for retries?
-                    return select;
-                }
-            }
-            return select;
-        } else {
-            selector = selector.join(' ');
-        }
-
-    }
-    if(typeof list == 'undefined' || (typeof list != 'undefined' && list.length == 0)){
-        if(typeof selector == 'object'){
-            var list = new Array();
-            list.push(selector);
-        } else {
-            if(typeof this.querySelectorAll == 'function'){
-                var list = this.find(selector);
-            } else {
-                var list = document.querySelectorAll(selector);
-            }
-        }
-    }
-
-    if(list.length == 0){
-        var priya = this.attach(this.create('element', selector));
-        priya.data('selector', selector);
-        //add to document for retries?
-        return priya;
-    }
-    else if(list.length == 1){
-        return this.attach(list[0]);
-    } else {
-        for(item in list){
-            list[item] = this.attach(list[item]);
-        }
-        return this.attach(list);
-    }
-    */
-}
 
 
 /*
 priya.prototype.select = function(selector){
-    if(typeof selector == 'undefined' || selector === null){
-        return false;
-    }
-    if(typeof this['Priya'] != 'undefined'){
-        if(typeof this['Priya']['dom'] != 'undefined'){
-            if(typeof this['Priya']['dom']['selected'] == 'undefined'){
-                this['Priya']['dom']['selected'] = {};
-            }
-            var selected;
-            if(typeof selector == 'object'){
-                selected = selector.tagName;
-                if(typeof selected == 'undefined' && selector instanceof HTMLDocument){
-                    var priya = this.attach(this.create('element', selector));
-                    priya.data('selector', selector);
-                    //add to document for retries?
-                    return priya;
-                }
-                selected = selected.toLowerCase();
-                if(selector.id){
-                    selected += ' #' + selector.id;
-                }
-                if(selector.className){
-                    selected += ' .' + this.str_replace(' ','.',selector.className);
-                }
-            } else {
-                selected = selector;
-            }
-            if(typeof this['Priya']['dom']['selected'][selected] == 'undefined'){
-                var counter = 1;
-            } else {
-                var counter = this['Priya']['dom']['selected'][selected]++;
-            }
-            this['Priya']['dom']['selected'][selected] = counter;
+    if(Object.prototype.toString.call(priya) == '[object Function]'){
+        var object = this;
+        if(typeof selector == 'undefined' || selector === null){
+            return false;
         }
-    }
-    var oldSelector;
-    var matchSelector;
-    if(typeof selector == 'string'){
-        var oldSelector = this.trim(selector);
-        var not = this.explode(':not(', selector);
-        if(not.length >= 2){
-            var index;
-            for(index in not){
-                var temp = this.explode(')', not[index]);
-                if(temp.length >= 2){
-                    var subSelector = temp[0];
-                    if(subSelector.substr(0,1) == '#'){
-                        subSelector = '[id="' + subSelector.substr(1) + '"]' + ')'; // + implode(')', temp);
-                    } else if (subSelector.substr(0,1) == '.'){
-                        subSelector = '[class="' + subSelector.substr(1) + '"]' + ')'; // + implode(')', temp);
-                    } else {
-                        subSelector = temp[0] + ')'; //implode(')', temp);
+        if(typeof this['Priya'] != 'undefined'){
+            if(typeof this['Priya']['dom'] != 'undefined'){
+                if(typeof this['Priya']['dom']['selected'] == 'undefined'){
+                    this['Priya']['dom']['selected'] = {};
+                }
+                var selected;
+                if(typeof selector == 'object'){
+                    selected = selector.tagName;
+                    if(typeof selected == 'undefined' && selector instanceof HTMLDocument){
+                        var priya = this.attach(this.create('element', selector));
+                        priya.data('selector', selector);
+                        //add to document for retries?
+                        return priya;
                     }
-                    not[index] = subSelector;
+                    selected = selected.toLowerCase();
+                    if(selector.id){
+                        selected += ' #' + selector.id;
+                    }
+                    if(selector.className){
+                        selected += ' .' + this.str_replace(' ','.',selector.className);
+                    }
+                } else {
+                    selected = selector;
                 }
+                if(typeof this['Priya']['dom']['selected'][selected] == 'undefined'){
+                    var counter = 1;
+                } else {
+                    var counter = this['Priya']['dom']['selected'][selected]++;
+                }
+                this['Priya']['dom']['selected'][selected] = counter;
             }
-            selector = this.implode(':not(', not);
         }
-        matchSelector = this.trim(selector);
-        selector = this.trim(selector).split(' ');
-    }
-    if(Object.prototype.toString.call( selector ) === '[object Array]'){
-        if(typeof this.querySelectorAll == 'function' && oldSelector != matchSelector){
-            var list = this.find(matchSelector);
-//            var list = this.querySelectorAll(matchSelector);
-        } else if(oldSelector != matchSelector){
-            var list = document.querySelectorAll(matchSelector);
-        }
-        if(typeof list == 'undefined'){
-            list = new Array();
-        }
-        if(list.length == 0 && selector.length > 1){
-            var index;
-            for(index = 0; index < selector.length; index++){
-                if(typeof select == 'undefined'){
-                    var select = this.select(selector[index]);
-                    continue;
+        var oldSelector;
+        var matchSelector;
+        if(typeof selector == 'string'){
+            var oldSelector = this.trim(selector);
+            var not = this.explode(':not(', selector);
+            if(not.length >= 2){
+                var index;
+                for(index in not){
+                    var temp = this.explode(')', not[index]);
+                    if(temp.length >= 2){
+                        var subSelector = temp[0];
+                        if(subSelector.substr(0,1) == '#'){
+                            subSelector = '[id="' + subSelector.substr(1) + '"]' + ')'; // + implode(')', temp);
+                        } else if (subSelector.substr(0,1) == '.'){
+                            subSelector = '[class="' + subSelector.substr(1) + '"]' + ')'; // + implode(')', temp);
+                        } else {
+                            subSelector = temp[0] + ')'; //implode(')', temp);
+                        }
+                        not[index] = subSelector;
+                    }
                 }
-                var select = select.select(selector[index]);
-
-                if(select.tagName == 'PRIYA-NODE'){
-                    select.data('selector', matchSelector);
-                    //add to document for retries?
-                    return select;
-                }
+                selector = this.implode(':not(', not);
             }
-            return select;
-        } else {
-            selector = selector.join(' ');
+            matchSelector = this.trim(selector);
+            selector = this.trim(selector).split(' ');
         }
+        if(Object.prototype.toString.call( selector ) === '[object Array]'){
+            if(typeof this.querySelectorAll == 'function' && oldSelector != matchSelector){
+                var list = this.find(matchSelector);
+//                var list = this.querySelectorAll(matchSelector);
+            } else if(oldSelector != matchSelector){
+                var list = document.querySelectorAll(matchSelector);
+            }
+            if(typeof list == 'undefined'){
+                list = new Array();
+            }
+            if(list.length == 0 && selector.length > 1){
+                var index;
+                for(index = 0; index < selector.length; index++){
+                    if(typeof select == 'undefined'){
+                        var select = this.select(selector[index]);
+                        continue;
+                    }
+                    var select = select.select(selector[index]);
 
-    }
-    if(typeof list == 'undefined' || (typeof list != 'undefined' && list.length == 0)){
-        if(typeof selector == 'object'){
-            var list = new Array();
-            list.push(selector);
-        } else {
-            if(typeof this.querySelectorAll == 'function'){
-                var list = this.find(selector);
+                    if(select.tagName == 'PRIYA-NODE'){
+                        select.data('selector', matchSelector);
+                        //add to document for retries?
+                        return select;
+                    }
+                }
+                return select;
             } else {
-                var list = document.querySelectorAll(selector);
+                selector = selector.join(' ');
+            }
+
+        }
+        if(typeof list == 'undefined' || (typeof list != 'undefined' && list.length == 0)){
+            if(typeof selector == 'object'){
+                var list = new Array();
+                list.push(selector);
+            } else {
+                if(typeof this.querySelectorAll == 'function'){
+                    var list = this.find(selector);
+                } else {
+                    var list = document.querySelectorAll(selector);
+                }
             }
         }
+
+        if(list.length == 0){
+            var priya = this.attach(this.create('element', selector));
+            priya.data('selector', selector);
+            //add to document for retries?
+            return priya;
+        }
+        else if(list.length == 1){
+            return this.attach(list[0]);
+        } else {
+            for(item in list){
+                list[item] = this.attach(list[item]);
+            }
+            return this.attach(list);
+        }
+    } else {
+        var object = priya;
+        console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+        console.log('object = priya')
+        console.log(this);
+        if(typeof object == 'undefined'){
+            return this.priya.attach(this);
+        } else {
+            console.log('^^^^^^^^^^^^^^^^^^^^^HAS OBJECT_________________');
+            return object.attach(this);
+        }
+
     }
 
-    if(list.length == 0){
-        var priya = this.attach(this.create('element', selector));
-        priya.data('selector', selector);
-        //add to document for retries?
-        return priya;
-    }
-    else if(list.length == 1){
-        return this.attach(list[0]);
-    } else {
-        for(item in list){
-            list[item] = this.attach(list[item]);
-        }
-        return this.attach(list);
-    }
 }
 */
+
 
 priya.prototype.methods = function (){
     var result = {};
@@ -899,6 +740,7 @@ priya.prototype.html = function (html, where){
     }
 }
 
+/*
 priya.prototype.closest = function (attribute, node, type){
     var parent;
     if(this.function_exists(node)){
@@ -934,6 +776,11 @@ priya.prototype.closest = function (attribute, node, type){
         if(this === parent && parent === node){
             parent = this.attach(this.parentNode);
         }
+        console.log('#####################################################');
+        console.log(this);
+        console.log(parent);
+        console.log(attribute);
+        console.log(node);
         var select = parent.select(attribute);
         if(typeof select == 'object' && select.tagName == 'PRIYA-NODE'){
             delete select;
@@ -945,6 +792,7 @@ priya.prototype.closest = function (attribute, node, type){
         return select;
     }
 }
+*/
 
 priya.prototype.previous = function (node){
     if(typeof node == 'undefined'){
@@ -2081,8 +1929,7 @@ priya.prototype.on = function (event, action, capture){
             for (index=0; index < this.length; index++){
                 var node = this[index];
                 if(typeof action == 'undefined'){
-                    console.log('action undefined with event:');
-                    console.log(event);
+                    console.log('action undefined with event: ' + event);
                 }
                 node.addEventListener(event, action, capture);
             }
@@ -2338,6 +2185,7 @@ priya.prototype.naturalCompare = function (a, b){
     return 0
 }
 
+/*
 priya.prototype.trim = function (str, charlist){
     var whitespace, l = 0,
     i = 0;
@@ -2367,6 +2215,7 @@ priya.prototype.trim = function (str, charlist){
     }
     return whitespace.indexOf(str.charAt(0)) === -1 ? str : '';
 }
+*/
 
 priya.prototype.basename = function (path, suffix){
     var b = path;
