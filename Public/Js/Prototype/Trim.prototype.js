@@ -27,3 +27,8 @@ _('prototype').trim = function(str, charlist){
     }
     return whitespace.indexOf(str.charAt(0)) === -1 ? str : '';
 }
+
+if(typeof priya != 'undefined'){
+    priya.trim = _('prototype').trim;
+}
+

@@ -22,30 +22,27 @@ var priya = function (url){
     this.parent = this;
     this.load = 0;
     this.hit = 0;
-    this.collection('url', url);
-    var expose = {};
-    this.collection('expose', {
+    this.collect.url = url;
+    this.collect.expose = {
         'namespace' : '_',
         'require' : 'require',
-        'empty' : 'empty'
-    });
-    this.collection('expose.prototype', {
+        //'empty' : 'empty'
+    };
+    this.collect.expose.window = {
         'isset' : 'isset',
+        'empty' : 'empty',
         'microtime' : 'microtime',
         'trim' : 'trim',
         'run' : 'run',
         'select' : 'select',
-    });
-    this.collection('expose.priya', {
-        'select' : 'select',
-        'closest': 'closest',
-        'trim' : 'trim',
-        'content' : 'content'
-    });
+
+    };
+    //require needs this
     this.expose();
 
     var prototype = url + 'Priya/Public/Js/Prototype/';
     this.require([
+        prototype + 'Empty.prototype.js',
         prototype + 'Isset.prototype.js',
         prototype + 'Microtime.prototype.js',
         prototype + 'Trim.prototype.js',
@@ -54,22 +51,9 @@ var priya = function (url){
         prototype + 'Closest.prototype.js',
         prototype + 'Content.prototype.js',
     ], function(){
-        priya.expose('prototype');
-        priya.expose('priya');
-        /*
-        console.log('bind select from prototype+++++++++++++++++++++++');
-        console.log(priya.namespace('prototype').select);
-        console.log(_('prototype').select);
-        priya.select =  _('prototype').select;
-        priya.closest = _('prototype').closest;
-        priya.trim = _('prototype').trim;
-        priya.content = _('prototype').content;
-        /*
-        priya.select = _('prototype').select;
-        priya.closest = _('prototype').closest;
-        priya.trim = _('prototype').trim;
-        priya.content = _('prototype').content;
-        */
+        //priya.expose('priya');
+        priya.expose('window');
+
     });
 };
 
@@ -105,13 +89,10 @@ priya.prototype.dom = function (data){
 
 priya.prototype.expose = function (collection, attribute){
     if(typeof collection == 'undefined'){
-        var expose = this.collection('expose');
+        var expose = this.collect.expose;
         var index;
         for(index in expose){
-            if(index == 'priya'){
-                continue;
-            }
-            if(index == 'prototype'){
+            if(index == 'window'){
                 continue;
             }
             var name = expose[index];
@@ -119,37 +100,21 @@ priya.prototype.expose = function (collection, attribute){
         }
     } else {
         if(typeof attribute == 'undefined'){
-            var expose = this.collection('expose.' + collection);
-            var index;
-            if(expose.length == 0){
-                console.log('**COLLECTION**********************************************************************************');
-                console.log(collection);
-            } else {
+            if(collection == 'window'){
+                var expose = this.collect.expose[collection];
                 for(index in expose){
                     var name = expose[index];
-                    if(collection == 'priya'){
-                        if(typeof this[name] == 'undefined'){
-                            this[name] = _('prototype')[index];
-                        }
-                    } else {
-                        window[name] = _(collection)[index].bind(window);
-                    }
+                    window[name] = _('prototype')[index].bind(window);
                 }
             }
         } else {
-            if(collection == 'priya'){
-                if(typeof this[attribute] == 'undefined'){
-                    this[attribute] = _('prototype')[attribute];
-                    console.log('NEW ASSIGN+=================================');
-                    console.log(attribute);
-                }
-            }
+            console.log('expose; collection: ' + collection +' attribute: ' + attribute);
         }
     }
 }
 
 priya.prototype.namespace = function (namespace) {
-    if(typeof namespace == 'undefined'){
+    if(typeof namespace == 'undefined' || namespace == '__proto__'){
         priya.debug('undefined namespace');
         return;
     }
@@ -172,10 +137,11 @@ priya.prototype.namespace = function (namespace) {
         object = object[token];
     }
     if(Object.prototype.toString.call(priya) == '[object Function]'){
-        return this.attach(object);
+        object = this.attach(object);
     } else {
-        return priya.attach(object);
+        object = priya.attach(object);
     }
+    return object;
 }
 
 priya.prototype.requireElement= function(url, closure){
@@ -185,26 +151,36 @@ priya.prototype.requireElement= function(url, closure){
     } else {
         element = priya.attach(element);
     }
-    element.attribute('defer', 'defer');
-    element.data('require-once', true);
-    element.on('load', function(event){
-        var file = priya.collection('require.file') ? priya.collection('require.file') : [];
-        file.push(this.attribute('src'));
-        priya.collection('require.file', file);
-        var loaded = priya.collection('require.loaded') ? priya.collection('require.loaded') : 0;
-        priya.collection('require.loaded', ++loaded);
-        if(priya.collection('require.loaded') == priya.collection('require.toLoad')){
-            closure();
-        }
-    });
-    element.attribute('src', url);
+    element.setAttribute('defer', 'defer');
+    element.setAttribute('data-require-once', true);
+
+    element.addEventListener('load', function(event){
+         var file = priya.collect.require.file ? priya.collect.require.file : [];
+         file.push(this.attribute('src'));
+         if(typeof priya.collect.require == 'undefined'){
+             priya.collect.require = {};
+         }
+         priya.collect.require.file = file;
+         var loaded = priya.collect.require.loaded ? priya.collect.require.loaded : 0;
+         priya.collect.require.loaded = ++loaded;
+         if(priya.collect.require.loaded == priya.collect.require.toLoad){
+             closure();
+         }
+    }, false);
+    element.src = url;
     document.getElementsByTagName("head")[0].appendChild(element);
     if(Object.prototype.toString.call(priya) == '[object Function]'){
-        var toLoad = this.collection('require.toLoad') ? this.collection('require.toLoad') : 0;
-        this.collection('require.toLoad', ++toLoad);
+        if(typeof this.collect.require == 'undefined'){
+            this.collect.require = {};
+        }
+        var toLoad = this.collect.require.toLoad ? this.collect.require.toLoad : 0;
+        this.collect.require.toLoad = ++toLoad;
     } else {
-        var toLoad = priya.collection('require.toLoad') ? priya.collection('require.toLoad') : 0;
-        priya.collection('require.toLoad', ++toLoad);
+        if(typeof priya.collect.require == 'undefined'){
+            priya.collect.require = {};
+        }
+        var toLoad = priya.collect.require.toLoad ? priya.collect.require.toLoad : 0;
+        priya.collect.require.toLoad = ++toLoad;
     }
 }
 
@@ -250,7 +226,7 @@ priya.prototype.require= function(url, closure){
             } else {
                 var node = priya.attach(script[index]);
             }
-            if(node.attribute('data-require-once') == 'true' && node.attribute('src') == item){
+            if(node.getAttribute('data-require-once') == 'true' && node.src == item){
                 found = true;
             }
         }
@@ -2044,12 +2020,17 @@ priya.prototype.attach = function (element){
     element['parent'] = dom['parentNode'].bind(element);
     element['Priya'] = {
             "version": '0.0.1',
-            "mtime": this.microtime(true),
             "dom" : dom
     };
     if(typeof element.tagName != 'undefined'){
-        element.data('mtime', element['Priya']['mtime']);
-        element.data('random', this.rand(1000, 9999));
+        if(typeof this.microtime == 'function' && typeof element.data == 'function'){
+            element.data('mtime', this.microtime(true));
+        }
+        /*
+        if(typeof this.rand == 'function'){
+            element.data('random', this.rand(1000, 9999));
+        }
+        */
     }
     return element;
 }
@@ -2140,6 +2121,7 @@ priya.prototype.deleteCollection = function(attribute){
     return this.object_delete(attribute, this.collect);
 }
 
+/*
 priya.prototype.empty = function (mixed_var){
     var key;
      if (
@@ -2160,6 +2142,7 @@ priya.prototype.empty = function (mixed_var){
     return false;
 }
 
+
 priya.prototype.isset = function (){
     var a = arguments,
         l = a.length,
@@ -2178,11 +2161,15 @@ priya.prototype.isset = function (){
     return true;
 }
 
+
+
 priya.prototype.microtime = function (get_as_float){
     var now = new Date().getTime() / 1000;
     var s = parseInt(now, 10);
     return (get_as_float) ? now : (Math.round((now - s) * 1000) / 1000) + ' ' + s;
 }
+*/
+
 
 priya.prototype.naturalICompare = function (a, b){
     a = a.toLowerCase();
@@ -2377,6 +2364,8 @@ priya.prototype.explode = function (delimiter, string, limit){
 }
 
 priya.prototype.explode_multi = function(delimiter, string, limit){
+    console.log(delimiter);
+    console.log(string);
     var result = new Array();
     var index;
     for(index =0; index < delimiter.length; index++){

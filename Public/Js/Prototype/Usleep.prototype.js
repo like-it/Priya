@@ -1,7 +1,3 @@
-/**
- * @see https://www.phpied.com/sleep-in-javascript/
- */
-
 _('prototype').usleep = function (msec){
     console.log('USLEEP__________________________________________________' + msec);
     var start = new Date().getTime();
@@ -11,6 +7,6 @@ _('prototype').usleep = function (msec){
     }
 }
 
-priya.usleep = _('prototype').usleep;
-
-//_('prototype').expose('priya', 'usleep');
+if(typeof priya != 'undefined'){
+    priya.usleep = _('prototype').usleep;
+}

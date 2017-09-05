@@ -99,3 +99,7 @@ _('prototype').content = function (data){
     }
     return target;
 }
+
+if(typeof priya != 'undefined'){
+    priya.content = _('prototype').content;
+}

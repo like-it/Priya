@@ -1,4 +1,4 @@
-_('prototype').empty = function (){
+_('prototype').isset = function (){
     var a = arguments,
         l = a.length,
         i = 0,
@@ -14,4 +14,8 @@ _('prototype').empty = function (){
         i++;
     }
     return true;
+}
+
+if(typeof priya != 'undefined'){
+    priya.isset = _('prototype').isset;
 }

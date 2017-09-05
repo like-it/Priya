@@ -16,7 +16,10 @@
             setTimeout(ready, 1/30);
             return;
         }
-        var require = priya.collection('require');
+        var require = {};
+        if(typeof priya.collect != 'undefined' && typeof priya.collect.require == 'object'){
+            require = priya.collect.require;
+        }
         if(require.toLoad != require.loaded){
             setTimeout(ready, 1/30);
             return;

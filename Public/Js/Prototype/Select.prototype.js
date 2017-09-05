@@ -198,5 +198,8 @@ _('prototype').select = function(selector){
             return object.attach(call);
         }
     }
+}
 
+if(typeof priya != 'undefined'){
+    priya.select = _('prototype').select;
 }

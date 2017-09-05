@@ -25,3 +25,7 @@ _('prototype').run = function (data){
         }, 1/30);
     }
 }
+
+if(typeof priya != 'undefined'){
+    priya.run = _('prototype').run;
+}

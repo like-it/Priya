@@ -3,3 +3,7 @@ _('prototype').microtime = function (get_as_float){
     var s = parseInt(now, 10);
     return (get_as_float) ? now : (Math.round((now - s) * 1000) / 1000) + ' ' + s;
 }
+
+if(typeof priya != 'undefined'){
+    priya.microtime = _('prototype').microtime;
+}
