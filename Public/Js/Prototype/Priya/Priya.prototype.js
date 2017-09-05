@@ -2364,8 +2364,6 @@ priya.prototype.explode = function (delimiter, string, limit){
 }
 
 priya.prototype.explode_multi = function(delimiter, string, limit){
-    console.log(delimiter);
-    console.log(string);
     var result = new Array();
     var index;
     for(index =0; index < delimiter.length; index++){
