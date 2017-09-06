@@ -65,6 +65,7 @@ _('prototype').request = function (url, data, script){
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             if(xhttp.responseText.substr(0, 1) == '{' && xhttp.responseText.substr(-1) == '}'){
+                console.log(xhttp.responseText);
                 var data = JSON.parse(xhttp.responseText);
                 priya.link(data);
                 priya.script(data);

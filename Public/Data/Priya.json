@@ -1,5 +1,6 @@
 {
 "@see" : "http://priya.software/Documentation/Json/Priya.json",
+"name" : "{$url|basename:'.json'}",
 "core" : "{$web.root}Priya/Public/Js/Prototype/Core/",
 "prototype" : "{$core|dir.name}",
 "extension" : ".prototype.js",
@@ -10,8 +11,10 @@
 },
 "method" : "append",
 "target" : "body",
-"html" : "<h1>Hello world</h1>",
+"template" : "{$name}.tpl",
+"route" : "{route('priya-template', $template)}",
+"html" : "{priya('{$web.root}Application/Template/{$template}', 'text/html', 'POST')}",
 "script" : [
-    "<script type=\"text/javascript\">priya.usleep(400);</script>"
+    "<script type=\"text/javascript\" src=\"{$web.root}Priya/Public/Template/{$name}.js\"></script>"
 ]
 }

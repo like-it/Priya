@@ -77,7 +77,7 @@ var priya = function (url){
             priya.expose('window');
 //                priya.collect = priya.object_merge(priya.collect, data);
             //data.url = priya.collect.url;
-            priya.request(priya.collect.url + 'Priya/Module/Parser/', data, function(url, data){
+            priya.request(priya.collect.url + 'Application/Parser/', data, function(url, data){
                 //priya.collect = data;
                 console.log("COPARE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                 console.log(priya.collect);
@@ -96,7 +96,7 @@ var priya = function (url){
                 console.log('AFTER PARSING........................................');
                 console.log(priya.collect.parser.require.file);
                 require([
-                    priya.collect.parser.require.file,
+                    data.require.file,
                 ], function(){
                     _('prototype').usleep('200');
                     console.log(priya.collect.parser.script);

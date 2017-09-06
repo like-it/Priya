@@ -16,6 +16,13 @@ _('prototype').content = function (data){
     if(typeof data['html'] == 'undefined' && (data['method'] != 'replace' && data['method'] != 'unwrap')){
         return;
     }
+    /*
+    if(data['html'] === false){
+        priya.debug('html is false in data, see:');
+        priya.debug(data);
+        return;
+    }
+    */
     var target = priya.select(data['target']);
     var method = data['method'];
     if(this.is_nodeList(target)){

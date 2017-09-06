@@ -217,6 +217,13 @@ class Application extends Parser {
                     $parser = new Parser();
                     $file = new File();
                     $result = $parser->data('object')->compile($file->read($url), $data->data());
+                } elseif($ext == 'json'){
+                    $file = new File();
+                    $result = $file->read($url);
+                    $object = new stdClass();
+                    $object->url = $this->handler()->url();
+                    $object = $this->object_merge($object, $this->object($result));
+                    $result = $this->object($object, 'json');
                 } else {
                     if($ext == 'js'){
 //                         sleep(rand(1, 10)); //testing async

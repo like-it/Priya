@@ -24,6 +24,8 @@ class Parser extends Data {
     public function __construct($handler=null, $route=null, $data=null){
         $this->random(rand(1000,9999) . '-' . rand(1000,9999) . '-' . rand(1000,9999) . '-' . rand(1000,9999));
         if($data !== null){
+            $this->handler($handler);
+            $this->route($route);
             $this->data($this->object_merge($this->data(), $data));
         } else {
             $this->data($this->object_merge($this->data(), $handler));
@@ -56,7 +58,10 @@ class Parser extends Data {
             $this->request($attribute, $decode);
         }
         $data = $this->object_merge($data, $this->request());
-        return $this->object($this->compile($this->request(), $data), 'json');
+        $this->data($this->object_merge($data, $this->data())); // <-> ?
+        //$data = $this->compile($data, $data);
+        $data =  $this->compile($this->request(), $data);
+        return $this->object($data, 'json');
     }
 
     public function random($random=null){

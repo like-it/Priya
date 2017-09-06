@@ -27,7 +27,7 @@ function function_priya($value=null, $argumentList=array(), $parser=null){
     $app = new Application($parser->autoload(), $data);
     if(!empty($contentType)){
         $app->request('contentType', $contentType);
-        $app->handler()->contentType($contentType);
+        $app->handler()->contentType($contentType); // move to app.request
     }
     if(!empty($method)){
         $app->handler()->method($method);

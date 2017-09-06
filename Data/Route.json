@@ -24,9 +24,21 @@
         "translate": false
     },
      "priya-parser": {
-        "path": "Priya\/Module\/Parser",
+        "path": "Application\/Parser",
         "default": {
             "controller": "Priya.Module.Parser.run",
+            "format": "html",
+            "language": "en"
+        },
+        "method": [
+            "POST"
+        ],
+        "translate": false
+    },
+    "priya-template": {
+        "path": "Application\/Template\/{$template}",
+        "default": {
+            "controller": "Priya.Module.Template.run",
             "format": "html",
             "language": "en"
         },
