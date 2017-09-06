@@ -13,6 +13,4 @@ _('prototype').week = function (date) {
     return 1 + Math.ceil((firstThursday - tdt) / 604800000);
 }
 
-if(typeof priya != 'undefined'){
-    priya.week = _('prototype').week;
-}
+priya.week = _('prototype').week;

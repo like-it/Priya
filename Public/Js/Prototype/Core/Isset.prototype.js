@@ -16,6 +16,4 @@ _('prototype').isset = function (){
     return true;
 }
 
-if(typeof priya != 'undefined'){
-    priya.isset = _('prototype').isset;
-}
+priya.isset = _('prototype').isset;

@@ -7,6 +7,4 @@ _('prototype').usleep = function (msec){
     }
 }
 
-if(typeof priya != 'undefined'){
-    priya.usleep = _('prototype').usleep;
-}
+priya.usleep = _('prototype').usleep;

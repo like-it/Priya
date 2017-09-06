@@ -26,6 +26,4 @@ _('prototype').run = function (data){
     }
 }
 
-if(typeof priya != 'undefined'){
-    priya.run = _('prototype').run;
-}
+priya.run = _('prototype').run;

@@ -23,6 +23,18 @@
         ],
         "translate": false
     },
+     "priya-parser": {
+        "path": "Priya\/Module\/Parser",
+        "default": {
+            "controller": "Priya.Module.Parser.run",
+            "format": "html",
+            "language": "en"
+        },
+        "method": [
+            "POST"
+        ],
+        "translate": false
+    },
     "Indent": {
         "path": "Priya/Module/Indent/Public/Css/Indent.css",
         "default": {

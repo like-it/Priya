@@ -1,0 +1,14 @@
+{
+"@see" : "http://priya.software/Documentation/Json/Priya.json",
+"core" : "{$url}Priya/Public/Js/Prototype/Core/",
+"prototype" : "{$core|dir.name}",
+"extension" : ".prototype.js",
+"require" : {
+    "file" : [
+        "{$prototype}Usleep{$extension}"
+    ]
+},
+"script" : [
+    "<script type=\"text/javascript\">priya.usleep(400);</script>"
+]
+}

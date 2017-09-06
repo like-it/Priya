@@ -55,10 +55,7 @@ _('prototype').closest = function(attribute, node, type){
     }
 }
 
-if(typeof priya != 'undefined'){
-    priya.closest = _('prototype').closest;
-}
-
+priya.closest = _('prototype').closest;
 /*
 _('prototype').select = function(selector){
     if(Object.prototype.toString.call(priya) == '[object Function]'){

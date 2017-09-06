@@ -23,39 +23,105 @@ var priya = function (url){
     this.load = 0;
     this.hit = 0;
     this.collect.url = url;
-    this.collect.expose = {
-        'namespace' : '_',
-        'require' : 'require',
-        //'empty' : 'empty'
-    };
-    this.collect.expose.window = {
-        'isset' : 'isset',
-        'empty' : 'empty',
-        'microtime' : 'microtime',
-        'trim' : 'trim',
-        'run' : 'run',
-        'select' : 'select',
+    this.get(url + 'Priya/Public/Data/Priya.json', function(url, data){
+        priya.collect.data = {};
+        priya.collect.data.toLoad = 1;
+        priya.collect.require.toLoad--;
+        if(typeof data == 'object'){
+             priya.collect.expose = {
+                'namespace' : '_',
+                'require' : 'require',
+            };
+            priya.collect.expose.window = {
+                'isset' : 'isset',
+                'empty' : 'empty',
+                'microtime' : 'microtime',
+                'trim' : 'trim',
+                'run' : 'run',
+                'select' : 'select',
+                'get' : 'get',
+                'request' : 'request'
 
-    };
-    //require needs this
-    this.expose();
+            };
+            //require needs this
+            priya.expose();
+            priya.collect.data.loaded = 1;
+            priya.collect.require.loaded--;
+            priya.collect.data.file = [];
+            priya.collect.data.file.push(url);
+            priya.collect.dir = {};
+            priya.collect.dir.root = priya.collect.url;
+            priya.collect.dir.js = priya.collect.dir.root + 'Priya/Public/Js/';
+            priya.collect.dir.prototype = priya.collect.dir.js + 'Prototype/';
+            var core = priya.collect.dir.core = priya.collect.dir.prototype + 'Core/';
+            //var core = priya.collect.url + 'Priya/Public/Js/Prototype/Core/';
+            var parser = priya.collect.dir.prototype + 'Parser/'; //serverside parsing for now (how much !!!)
+            require([
+                core + 'Empty.prototype.js',
+                core + 'Isset.prototype.js',
+                core + 'Microtime.prototype.js',
+                core + 'Trim.prototype.js',
+                core + 'Exception.prototype.js',
+                core + 'Debug.prototype.js',
+                core + 'Collection.prototype.js',
+                core + 'Request.prototype.js',
+                core + 'Select.prototype.js',
+                core + 'Run.prototype.js',
+                core + 'Closest.prototype.js',
+                core + 'Content.prototype.js',
+                core + 'Script.prototype.js',
+            ], function(){
+                priya.expose('window');
+//                priya.collect = priya.object_merge(priya.collect, data);
+                data.url = priya.collect.url;
+                priya.request(priya.collect.url + 'Priya/Module/Parser/', data, function(url, data){
+                    //priya.collect = data;
+                    console.log("COPARE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                    console.log(priya.collect);
+                    console.log(data);
 
-    var prototype = url + 'Priya/Public/Js/Prototype/';
-    this.require([
-        prototype + 'Empty.prototype.js',
-        prototype + 'Isset.prototype.js',
-        prototype + 'Microtime.prototype.js',
-        prototype + 'Trim.prototype.js',
-        prototype + 'Select.prototype.js',
-        prototype + 'Run.prototype.js',
-        prototype + 'Closest.prototype.js',
-        prototype + 'Content.prototype.js',
-    ], function(){
-        //priya.expose('priya');
-        priya.expose('window');
+                    var index;
+                    for(index in data){
+                        if(data[index] == null){
+                            delete data[index];
+                            continue;
+                        }
+                    }
+
+                    priya.collect.parser = data;
+                    //priya.collect.require = data.require;
+                    console.log('AFTER PARSING........................................');
+                    console.log(priya.collect.parser.require.file);
+                    require(priya.collect.parser.require.file, function(){
+                        _('prototype').usleep('200');
+                        console.log(priya.collect.parser.script);
+                        priya.script(priya.collect.parser);
+                        console.log('parseble require options');
+                    });
+                    console.log(priya.collect);
+                    //priya.collect = priya.object_merge(data, priya.collect);
+                });
+                /*
+                require([
+
+                ], function(){
+                    priya.expose('window');
+                });
+                */
+                /*
+                require([
+                    core + 'Request.prototype.js'
+                ], function(){
+
+                });
+                */
+            });
+        } else {
+            priya.collect.data.loaded = 0;
+        }
 
     });
-};
+}
 
 /*
 priya.prototype.run = function (data){
@@ -104,6 +170,8 @@ priya.prototype.expose = function (collection, attribute){
                 var expose = this.collect.expose[collection];
                 for(index in expose){
                     var name = expose[index];
+                    console.log(index);
+                    console.log(name);
                     window[name] = _('prototype')[index].bind(window);
                 }
             }
@@ -199,7 +267,7 @@ priya.prototype.require= function(url, closure){
                 } else {
                     var node = priya.attach(script[index]);
                 }
-                if(node.attribute('data-require-once') == 'true' && node.attribute('src') == item){
+                if(node.getAttribute('data-require-once') == 'true' && node.src == item){
                     found = true;
                     break;
                 }
@@ -332,6 +400,7 @@ priya.prototype.debug = function(data){
         }
         var item = this.create('pre', '');
         item.html(data);
+        console.log(debug);
         debug.append(item);
         //wrong syntax
         //var scrollable = debug.closest('has', 'scrollbar', 'vertical');
@@ -1399,6 +1468,31 @@ priya.prototype.remove = function (){
     }
 }
 
+priya.prototype.get = function (url, script){
+    var xhttp = new XMLHttpRequest();
+    if(typeof this.collect.require == 'undefined'){
+        this.collect.require = {};
+    }
+    this.collect.require.toLoad = this.collect.require.toLoad ? this.collect.require.toLoad : 0;
+    this.collect.require.toLoad++;
+    xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            if(xhttp.responseText.substr(0, 1) == '{' && xhttp.responseText.substr(-1) == '}'){
+                var data = JSON.parse(xhttp.responseText);
+                priya.collect.require.loaded = priya.collect.require.loaded ? priya.collect.require.loaded : 0;
+                priya.collect.require.loaded++;
+                script(url, data);
+            } else {
+                priya.debug(xhttp.responseText);
+            }
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.send();
+}
+
+/*
 priya.prototype.request = function (url, data, script){
     if(typeof url == 'object' && url !== null){
         data = url;
@@ -1467,6 +1561,7 @@ priya.prototype.request = function (url, data, script){
     }
     priya.script(script);
 }
+*/
 
 priya.prototype.loader = function(data){
     if(data == 'remove'){
@@ -1568,6 +1663,8 @@ priya.prototype.script = function (data, closure){
         return data;
     }
     var index;
+    console.log('IN SCRipt ((((((((((((((((((((((((((((((((((((((99');
+    console.log(data.script);
     for(index in data.script){
         //this.debug(data.script[index]);
         this.addScriptSrc(data.script[index]);
@@ -1689,6 +1786,7 @@ priya.prototype.addScriptSrc = function (data){
 
 priya.prototype.addScriptText = function (data){
     var tag = this.readTag(data);
+    console.log(tag);
     if(!this.isset(tag['tagName']) || tag['tagName'] != 'script'){
         return;
     }
@@ -2485,7 +2583,7 @@ priya.prototype.object_merge = function (main, merge){
     }
     for (key in merge){
         var value = merge[key];
-        if(!this.isset(main[key])){
+        if(typeof main[key] == 'undefined'){
             main[key] = value;
         } else {
             if(typeof value == 'object' && typeof main[key] == 'object'){
@@ -2499,6 +2597,8 @@ priya.prototype.object_merge = function (main, merge){
 }
 
 priya.prototype.object_get = function(attributeList, object){
+//    console.log(attributeList);
+//    console.log(object);
     if(this.empty(object)){
         return object;
     }

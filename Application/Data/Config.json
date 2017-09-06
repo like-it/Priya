@@ -4,6 +4,7 @@
         "css": "text\/css",
         "pcss": "text\/css",
         "js": "application\/javascript",
+        "json": "application\/json",
         "ico": "image\/x-icon",
         "png": "image\/png",
         "jpg": "image\/jpeg",

@@ -200,6 +200,4 @@ _('prototype').select = function(selector){
     }
 }
 
-if(typeof priya != 'undefined'){
-    priya.select = _('prototype').select;
-}
+priya.select = _('prototype').select;

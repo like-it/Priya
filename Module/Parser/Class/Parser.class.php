@@ -26,6 +26,10 @@ class Parser extends Data {
         $this->data($this->object_merge($this->data(), $handler));
     }
 
+    public function run(){
+        return $this->object($this->data($this->compile($this->request(), $this->request())), 'json');
+    }
+
     public function random($random=null){
         if($random !== null){
             $this->setRandom($random);

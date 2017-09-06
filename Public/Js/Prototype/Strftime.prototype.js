@@ -91,7 +91,4 @@ _('prototype').strftime = function (sFormat, date) {
   });
 }
 
-if(typeof priya != 'undefined'){
-    priya.strftime = _('prototype').strftime;
-}
-
+priya.strftime = _('prototype').strftime;
