@@ -169,7 +169,7 @@ class Data extends Core {
             $module = $url;
         }
         $autoload = $this->autoload();
-        if(empty($autoload)){
+        if(empty($autoload) || !$autoload instanceof \Priya\Module\Autoload\Data){
             $tmp = explode('\\', trim(str_replace(Application::DS, '\\',$url),'\\'));
             $class = array_pop($tmp);
             $namespace = implode('\\', $tmp);

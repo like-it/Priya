@@ -23,11 +23,40 @@ class Parser extends Data {
 
     public function __construct($handler=null, $route=null, $data=null){
         $this->random(rand(1000,9999) . '-' . rand(1000,9999) . '-' . rand(1000,9999) . '-' . rand(1000,9999));
-        $this->data($this->object_merge($this->data(), $handler));
+        if($data !== null){
+            $this->data($this->object_merge($this->data(), $data));
+        } else {
+            $this->data($this->object_merge($this->data(), $handler));
+        }
     }
 
     public function run(){
-        return $this->object($this->data($this->compile($this->request(), $this->request())), 'json');
+        $this->read(__CLASS__);
+        $allowed = $this->data('allow');
+        $data = new stdClass();
+        foreach($allowed as $key => $allow){
+            $data = $this->object_set($key, $this->data($allow), $data, 'root');
+        }
+        $list = $this->data('entity_decode');
+        foreach($list as $target => $attribute){
+            $decode = $this->request($attribute);
+            if(is_array($decode) || is_object($decode)){
+                if(is_object($decode)){
+                    foreach($decode as $key => $value){
+                        $decode->{$key} = html_entity_decode($value, ENT_HTML5);
+                    }
+                } else {
+                    foreach($decode as $key => $value){
+                        $decode[$key] = html_entity_decode($value, ENT_HTML5);
+                    }
+                }
+            } else {
+                $decode = html_entity_decode($decode, ENT_HTML5);
+            }
+            $this->request($attribute, $decode);
+        }
+        $data = $this->object_merge($data, $this->request());
+        return $this->object($this->compile($this->request(), $data), 'json');
     }
 
     public function random($random=null){

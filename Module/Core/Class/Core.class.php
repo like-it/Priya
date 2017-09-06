@@ -652,7 +652,11 @@ class Core {
 
     public function autoload($autoload=null){
         if($autoload !== null){
-            $this->setAutoload($autoload);
+            if($autoload == 'delete' || $autoload == 'remove'){
+                $this->setAutoload(null);
+            } else {
+                $this->setAutoload($autoload);
+            }
         }
         return $this->getAutoload();
     }

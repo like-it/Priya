@@ -1,0 +1,12 @@
+{
+"allow" : {
+    "public_html" : "public_html",
+    "web" : "web",
+    "time" : "time"
+},
+"entity_decode" : {
+    "html" : "html",
+    "script" : "script",
+    "link" : "link"
+}
+}
