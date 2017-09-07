@@ -8,9 +8,9 @@ class Operator extends Core {
         return array(
             '&&',
             '||',
-            ' and ',
-            ' or ',
-            ' xor ',
+            'and',
+            'or',
+            'xor',
             '==',
             '===',
             '<>',

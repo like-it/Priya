@@ -3,7 +3,8 @@
 {$test =  ($true+1) == $two ?  $welcome2  :   'default'}
 {$test =  $welcome == 'hello' ?  'nice'  :   $two}
 {$test =  $welcome2  ?  $welcome2  :   'default'}
-{$begin =   $start ?:  1}
+{$begin =   $start > $two ?: 1}
+{$begin =   $start2 ?: '$start3 > $two'}
 {$end = 2}
 {$highest = $start > $end ? $start : $end}
 {literal}

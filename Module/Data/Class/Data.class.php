@@ -22,8 +22,16 @@ class Data extends Core {
         $this->data($this->object_merge($this->data(), $handler));
     }
 
-    public function data($attribute=null, $value=null){
+    public function data($attribute=null, $value=null, $type=null){
         if($attribute !== null){
+            if($attribute == 'set'){
+                $this->object_delete($value, $this->data()); //for sorting an object
+                $this->object_set($value, $type, $this->data());
+                return $this->object_get($value, $this->data());
+            }
+            elseif($attribute == 'get'){
+                return $this->object_get($value, $this->data());
+            }
             if($value !== null){
                 if($attribute=='delete'){
                     return $this->deleteData($value);
