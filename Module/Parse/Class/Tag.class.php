@@ -4,7 +4,7 @@ namespace Priya\Module\Parse;
 
 //use Priya\Module\Parse\Data;
 
-class Tag extends Data {
+class Tag extends Core {
 
     public function __construct($input=null){
         $this->input($input);

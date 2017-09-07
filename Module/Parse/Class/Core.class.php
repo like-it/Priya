@@ -2,7 +2,7 @@
 
 namespace Priya\Module\Parse;
 
-class Data extends \Priya\Module\Data {
+class Core extends \Priya\Module\Data {
     protected $input;
     protected $output;
     protected $random;

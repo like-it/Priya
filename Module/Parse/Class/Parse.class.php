@@ -9,17 +9,13 @@
 
 namespace Priya\Module;
 
-use stdClass;
-use Priya\Application;
-use Priya\Module\Core\Object;
+use Priya\Module\Parse\Core;
 
-class Parse extends Data {
+class Parse extends Core {
     const DIR = __DIR__;
     const LITERAL = 'literal';
     const PHP_MIN_VERSION = '7.0.0';
     const FUNCTION_LIST = 'Function.List.php';
-
-    private $random;
 
     public function __construct($handler=null, $route=null, $data=null){
         $this->random(rand(1000,9999) . '-' . rand(1000,9999) . '-' . rand(1000,9999) . '-' . rand(1000,9999));
@@ -30,21 +26,6 @@ class Parse extends Data {
         } else {
             $this->data($this->object_merge($this->data(), $handler));
         }
-    }
-
-    public function random($random=null){
-        if($random !== null){
-            $this->setRandom($random);
-        }
-        return $this->getRandom();
-    }
-
-    private function setRandom($random=''){
-        $this->random = $random;
-    }
-
-    private function getRandom(){
-        return $this->random;
     }
 
     public function compile($string, $data, $keep=false){
@@ -59,8 +40,7 @@ class Parse extends Data {
             $assign->find($value);
         }
         $data = $assign->data();
-        var_dump($data);
-        die;
+        var_Dump($data);
     }
 
 

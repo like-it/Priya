@@ -4,7 +4,7 @@ namespace Priya\Module\Parse;
 
 //use Priya\Module\Parse\Data;
 
-class Newline extends Data {
+class Newline extends Core {
 
     public function __construct($input=null, $random=null){
         $this->input($input);

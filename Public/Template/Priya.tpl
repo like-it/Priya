@@ -1,4 +1,11 @@
-{$welcome =  hello } {$true = 'true'}
+{$welcome =  hello } {$true = '2'}
+{$two = '2'}
+{$test =  ($true+1) == $two ?  $welcome2  :   'default'}
+{$test =  $welcome == 'hello' ?  'nice'  :   $two}
+{$test =  $welcome2  ?  $welcome2  :   'default'}
+{$begin =   $start ?:  1}
+{$end = 2}
+{$highest = $start > $end ? $start : $end}
 {literal}
 {$welcome} should not be hello
 {/literal}
@@ -7,6 +14,14 @@
  *
  *
  */
+
+ternary tests, boolean logical operators
+
+$start > $end ? $start : $end //highest number
+
+
+
+
 
 {if $welcome == 'hello'}
     {$welcome = 'welcome'}

@@ -4,6 +4,7 @@
     "web" : "web",
     "time" : "time"
 },
+"start" : 1,
 "entity_decode" : {
     "html" : "html",
     "script" : "script",

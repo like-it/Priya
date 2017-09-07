@@ -1,0 +1,1 @@
+exec is not allowed use priya instead (not safe throught public parser)
