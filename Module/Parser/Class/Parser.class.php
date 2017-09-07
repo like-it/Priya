@@ -57,8 +57,26 @@ class Parser extends Data {
             }
             $this->request($attribute, $decode);
         }
-        $data = $this->object_merge($data, $this->request());
-        $this->data($this->object_merge($data, $this->data())); // <-> ?
+        //$data = $this->object_merge($data, $this->request());
+        //$this->data($this->object_merge($data, $this->data())); // <-> ?
+
+
+        $file = new File();
+        $read = $file->read($this->data('dir.priya.public') . 'Template/Priya.tpl');
+
+        $parser = new Parse($this->handler(), $this->route(), $this->data());
+
+        $read = $parser->compile($read, $this->data());
+
+        die('end parsing');
+
+        var_dump($read);
+
+        var_dump($this->data());
+        die;
+
+
+
         //$data = $this->compile($data, $data);
         $data =  $this->compile($this->request(), $data);
         return $this->object($data, 'json');
