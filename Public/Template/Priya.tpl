@@ -1,10 +1,10 @@
 {$welcome =  hello } {$true = '2'}
 {$two = '2'}
-{$test =  ($true+1) == $two ?  $welcome2  :   'default'}
+{$test2 =  (($start+31)-14) >= $start ?  $welcome  :   'default'} #bug
 {$test =  $welcome == 'hello' ?  'nice'  :   $two}
 {$test =  $welcome2  ?  $welcome2  :   'default'}
 {$begin =   $start > $two ?: 1}
-{$begin =   $start2 ?: '$start3 > $two'}
+{$begin =   $start2 ?: null == null}
 {$end = 2}
 {$highest = $start > $end ? $start : $end}
 {literal}

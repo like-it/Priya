@@ -52,11 +52,21 @@ class Assign extends Core {
 
     private function variable($string='', $type=null){
         $has = false;
+        $result = null;
         if($string == 'has' && $type !== null){
             $has = true;
             $string = $type;
         }
-        if((is_bool($string) || is_null($string) || is_numeric($string) || is_array($string) || is_object($string))){
+        if(
+            is_bool($string) ||
+            $string== 'true' ||
+            $string== 'false' ||
+            is_null($string) ||
+            $string== 'null' ||
+            is_numeric($string) ||
+            is_array($string) ||
+            is_object($string)
+        ){
             if(is_numeric($string)){
                 $pos = strpos($string,'0');
                 if($pos === 0 && is_numeric(substr($string, 1, 1))){
@@ -70,6 +80,9 @@ class Assign extends Core {
             elseif(is_null($string) || $string== 'null'){
                 $result= null;
             }
+            if($has === true){
+                return !false; //this means not true but needed for statement default trigger
+            }
             return $result;
         }
         $string = trim($string, '\'"');
@@ -79,12 +92,27 @@ class Assign extends Core {
             $result = null;
             foreach ($matches[0] as $key => $search){
                 $replace = $this->data(substr($search, 1));
+                $is_variable = !(bool) str_replace($search, '', $string);
+
                 if(is_null($replace) && $has === true){
                     return false;
                 } elseif($has === true){
                     return true;
                 }
-                if((is_bool($replace) || is_null($replace) || is_numeric($replace) || is_array($replace) || is_object($replace)) && $result === null){
+                if(
+                    (
+                        is_bool($replace) ||
+                        $replace== 'true' ||
+                        $replace== 'false' ||
+                        is_null($replace) ||
+                        $replace== 'null' ||
+                        is_numeric($replace) ||
+                        is_array($replace) ||
+                        is_object($replace)
+                    ) &&
+                    $result === null &&
+                    $is_variable === true
+                ){
                     if(is_numeric($replace)){
                         $pos = strpos($replace,'0');
                         if($pos === 0 && is_numeric(substr($replace, 1, 1))){
@@ -106,6 +134,10 @@ class Assign extends Core {
                 }
             }
         } else {
+            if($has === true){
+                var_dump('HERE IT IS....');
+                var_dump($string);
+            }
             if(is_numeric($string)){
                 $pos = strpos($string,'0');
                 if($pos === 0 && is_numeric(substr($string, 1, 1))){
@@ -126,45 +158,60 @@ class Assign extends Core {
         return $result;
     }
 
-    private function statement($string='', $default=null){
+    private function statement($string='', $default=null, $true=true, $false=false){
+        $statement = array();
         $pattern = '/(\S+)(\s+)(\S+)(\s+)(\S+)/';
         preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
         if(count($matches) == 1){
-
             $statement['left'] = $matches[0][1];
             $statement['operator'] = $matches[0][3];
             $statement['right'] = $matches[0][5];
-            $statement['true'] = true;
-            $statement['false'] = false; // $default;
+            $statement['true'] = $true;
+            $statement['false'] = $false; // $default;
+            $statement['left'] = $this->variable($statement['left']);
+            $statement['right'] = $this->variable($statement['right']);
+
+            $pattern = '^([-+/*]\d+(\.\d+)?)*';
+            preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
+            var_dump('__MATCHES__________________________');
+            var_dump($matches);
+
+            ob_start();
+            $statement['left'] ='print ('.$statement['left'].');';
+            eval($statement['left']);
+            $statement['left'] = ob_get_contents();
+            ob_end_clean();
+
+            ob_start();
+            $statement['right'] ='print ('.$statement['right'].');';
+            eval($statement['right']);
+            $statement['right'] = ob_get_contents();
+            ob_end_clean();
+
+            $statement['left'] = $this->variable($statement['left']);
+            $statement['right'] = $this->variable($statement['right']);
 
             if(!$this->variable('has', $statement['left']) || !$this->variable('has', $statement['right'])){
                 return $default;
             }
-
-            $statement['left'] = $this->variable($statement['left']);
-            $statement['right'] = $this->variable($statement['right']);
             $statement['true'] = $this->variable($statement['true']);
             $statement['false'] = $this->variable($statement['false']);
 
             $statement = Control_If::statement($statement);
 
-            var_dump($statement);
-
             if(!empty($statement['output'])){
-                return $statement['true']; //$this->data($attribute, $statement['true']);
+                $statement['result'] = $statement['true']; //$this->data($attribute, $statement['true']);
             } else {
-                return $statement['false']; //$this->data($attribute, $statement['false']);
+                $statement['result'] = $statement['false']; //$this->data($attribute, $statement['false']);
             }
         } else {
             $replace= $this->variable($string);
             if(!$replace){
                 $replace = $this->variable($default);
             }
-            return $replace;
-
-            //$this->data($attribute, $replace);
-            //return true;
+            $statement['result'] = $replace;
         }
+        return $statement;
     }
 
     private function ternary($explode='', $attribute, $value=''){
@@ -173,47 +220,14 @@ class Assign extends Core {
             if(count($short) == 2){
                 $start = rtrim($short[0], ' ');
                 $end = ltrim($short[1], ' ');
-                var_dump($end);
-                $value = $this->variable($this->statement($start, $this->statement($end, null)));
-                var_dump($start);
-                var_dump($end);
-                var_dump($attribute);
-                var_dump($value);
-                $this->data('set', $attribute, $value);
+
+                $statement = $this->statement($start, $this->statement($end));
+                $statement['result'] = $this->variable($statement['result']);
+
+                //$statement['result'] = $this->variable($this->statement($start, $this->statement($end)));
+                $this->data('set', $attribute, $statement['result']);
                 return true;
-                /*
-                $pattern = '/(\S+)(\s+)(\S+)(\s+)(\S+)/';
-                preg_match_all($pattern, $start, $matches, PREG_SET_ORDER);
-                if(count($matches) == 1){
 
-                    $statement['left'] = trim($matches[0][1], '\'"');
-                    $statement['operator'] = $matches[0][3];
-                    $statement['right'] = trim($matches[0][5], '\'"');
-                    $statement['true'] = true;
-                    $statement['false'] = trim($end, '\'"');
-
-                    $statement['left'] = $this->variable($statement['left']);
-                    $statement['right'] = $this->variable($statement['right']);
-                    $statement['true'] = $this->variable($statement['true']);
-                    $statement['false'] = $this->variable($statement['false']);
-
-                    $statement = Control_If::statement($statement);
-
-                    if(!empty($statement['output'])){
-                        $this->data($attribute, $statement['true']);
-                    } else {
-                        $this->data($attribute, $statement['false']);
-                    }
-                    return true;
-                } else {
-                    $replace= $this->variable($start);
-                    if(!$replace){
-                        $replace = $this->variable($end);
-                    }
-                    $this->data($attribute, $replace);
-                    return true;
-                }
-                */
             }
         }
         elseif ($explode == Ternary::QUESTION){
@@ -229,8 +243,6 @@ class Assign extends Core {
                 if(substr($start[1], 0, 1) == ':'){
                     $start = $start[0];
                     //add operator support
-//                     var_dump('_____________________________________________');
-//                     var_dump($start);
                     if(substr($start, 0, 1) == '$'){
                         $search = substr($start, 1);
                         $replace = $this->data($search);
@@ -241,10 +253,16 @@ class Assign extends Core {
                         return true;
                     }
                 } else {
+                    $original = $value;
+                    $statement = $this->statement($start[0], $this->statement($end[1]), $end[0], $end[1]);
+                    $statement['result'] = $this->variable($statement['result']);
+
+
+                    var_dump($statement);
+                    /*
                     $pattern = '/(\S+)(\s+)(\S+)(\s+)(\S+)/';
                     preg_match_all($pattern, $start[0], $matches, PREG_SET_ORDER);
                     if(count($matches) == 1){
-
                         $statement['left'] = trim($matches[0][1], '\'"');
                         $statement['operator'] = $matches[0][3];
                         $statement['right'] = trim($matches[0][5], '\'"');
@@ -259,8 +277,10 @@ class Assign extends Core {
                         $statement = Control_If::statement($statement);
 
                         if(!empty($statement['output'])){
+                            var_dump($statement['true']);
                             $this->data('set', $attribute, $statement['true']);
                         } else {
+                            var_dump($statement['true']);
                             $this->data('set', $attribute, $statement['false']);
                         }
                         return true;
@@ -268,6 +288,7 @@ class Assign extends Core {
                         //no comparison
                         //maybe a pattern without spaces
                     }
+                    */
                 }
             }
 

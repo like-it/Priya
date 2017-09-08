@@ -396,7 +396,7 @@ priya.prototype.debug = function(data){
         });
 
     }
-    var debug = run('.debug .tab-body.tab-debug');
+    var debug = select('.debug .tab-body.tab-debug');
     if(typeof data == 'string'){
         if(data == 'run'){
             data = string;

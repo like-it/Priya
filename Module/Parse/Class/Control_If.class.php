@@ -103,6 +103,9 @@ class Control_If extends Core {
                 break;
                 case '>=' :
                     if($statement['left'] >= $statement['right']){
+                        var_dump('__STATEMENT______________________');
+                        var_dump($statement['left']);
+                        var_dump($statement['right']);
                         $statement['output'] = true;
                     } else {
                         $statement['output'] = false;
