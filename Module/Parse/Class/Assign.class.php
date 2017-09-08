@@ -159,6 +159,13 @@ class Assign extends Core {
     }
 
     private function statement($string='', $default=null, $true=true, $false=false){
+        $tokens = Token::all($string);
+
+
+
+        var_dump($tokens);
+
+
         $statement = array();
         $pattern = '/(\S+)(\s+)(\S+)(\s+)(\S+)/';
         preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
@@ -171,13 +178,22 @@ class Assign extends Core {
             $statement['left'] = $this->variable($statement['left']);
             $statement['right'] = $this->variable($statement['right']);
 
-            $pattern = '^([-+/*]\d+(\.\d+)?)*';
-            preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
+            /*
+            $pattern = '/\d+/';
+            preg_match_all($pattern, $statement['left'], $match, PREG_SET_ORDER);
             var_dump('__MATCHES__________________________');
-            var_dump($matches);
+            var_dump($statement['left']);
+            var_dump($match);
+            $tokens = token_get_all('<?php print(' . $statement['left'] . ');');
+
+            foreach ($tokens as $key => $token){
+                $tokens[$key][2] = token_name($token[0]);
+            }
+            var_dump($tokens);
+
 
             ob_start();
-            $statement['left'] ='print ('.$statement['left'].');';
+            $statement['left'] ='print ("'.$statement['left'].'");';
             eval($statement['left']);
             $statement['left'] = ob_get_contents();
             ob_end_clean();
@@ -190,6 +206,8 @@ class Assign extends Core {
 
             $statement['left'] = $this->variable($statement['left']);
             $statement['right'] = $this->variable($statement['right']);
+
+            */
 
             if(!$this->variable('has', $statement['left']) || !$this->variable('has', $statement['right'])){
                 return $default;

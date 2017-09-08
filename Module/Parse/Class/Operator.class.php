@@ -4,7 +4,18 @@ namespace Priya\Module\Parse;
 
 class Operator extends Core {
 
-    public static function Compare(){
+    public static function compare_array(){
+        return array(
+            '+',
+            '==',
+            '===',
+            '!=',
+            '<>',
+            '!==',
+        );
+    }
+
+    public static function compare(){
         return array(
             '&&',
             '||',
@@ -24,7 +35,26 @@ class Operator extends Core {
         );
     }
 
+    public static function arithmetic(){
+        return array(
+            '+',
+            '-',
+            '*',
+            '/',
+            '%',
+            '**',
+        );
+    }
+
+    public static function bitwise(){
+        return array(
+            '&',
+            '|',
+            '^',
+            '~',
+            '<<',
+            '>>',
+        );
+    }
+
 }
-
-
-

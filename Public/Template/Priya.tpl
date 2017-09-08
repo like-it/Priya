@@ -1,6 +1,6 @@
 {$welcome =  hello } {$true = '2'}
 {$two = '2'}
-{$test2 =  (($start+31)-14) >= $start ?  $welcome  :   'default'} #bug
+{$test2 =  (($start+31)-14.3) >= $start ?  $welcome  :   'default'} #bug
 {$test =  $welcome == 'hello' ?  'nice'  :   $two}
 {$test =  $welcome2  ?  $welcome2  :   'default'}
 {$begin =   $start > $two ?: 1}
