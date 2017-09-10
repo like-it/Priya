@@ -163,6 +163,11 @@ class Assign extends Core {
                 $this->data($attribute, $object['value']);
                 return;
             }
+            debug('create array');
+            die;
+            $array =  Token::create_array($create);
+            debug($array, 'create array');
+
 
             $parse = Token::parse($value);
             //debug($assign, 'assign');
