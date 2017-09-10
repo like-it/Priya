@@ -28,12 +28,14 @@ class Parse extends Core {
     }
 
     public function compile($string, $data, $keep=false){
-        $random = Parse\Random::create();
-        while(stristr($string, $random) !== false){
+        $random = $this->random();
+        if(empty($random)){
             $random = Parse\Random::create();
+            while(stristr($string, $random) !== false){
+                $random = Parse\Random::create();
+            }
+            $this->random($random);
         }
-        $this->random($random);
-
         $newline = new Parse\Newline($string, $this->random());
         $string = $newline->replace();
 

@@ -135,6 +135,7 @@ class Assign extends Core {
         $tag = key($input);
         $assign = false;
         $parse = array();
+        $count = 0;
 //         debug($tag, 'tag');
         $explode = explode('=', substr($tag, 1, -1), 2);
 
@@ -157,8 +158,10 @@ class Assign extends Core {
             if(!empty($object)){
                 $variable = new Variable($this->data(), $this->random());
                 $object['value'] = $variable->replace($object['value']);
-                debug($object, 'object in assign');
-                die;
+                //is variable data changed?
+                $object = Token::cast($object);
+                $this->data($attribute, $object['value']);
+                return;
             }
 
             $parse = Token::parse($value);
@@ -172,15 +175,18 @@ class Assign extends Core {
                     $record['value'] = $this->data(substr($record['value'], 1));
                     $record['type'] = Variable::type($record['value']);
                 } else {
-                    $record['value'] = $record['token'][0][1];
-                    $record['type'] = Token::type($record['token'][0][2]);
                     if($record['type'] == Token::TYPE_STRING){
+                        /*
                         if(substr($record['value'], 0, 1) == '\'' && substr($record['value'], -1, 1) == '\''){
-                            $record['value'] = substr($record['value'], 1, -1);
+//                             $record['value'] = substr($record['value'], 1, -1);
+//                             $record['value'] = str_replace('\\\'', '\'', $record['value']);
+//                             $record['is_escaped'] = true;
                         }
                         elseif(substr($record['value'], 0, 1) == '"' && substr($record['value'], -1, 1) == '"'){
-                            $record['value'] = substr($record['value'], 1, -1);
+//                             $record['value'] = substr($record['value'], 1, -1);
+//                             $record['value'] = str_replace('\"', '"', $record['value']);
                         }
+                        */
                     }
                     if($record['type'] == Token::TYPE_INT){
                         $record['value'] = $record['value'] + 0;
@@ -189,7 +195,8 @@ class Assign extends Core {
                 }
                 $parse[$nr] = $record;
             }
-            if(count($parse) > 1){
+            $count = count($parse);
+            if($count > 1){
                 //move up without the count
                 $counter = 0;
                 while(Assign::has_set($parse)){
@@ -217,7 +224,8 @@ class Assign extends Core {
 //                 debug($parse, 'parse with assign', true);
 //                 die;
             }
-            if(count($parse) > 1){
+            $count = count($parse);
+            if($count > 1){
                 if(isset($parse[0]) && !empty($parse[0]['is_cast'])){
                     //maybe detect earlier
                     $cast = array_shift($parse);
@@ -263,8 +271,9 @@ class Assign extends Core {
             $record['input'] = $input;
             $parse[$nr] = $record;
         }
+        $count = count($parse);
         if($assign == '-='){
-            if(count($parse) > 1){
+            if($count > 1){
                 debug($parse, 'parse with assign -=');
             }
             $variable = $this->data($attribute) + 0;
@@ -273,7 +282,7 @@ class Assign extends Core {
             return;
         }
         elseif($assign == '+='){
-            if(count($parse) > 1){
+            if($count > 1){
                 debug($parse, 'parse with assign +=');
             }
             $variable = $this->data($attribute) + 0;
@@ -282,7 +291,7 @@ class Assign extends Core {
             return;
         }
         elseif($assign == '.='){
-            if(count($parse) > 1){
+            if($count > 1){
                 debug($parse, 'parse with assign .=');
             }
             $string = (string) $this->data($attribute);
@@ -291,18 +300,20 @@ class Assign extends Core {
             return;
         }
         elseif($assign == '!='){
-            if(count($parse) > 1){
+            if($count > 1){
                 debug($parse, 'parse with assign !=');
             }
             $this->data($attribute, $this->data($attribute) != $record['value']);
             return;
         }
-        if(count($parse) == 1){
+        if($count == 1){
             $this->data($record['attribute'], $record['value']);
+        }
+        elseif($count == 0){
+            return;
         } else {
             debug($parse, 'do thing');
         }
-        //debug($this->data());
         return;
     }
 

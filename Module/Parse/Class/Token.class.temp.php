@@ -3,7 +3,6 @@
 namespace Priya\Module\Parse;
 
 use Priya\Module\Core\Object;
-use stdClass;
 
 class Token extends Core {
     const TYPE_NULL = 'null';
@@ -82,11 +81,6 @@ class Token extends Core {
                     }
                 }
             }
-            if(isset($tokens[$key][1]) && $tokens[$key][1] == '"'){
-                $tokens[$key][0] = -7;
-                $tokens[$key][2] = Token::TYPE_STRING;
-            }
-
             if(isset($token[1]) && $token[1] == 'null'){
                 $tokens[$key][0] = -5;
                 $tokens[$key][1] = null;
@@ -102,6 +96,7 @@ class Token extends Core {
                 $tokens[$key][1] = true;
                 $tokens[$key][2] = Token::TYPE_BOOLEAN;
             }
+
         }
         return $tokens;
     }
@@ -124,6 +119,76 @@ class Token extends Core {
                     $record['cast'] = Token::type(Token::get($token));
                     $record['token'][] = $token;
                     continue;
+                }/* else {
+                    if(Token::is_whitespace($token)){
+                        if(isset($record['value'])){
+                            $result[] = $record;
+                            $record = array();
+                        }
+                        continue;
+                    }
+                    /*
+                    if(Token::is_parenthese($token)){
+                        if($token[1] == '('){
+                            $set_depth++;
+                            $record['in_set'] = true;
+                            //$record['type'] = Token::TYPE_SET;
+                            $result[] = $record;
+                            $record = array();
+                            $record['is_cast'] = false;
+                            $record['is_set'] = true;
+                            $record['type'] = Token::TYPE_PARENTHESE;
+                            $record['parenthese'] = $token[1];
+                            $record['set'] = array();
+                            $record['set']['depth'] = $set_depth;
+                            $record['token'][] = $token;
+                            $result[] = $record;
+                            $record = array();
+                            continue;
+                        } else {
+                            $result[] = $record;
+                            $record = array();
+                            $record['is_cast'] = false;
+                            $record['is_set'] = true;
+                            $record['type'] = Token::TYPE_PARENTHESE;
+                            $record['parenthese'] = $token[1];
+                            $record['set'] = array();
+                            $record['set']['depth'] = $set_depth;
+                            $record['token'][] = $token;
+                            $result[] = $record;
+                            $record = array();
+                            $set_depth--;
+                            continue;
+                        }
+                    }
+                    //debug($token,'token');
+                    if(isset($record['type'])){
+                        $type = Token::type(Token::get($token));
+                        if($record['type'] != $type){
+                            $record['type'] = Token::TYPE_MIXED;
+                        }
+                    } else {
+                        $record['type'] = Token::type(Token::get($token));
+                    }
+                    if($record['type'] == Token::TYPE_OPERATOR){
+                        $record['operator'] = $token[1];
+                        $record['token'][] = $token;
+                        $result[] = $record;
+                        $record = array();
+                        continue;
+                    } else {
+                        if(!isset($record['value'])){
+                            $record['value'] = Token::value($token);
+                        } else {
+                            $record['value'] .= Token::value($token);
+                        }
+                        $record['token'][] = $token;
+                        if($record['type'] == token::TYPE_INT){
+                            $record['value'] += 0;
+                        }
+                        continue;
+                    }
+                    */
                 }
             }
             if(Token::is_whitespace($token)){
@@ -166,6 +231,7 @@ class Token extends Core {
                     continue;
                 }
             }
+            debug($token, 'token');
             if(isset($record['type'])){
                 $type = Token::type(Token::get($token));
                 if($record['type'] != $type){
@@ -184,21 +250,19 @@ class Token extends Core {
                 if(!isset($record['value'])){
                     $record['value'] = Token::value($token);
                 } else {
-                    $add = Token::value($token);
-                    if($add){
-                        $record['value'] .= $add;
-                    }
+                    $record['value'] .= Token::value($token);
                 }
                 $record['token'][] = $token;
                 if($record['type'] == token::TYPE_INT){
                     $record['value'] += 0;
                 }
             }
+
         }
         if(!empty($record)){
             $result[] = $record;
         }
-        //debug($result, 'result');
+        debug($result, 'result');
         return $result;
     }
 
@@ -358,30 +422,9 @@ class Token extends Core {
                 unset($record['cast']);
                 return $record;
                 break;
-            case Token::TYPE_ARRAY:
-                if(!empty($record['value'])){
-                    $record['value'] =  Token::object($record['value'], 'array');
-                } else {
-                    $record['value'] =  array();
-                }
-                $record['is_cast'] = false;
-                $record['type'] = Token::TYPE_ARRAY;
-                unset($record['cast']);
-                return $record;
-                break;
-            case Token::TYPE_OBJECT:
-                if(!empty($record['value'])){
-                    $record['value'] =  Token::object($record['value']);
-                } else {
-                    $record['value'] =  new stdClass();
-                }
-                $record['is_cast'] = false;
-                $record['type'] = Token::TYPE_OBJECT;
-                unset($record['cast']);
-                return $record;
-                break;
             default:
-                debug('unknown cast');
+                var_dump('_UNKNOWN_CAST_____________________________________');
+                var_dump($record);
                 break;
         }
     }
@@ -401,7 +444,6 @@ class Token extends Core {
             case 'T_STRING' :
             case 'T_CONSTANT_ENCAPSED_STRING' :
             case 'T_ENCAPSED_AND_WHITESPACE' :
-            case 'T_NS_SEPARATOR' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
@@ -425,10 +467,6 @@ class Token extends Core {
             case 'T_ARRAY_CAST' :
                 return Token::TYPE_ARRAY;
             break;
-            case 'T_OBJECT_CAST' :
-                return Token::TYPE_OBJECT;
-            break;
-            case Token::TYPE_STRING:
             case Token::TYPE_MIXED:
             case Token::TYPE_NULL:
             case Token::TYPE_BOOLEAN:
@@ -452,8 +490,6 @@ class Token extends Core {
                 'T_VARIABLE',
                 'T_STRING',
                 'T_STRING_VARNAME',
-                'T_NS_SEPARATOR',
-                TOKEN::TYPE_STRING,
         ))){
             return $token[1];
         }

@@ -1,10 +1,28 @@
-{$testing = testing}
+{$omg3}
+{$testing = (string) "t\"\''"\"est\\""}tes2t
 {$test6 = (array) {
     "test" : {
         "object" : true
     },
     "previous" : 1.0,
-    "omg": "{$start}",
+    "omg": "{$allow}{$entity_decode}",
+    "task" : "{if $omg == $start}{$testing}{else}todo{/if}"
+}}
+{$test7 = (object) {
+    "test" : {
+        "object" : true
+    },
+    "previous" : 1.0,
+    "omg": "{$allow}{$entity_decode}",
+    "task" : "{if $omg == $start}{$testing}{else}todo{/if}"
+}}
+{$test8 = (array) {
+    "test" : {
+        "object" : true
+    },
+    "previous" : 1.0,
+    "omg": "{$start}{$testing}",
+    "omg2": "{$omg3}",
     "task" : "{if $omg == $start}{$testing}{else}todo{/if}"
 }}
 shit    {$test7 = (array) {}}
