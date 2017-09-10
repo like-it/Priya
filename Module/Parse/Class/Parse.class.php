@@ -18,7 +18,6 @@ class Parse extends Core {
     const FUNCTION_LIST = 'Function.List.php';
 
     public function __construct($handler=null, $route=null, $data=null){
-        $this->random(rand(1000,9999) . '-' . rand(1000,9999) . '-' . rand(1000,9999) . '-' . rand(1000,9999));
         if($data !== null){
             $this->handler($handler);
             $this->route($route);
@@ -29,13 +28,19 @@ class Parse extends Core {
     }
 
     public function compile($string, $data, $keep=false){
+        $random = Parse\Random::create();
+        while(stristr($string, $random) !== false){
+            $random = Parse\Random::create();
+        }
+        $this->random($random);
+
         $newline = new Parse\Newline($string, $this->random());
         $string = $newline->replace();
 
         $tag = new Parse\Tag($string);
         $list = $tag->find();
 
-        $assign = new Parse\Assign($data);
+        $assign = new Parse\Assign($data, $this->random());
         foreach($list as $key => $value){
             $assign->find($value);
         }

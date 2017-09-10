@@ -2,13 +2,10 @@
 
 namespace Priya\Module\Parse;
 
-use Priya\Module\Core\Object;
-
 class Assign extends Core {
 
-    public function __construct($data=null, $random=null){
+    public function __construct($data=null){
         $this->data($data);
-        $this->random($random);
     }
 
     public static function is_variable($record=array()){
@@ -90,6 +87,26 @@ class Assign extends Core {
         return $parse;
     }
 
+    /*
+    public static function remove_set_parse($set=array(), $parse=array()){
+        $match = reset($set); //deep //left to right
+        $remove = false;
+        foreach ($parse as $nr => $record){
+            if(isset($record['set']) && $record['set']['depth'] == $match['set']['depth']){
+                if(!empty($remove)){
+                    return $parse;
+                } else {
+                    $remove = true;
+                }
+            }
+            if(!empty($remove)){
+                unset($parse[$nr]);
+            }
+        }
+        return $parse;
+    }
+    */
+
     public static function get_set($parse=array()){
         $highest = Assign::get_set_highest($parse);
         $is_set = false;
@@ -133,64 +150,23 @@ class Assign extends Core {
             return;
         }
         $tag = key($input);
-        $assign = false;
-        $parse = array();
-//         debug($tag, 'tag');
-        $explode = explode('=', substr($tag, 1, -1), 2);
+
+        $explode = explode('=', trim($tag, '{}'), 2);
 
         if(!empty($explode[0]) && substr($explode[0], 0, 1) == '$' && count($explode) == 2){
             $attribute = substr(rtrim($explode[0]), 1);
             $value = trim($explode[1], ' ');
-            if(
-                substr($attribute,-1) == '-' ||
-                substr($attribute,-1) == '+' ||
-                substr($attribute,-1) == '.' ||
-                substr($attribute,-1) == '!'
-            ){
-                $assign = substr($attribute, -1) . '=';
-                $attribute = substr($attribute, 0, -1);
-                $attribute = rtrim($attribute,' ');
-            }
-            //before create_object assign variable needed
-            $create = Token::restore_return($value, $this->random());
-            $object = Token::create_object($create);
-            if(!empty($object)){
-                $variable = new Variable($this->data(), $this->random());
-                $object['value'] = $variable->replace($object['value']);
-                debug($object, 'object in assign');
-                die;
-            }
-
             $parse = Token::parse($value);
-            //debug($assign, 'assign');
-            //debug($value, 'value');
-            //debug($attribute, 'attribute');
-            //debug($parse, 'parse in find');
+            $output = null;
             $type = null;
             foreach($parse as $nr => $record){
                 if(Assign::is_variable($record)){
                     $record['value'] = $this->data(substr($record['value'], 1));
                     $record['type'] = Variable::type($record['value']);
-                } else {
-                    $record['value'] = $record['token'][0][1];
-                    $record['type'] = Token::type($record['token'][0][2]);
-                    if($record['type'] == Token::TYPE_STRING){
-                        if(substr($record['value'], 0, 1) == '\'' && substr($record['value'], -1, 1) == '\''){
-                            $record['value'] = substr($record['value'], 1, -1);
-                        }
-                        elseif(substr($record['value'], 0, 1) == '"' && substr($record['value'], -1, 1) == '"'){
-                            $record['value'] = substr($record['value'], 1, -1);
-                        }
-                    }
-                    if($record['type'] == Token::TYPE_INT){
-                        $record['value'] = $record['value'] + 0;
-                    }
-                    //debug($record, 'no variable');
+                    $parse[$nr] = $record;
                 }
-                $parse[$nr] = $record;
             }
             if(count($parse) > 1){
-                //move up without the count
                 $counter = 0;
                 while(Assign::has_set($parse)){
                     $counter++;
@@ -210,100 +186,30 @@ class Assign extends Core {
                         break;
                     }
                 }
-                //debug($parse);
-            }
-            if($assign == '.='){
-                //                     $parse = Token::parse($value);
-//                 debug($parse, 'parse with assign', true);
-//                 die;
-            }
-            if(count($parse) > 1){
-                if(isset($parse[0]) && !empty($parse[0]['is_cast'])){
-                    //maybe detect earlier
-                    $cast = array_shift($parse);
-                    foreach($parse as $nr => $record){
-                        $record['is_cast'] = $cast['is_cast'];
-                        $record['cast'] = $cast['cast'];
-                        $parse[$nr] = $record;
-                    }
-                }
-                elseif(isset($parse[0]) && !isset($parse[0]['value'])){
-                    if(isset($parse[0]['type']) && $parse[0]['type']==  Token::TYPE_OPERATOR){
-                        //keep in parse
-                    } else {
-                        array_shift($parse);
-                    }
-                }
-                //add operator assignment so + .= !
-                //                 while(Assign::has_operator($parse)){
-                $has_operator = Assign::has_operator($parse);
-                if($has_operator === true){
-                    var_dump($has_operator);
-                    $record = Operator::statement($parse);
-                    debug($parse, 'parse');
-                    debug($record, 'while has operator');
-                    die;
-                    $parse = Assign::replace_set($parse, $set, $record);
-                    debug($parse, 'do thing');
+                   debug($parse);
+                /*
+                if(Assign::has_set($parse)){
+                    var_dump('still has set');
+                    var_dump($parse);
                     die;
                 }
-
+                */
             }
-        } else {
-            /*
-            $explode = explode('+', trim($tag, '{}'), 2);
-            var_dump($explode);
-            die;
-            */
-        }
-        foreach($parse as $nr => $record){
-            $record = Token::cast($record);
-            $record['attribute'] = $attribute;
-            $record['original'] = $value;
-            $record['input'] = $input;
-            $parse[$nr] = $record;
-        }
-        if($assign == '-='){
-            if(count($parse) > 1){
-                debug($parse, 'parse with assign -=');
+            foreach($parse as $nr => $record){
+                $record = Token::cast($record);
+                $record['attribute'] = $attribute;
+                $record['original'] = $value;
+                $record['input'] = $input;
+                $parse[$nr] = $record;
             }
-            $variable = $this->data($attribute) + 0;
-            $variable -= ($record['value'] + 0);
-            $this->data($attribute, $variable);
+            if(count($parse) == 1){
+                $this->data($record['attribute'], $record['value']);
+            } else {
+                var_dump('__DO_THING__________________________________');
+                var_dump($parse);
+            }
             return;
         }
-        elseif($assign == '+='){
-            if(count($parse) > 1){
-                debug($parse, 'parse with assign +=');
-            }
-            $variable = $this->data($attribute) + 0;
-            $variable += ($record['value'] + 0);
-            $this->data($attribute, $variable);
-            return;
-        }
-        elseif($assign == '.='){
-            if(count($parse) > 1){
-                debug($parse, 'parse with assign .=');
-            }
-            $string = (string) $this->data($attribute);
-            $string .= (string) $record['value'];
-            $this->data($attribute, $string);
-            return;
-        }
-        elseif($assign == '!='){
-            if(count($parse) > 1){
-                debug($parse, 'parse with assign !=');
-            }
-            $this->data($attribute, $this->data($attribute) != $record['value']);
-            return;
-        }
-        if(count($parse) == 1){
-            $this->data($record['attribute'], $record['value']);
-        } else {
-            debug($parse, 'do thing');
-        }
-        //debug($this->data());
-        return;
     }
 
     private function variable($string='', $type=null){
@@ -412,6 +318,80 @@ class Assign extends Core {
             }
         }
         return $result;
+    }
+
+    private function statement($string='', $default=null, $true=true, $false=false){
+        $tokens = Token::all($string);
+
+
+
+        var_dump($tokens);
+
+
+        $statement = array();
+        $pattern = '/(\S+)(\s+)(\S+)(\s+)(\S+)/';
+        preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
+        if(count($matches) == 1){
+            $statement['left'] = $matches[0][1];
+            $statement['operator'] = $matches[0][3];
+            $statement['right'] = $matches[0][5];
+            $statement['true'] = $true;
+            $statement['false'] = $false; // $default;
+            $statement['left'] = $this->variable($statement['left']);
+            $statement['right'] = $this->variable($statement['right']);
+
+            /*
+            $pattern = '/\d+/';
+            preg_match_all($pattern, $statement['left'], $match, PREG_SET_ORDER);
+            var_dump('__MATCHES__________________________');
+            var_dump($statement['left']);
+            var_dump($match);
+            $tokens = token_get_all('<?php print(' . $statement['left'] . ');');
+
+            foreach ($tokens as $key => $token){
+                $tokens[$key][2] = token_name($token[0]);
+            }
+            var_dump($tokens);
+
+
+            ob_start();
+            $statement['left'] ='print ("'.$statement['left'].'");';
+            eval($statement['left']);
+            $statement['left'] = ob_get_contents();
+            ob_end_clean();
+
+            ob_start();
+            $statement['right'] ='print ('.$statement['right'].');';
+            eval($statement['right']);
+            $statement['right'] = ob_get_contents();
+            ob_end_clean();
+
+            $statement['left'] = $this->variable($statement['left']);
+            $statement['right'] = $this->variable($statement['right']);
+
+            */
+
+            if(!$this->variable('has', $statement['left']) || !$this->variable('has', $statement['right'])){
+                return $default;
+            }
+            $statement['true'] = $this->variable($statement['true']);
+            $statement['false'] = $this->variable($statement['false']);
+
+            $statement = Control_If::statement($statement);
+
+            if(!empty($statement['output'])){
+                $statement['result'] = $statement['true']; //$this->data($attribute, $statement['true']);
+            } else {
+                $statement['result'] = $statement['false']; //$this->data($attribute, $statement['false']);
+            }
+        } else {
+            $replace= $this->variable($string);
+            if(!$replace){
+                $replace = $this->variable($default);
+            }
+            $statement['result'] = $replace;
+        }
+        return $statement;
     }
 
     private function ternary($explode='', $attribute, $value=''){

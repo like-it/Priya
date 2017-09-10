@@ -4,7 +4,9 @@
     "web" : "web",
     "time" : "time"
 },
-"start" : 100,
+"start" : 3.232,
+"var" : "{$start}",
+"test" : "{$start}",
 "entity_decode" : {
     "html" : "html",
     "script" : "script",

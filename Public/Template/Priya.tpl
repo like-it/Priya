@@ -1,46 +1,36 @@
-{$welcome =  hello } {$true = '2'}
-{$two = '2'}
-{$test2 =  (($start+31)-14.3) >= $start ?  $welcome  :   'default'} #bug
-{$test =  $welcome == 'hello' ?  'nice'  :   $two}
-{$test =  $welcome2  ?  $welcome2  :   'default'}
-{$begin =   $start > $two ?: 1}
-{$begin =   $start2 ?: null == null}
-{$end = 2}
-{$highest = $start > $end ? $start : $end}
-{literal}
-{$welcome} should not be hello
-{/literal}
-/**
- * {$welcome} should be hello but in comment
- *
- *
- */
+{$testing = testing}
+{$test6 = (array) {
+    "test" : {
+        "object" : true
+    },
+    "previous" : 1.0,
+    "omg": "{$start}",
+    "task" : "{if $omg == $start}{$testing}{else}todo{/if}"
+}}
+shit    {$test7 = (array) {}}
 
-ternary tests, boolean logical operators
-
-$start > $end ? $start : $end //highest number
+{$test4 = {}}
+{$test5 = [
 
 
+]}
 
+literal, remove from the data and replace with [literal:1] and replace [literal:1] with the literal data at the end
 
+{$test += 1.1}
+{$test2 += 1.1}
+{$test3 = $allow}
+{$test != 1.1} != boolean value so 0 = false & <> 0 = true "" = false '' = false "test" = true
 
-{if $welcome == 'hello'}
-    {$welcome = 'welcome'}
-    {$welcome}
-{/if}
+{$float = (float) $var}
+{$welcome5 = (int) ($var - ($float -12) * 3)}
+{$welcome6 = ($var - ($float -12) * 3)}
+{$welcome7 = $var - $float -12 * 3}
+{$welcome3 = (int) $var}
+{$welcome4 =  (boolean)      $var}
+{$welcome1 =      (bool)    ($var < 4)}
+{$welcome =      (int)     hello (int) 45n} pakt de eerste cast
+{$welcome2                 =         'hello 2'} {$true =       '   2   '   }
+{$two = 2}
 
-{if $welcome == 'hello'}
-    {$welcome == 'welcome'}
-{elseif $welcome == 'welcome'}
-    {$welcome = 'finish'}
-{else}
-    {$welcome = 'else'}
-{/if}
-
-{$html = file.read('http://google.com')}
-
-
-
-<section name="{$name}">
-    no debug
-</section>
+move if count right_parse == 2 first right_parse becomes left_parse

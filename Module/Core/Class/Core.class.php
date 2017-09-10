@@ -669,59 +669,7 @@ class Core {
         return $this->autoload;
     }
 
-    public function debug($output='',$isExport=false,$isDie=false){
-        if($this->handler()->contentType() == Handler::CONTENT_TYPE_JSON){
-            $object = new stdClass();
-            $attribute = 'Priya\Module\Debug';
-            $object->{$attribute} = $output;
-            echo $this->object($object, 'json');
-        } else {
-            if($this->handler()->method() == Handler::METHOD_CLI){
-                $cli = new Cli();
-                $cols = $cli->tput('columns');
-                $rows = $cli->tput('rows');
-
-                echo PHP_EOL;
-                if(
-                        is_string($output) &&
-                        in_array($output, array(
-                                '***',
-                                '!!!',
-                                '---',
-                                '+++',
-                                '___',
-                                '===',
-                                '^^^',
-                                '$$$',
-                                '###',
-                                '@@@',
-                                '%%%',
-                                '&&&'
-                        ))
-                        ){
-                            $char = substr($output, 0, 1);
-                            for($i=0; $i< $cols; $i++){
-                                echo $char;
-                            }
-                            return;
-                } else {
-                    $char = '_';
-                    for($i=0; $i< $cols; $i++){
-                        echo $char;
-                    }
-                }
-                echo PHP_EOL;
-            }
-            if(empty($isExport)){
-                var_dump($output);
-            } else {
-                var_export($output);
-            }
-            echo PHP_EOL;
-        }
-        if(!empty($isDie)){
-            die;
-        }
-
+    public function debug($output='', $title=null, $isExport=false){
+        debug($output, $title, $isExport);
     }
 }
