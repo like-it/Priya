@@ -42,6 +42,9 @@ class Parse extends Core {
         $tag = new Parse\Tag($string);
         $list = $tag->find();
 
+        debug($list);
+        die;
+
         $assign = new Parse\Assign($data, $this->random());
         foreach($list as $key => $value){
             $assign->find($value);

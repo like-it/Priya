@@ -55,7 +55,11 @@ class Tag extends Core {
         } else {
             $this->input($input);
         }
+        //remove literals
+        debug($input);
         $explode = $this->explode($input);
+        debug($explode);
+        die;
 //         $pattern = '/\$([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/';
         $pattern = '/\{.*\}/';
         $tagged = array();
