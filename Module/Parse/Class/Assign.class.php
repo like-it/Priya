@@ -163,11 +163,25 @@ class Assign extends Core {
                 $this->data($attribute, $object['value']);
                 return;
             }
+            $array = Token::create_array($create);
+            if(!empty($array)){
+                debug($array, 'array');
+                die;
+                $variable = new Variable($this->data(), $this->random());
+                $object['value'] = $variable->replace($object['value']);
+                //is variable data changed?
+                $object = Token::cast($object);
+                $this->data($attribute, $object['value']);
+                return;
+            }
+
+
+            /*
             debug('create array');
             die;
             $array =  Token::create_array($create);
             debug($array, 'create array');
-
+            */
 
             $parse = Token::parse($value);
             //debug($assign, 'assign');

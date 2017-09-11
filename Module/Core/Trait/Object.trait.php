@@ -23,6 +23,9 @@ trait Object {
                 if(substr($input,0,1)=='{' && substr($input,-1,1)=='}' && stristr($input,':')){
                     return json_decode($input);
                 }
+                elseif(substr($input,0,1)=='[' && substr($input,-1,1)==']'){
+                    return json_decode($input);
+                }
             }
             elseif(stristr($output, 'json') !== false){
                 if(substr($input,0,1)=='{' && substr($input,-1,1)=='}' && stristr($input,':')){
@@ -31,7 +34,10 @@ trait Object {
             }
             elseif($output=='array'){
                 if(substr($input,0,1)=='{' && substr($input,-1,1)=='}' && stristr($input,':')){
-                    return json_decode($input,true);
+                    return json_decode($input, true);
+                }
+                elseif(substr($input,0,1)=='[' && substr($input,-1,1)==']'){
+                    return json_decode($input, true);
                 }
             }
         }

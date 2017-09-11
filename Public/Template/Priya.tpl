@@ -1,13 +1,13 @@
 {$omg3}
 {$testing = (string) "t\"\''"\"est\\""}tes2t
-{$test6 = (array) {
-    "test" : {
+{$test6 =  (array) {
+    "testw;" : {
         "object" : true
     },
     "previous" : 1.0,
     "omg": "{$allow}{$entity_decode}",
     "task" : "{if $omg == $start}{$testing}{else}todo{/if}"
-}}
+} }
 {$test7 = (object) {
     "test" : {
         "object" : true

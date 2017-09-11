@@ -61,6 +61,14 @@ class Token extends Core {
                     case ';' :
                         $tokens[$key][2] = 'T_SEMI_COLON';
                     break;
+                    case '"' :
+                        $tokens[$key][2] = 'T_DOUBLE_QUOTE';
+                    break;
+                    case ':' :
+                        $tokens[$key][2] = 'T_COLON';
+                    case '$' :
+                        $tokens[$key][2] = 'T_DOLLAR_SIGN';
+                    break;
                 }
             }
             if(empty($tokens[$key][2])){
@@ -82,11 +90,6 @@ class Token extends Core {
                     }
                 }
             }
-            if(isset($tokens[$key][1]) && $tokens[$key][1] == '"'){
-                $tokens[$key][0] = -7;
-                $tokens[$key][2] = Token::TYPE_STRING;
-            }
-
             if(isset($token[1]) && $token[1] == 'null'){
                 $tokens[$key][0] = -5;
                 $tokens[$key][1] = null;
@@ -235,6 +238,39 @@ class Token extends Core {
         return array();
     }
 
+    public static function create_array($value= ''){
+        if(is_array($value)){
+            $tokens = $value;
+        } else {
+            $tokens = Token::all($value);
+        }
+        $result = array();
+        $record = array();
+        foreach($tokens as $nr => $token){
+            if(!isset($record['is_cast'])){
+                $record['is_cast'] = Token::is_cast($token);
+                if($record['is_cast'] === true){
+                    $record['cast'] = Token::type(Token::get($token));
+                    continue;
+                }
+            }
+            if(Token::is_square_bracket($token, Token::TYPE_OPEN) && Token::is_square_bracket(end($tokens) ,  Token::TYPE_CLOSE)){
+                $record['type'] = Token::TYPE_ARRAY;
+                if($record['is_cast'] === true){
+                    $explode = explode($record['cast'], $value, 2);
+                    $record['value'] = ltrim($explode[1], ') ');
+                } else {
+                    $record['value'] = $value;
+                }
+                $record['original'] = $record['value'];
+                $record['token'] = $tokens;
+                $record['value'] = Token::object($record['value'], 'array');
+                return $record;
+            }
+        }
+        return array();
+    }
+
     public static function is_whitespace($token=array()){
         if(isset($token[2]) && in_array($token[2], array(
                 'T_WHITESPACE',
@@ -271,7 +307,6 @@ class Token extends Core {
             ))){
                 return true;
             }
-            return false;
         }
         elseif($type == Token::TYPE_OPEN){
             if(isset($token[2]) && in_array($token[2], array(
@@ -279,7 +314,6 @@ class Token extends Core {
             ))){
                 return true;
             }
-            return false;
         }
         elseif($type == Token::TYPE_CLOSE){
             if(isset($token[2]) && in_array($token[2], array(
@@ -287,11 +321,34 @@ class Token extends Core {
             ))){
                 return true;
             }
-            return false;
-        } else {
-            debug('unknown type');
-            die;
         }
+        return false;
+    }
+
+    public static function is_square_bracket($token=array(), $type=null){
+        if($type === null){
+            if(isset($token[2]) && in_array($token[2], array(
+                'T_SQUARE_BRACKET_OPEN',
+                'T_SQUARE_BRACKET_CLOSE',
+            ))){
+                return true;
+            }
+        }
+        elseif($type == Token::TYPE_OPEN){
+            if(isset($token[2]) && in_array($token[2], array(
+                'T_SQUARE_BRACKET_OPEN',
+            ))){
+                return true;
+            }
+        }
+        elseif($type == Token::TYPE_CLOSE){
+            if(isset($token[2]) && in_array($token[2], array(
+                'T_SQUARE_BRACKET_CLOSE',
+            ))){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static function is_cast($token=array()){
@@ -402,6 +459,7 @@ class Token extends Core {
             case 'T_CONSTANT_ENCAPSED_STRING' :
             case 'T_ENCAPSED_AND_WHITESPACE' :
             case 'T_NS_SEPARATOR' :
+            case 'T_DOUBLE_QUOTE' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
