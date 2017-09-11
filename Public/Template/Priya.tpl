@@ -1,5 +1,7 @@
 {literal}{test{}{}}{/literal}
 
+{test({literal}{}{/literal})}
+
 {$omg3}
 {$testing = (string) "t\"\''"\"est\\""}tes2t
 {$test6 =  (array) {

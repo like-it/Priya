@@ -6,11 +6,12 @@ namespace Priya\Module\Parse;
 
 class Tag extends Core {
 
-    public function __construct($input=null){
+    public function __construct($input=null, $random=null){
         $this->input($input);
+        $this->random($random);
     }
 
-    public function explode($input='', $depth=0){
+    public static function explode($input='', $depth=0){
         $explode = explode('{', $input);
         $open_count = 0;
         $close_count = 0;
@@ -55,11 +56,8 @@ class Tag extends Core {
         } else {
             $this->input($input);
         }
-        //remove literals
-        debug($input);
-        $explode = $this->explode($input);
-        debug($explode);
-        die;
+        $input = Literal::replace($input, $this->random());
+        $explode = Tag::explode($input);
 //         $pattern = '/\$([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/';
         $pattern = '/\{.*\}/';
         $tagged = array();

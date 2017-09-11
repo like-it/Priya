@@ -36,14 +36,10 @@ class Parse extends Core {
             }
             $this->random($random);
         }
-        $newline = new Parse\Newline($string, $this->random());
-        $string = $newline->replace();
+        $string = Parse\Newline::replace($string, $this->random());
 
-        $tag = new Parse\Tag($string);
+        $tag = new Parse\Tag($string, $this->random());
         $list = $tag->find();
-
-        debug($list);
-        die;
 
         $assign = new Parse\Assign($data, $this->random());
         foreach($list as $key => $value){
