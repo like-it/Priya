@@ -1,3 +1,17 @@
+Welcome to PRIYA
+_______________________________________________________________________________
+-------------------------------------------------------------------------------
+{$multiply = 12 * 3}
+
+how to detect if it is  multiply, are we going to use
+
+function is_equation(){
+    first replace variables
+    then check for is_number & operator::arithmetic
+}
+
+
+
 {literal}{test{}{}}{/literal}
 
 {test({literal}{}{/literal})}
@@ -44,10 +58,12 @@ literal, remove from the data and replace with [literal:1] and replace [literal:
 {$test3 = $allow}
 {$test != 1.1} != boolean value so 0 = false & <> 0 = true "" = false '' = false "test" = true
 
+
+
 {$float = (float) $var}
 {$welcome5 = (int) ($var - ($float -12) * 3)}
 {$welcome6 = ($var - ($float -12) * 3)}
-{$welcome7 = $var - $float -12 * 3}
+
 {$welcome3 = (int) $var}
 {$welcome4 =  (boolean)      $var}
 {$welcome1 =      (bool)    ($var < 4)}
@@ -55,4 +71,4 @@ literal, remove from the data and replace with [literal:1] and replace [literal:
 {$welcome2                 =         'hello 2'} {$true =       '   2   '   }
 {$two = 2}
 
-move if count right_parse == 2 first right_parse becomes left_parse
+(this bug at line 273... ) move if count right_parse == 2 first right_parse becomes left_parse

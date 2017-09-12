@@ -165,16 +165,18 @@ class Assign extends Core {
             }
             $array = Token::create_array($create);
             if(!empty($array)){
-                debug($array, 'array');
-                die;
                 $variable = new Variable($this->data(), $this->random());
-                $object['value'] = $variable->replace($object['value']);
+                $array['value'] = $variable->replace($array['value']);
                 //is variable data changed?
-                $object = Token::cast($object);
-                $this->data($attribute, $object['value']);
+                $array = Token::cast($array);
+                $this->data($attribute, $array['value']);
                 return;
             }
+            debug($create);
+            $parse = Token::parse($value);
 
+            debug($parse);
+            die;
 
             /*
             debug('create array');
@@ -183,7 +185,7 @@ class Assign extends Core {
             debug($array, 'create array');
             */
 
-            $parse = Token::parse($value);
+
             //debug($assign, 'assign');
             //debug($value, 'value');
             //debug($attribute, 'attribute');
@@ -194,6 +196,10 @@ class Assign extends Core {
                     $record['value'] = $this->data(substr($record['value'], 1));
                     $record['type'] = Variable::type($record['value']);
                 } else {
+                    if(!isset($record['value'])){
+                        continue;
+                    }
+                    $record['type'] = Variable::type($record['value']);
                     if($record['type'] == Token::TYPE_STRING){
                         /*
                         if(substr($record['value'], 0, 1) == '\'' && substr($record['value'], -1, 1) == '\''){
@@ -232,7 +238,7 @@ class Assign extends Core {
 
                     }
                     //remove counter
-                    if($counter > 1024){
+                    if($counter > 10){
                         break;
                     }
                 }
