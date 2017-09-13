@@ -3,6 +3,17 @@
 namespace Priya\Module\Parse;
 
 class Operator extends Core {
+    const MAX = 255;
+
+    public static function has($parse=array()){
+        foreach($parse as $nr => $record){
+            if(isset($record['type']) && $record['type'] == Token::TYPE_OPERATOR){
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public static function compare_array(){
         return array(
@@ -46,6 +57,10 @@ class Operator extends Core {
         );
     }
 
+    public static function is_arithmetic($needle){
+        return in_array($needle, Operator::arithmetic());
+    }
+
     public static function bitwise(){
         return array(
             '&',
@@ -61,6 +76,8 @@ class Operator extends Core {
         if(!isset($operator['operator'])){
             return $operator;
         }
+//         debug($operator, 'execute');
+        //add % & ** >= <=
         switch($operator['operator']){
             case '-' :
                 $operator['value'] = $operator['left'] - $operator['right'];
@@ -83,13 +100,23 @@ class Operator extends Core {
         if(!isset($operator['value'])){
             debug($operator, 'no value');
         }
+        $operator['statement'] = '';
+        foreach($operator['left_parse'] as $nr => $record){
+            $operator['statement'] .= $record['original'];
+        }
+        foreach($operator['right_parse'] as $nr => $record){
+            $operator['statement'] .= $record['original'];
+        }
+
+        //replace original with math
         unset($operator['operator']);
         $operator['type'] = Variable::type($operator['value']);
 //         debug($operator);
         return $operator;
     }
 
-    public static function statement($statement=array()){
+    public static function statement($statement=array(), $input=null){
+        //add original
         $left = array();
         $right = array();
         $operator = array();

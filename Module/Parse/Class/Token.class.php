@@ -120,9 +120,15 @@ class Token extends Core {
         $result = array();
         $record = array();
         $set_depth = 0;
+        $original = null;
         foreach($tokens as $nr => $token){
+//             debug($token);
+            if(isset($token[1])){
+                $original .= $token[1];
+            }
             if(!isset($record['is_cast'])){
                 $record['is_cast'] = Token::is_cast($token);
+                $record['original'] = $original;
                 if($record['is_cast'] === true){
                     $record['cast'] = Token::type(Token::get($token));
                     $record['token'][] = $token;
@@ -131,8 +137,10 @@ class Token extends Core {
             }
             if(Token::is_whitespace($token)){
                 if(isset($record['value'])){
+                    $record['original'] = $original;
                     $result[] = $record;
                     $record = array();
+                    $original = '';
                 }
                 continue;
             }
@@ -140,6 +148,7 @@ class Token extends Core {
                 if($token[1] == '('){
                     $set_depth++;
                     $record['in_set'] = true;
+                    $record['original'] = $original;
                     //$record['type'] = Token::TYPE_SET;
                     $result[] = $record;
                     $record = array();
@@ -152,10 +161,12 @@ class Token extends Core {
                     $record['token'][] = $token;
                     $result[] = $record;
                     $record = array();
+                    $original = '';
                     continue;
                 } else {
-                    $result[] = $record;
+//                     $result[] = $record;
                     $record = array();
+                    $record['original'] = $original;
                     $record['is_cast'] = false;
                     $record['is_set'] = true;
                     $record['type'] = Token::TYPE_PARENTHESE;
@@ -165,6 +176,7 @@ class Token extends Core {
                     $record['token'][] = $token;
                     $result[] = $record;
                     $record = array();
+                    $original = '';
                     $set_depth--;
                     continue;
                 }
@@ -199,6 +211,7 @@ class Token extends Core {
             }
         }
         if(!empty($record)){
+            $record['original'] = $original;
             $result[] = $record;
         }
         //debug($result, 'result');
@@ -269,6 +282,170 @@ class Token extends Core {
             }
         }
         return array();
+    }
+
+    public static function has_equation($value=''){
+        $plus = strpos($value, '+');
+        $min = strpos($value, '-');
+        $mul = strpos($value, '*');
+        $div = strpos($value, '/');
+        $mod = strpos($value, '/');
+        $exp = strpos($value, '**');
+        //add % & **
+        if(
+            $plus === false &&
+            $min === false &&
+            $mul === false &&
+            $div === false &&
+            $mod === false &&
+            $exp === false
+        ) {
+            return false;
+        } else {
+            if($plus > 0){
+                $explode = explode('+', $value);
+            }
+            elseif($min> 0){
+                $explode = explode('-', $value);
+            }
+            elseif($mul> 0){
+                $explode = explode('*', $value);
+            }
+            elseif($div> 0){
+                $explode = explode('/', $value);
+            }
+            elseif($mod> 0){
+                $explode = explode('%', $value);
+            }
+            elseif($exp> 0){
+                $explode = explode('**', $value);
+            }
+            $search = array(
+                '(',
+                ')',
+                '+',
+                '-',
+                '*',
+                '/',
+                '%',
+                ' ',
+                "\r",
+                "\n",
+                'int',
+                'integer',
+                'float',
+                'double'
+            );
+            $replace = '';
+            foreach($explode as $nr => $subject){
+                $explode[$nr] = str_replace($search, $replace, $subject);
+            }
+            foreach($explode as $nr => $is_numeric){
+                if(is_numeric($is_numeric)){
+                    continue;
+                }
+                return false;
+            }
+            return true;
+        }
+
+    }
+
+    public static function create_equation($value= '', $input=null, $variable=null){
+        if(is_array($value)){
+            $tokens = $value;
+        } else {
+            $tokens = Token::all($value);
+        }
+        //need spaces
+        $parse = Token::parse($tokens);
+//         debug($value);
+//         debug($parse, 'parse', true);
+        //die;
+        $counter = 0;
+        while(Set::has($parse)){
+            $counter++;
+            $set = Set::get($parse);
+            $statement = Set::remove($set);
+            foreach ($statement as $nr => $record){
+                if(!isset($record['value'])){
+                    continue;
+                }
+                $record['value'] = $variable->replace($record['value']);
+                $record['type'] = Variable::type($record['value']);
+                $record= Token::cast($record);
+                $statement[$nr] = $record;
+            }
+            if(Operator::has($statement)){
+                $record = Operator::statement($statement);
+                $statement = '';
+                debug($parse,'cout');
+                foreach($parse as $nr => $item){
+                    if(!isset($item['original'])){
+                        continue;
+                    }
+                    if(Operator::is_arithmetic($item['original'])){
+                        continue;
+                    }
+                    $statement .= $item['original'];
+                }
+                $parse = Set::replace($parse, $set, $record);
+                foreach ($parse as $nr => $record){
+                    $parse[$nr]['statement'] = $statement;
+                    $parse[$nr]['input'] = $input;
+                }
+            } else {
+                debug($statement, 'statement');
+                debug($set, 'set');
+                debug($parse, 'parse');
+
+            }
+            //remove counter
+            if($counter > Set::MAX){
+                break;
+            }
+        }
+        if(isset($parse[0]['in_set']) && $parse[0]['in_set'] === true){
+            array_shift($parse);
+        }
+        $counter = 0;
+        while(Operator::has($parse)){
+            $record = Operator::statement($parse, $input);
+            debug($record, 'record & input');
+            debug($input, 'input');
+//         	$parse = Set::replace($parse, $set, $record);
+            $counter++;
+            if($counter >= Operator::MAX){
+                break;
+            }
+        }
+        $output = null;
+        foreach($parse as $nr => $record){
+            if($output === null){
+                $output = $record['input'];
+            }
+            $search = $record['statement'];
+            $replace = $record['value'];
+            $subject = $output;
+            $output = str_replace($search, $replace, $subject);
+            $output += 0;
+            $record['output'] = $output;
+            $parse[$nr] = $record;
+            //value
+            //operator
+            //value
+        }
+        /*
+        foreach($parse as $nr => $record){
+            $record = Token::cast($record);
+            $record['attribute'] = $attribute;
+            $record['original'] = $value;
+            $record['input'] = $input;
+            $parse[$nr] = $record;
+        }
+        */
+        //not completed with calculation
+        return $output;
     }
 
     public static function is_whitespace($token=array()){
@@ -447,8 +624,7 @@ class Token extends Core {
         if(isset($token[2])){
             return $token[2];
         } else {
-            var_dump('__IN_GET______________________________');
-            var_export($token);
+            debug($token);
         }
     }
 

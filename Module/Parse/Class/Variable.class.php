@@ -82,68 +82,83 @@ class Variable extends Core {
             $output_type = Token::TYPE_NULL;
             $is_set = false;
             $record = array();
-            foreach ($list as $nr => $subList){
-                foreach ($subList as $search => $empty){
-                    if(substr($search, 1, 1) != '$'){
-                        continue;
-                    }
-                    $attribute = substr($search, 2, -1);
-                    $value = $this->data($attribute);
-                    $value = Variable::value($value);
-                    $type = Variable::type($value);
-                    if($output != null){
-                        $output_type = Variable::type($output);
-                    }
-                    if($output === null){
-                        if(in_array($type, array(
-                            Token::TYPE_ARRAY,
-                            Token::TYPE_OBJECT
-                        ))){
-                            $output = $value;
-                        } else {
-                            $output = str_replace($search, $value, $input);
-                            $output = Variable::value($output);
-                            $type = Variable::type($value);
-                        }
-                        //make list?
-                        $record['attribute'] = $attribute;
-                        $record['search'] = $search;
-                        $record['value'] = $value;
-                        $record['type'] = $type;
+            if(empty($list)){
+                if(substr($input, 0, 1) == '$'){
+                    $attribute = substr($input, 1);
+                    if($attribute === false){
+                        $output = $input;
                     } else {
-                        if($type == Token::TYPE_OBJECT && $output_type == Token::TYPE_OBJECT){
-                            $output = $this->object_merge($output, $value);
+                        debug($attribute, 'attr');
+                        $output = $this->data($attribute);
+                        $output = Variable::value($output);
+                    }
+                } else {
+                    $output = $input;
+                }
+            } else {
+                foreach ($list as $nr => $subList){
+                    foreach ($subList as $search => $empty){
+                        if(substr($search, 1, 1) != '$'){
                             continue;
                         }
-                        elseif($type == Token::TYPE_ARRAY && $output_type == Token::TYPE_ARRAY){
-                            $output = array_merge($output, $value);
-                            continue;
+                        $attribute = substr($search, 2, -1);
+                        $value = $this->data($attribute);
+                        $value = Variable::value($value);
+                        $type = Variable::type($value);
+                        if($output != null){
+                            $output_type = Variable::type($output);
                         }
-                        if($output_type == Token::TYPE_OBJECT && $type == Token::TYPE_NULL){
-                            continue; //add false too ?
+                        if($output === null){
+                            if(in_array($type, array(
+                                    Token::TYPE_ARRAY,
+                                    Token::TYPE_OBJECT
+                            ))){
+                                $output = $value;
+                            } else {
+                                $output = str_replace($search, $value, $input);
+                                $output = Variable::value($output);
+                                $type = Variable::type($value);
+                            }
+                            //make list?
+                            $record['attribute'] = $attribute;
+                            $record['search'] = $search;
+                            $record['value'] = $value;
+                            $record['type'] = $type;
+                        } else {
+                            if($type == Token::TYPE_OBJECT && $output_type == Token::TYPE_OBJECT){
+                                $output = $this->object_merge($output, $value);
+                                continue;
+                            }
+                            elseif($type == Token::TYPE_ARRAY && $output_type == Token::TYPE_ARRAY){
+                                $output = array_merge($output, $value);
+                                continue;
+                            }
+                            if($output_type == Token::TYPE_OBJECT && $type == Token::TYPE_NULL){
+                                continue; //add false too ?
+                            }
+                            if($output_type == Token::TYPE_ARRAY && $type == Token::TYPE_NULL){
+                                continue; //add false too ?
+                            }
+                            if(in_array($output_type, array(
+                                    Token::TYPE_ARRAY,
+                                    Token::TYPE_OBJECT
+                            ))){
+                                continue; //preserve arrays and objects
+                            }
+                            if(empty($is_set)){
+                                $output = $input;
+                                $is_set = true;
+                                $output = str_replace($record['search'], $record['value'], $output);
+                            }
+                            $output = str_replace($search, $value, $output);
                         }
-                        if($output_type == Token::TYPE_ARRAY && $type == Token::TYPE_NULL){
-                            continue; //add false too ?
-                        }
-                        if(in_array($output_type, array(
-                            Token::TYPE_ARRAY,
-                            Token::TYPE_OBJECT
-                        ))){
-                            continue; //preserve arrays and objects
-                        }
-                        if(empty($is_set)){
-                            $output = $input;
-                            $is_set = true;
-                            $output = str_replace($record['search'], $record['value'], $output);
-                        }
-                        $output = str_replace($search, $value, $output);
                     }
                 }
+//                 debug($output, 'output');
+//                 debug($list, 'list');
+//                 debug($input, 'input in replace');
+//                 debug($output);
             }
-//             debug($output, 'output');
-//             debug($list, 'list');
-//             debug($input, 'input in replace');
-//             debug($output);
             return $output;
         }
     }

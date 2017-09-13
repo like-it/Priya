@@ -1,16 +1,38 @@
 Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
-{$multiply = 12 * 3}
+{$test6 =  (array) {
+    "testw;" : {
+        "object" : true
+    },
+    "previous" : 1.0,
+    "omg": "{$allow}{$entity_decode}",
+    "task" : "{if $omg == $start}{$testing}{else}todo{/if}"
+} }
+
+{$multiply = (
+    12 * 3
+)}
+
+{$multiply = (
+    $start * 3
+) * 4 + 5}
+
+{$multiply =
+    $var * 3
+}
 
 how to detect if it is  multiply, are we going to use
 
-function is_equation(){
-    first replace variables
-    then check for is_number & operator::arithmetic
-}
+{function is_equation(multiply)}
+    {$this ?}
+    /**
+     * first replace variables
+     * then check for is_number & operator::arithmetic
+     */
+{/function}
 
-
+{is_equation(multiply)}
 
 {literal}{test{}{}}{/literal}
 

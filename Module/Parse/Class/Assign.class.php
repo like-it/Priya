@@ -154,6 +154,8 @@ class Assign extends Core {
             }
             //before create_object assign variable needed
             $create = Token::restore_return($value, $this->random());
+            $original = $create;
+            $create = Token::all($create);
             $object = Token::create_object($create);
             if(!empty($object)){
                 $variable = new Variable($this->data(), $this->random());
@@ -172,12 +174,26 @@ class Assign extends Core {
                 $this->data($attribute, $array['value']);
                 return;
             }
+            $variable = new Variable($this->data(), $this->random());
+            // an equation can be a variable, in that case it will be + 0
+            // original, spaces have to be removed to replace the parts
+            $value = Token::create_equation($create, $original, $variable);
+//             $value = Token::restore_return($value, $this->random());
+            debug($value, 'value');
+
+            /*
+
+
+            $variable = new Variable($this->data(), $this->random());
+            $equation = $variable->replace($create);
+
+                $array = Token::cast($array);
+                $this->data($attribute, $equation);
+                debug($equation);
+            }
             debug($create);
+            */
             $parse = Token::parse($value);
-
-            debug($parse);
-            die;
-
             /*
             debug('create array');
             die;
