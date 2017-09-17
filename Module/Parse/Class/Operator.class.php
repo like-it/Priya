@@ -57,6 +57,13 @@ class Operator extends Core {
         );
     }
 
+    public static function is($record=array()){
+        if(isset($record['type']) && $record['type'] == Token::TYPE_OPERATOR){
+            return true;
+        }
+        return false;
+    }
+
     public static function is_arithmetic($needle){
         return in_array($needle, Operator::arithmetic());
     }
@@ -73,12 +80,14 @@ class Operator extends Core {
     }
 
     public static function execute($operator=array()){
-        if(!isset($operator['operator'])){
+        if(!isset($operator['type']) || $operator['type'] != 'operator'){
             return $operator;
         }
+        $operator['operator'] = $operator['value'];
+        $operator['execute'] = $operator['left'] . $operator['operator'] . $operator['right'];
 //         debug($operator, 'execute');
         //add % & ** >= <=
-        switch($operator['operator']){
+        switch($operator['value']){
             case '-' :
                 $operator['value'] = $operator['left'] - $operator['right'];
                 break;
@@ -100,16 +109,30 @@ class Operator extends Core {
         if(!isset($operator['value'])){
             debug($operator, 'no value');
         }
+        /*
         $operator['statement'] = '';
         foreach($operator['left_parse'] as $nr => $record){
-            $operator['statement'] .= $record['original'];
-        }
-        foreach($operator['right_parse'] as $nr => $record){
-            $operator['statement'] .= $record['original'];
-        }
+            if(isset($record['statement'])){
+                $operator['statement'] .= $record['statement'];
+            } else {
+                $operator['statement'] .= $record['original'];
+            }
 
+        }
+        if($operator['operator'] != $operator['original']){
+            $operator['statement'] .= $operator['original'];
+        }
+        $operator['statement'] .= $operator['operator'];
+
+        foreach($operator['right_parse'] as $nr => $record){
+            if(isset($record['statement'])){
+                $operator['statement'] .= $record['statement'];
+            } else {
+                $operator['statement'] .= $record['original'];
+            }
+        }
+        */
         //replace original with math
-        unset($operator['operator']);
         $operator['type'] = Variable::type($operator['value']);
 //         debug($operator);
         return $operator;
@@ -121,11 +144,22 @@ class Operator extends Core {
         $right = array();
         $operator = array();
         foreach($statement as $nr => $record){
-            if(Assign::is_operator($record)){
+            if(Operator::is($record)){
+                if(!empty($operator)){
+                    break; //only 1 at a time
+                }
+                unset($statement[$nr]);
                 $operator = $record;
                 continue;
             }
+            unset($statement[$nr]);
             if(!isset($record['value'])){
+                continue;
+            }
+            if(!isset($record['type'])){
+                continue;
+            }
+            if($record['type'] == Token::TYPE_WHITESPACE){
                 continue;
             }
             if(empty($operator)){
@@ -167,7 +201,9 @@ class Operator extends Core {
             }
         }
         $operator = Operator::execute($operator);
-        return $operator;
+//         debug($operator, 'operator', true);
+        array_unshift($statement, $operator);
+        return $statement;
     }
 
 }

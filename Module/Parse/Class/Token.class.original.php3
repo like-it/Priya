@@ -16,7 +16,6 @@ class Token extends Core {
     const TYPE_VARIABLE = 'variable';
     const TYPE_OPERATOR = 'operator';
     const TYPE_MIXED = 'mixed';
-    const TYPE_WHITESPACE = 'whitespace';
     const TYPE_STATEMENT = 'statement';
     const TYPE_PARENTHESE = 'parenthese';
     const TYPE_SET = 'set';
@@ -117,100 +116,11 @@ class Token extends Core {
             $tokens = Token::all($value);
         }
         //debug($value, 'value in parse');
-        //         debug($tokens, 'tokens in parse');
-        $result = array();
-        $record = array();
-        $set_depth = 0;
-        $parse = '';
-        foreach($tokens as $nr => $token){
-            if(isset($token[1])){
-                $parse .= $token[1];
-            }
-            if(!isset($record['is_cast'])){
-                $record['is_cast'] = Token::is_cast($token);
-                if($record['is_cast'] === true){
-                    $record['cast'] = Token::type(Token::get($token));
-                    $record['token'][] = $token;
-                    continue;
-                }
-            }
-            if(!isset($record['parse'])){
-                $record['parse'] = $parse;
-            } else {
-                $record['parse'] .= $parse;
-            }
-            $record['value'] = $token[1];
-            if(isset($record['type'])){
-                $type = Token::type(Token::get($token));
-                if($record['type'] != $type){
-                    $record['type'] = Token::TYPE_MIXED;
-                }
-            } else {
-                $record['type'] = Token::type(Token::get($token));
-            }
-            if($record['type'] == token::TYPE_INT){
-                $record['value'] += 0;
-            }
-            if(!isset($result['set'])){
-                $record['set'] = array();
-            }
-            if(Token::is_parenthese($token)){
-                if($token[1] == '('){
-                    $set_depth++;
-                    $record['set']['depth'] = $set_depth;
-                } else {
-                    $record['set']['depth'] = $set_depth;
-                    $set_depth--;
-                }
-            } else {
-                $record['set']['depth'] = $set_depth;
-            }
-
-            $result[] = $record;
-            $record = array();
-        }
-        $result = Token::parse_fix_cast($result);
-        debug($result);
-
-        return $result;
-    }
-
-    public static function parse_fix_cast($parse=array()){
-        foreach($parse as $nr => $record){
-            $to = next($parse);
-            if($record['is_cast'] === true && $record['type'] == Token::TYPE_WHITESPACE){
-                while($to['type'] == Token::TYPE_WHITESPACE){
-                    $to = next($parse);
-                }
-                $to['is_cast'] = $record['is_cast'];
-                $to['cast'] = $record['cast'];
-
-                $record['is_cast'] = false;
-                unset($record['cast']);
-                $key = key($parse);
-
-                $parse[$nr] = $record;
-                $parse[$key] = $to;
-            }
-        }
-        return $parse;
-    }
-
-    public static function parse2($value= ''){
-        if(is_array($value)){
-            $tokens = $value;
-        } else {
-            $tokens = Token::all($value);
-        }
-        //debug($value, 'value in parse');
 //         debug($tokens, 'tokens in parse');
         $result = array();
         $record = array();
         $set_depth = 0;
         $original = '';
-        debug($value, 'value');
-        debug(debug_backtrace(true));
-        die;
         foreach($tokens as $nr => $token){
 //             debug($token);
             if(isset($token[1])){
@@ -254,14 +164,9 @@ class Token extends Core {
                     $original = '';
                     continue;
                 } else {
-                    if(isset($record['original'])){
-                        $record['original'] .= $original;
-                    } else {
-                        $record['original'] = $original;
-                    }
-                    $result[] = $record;
+//                     $result[] = $record;
                     $record = array();
-
+                    $record['original'] = $original;
                     $record['is_cast'] = false;
                     $record['is_set'] = true;
                     $record['type'] = Token::TYPE_PARENTHESE;
@@ -453,12 +358,16 @@ class Token extends Core {
         } else {
             $tokens = Token::all($value);
         }
+        //need spaces
         $parse = Token::parse($tokens);
-        $set_counter = 0;
+//         debug($value);
+//         debug($parse, 'parse', true);
+        //die;
+        $counter = 0;
         while(Set::has($parse)){
-            $set_counter++;
+            $counter++;
             $set = Set::get($parse);
-            $statement = Set::statement($set);
+            $statement = Set::remove($set);
             foreach ($statement as $nr => $record){
                 if(!isset($record['value'])){
                     continue;
@@ -468,8 +377,10 @@ class Token extends Core {
                 $record = Token::cast($record);
                 $statement[$nr] = $record;
             }
+            //debug($set, 'set');
+            //debug($statement, 'statement');
+
             $operator_counter = 0;
-            debug($statement, 'statement');
             while (Operator::has($statement)){
                 $operator_counter++;
                 $statement = Operator::statement($statement);
@@ -478,31 +389,104 @@ class Token extends Core {
                 }
             }
             $record = reset($statement);
-            $record['set']['depth']--;
+            $record['original'] = $record['statement'];
             $parse = Set::replace($parse, $set, $record);
-            if($set_counter > Set::MAX){
-                break;
-            }
-        }
-        $operator_counter = 0;
-        while (Operator::has($parse)){
-            $operator_counter++;
-            $parse = Operator::statement($parse);
-            if($operator_counter > Operator::MAX){
-                break;
-            }
-        }
-        if(count($parse) == 1){
-            $record = array_shift($parse);
-            if(is_numeric($record['value'])){
-                return $record['value'] + 0;
+            //if !isset($parse[0]['value']){array_shift($parse); //can be cast}
+            debug($set, 'set');
+            debug($parse, 'preparse');
+
+
+//             debug($parse, 'true');
+            debug($statement, 'calculate');
+
+            /**
+             * adjust parse with the results...
+             */
+            die;
+
+
+
+
+            //while operator::has ?
+            if(Operator::has($statement)){
+                $record = Operator::statement($statement);
+//                 debug($statement);
+                $statement = '';
+//                 debug($parse,'cout');
+                foreach($parse as $nr => $item){
+                    if(!isset($item['original'])){
+                        continue;
+                    }
+                    /*
+                    if(Operator::is_arithmetic($item['original'])){
+                        continue;
+                    }
+                    */
+                    $statement .= $item['original'];
+                }
+                debug($set, 'set');
+                debug($record, 'record');
+                $parse = Set::replace($parse, $set, $record);
+                debug($parse, 'preparse');
+                foreach ($parse as $nr => $record){
+                    $parse[$nr]['statement'] = $statement;
+                    $parse[$nr]['input'] = $input;
+                }
             } else {
-                return false;
+                debug($statement, 'statement');
+                debug($set, 'set');
+                debug($parse, 'parse');
+
             }
-        } else {
-            debug($parse, 'output in create_equation');
-            return false;
+            //remove counter
+            if($counter > Set::MAX){
+                break;
+            }
         }
+        if(isset($parse[0]['in_set']) && $parse[0]['in_set'] === true){
+            array_shift($parse);
+        }
+        $counter = 0;
+        debug($parse, 'before while');
+        die;
+        while(Operator::has($parse)){
+            $record = Operator::statement($parse, $input);
+            debug($record, 'record & input');
+            debug($input, 'input');
+//         	$parse = Set::replace($parse, $set, $record);
+            $counter++;
+            if($counter >= Operator::MAX){
+                break;
+            }
+        }
+        $output = null;
+        debug($parse, 'testo', true);
+        foreach($parse as $nr => $record){
+            if($output === null){
+                $output = $record['input'];
+            }
+            $search = $record['statement'];
+            $replace = $record['value'];
+            $subject = $output;
+            $output = str_replace($search, $replace, $subject);
+            $output += 0;
+            $record['output'] = $output;
+            $parse[$nr] = $record;
+            //value
+            //operator
+            //value
+        }
+        /*
+        foreach($parse as $nr => $record){
+            $record = Token::cast($record);
+            $record['attribute'] = $attribute;
+            $record['original'] = $value;
+            $record['input'] = $input;
+            $parse[$nr] = $record;
+        }
+        */
+        //not completed with calculation
+        return $output;
     }
 
     public static function is_whitespace($token=array()){
@@ -718,13 +702,6 @@ class Token extends Core {
             break;
             case 'T_OBJECT_CAST' :
                 return Token::TYPE_OBJECT;
-            break;
-            case 'T_PARENTHESE_OPEN' :
-            case 'T_PARENTHESE_CLOSE':
-                return Token::TYPE_PARENTHESE;
-            break;
-            case 'T_WHITESPACE' :
-                return Token::TYPE_WHITESPACE;
             break;
             case Token::TYPE_STRING:
             case Token::TYPE_MIXED:

@@ -28,6 +28,9 @@ class Variable extends Core {
         elseif(is_object($mixed)){
             return Token::TYPE_OBJECT;
         }
+        elseif(Operator::is_arithmetic($mixed)){
+            return Token::TYPE_OPERATOR;
+        }
         elseif(is_string($mixed)){
             return Token::TYPE_STRING;
         } else {
@@ -88,7 +91,7 @@ class Variable extends Core {
                     if($attribute === false){
                         $output = $input;
                     } else {
-                        debug($attribute, 'attr');
+//                         debug($attribute, 'attr');
                         $output = $this->data($attribute);
                         $output = Variable::value($output);
                     }

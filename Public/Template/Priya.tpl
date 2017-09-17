@@ -1,6 +1,23 @@
 Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
+
+{$multiply = ((float)
+    12 * 3
+)}
+
+{$multiply2 = (
+    $start * ((int)  3 + 2)
+)  * 4 + 5}
+
+
+
+
+
+{$multiply =
+    $var * 3
+}
+
 {$test6 =  (array) {
     "testw;" : {
         "object" : true
@@ -9,18 +26,6 @@ _______________________________________________________________________________
     "omg": "{$allow}{$entity_decode}",
     "task" : "{if $omg == $start}{$testing}{else}todo{/if}"
 } }
-
-{$multiply = (
-    12 * 3
-)}
-
-{$multiply = (
-    $start * 3
-) * 4 + 5}
-
-{$multiply =
-    $var * 3
-}
 
 how to detect if it is  multiply, are we going to use
 
