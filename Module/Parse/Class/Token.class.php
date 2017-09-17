@@ -170,8 +170,6 @@ class Token extends Core {
             $record = array();
         }
         $result = Token::parse_fix_cast($result);
-        debug($result);
-
         return $result;
     }
 
@@ -447,6 +445,25 @@ class Token extends Core {
 
     }
 
+    public static function variable($parse=array(), Variable $variable){
+        foreach ($parse as $nr => $record){
+            if(!isset($record['value'])){
+                continue;
+            }
+            if(!isset($record['type'])){
+                continue;
+            }
+            if($record['type'] != Token::TYPE_VARIABLE){
+                continue;
+            }
+            $record['value'] = $variable->replace($record['value']);
+            $record['type'] = Variable::type($record['value']);
+            $record = Token::cast($record);
+            $parse[$nr] = $record;
+        }
+        return $parse;
+    }
+
     public static function create_equation($value= '', $input=null, $variable=null){
         if(is_array($value)){
             $tokens = $value;
@@ -454,22 +471,17 @@ class Token extends Core {
             $tokens = Token::all($value);
         }
         $parse = Token::parse($tokens);
+        $parse = Token::variable($parse, $variable);
         $set_counter = 0;
+
+        if(Operator::has($parse) === false){
+            return false;
+        }
         while(Set::has($parse)){
             $set_counter++;
             $set = Set::get($parse);
             $statement = Set::statement($set);
-            foreach ($statement as $nr => $record){
-                if(!isset($record['value'])){
-                    continue;
-                }
-                $record['value'] = $variable->replace($record['value']);
-                $record['type'] = Variable::type($record['value']);
-                $record = Token::cast($record);
-                $statement[$nr] = $record;
-            }
             $operator_counter = 0;
-            debug($statement, 'statement');
             while (Operator::has($statement)){
                 $operator_counter++;
                 $statement = Operator::statement($statement);
