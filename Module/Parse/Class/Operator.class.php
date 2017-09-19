@@ -109,32 +109,7 @@ class Operator extends Core {
         if(!isset($operator['value'])){
             debug($operator, 'no value');
         }
-        /*
-        $operator['statement'] = '';
-        foreach($operator['left_parse'] as $nr => $record){
-            if(isset($record['statement'])){
-                $operator['statement'] .= $record['statement'];
-            } else {
-                $operator['statement'] .= $record['original'];
-            }
-
-        }
-        if($operator['operator'] != $operator['original']){
-            $operator['statement'] .= $operator['original'];
-        }
-        $operator['statement'] .= $operator['operator'];
-
-        foreach($operator['right_parse'] as $nr => $record){
-            if(isset($record['statement'])){
-                $operator['statement'] .= $record['statement'];
-            } else {
-                $operator['statement'] .= $record['original'];
-            }
-        }
-        */
-        //replace original with math
         $operator['type'] = Variable::type($operator['value']);
-//         debug($operator);
         return $operator;
     }
 
@@ -183,23 +158,25 @@ class Operator extends Core {
         }
 //         debug($statement);
         foreach($operator['left_parse']as $nr => $record){
+            $record = Token::cast($record);
             if(!isset($operator['left'])){
                 $operator['left'] = $record['value'];
             } else {
-                debug($operator, 'already set');
-                debug($record, 'record');
                 $operator['left'] .= $record['value'];
             }
+            $operator['left_parse'][$nr] = $record;
         }
         foreach($operator['right_parse']as $nr => $record){
+            $record = Token::cast($record);
             if(!isset($operator['right'])){
                 $operator['right'] = $record['value'];
             } else {
-                debug($operator, 'already set');
-                debug($record, 'record');
                 $operator['right'] .= $record['value'];
             }
+            $operator['right_parse'][$nr] = $record;
         }
+//         $operator =  Token::cast($operator, 'left');
+//         $operator =  Token::cast($operator, 'right');
         $operator = Operator::execute($operator);
 //         debug($operator, 'operator', true);
         array_unshift($statement, $operator);

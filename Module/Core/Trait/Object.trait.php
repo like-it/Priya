@@ -20,7 +20,7 @@ trait Object {
         if(is_string($input)){
             $input = trim($input);
             if($output=='object'){
-                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}' && stristr($input,':')){
+                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}'){
                     return json_decode($input);
                 }
                 elseif(substr($input,0,1)=='[' && substr($input,-1,1)==']'){
@@ -28,12 +28,12 @@ trait Object {
                 }
             }
             elseif(stristr($output, 'json') !== false){
-                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}' && stristr($input,':')){
+                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}'){
                     $input = json_decode($input);
                 }
             }
             elseif($output=='array'){
-                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}' && stristr($input,':')){
+                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}'){
                     return json_decode($input, true);
                 }
                 elseif(substr($input,0,1)=='[' && substr($input,-1,1)==']'){

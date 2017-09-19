@@ -330,6 +330,9 @@ class Token extends Core {
             }
             if(Token::is_bracket($token, Token::TYPE_OPEN) && Token::is_bracket(end($tokens) ,  Token::TYPE_CLOSE)){
                 $record['type'] = Token::TYPE_OBJECT;
+                if(is_array($value)){
+                    $value = Token::string($value);
+                }
                 if($record['is_cast'] === true){
                     $explode = explode($record['cast'], $value, 2);
                     $record['value'] = ltrim($explode[1], ') ');
@@ -363,6 +366,9 @@ class Token extends Core {
             }
             if(Token::is_square_bracket($token, Token::TYPE_OPEN) && Token::is_square_bracket(end($tokens) ,  Token::TYPE_CLOSE)){
                 $record['type'] = Token::TYPE_ARRAY;
+                if(is_array($value)){
+                    $value = Token::string($value);
+                }
                 if($record['is_cast'] === true){
                     $explode = explode($record['cast'], $value, 2);
                     $record['value'] = ltrim($explode[1], ') ');
@@ -464,19 +470,17 @@ class Token extends Core {
         return $parse;
     }
 
-    public static function create_equation($value= '', $input=null, $variable=null){
-        if(is_array($value)){
-            $tokens = $value;
-        } else {
-            $tokens = Token::all($value);
-        }
-        $parse = Token::parse($tokens);
-        $parse = Token::variable($parse, $variable);
+    /**
+     * @todo
+     * - add cast
+     */
+    public static function create_equation($parse=null){
         $set_counter = 0;
 
         if(Operator::has($parse) === false){
             return false;
         }
+//         debug($parse, 'in the beginning');
         while(Set::has($parse)){
             $set_counter++;
             $set = Set::get($parse);
@@ -504,8 +508,14 @@ class Token extends Core {
                 break;
             }
         }
+        foreach($parse as $nr => $record){
+            if($record['type'] == Token::TYPE_WHITESPACE){
+                unset($parse[$nr]);
+            }
+        }
         if(count($parse) == 1){
             $record = array_shift($parse);
+            $record = Token::cast($record);
             if(is_numeric($record['value'])){
                 return $record['value'] + 0;
             } else {
@@ -612,16 +622,16 @@ class Token extends Core {
         return false;
     }
 
-    public static function cast($record=array()){
+    public static function cast($record=array(), $attribute='value'){
         if(empty($record['is_cast'])){
             return $record;
         }
         switch ($record['cast']){
             case Token::TYPE_STRING :
-                if(empty($record['value'])){
-                    $record['value'] = '';
+                if(empty($record[$attribute])){
+                    $record[$attribute] = '';
                 } else {
-                    $record['value'] = (string) $record['value'];
+                    $record[$attribute] = (string) $record[$attribute];
                 }
                 $record['is_cast'] = false;
                 $record['type'] = Token::TYPE_STRING;
@@ -629,10 +639,10 @@ class Token extends Core {
                 return $record;
                 break;
             case Token::TYPE_INT:
-                if(!isset($record['value'])){
-                    $record['value'] = 0;
+                if(!isset($record[$attribute])){
+                    $record[$attribute] = 0;
                 } else {
-                    $record['value'] = intval($record['value']);
+                    $record[$attribute] = intval($record[$attribute]);
                 }
                 $record['is_cast'] = false;
                 $record['type'] = Token::TYPE_INT;
@@ -640,10 +650,10 @@ class Token extends Core {
                 return $record;
                 break;
             case Token::TYPE_FLOAT:
-                if(!isset($record['value'])){
-                    $record['value'] = 0.0;
+                if(!isset($record[$attribute])){
+                    $record[$attribute] = 0.0;
                 } else {
-                    $record['value'] = floatval($record['value']);
+                    $record[$attribute] = floatval($record[$attribute]);
                 }
                 $record['is_cast'] = false;
                 $record['type'] = Token::TYPE_FLOAT;
@@ -651,10 +661,10 @@ class Token extends Core {
                 return $record;
                 break;
             case Token::TYPE_BOOLEAN:
-                if(!empty($record['value'])){
-                    $record['value'] =  true;
+                if(!empty($record[$attribute])){
+                    $record[$attribute] =  true;
                 } else {
-                    $record['value'] =  false;
+                    $record[$attribute] =  false;
                 }
                 $record['is_cast'] = false;
                 $record['type'] = Token::TYPE_BOOLEAN;
@@ -662,8 +672,8 @@ class Token extends Core {
                 return $record;
                 break;
             case Token::TYPE_ARRAY:
-                if(!empty($record['value'])){
-                    $record['value'] =  Token::object($record['value'], 'array');
+                if(!empty($record[$attribute])){
+                    $record[$attribute] =  Token::object($record[$attribute], 'array');
                 } else {
                     $record['value'] =  array();
                 }
@@ -673,10 +683,10 @@ class Token extends Core {
                 return $record;
                 break;
             case Token::TYPE_OBJECT:
-                if(!empty($record['value'])){
-                    $record['value'] =  Token::object($record['value']);
+                if(!empty($record[$attribute])){
+                    $record[$attribute] =  Token::object($record[$attribute]);
                 } else {
-                    $record['value'] =  new stdClass();
+                    $record[$attribute] =  new stdClass();
                 }
                 $record['is_cast'] = false;
                 $record['type'] = Token::TYPE_OBJECT;
@@ -687,6 +697,16 @@ class Token extends Core {
                 debug('unknown cast');
                 break;
         }
+    }
+
+    public static function string($tokens=array()){
+        $string = '';
+        foreach($tokens as $nr => $token){
+            if(isset($token[1])){
+                $string .= $token[1];
+            }
+        }
+        return $string;
     }
 
     public static function get($token=array()){

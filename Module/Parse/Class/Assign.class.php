@@ -177,11 +177,60 @@ class Assign extends Core {
             $variable = new Variable($this->data(), $this->random());
             // an equation can be a variable, in that case it will be + 0
             // original, spaces have to be removed to replace the parts
-            $math = Token::create_equation($create, $original, $variable);
+
+            $parse = Token::parse($create);
+            $parse = Token::variable($parse, $variable);
+
+            $math = Token::create_equation($parse);
             if($math !== false){
                 $this->data($attribute, $math);
-                debug($attribute);
-                debug($math);
+                return;
+            } else {
+                $item = array();
+                foreach ($parse as $nr => $record){
+                    if(empty($record['type'])){
+                        continue;
+                    }
+                    if($record['type'] == Token::TYPE_WHITESPACE){
+                        continue;
+                    }
+                    if(empty($item)){
+                        $item = $record;
+                        continue;
+                    }
+                    if(!empty($item['type']) && $item['type'] != $record['type']){
+                        $item['type'] = Token::TYPE_MIXED;
+                    }
+                    if(!empty($item['value']) && isset($record['value']) && $item['type'] == Token::TYPE_STRING || $item['type'] == Token::TYPE_MIXED){
+                        $item['value'] .= $record['value'];
+                    }
+                    elseif(!empty($item['value']) && !empty($record['value'])){
+                        debug($record, 'record, item already set');
+                        debug($item, 'item already set');
+                    }
+                }
+                switch($assign){
+                    case '+=' :
+                        $plus = $this->data($attribute) + 0;
+                        $this->data($attribute, $plus += $item['value']);
+                    break;
+                    case '-=' :
+                        $min = $this->data($attribute) + 0;
+                        $this->data($attribute, $min -= $item['value']);
+                    break;
+                    case '.=' :
+                        $add = $this->data($attribute);
+                        $this->data($attribute, $add .= $item['value']);
+                    break;
+                    default :
+                        $item = Token::cast($item);
+                        $this->data($attribute, $item['value']);
+                       break;
+                }
+//                 debug($assign, 'assign');
+//                 debug($item, 'pre cast');
+
+//                 debug($item, 'item');
                 return;
             }
 //             $value = Token::restore_return($value, $this->random());

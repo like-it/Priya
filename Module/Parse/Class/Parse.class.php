@@ -46,7 +46,8 @@ class Parse extends Core {
             $assign->find($value);
         }
         $data = $assign->data();
-        var_Dump($data);
+        debug($assign->data('welcome2'));
+        echo $assign->data('welcome2');
     }
 
 
