@@ -111,6 +111,10 @@ class Set extends Core {
             }
             if(!empty($remove)){
                 if(empty($is_replace)){
+                    $replace['is_cast'] = $match['is_cast'];
+                    if(isset($match['cast'])){
+                        $replace['cast'] = $match['cast'];
+                    }
                     $parse[$nr] = $replace;
                     $is_replace = true;
                     continue;

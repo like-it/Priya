@@ -15,6 +15,7 @@ class Token extends Core {
     const TYPE_OBJECT = 'object';
     const TYPE_VARIABLE = 'variable';
     const TYPE_OPERATOR = 'operator';
+    const TYPE_DOT = 'dot';
     const TYPE_MIXED = 'mixed';
     const TYPE_WHITESPACE = 'whitespace';
     const TYPE_STATEMENT = 'statement';
@@ -58,6 +59,9 @@ class Token extends Core {
                     break;
                     case ',' :
                         $tokens[$key][2] = 'T_COMMA';
+                    break;
+                    case '.' :
+                        $tokens[$key][2] = 'T_DOT';
                     break;
                     case ';' :
                         $tokens[$key][2] = 'T_SEMI_COLON';
@@ -452,20 +456,49 @@ class Token extends Core {
     }
 
     public static function variable($parse=array(), Variable $variable){
+//         debug($parse);
+        $item = array();
+        $key = null;
+        $unset = array();
         foreach ($parse as $nr => $record){
+            $possible_dot = next($parse);
             if(!isset($record['value'])){
                 continue;
             }
             if(!isset($record['type'])){
                 continue;
             }
-            if($record['type'] != Token::TYPE_VARIABLE){
+            if($record['type'] != Token::TYPE_VARIABLE && empty($item)){
                 continue;
             }
-            $record['value'] = $variable->replace($record['value']);
-            $record['type'] = Variable::type($record['value']);
-            $record = Token::cast($record);
-            $parse[$nr] = $record;
+            if(isset($possible_dot) && $possible_dot['type'] == Token::TYPE_DOT && empty($item)){
+                $item = $record;
+                $key = $nr;
+                continue;
+            }
+            elseif(empty($item)) {
+                $record['value'] = $variable->replace($record['value']);
+                $record['type'] = Variable::type($record['value']);
+                $record = Token::cast($record);
+                $parse[$nr] = $record;
+            }
+            if(!empty($item)){
+                if($record['type'] == Token::TYPE_WHITESPACE){
+                    $item['value'] = $variable->replace($item['value']);
+                    $item['type'] = Variable::type($item['value']);
+                    $item = Token::cast($item);
+                    foreach($unset as $unset_key){
+                        unset($parse[$unset_key]);
+                    }
+                    $parse[$key] = $item;
+                    $item = array();
+                    $unset = array();
+                    $key = null;
+                } else {
+                    $item['value'] .= $record['value'];
+                    $unset[] = $nr;
+                }
+            }
         }
         return $parse;
     }
@@ -480,7 +513,6 @@ class Token extends Core {
         if(Operator::has($parse) === false){
             return false;
         }
-//         debug($parse, 'in the beginning');
         while(Set::has($parse)){
             $set_counter++;
             $set = Set::get($parse);
@@ -630,6 +662,9 @@ class Token extends Core {
             case Token::TYPE_STRING :
                 if(empty($record[$attribute])){
                     $record[$attribute] = '';
+                }
+                elseif(is_array($record[$attribute]) || is_object($record[$attribute])){
+                    $record[$attribute] = '';
                 } else {
                     $record[$attribute] = (string) $record[$attribute];
                 }
@@ -641,8 +676,11 @@ class Token extends Core {
             case Token::TYPE_INT:
                 if(!isset($record[$attribute])){
                     $record[$attribute] = 0;
+                }
+                elseif(is_array($record[$attribute]) || is_object($record[$attribute])){
+                    $record[$attribute] = 0;
                 } else {
-                    $record[$attribute] = intval($record[$attribute]);
+                    $record[$attribute] = (int) round($record[$attribute] + 0);
                 }
                 $record['is_cast'] = false;
                 $record['type'] = Token::TYPE_INT;
@@ -651,6 +689,8 @@ class Token extends Core {
                 break;
             case Token::TYPE_FLOAT:
                 if(!isset($record[$attribute])){
+                    $record[$attribute] = 0.0;
+                }elseif(is_array($record[$attribute]) || is_object($record[$attribute])){
                     $record[$attribute] = 0.0;
                 } else {
                     $record[$attribute] = floatval($record[$attribute]);
@@ -714,6 +754,7 @@ class Token extends Core {
             return $token[2];
         } else {
             debug($token);
+            debug(debug_backtrace(true));
         }
     }
 
@@ -757,6 +798,9 @@ class Token extends Core {
             break;
             case 'T_WHITESPACE' :
                 return Token::TYPE_WHITESPACE;
+            break;
+            case 'T_DOT' :
+                return Token::TYPE_DOT;
             break;
             case Token::TYPE_STRING:
             case Token::TYPE_MIXED:

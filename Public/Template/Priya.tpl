@@ -2,6 +2,23 @@ Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
 
+{$math.int.water = 5.6}
+
+{$string_1 =
+
+
+'
+$math
+test\'
+\''
+
+}
+
+test $math.int.water in equation
+parseble tags should be removed from the documents
+\'\' => '' \' => ' \\' => \' \\\' => \\' \\\\' => \\\'
+
+
 {$test5 = [
     "omg",
     "test5"
@@ -10,8 +27,8 @@ _______________________________________________________________________________
 
 {$test4 = {}}
 
-{$multiply =
-    (int) $var * 3
+{$multiply6 =
+   (int) $math.int.water * 3
 }
 
 {$multiply = ((float)
@@ -57,7 +74,7 @@ how to detect if it is  multiply, are we going to use
 
 {$omg3}
 {$testing = (string) "t\"\''"\"est\\""}tes2t
-{$quote = 'quote'}
+{$quote = 'quo\\\'te'}
 {$test6 =  (array) {
     "testw;" : {
         "object" : true

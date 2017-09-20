@@ -68,6 +68,8 @@ class Parser extends Data {
 
         $read = $parser->compile($read, $this->data());
 
+        debug($parser->data());
+
         die('end parsing');
 
         var_dump($read);

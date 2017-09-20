@@ -45,10 +45,6 @@ class Parse extends Core {
         foreach($list as $key => $value){
             $assign->find($value);
         }
-        $data = $assign->data();
-        debug($assign->data('welcome2'));
-        echo $assign->data('welcome2');
+        $this->data($assign->data());
     }
-
-
 }
