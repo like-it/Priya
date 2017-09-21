@@ -152,7 +152,10 @@ class Token extends Core {
             } else {
                 $record['type'] = Token::type(Token::get($token));
             }
-            if($record['type'] == token::TYPE_INT){
+            if(
+                $record['type'] == Token::TYPE_INT ||
+                $record['type'] == Token::TYPE_FLOAT
+            ){
                 $record['value'] += 0;
             }
             if(!isset($result['set'])){
@@ -511,7 +514,7 @@ class Token extends Core {
         $set_counter = 0;
 
         if(Operator::has($parse) === false){
-            return false;
+            return;
         }
         while(Set::has($parse)){
             $set_counter++;
@@ -551,11 +554,11 @@ class Token extends Core {
             if(is_numeric($record['value'])){
                 return $record['value'] + 0;
             } else {
-                return false;
+                return;
             }
         } else {
             debug($parse, 'output in create_equation');
-            return false;
+            return;
         }
     }
 
@@ -781,6 +784,12 @@ class Token extends Core {
             break;
             case 'T_OPERATOR_COMPARE' :
             case 'T_OPERATOR_ARITHMETIC' :
+            case 'T_IS_GREATER_OR_EQUAL' :
+            case 'T_IS_SMALLER_OR_EQUAL' :
+            case 'T_IS_EQUAL' :
+            case 'T_IS_NOT_EQUAL' :
+            case 'T_IS_IDENTICAL' :
+            case 'T_IS_NOT_IDENTICAL' :
                 return  Token::TYPE_OPERATOR;
             break;
             case 'T_VARIABLE' :

@@ -87,25 +87,71 @@ class Operator extends Core {
         $operator['execute'] = $operator['left'] . $operator['operator'] . $operator['right'];
 //         debug($operator, 'execute');
         //add % & ** >= <=
+        $original = $operator['value'];
         switch($operator['value']){
             case '-' :
                 $operator['value'] = $operator['left'] - $operator['right'];
-                break;
+            break;
             case '+' :
                 $operator['value'] = $operator['left'] + $operator['right'];
-                break;
+            break;
             case '*' :
                 $operator['value'] = $operator['left'] * $operator['right'];
-                break;
+            break;
             case '/' :
                 $operator['value'] = $operator['left'] / $operator['right'];
+            break;
             case '>' :
                 $operator['value'] = $operator['left'] > $operator['right'];
-                break;
+            break;
             case '<' :
                 $operator['value'] = $operator['left'] < $operator['right'];
-                break;
+            break;
+            case '<=' :
+                $operator['value'] = $operator['left'] <= $operator['right'];
+            break;
+            case '>=' :
+                $operator['value'] = $operator['left'] >= $operator['right'];
+            break;
+            case '<>' :
+                $operator['value'] = $operator['left'] <> $operator['right'];
+            break;
+            case '!=' :
+                $operator['value'] = $operator['left'] != $operator['right'];
+            break;
+            case '!==' :
+                $operator['value'] = $operator['left'] !== $operator['right'];
+            break;
+            case '===' :
+                $operator['value'] = $operator['left'] === $operator['right'];
+            break;
+            case '==' :
+                $operator['value'] = $operator['left'] == $operator['right'];
+            break;
+            case '%' :
+                $operator['value'] = $operator['left'] % $operator['right'];
+            break;
+            case '&' :
+                $operator['value'] = $operator['left'] & $operator['right'];
+            break;
+            case '|' :
+                $operator['value'] = $operator['left'] | $operator['right'];
+               break;
+            case '^' :
+                $operator['value'] = $operator['left'] ^ $operator['right'];
+               break;
+            case '<<' :
+                $operator['value'] = $operator['left'] << $operator['right'];
+               break;
+            case '>>' :
+                $operator['value'] = $operator['left'] >> $operator['right'];
+            break;
+            default :
+                debug('undefined operator in execute');
+            break;
         }
+        debug($operator);
+
         if(!isset($operator['value'])){
             debug($operator, 'no value');
         }
@@ -133,6 +179,10 @@ class Operator extends Core {
             }
             if(!isset($record['type'])){
                 continue;
+            }
+            if($record['type'] == Token::TYPE_STRING && isset($record['value']) && substr($record['value'], 0, 1) == '\'' && substr($record['value'], -1, 1) == '\''){
+                $record['value'] = substr($record['value'], 1, -1);
+                $record['value'] = str_replace('\\\'', '\'', $record['value']);
             }
             if($record['type'] == Token::TYPE_WHITESPACE){
                 continue;

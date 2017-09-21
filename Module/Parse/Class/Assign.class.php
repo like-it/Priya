@@ -177,11 +177,9 @@ class Assign extends Core {
             // an equation can be a variable, in that case it will be + 0
 
             $parse = Token::parse($create);
-//             debug($parse);
             $parse = Token::variable($parse, $variable);
-
             $math = Token::create_equation($parse);
-            if($math !== false){
+            if($math !== null){
                 $this->data($attribute, $math);
                 return;
             } else {
