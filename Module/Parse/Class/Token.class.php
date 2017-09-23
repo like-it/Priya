@@ -784,12 +784,15 @@ class Token extends Core {
             break;
             case 'T_OPERATOR_COMPARE' :
             case 'T_OPERATOR_ARITHMETIC' :
+            case 'T_OPERATOR_BITWISE' :
             case 'T_IS_GREATER_OR_EQUAL' :
             case 'T_IS_SMALLER_OR_EQUAL' :
             case 'T_IS_EQUAL' :
             case 'T_IS_NOT_EQUAL' :
             case 'T_IS_IDENTICAL' :
             case 'T_IS_NOT_IDENTICAL' :
+            case 'T_SL' :
+            case 'T_SR' :
                 return  Token::TYPE_OPERATOR;
             break;
             case 'T_VARIABLE' :
