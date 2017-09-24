@@ -3,6 +3,19 @@
 namespace Priya\Module\Parse;
 
 class Control_If extends Core {
+    const MAX = 2;
+
+    public static function has($list=array()){
+
+    }
+
+    public static function create($list=array(), $string=''){
+        $result = array();
+        $result['string'] = $string;
+
+
+
+    }
 
     public static function statement($statement=array()){
         if(in_array(

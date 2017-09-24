@@ -14,7 +14,6 @@ use Priya\Module\Parse\Core;
 class Parse extends Core {
     const DIR = __DIR__;
     const LITERAL = 'literal';
-    const PHP_MIN_VERSION = '7.0.0';
     const FUNCTION_LIST = 'Function.List.php';
 
     public function __construct($handler=null, $route=null, $data=null){
@@ -42,9 +41,25 @@ class Parse extends Core {
         $list = $tag->find();
 
         $assign = new Parse\Assign($data, $this->random());
+        $if = new Parse\Control_if($data, $this->random());
+
+        $if_counter = 0;
+
+        $record = array();
+        $record['string'] = $string;
+
+        while($if::has($list)){
+            if($if_counter >= $if::MAX){
+                break;
+            }
+            $record = $if::create($list, $string);
+            $list = $tag->find($record['string']);
+        }
+        $string = $record['string'];
+
         foreach($list as $key => $value){
             $assign->find($value);
+            $this->data($assign->data());
         }
-        $this->data($assign->data());
     }
 }

@@ -150,8 +150,6 @@ class Operator extends Core {
                 debug('undefined operator in execute');
             break;
         }
-        debug($operator);
-
         if(!isset($operator['value'])){
             debug($operator, 'no value');
         }
