@@ -73,6 +73,8 @@ class Token extends Core {
                         $tokens[$key][2] = 'T_COLON';
                     case '$' :
                         $tokens[$key][2] = 'T_DOLLAR_SIGN';
+                    case '&&' :
+                        $tokens[$key][2] = 'T_BOOLEAN_AND';
                     break;
                 }
             }
@@ -543,6 +545,7 @@ class Token extends Core {
                 break;
             }
         }
+        debug($parse, 'outcome');
         foreach($parse as $nr => $record){
             if($record['type'] == Token::TYPE_WHITESPACE){
                 unset($parse[$nr]);
@@ -553,6 +556,8 @@ class Token extends Core {
             $record = Token::cast($record);
             if(is_numeric($record['value'])){
                 return $record['value'] + 0;
+            }elseif(is_bool($record['value'])){
+                return $record['value'];
             } else {
                 return;
             }
@@ -793,6 +798,8 @@ class Token extends Core {
             case 'T_IS_NOT_IDENTICAL' :
             case 'T_SL' :
             case 'T_SR' :
+            case 'T_BOOLEAN_AND';	//might need a different one
+            case 'T_BOOLEAN_OR'; 	//might need a different one
                 return  Token::TYPE_OPERATOR;
             break;
             case 'T_VARIABLE' :

@@ -146,18 +146,25 @@ class Operator extends Core {
             case '>>' :
                 $operator['value'] = $operator['left'] >> $operator['right'];
             break;
+            case '&&' :
+                $operator['value'] = $operator['left'] && $operator['right'];
+            break;
+            case '||' :
+                $operator['value'] = $operator['left'] || $operator['right'];
+            break;
             default :
-                debug('undefined operator in execute');
+                debug('undefined operator (' .  $operator['value'] . ') in execute');
             break;
         }
         if(!isset($operator['value'])){
             debug($operator, 'no value');
         }
         $operator['type'] = Variable::type($operator['value']);
+//         debug($operator, 'operator');
         return $operator;
     }
 
-    public static function statement($statement=array(), $input=null){
+    public static function statement($statement=array()){
         //add original
         $left = array();
         $right = array();
@@ -223,10 +230,41 @@ class Operator extends Core {
             }
             $operator['right_parse'][$nr] = $record;
         }
-//         $operator =  Token::cast($operator, 'left');
-//         $operator =  Token::cast($operator, 'right');
+        if(!isset($operator['value']) && empty($operator['right_parse'])){
+            debug($operator, 'wrong compare');
+            debug($statement, 'what is in statement');
+            die;
+        }
+        if($operator['value'] == '&&' || $operator['value'] == '||'){
+            //
+            /* $operator['right_parse'] = invalid should be calculated
+             * $operator['right'] = result of the calculated right_parse
+             *
+             * move right parse to statement
+             * //execute statement on the current statement
+             * // result should be right / right_parse
+             *
+             * .
+             */
+            $right_statement = $statement;
+            array_unshift($right_statement, $operator['right_parse'][0]);
+            if(count($right_statement) > 1){
+                $right_statement = Operator::statement($right_statement);
+                $right_statement_count = 0;
+                while(count($right_statement) > 1 && $right_statement[0]['value'] === true){
+                    $right_statement = Operator::statement($right_statement);
+                    $right_statement_count++;
+                    if($right_statement_count >= Operator::MAX){
+                        debug('$right_statement_count >= Operator::MAX');
+                        break;
+                    }
+                }
+            }
+            $operator['right_parse'][0] = $right_statement[0];
+            $operator['right'] = $right_statement[0]['value'];
+            $statement = array();
+        }
         $operator = Operator::execute($operator);
-//         debug($operator, 'operator', true);
         array_unshift($statement, $operator);
         return $statement;
     }

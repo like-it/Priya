@@ -41,7 +41,7 @@ class Parse extends Core {
         $list = $tag->find();
 
         $assign = new Parse\Assign($data, $this->random());
-        $if = new Parse\Control_if($data, $this->random());
+        $if = new Parse\Control_If($data, $this->random());
 
         $if_counter = 0;
 
@@ -49,17 +49,20 @@ class Parse extends Core {
         $record['string'] = $string;
 
         while($if::has($list)){
+            $record = $if::create($list, $string);
+            $record = $if->statement($record);
+//             $list = $tag->find($record['string']);
             if($if_counter >= $if::MAX){
                 break;
             }
-            $record = $if::create($list, $string);
-            $list = $tag->find($record['string']);
         }
+        die;
         $string = $record['string'];
 
         foreach($list as $key => $value){
             $assign->find($value);
             $this->data($assign->data());
         }
+        die;
     }
 }

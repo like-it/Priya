@@ -174,7 +174,7 @@ class Assign extends Core {
                 return;
             }
             $variable = new Variable($this->data(), $this->random());
-            // an equation can be a variable, in that case it will be + 0
+            //an equation can be a variable, if it is undefined it will be + 0
 
             $parse = Token::parse($create);
             $parse = Token::variable($parse, $variable);
