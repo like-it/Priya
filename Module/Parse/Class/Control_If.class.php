@@ -75,12 +75,17 @@ class Control_If extends Core {
         $parse = Token::parse($create);
         $parse = Token::variable($parse, $variable);
         $math = Token::create_equation($parse);
-        debug($math, 'do the math');
-        die;
-
-
-    debug($create, 'create');
-
-        die;
+        $record['if']['result'] = $math;
+        if($record['if']['result'] === true){
+            //get the true part of the if statement
+            //replace the if statement with the true part of the statement in record['string']
+        }
+        elseif($record['if']['result'] === false){
+            //get the else part of the if statement or null without else
+            //replace the if statement with the else part of the statement in record['string'] or null
+        } else {
+            debug($record, 'unknown result should be true || false');
+            die;
+        }
     }
 }
