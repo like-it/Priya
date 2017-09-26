@@ -203,124 +203,6 @@ class Token extends Core {
         return $parse;
     }
 
-    public static function parse2($value= ''){
-        if(is_array($value)){
-            $tokens = $value;
-        } else {
-            $tokens = Token::all($value);
-        }
-        //debug($value, 'value in parse');
-//         debug($tokens, 'tokens in parse');
-        $result = array();
-        $record = array();
-        $set_depth = 0;
-        $original = '';
-        debug($value, 'value');
-        debug(debug_backtrace(true));
-        die;
-        foreach($tokens as $nr => $token){
-//             debug($token);
-            if(isset($token[1])){
-                $original .= $token[1];
-            }
-            if(!isset($record['is_cast'])){
-                $record['is_cast'] = Token::is_cast($token);
-                $record['original'] = $original;
-                if($record['is_cast'] === true){
-                    $record['cast'] = Token::type(Token::get($token));
-                    $record['token'][] = $token;
-                    continue;
-                }
-            }
-            if(Token::is_whitespace($token)){
-                if(isset($record['value'])){
-                    $record['original'] = $original;
-                    $result[] = $record;
-                    $record = array();
-                    $original = '';
-                }
-                continue;
-            }
-            if(Token::is_parenthese($token)){
-                if($token[1] == '('){
-                    $set_depth++;
-                    $record['in_set'] = true;
-                    $record['original'] = $original;
-                    //$record['type'] = Token::TYPE_SET;
-                    $result[] = $record;
-                    $record = array();
-                    $record['is_cast'] = false;
-                    $record['is_set'] = true;
-                    $record['type'] = Token::TYPE_PARENTHESE;
-                    $record['parenthese'] = $token[1];
-                    $record['set'] = array();
-                    $record['set']['depth'] = $set_depth;
-                    $record['token'][] = $token;
-                    $result[] = $record;
-                    $record = array();
-                    $original = '';
-                    continue;
-                } else {
-                    if(isset($record['original'])){
-                        $record['original'] .= $original;
-                    } else {
-                        $record['original'] = $original;
-                    }
-                    $result[] = $record;
-                    $record = array();
-
-                    $record['is_cast'] = false;
-                    $record['is_set'] = true;
-                    $record['type'] = Token::TYPE_PARENTHESE;
-                    $record['parenthese'] = $token[1];
-                    $record['set'] = array();
-                    $record['set']['depth'] = $set_depth;
-                    $record['token'][] = $token;
-                    $result[] = $record;
-                    $record = array();
-                    $original = '';
-                    $set_depth--;
-                    continue;
-                }
-            }
-            if(isset($record['type'])){
-                $type = Token::type(Token::get($token));
-                if($record['type'] != $type){
-                    $record['type'] = Token::TYPE_MIXED;
-                }
-            } else {
-                $record['type'] = Token::type(Token::get($token));
-            }
-            if($record['type'] == Token::TYPE_OPERATOR){
-                $record['operator'] = $token[1];
-                $record['token'][] = $token;
-                $result[] = $record;
-                $record = array();
-                $original = '';
-                continue;
-            } else {
-                if(!isset($record['value'])){
-                    $record['value'] = Token::value($token);
-                } else {
-                    $add = Token::value($token);
-                    if($add){
-                        $record['value'] .= $add;
-                    }
-                }
-                $record['token'][] = $token;
-                if($record['type'] == token::TYPE_INT){
-                    $record['value'] += 0;
-                }
-            }
-        }
-        if(!empty($record)){
-            $record['original'] = $original;
-            $result[] = $record;
-        }
-        //debug($result, 'result');
-        return $result;
-    }
-
     public static function create_object($value= ''){
         if(is_array($value)){
             $tokens = $value;
@@ -541,11 +423,10 @@ class Token extends Core {
         while (Operator::has($parse)){
             $operator_counter++;
             $parse = Operator::statement($parse);
-            if($operator_counter > Operator::MAX){
+            if($operator_counter >= Operator::MAX){
                 break;
             }
         }
-        debug($parse, 'outcome');
         foreach($parse as $nr => $record){
             if($record['type'] == Token::TYPE_WHITESPACE){
                 unset($parse[$nr]);

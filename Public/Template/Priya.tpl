@@ -10,15 +10,23 @@ _______________________________________________________________________________
         water === water
     )
 }
-    {if 4.4 == 4.4}
-        {if 3.3 == 3.3}
+    depth = 1
+    {if 4.4 == 4.4} depth = 2
+        {if 3.3 == 3.3} depth = 3
             html
+        {else}
+            master
         {/if}
+        depth = 2
+    {else}
+            this one
     {/if}
+    depth = 1
     {$if1 = 3}
 {else}
-    {$if2 = 4}
+    depth = 1.1;
 {/if}
+
 
 {$boolean_1 = (int) ($math.int.water << 1)       }
 

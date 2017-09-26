@@ -3,7 +3,7 @@
 namespace Priya\Module\Parse;
 
 class Control_If extends Core {
-    const MAX = 2;
+    const MAX = 3;
 
     public function __construct($data=null, $random=null){
         $this->data($data);
@@ -24,12 +24,59 @@ class Control_If extends Core {
         return false;
     }
 
-    public static function create($list=array(), $string=''){
+    public static function true($parse=array(), $if=''){
+        $reset = reset($parse);
+        $collect = false;
+        $value = '';
+        foreach($parse as $nr => $record){
+            if($record['depth'] == $reset['depth']){
+                $collect = true;
+            }
+            if($record['depth'] == $reset['depth'] && stristr($record['string'], '{else}') !== false){
+                $part = explode('{else}', $record['string'], 2);
+                if(count($part) == 1){
+                    $value .= $record['string'];
+                } else {
+                    $value .= $part[0];;
+                }
+                continue;
+            }
+            if($collect === true){
+                $value .= $record['string'];
+            }
+            elseif($record['depth'] == $reset['depth']){
+                $collect = false;
+            }
+        }
+        $explode = explode($if, $value);
+        if(count($explode) == 2){
+            return $explode[1];
+        }
+    }
+
+    public static function false($parse=array()){
+        $reset = reset($parse);
+        $collect = false;
+        $value = '';
+        foreach($parse as $nr => $record){
+            if($record['depth'] == $reset['depth'] && stristr($record['string'], '{else}') !== false){
+                $explode = explode('{else}', $record['string'], 2);
+                $value .= $explode[1];
+            }
+        }
+        return substr($value, 0, -5);
+    }
+
+
+
+    public static function create($list=array(), $string='', $random=''){
         $result = array();
         $result['string'] = $string;
         $if = Control_If::get($list);
         $explode = explode($if, $string, 2);
         $inner_raw = $explode[1];
+        //bug inner raw should go to the end of this if...
+        //will be set when available
         $explode = explode('{if', $inner_raw);
 
         $list = array();
@@ -54,6 +101,21 @@ class Control_If extends Core {
                         $value .= $list_record['part'];
                     }
                 }
+                $temp = explode($if, $value, 2);
+                $inner_raw = substr($temp[1], 0, -5);
+                $raw = $value;
+                $depth = Control_If::depth($raw);
+                $true = Control_If::true($depth, $if);
+                $false = Control_If::false($depth);
+                if($false === false){
+                    $result['if']['true'] = $true;
+                    $result['if']['false'] = null;
+                } else {
+                    $result['if']['true'] = $true;
+                    $result['if']['false'] = $false;
+                }
+                $true= Token::restore_return($true, $random);
+                $false= Token::restore_return($false, $random);
                 $result['if']['value'] = $value;
             }
         }
@@ -61,31 +123,131 @@ class Control_If extends Core {
         return $result;
     }
 
-    /**
-     * - create left right
-     * - create true & false
-     * - execute statement see operator::statement
-     */
+    public static function execute($record=array(), $math=null){
+        $record['if']['result'] = $math;
+        if($math === true){
+            $record['if']['string'] = $record['if']['true'];
+        }
+        elseif($math === false){
+            $record['if']['string'] = $record['if']['false'];
+        } else {
+            debug('unknown math in execute');
+            debug($math, 'math');
+            debug($record, 'record');
+        }
+        $explode = explode($record['if']['value'], $record['string'], 2);
+        $record['execute'] = implode($record['if']['string'], $explode);
+        $record['string'] = $record['execute'];
+        return $record;
+    }
+
     public function statement($record=array()){
         $create = Token::restore_return($record['if']['statement'], $this->random());
         $create = str_replace('{if ', '', substr($create, 0, -1));
         $variable = new Variable($this->data(), $this->random());
         // an equation can be a variable, if it is undefined it will be + 0
-//         debug($create, 'create');
+        // an equeation can have functions.
         $parse = Token::parse($create);
         $parse = Token::variable($parse, $variable);
         $math = Token::create_equation($parse);
-        $record['if']['result'] = $math;
-        if($record['if']['result'] === true){
-            //get the true part of the if statement
-            //replace the if statement with the true part of the statement in record['string']
+        $record = Control_If::execute($record, $math);	//rename to execute...
+        return $record;
+    }
+
+    public static function depth($string=''){
+        $depth = 0;
+        $list = array();
+
+        $explode = explode('{', $string);
+        foreach($explode as $nr => $row){
+            if(substr($row,0, 2) == 'if'){
+                $depth++;
+                $record['depth'] = $depth;
+            }
+            elseif(substr($row,0, 3) == '/if'){
+                $record['depth'] = $depth;
+                $depth--;
+            }
+            elseif(substr($row,0, 4) == 'else'){
+                $record['depth'] = $depth;
+            } else {
+                $record['depth'] = $depth;
+            }
+            if($nr > 0){
+                $record['string'] = '{' . $row;
+            } else {
+                if(empty($row)){
+                    continue;
+                }
+                $record['string'] = $row;
+            }
+            $previous = end($list);
+            if($previous['depth'] == $record['depth']){
+                $key = key($list);
+                if(!isset($list[$key]['part'])){
+                    $list[$key]['part'][] = $previous['string'];
+                }
+                $list[$key]['part'][] = $record['string'];
+                if(isset($key)){
+                    $list[$key]['string'] .= $record['string'];
+                    continue;
+                }
+            }
+            $list[] = $record;
         }
-        elseif($record['if']['result'] === false){
-            //get the else part of the if statement or null without else
-            //replace the if statement with the else part of the statement in record['string'] or null
+        return $list;
+    }
+
+    public static function explode($delimiter=array(), $string='', $internal=array()){
+        $result = array();
+        if(is_array($delimiter)){
+            foreach($delimiter as $nr => $delim){
+                if(strpos($string, $delim) === false){
+                    continue; //speed... & always >=2
+                }
+                $tmp = Control_If::explode($delim, $string, $result);
+                foreach ($tmp as $tmp_nr => $tmp_value){
+                    $result[] = $tmp_value;
+                }
+            }
+            $list = array();
+            foreach ($result as $nr => $part){
+                $splitted = false;
+                foreach ($delimiter as $delim){
+                    if(strpos($part, $delim) === false){
+                        continue; //speed... & always >=2
+                    }
+                    $tmp = explode($delim, $part);
+                    $splitted = true;
+                    foreach($tmp as $part_splitted){
+                        $list[$part_splitted][] = $part_splitted;
+                    }
+                }
+                if(empty($splitted)){
+                    $list[$part][] = $part;
+                }
+            }
+            foreach($list as $part => $value){
+                foreach ($delimiter as $delim){
+                    if(strpos($part, $delim) !== false){
+                        unset($list[$part]);
+                    }
+                }
+            }
+            $result = array();
+            foreach($list as $part => $value){
+                $result[] = $part;
+            }
+            if(empty($result)){
+                $result[] = $string;
+            }
+            return $result;
         } else {
-            debug($record, 'unknown result should be true || false');
-            die;
+            $result = explode($delimiter, $string);
         }
+        if(empty($result)){
+            $result[] = $string;
+        }
+        return $result;
     }
 }
