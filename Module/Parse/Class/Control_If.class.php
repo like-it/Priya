@@ -121,7 +121,29 @@ class Control_If extends Core {
         return $result;
     }
 
-    public static function execute($record=array(), $math=null){
+    public static function row($record=array(), $random=''){
+        $string = Token::restore_return($record['string'], $random);
+        $statement = Token::restore_return($record['if']['value'], $random);
+        $if = Token::restore_return($record['if']['string'], $random);
+        $anchor = '[' . $random . '][anchor]';
+        $string = str_replace($statement, $anchor . $if, $string);
+        $explode = explode("\n", $string);
+        foreach($explode as $nr => $row){
+            if(trim($row) == $anchor){
+                unset($explode[$nr]);
+                break;
+            }
+            $explode[$nr] = str_replace($anchor, '', $row, $count);
+            if($count > 0){
+                break;
+            }
+        }
+        $string = implode("\n", $explode);
+        $record['string'] = Newline::replace($string, $random);
+        return $record;
+    }
+
+    public static function execute($record=array(), $math=null, $random=''){
         $record['if']['result'] = $math;
         if($math === true){
             $record['if']['string'] = $record['if']['true'];
@@ -133,9 +155,17 @@ class Control_If extends Core {
             debug($math, 'math');
             debug($record, 'record');
         }
+        $record = Control_if::row($record, $random);
+
+        /**
+         * get the row of $record['if']['value']
+         * if trim row == $record['if']['value'] explode on the row...
+         */
+        /*
         $explode = explode($record['if']['value'], $record['string'], 2);
         $record['execute'] = implode($record['if']['string'], $explode);
         $record['string'] = $record['execute'];
+        */
         return $record;
     }
 
@@ -148,7 +178,7 @@ class Control_If extends Core {
         $parse = Token::parse($create);
         $parse = Token::variable($parse, $variable);
         $math = Token::create_equation($parse);
-        $record = Control_If::execute($record, $math);	//rename to execute...
+        $record = Control_If::execute($record, $math, $this->random());	//rename to execute...
         return $record;
     }
 
@@ -194,58 +224,5 @@ class Control_If extends Core {
             $list[] = $record;
         }
         return $list;
-    }
-
-    public static function explode($delimiter=array(), $string='', $internal=array()){
-        $result = array();
-        if(is_array($delimiter)){
-            foreach($delimiter as $nr => $delim){
-                if(strpos($string, $delim) === false){
-                    continue; //speed... & always >=2
-                }
-                $tmp = Control_If::explode($delim, $string, $result);
-                foreach ($tmp as $tmp_nr => $tmp_value){
-                    $result[] = $tmp_value;
-                }
-            }
-            $list = array();
-            foreach ($result as $nr => $part){
-                $splitted = false;
-                foreach ($delimiter as $delim){
-                    if(strpos($part, $delim) === false){
-                        continue; //speed... & always >=2
-                    }
-                    $tmp = explode($delim, $part);
-                    $splitted = true;
-                    foreach($tmp as $part_splitted){
-                        $list[$part_splitted][] = $part_splitted;
-                    }
-                }
-                if(empty($splitted)){
-                    $list[$part][] = $part;
-                }
-            }
-            foreach($list as $part => $value){
-                foreach ($delimiter as $delim){
-                    if(strpos($part, $delim) !== false){
-                        unset($list[$part]);
-                    }
-                }
-            }
-            $result = array();
-            foreach($list as $part => $value){
-                $result[] = $part;
-            }
-            if(empty($result)){
-                $result[] = $string;
-            }
-            return $result;
-        } else {
-            $result = explode($delimiter, $string);
-        }
-        if(empty($result)){
-            $result[] = $string;
-        }
-        return $result;
     }
 }

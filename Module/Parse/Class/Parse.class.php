@@ -60,7 +60,7 @@ class Parse extends Core {
             $if->data($assign->data());
             $record = $if::create($list, $record['string'], $this->random());
             $record = $if->statement($record);
-            $record['execute'] = Parse\Token::restore_return($record['execute'], $this->random());
+//             $record['execute'] = Parse\Token::restore_return($record['execute'], $this->random());
 
             $list = $tag->find($record['string']);
             if($if_counter >= $if::MAX){
