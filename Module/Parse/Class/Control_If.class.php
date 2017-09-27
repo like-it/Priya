@@ -114,8 +114,6 @@ class Control_If extends Core {
                     $result['if']['true'] = $true;
                     $result['if']['false'] = $false;
                 }
-                $true= Token::restore_return($true, $random);
-                $false= Token::restore_return($false, $random);
                 $result['if']['value'] = $value;
             }
         }
