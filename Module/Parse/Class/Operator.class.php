@@ -179,7 +179,7 @@ class Operator extends Core {
                 continue;
             }
             unset($statement[$nr]);
-            if(!isset($record['value'])){
+            if(!isset($record['value']) && $record['value'] !== null){
                 continue;
             }
             if(!isset($record['type'])){

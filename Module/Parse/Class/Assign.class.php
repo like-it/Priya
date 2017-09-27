@@ -132,7 +132,7 @@ class Assign extends Core {
         if(empty($input)){
             return;
         }
-        $tag = key($input);
+        $tag = $input;
         $assign = false;
         $parse = array();
         $count = 0;

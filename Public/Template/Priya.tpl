@@ -12,9 +12,11 @@ _______________________________________________________________________________
 }
     depth = 1
     {if 4.4 == 4.4} depth = 2
-        {if 3.3 == 3.3} depth = 3
+        {if 3.3 == 3.4} depth = 3
             html
-        {else}
+            {$math.int.master = 'defined'}
+        {else}deze
+            {$math.int.shit = 'else'}
             master
         {/if}
         depth = 2

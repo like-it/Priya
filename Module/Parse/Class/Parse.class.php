@@ -49,6 +49,15 @@ class Parse extends Core {
         $record['string'] = $string;
 
         while($if::has($list)){
+//             debug($list, 'list');
+            foreach($list as $value){
+                $key = key($value);
+                if(substr($key, 0, 3) == '{if'){
+                    break;
+                }
+                $assign->find($key);
+            }
+            $if->data($assign->data());
             $record = $if::create($list, $record['string'], $this->random());
             $record = $if->statement($record);
             $record['execute'] = Parse\Token::restore_return($record['execute'], $this->random());
@@ -60,16 +69,17 @@ class Parse extends Core {
             }
             $if_counter++;
         }
+        $assign->data($if->data());
         $string = $record['string'];
-
         $string= Parse\Token::restore_return($string, $this->random());
 
-        debug($string, 'string');
-
-        foreach($list as $key => $value){
-            $assign->find($value);
-            $this->data($assign->data());
+        foreach($list as $value){
+            $key = key($value);
+            $assign->find($key);
         }
+        $this->data($assign->data());
+        echo $string;
+        debug($this->data());
         die('end parser tests');
     }
 }
