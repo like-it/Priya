@@ -3,7 +3,7 @@
 namespace Priya\Module\Parse;
 
 class Control_If extends Core {
-    const MAX = 3;
+    const MAX = 1024;
 
     public function __construct($data=null, $random=null){
         $this->data($data);
