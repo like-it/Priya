@@ -761,7 +761,7 @@ class Token extends Core {
         return $value;
     }
 
-    public static function method($parse=array(), Variable $variable){
+    public static function method($parse=array(), Variable $variable, $parser=null){
         //first math.equation
         $function = reset($parse);
         if($function['type'] != Token::TYPE_FUNCTION){

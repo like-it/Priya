@@ -5,9 +5,27 @@ namespace Priya\Module\Parse;
 class Control_If extends Core {
     const MAX = 1024;
 
-    public function __construct($data=null, $random=null){
+    private $parser;
+
+    public function __construct($data=null, $random=null, $parser=null){
         $this->data($data);
         $this->random($random);
+        $this->parser($parser);
+    }
+
+    public function parser($parser=null){
+        if($parser !== null){
+            $this->setParser($parser);
+        }
+        return $this->getParser();
+    }
+
+    private function setParser($parser=''){
+        $this->parser= $parser;
+    }
+
+    private function getParser(){
+        return $this->parser;
     }
 
     public static function has($list=array()){

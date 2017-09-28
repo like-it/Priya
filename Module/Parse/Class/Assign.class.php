@@ -6,9 +6,27 @@ use Priya\Module\Core\Object;
 
 class Assign extends Core {
 
-    public function __construct($data=null, $random=null){
+    private $parser;
+
+    public function __construct($data=null, $random=null, $parser=null){
         $this->data($data);
         $this->random($random);
+        $this->parser($parser);
+    }
+
+    public function parser($parser=null){
+        if($parser !== null){
+            $this->setParser($parser);
+        }
+        return $this->getParser();
+    }
+
+    private function setParser($parser=''){
+        $this->parser= $parser;
+    }
+
+    private function getParser(){
+        return $this->parser;
     }
 
     public static function is_variable($record=array()){
@@ -202,7 +220,7 @@ class Assign extends Core {
 
             $parse = Token::parse($create);
             $parse = Token::variable($parse, $variable);
-            $parse = Token::method($parse, $variable);
+            $parse = Token::method($parse, $variable, $this->parser());
             $math = Token::create_equation($parse);
             if($math !== null){
                 $this->data($attribute, $math);

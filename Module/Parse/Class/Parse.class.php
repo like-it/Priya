@@ -40,8 +40,8 @@ class Parse extends Core {
         $tag = new Parse\Tag($string, $this->random());
         $list = $tag->find();
 
-        $assign = new Parse\Assign($data, $this->random());
-        $if = new Parse\Control_If($data, $this->random());
+        $assign = new Parse\Assign($data, $this->random(), $this);
+        $if = new Parse\Control_If($data, $this->random(), $this);
         $if_counter = 0;
 
         $record = array();
