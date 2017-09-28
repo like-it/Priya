@@ -400,6 +400,7 @@ class Token extends Core {
             }
             $parse[$key] = $item;
         }
+//         debug($parse, 'parse');
         return $parse;
     }
 

@@ -17,6 +17,16 @@ class Literal extends Core {
         return '';
     }
 
+    public static function remove($value=''){
+        return str_replace(
+            array(
+                Literal::OPEN,
+                Literal::CLOSE
+            ),
+            '',
+            $value
+        );
+    }
 
     public static function replace($value='', $random=''){
         $literal = Literal::get($value);

@@ -4,6 +4,9 @@ _______________________________________________________________________________
 {$math.int.water =
 5.6
 }
+
+{$omg3 = 'jawel'}
+
 {$empty = empty($math.int.water)}
 {$empty2 = empty(null)}
 test
@@ -20,7 +23,8 @@ test
             {$math.int.master = 'defined'}
         {else}deze
             {$math.int.shit = 'else'}
-            master
+            master {$omg3}
+            {$omg3 = 'jaw2el'}
         {/if}
         depth = 2
     {else}

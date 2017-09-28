@@ -10,6 +10,7 @@
 namespace Priya\Module;
 
 use Priya\Module\Parse\Core;
+use Priya\Module\Parse\Variable;
 
 class Parse extends Core {
     const DIR = __DIR__;
@@ -42,6 +43,7 @@ class Parse extends Core {
 
         $assign = new Parse\Assign($data, $this->random(), $this);
         $if = new Parse\Control_If($data, $this->random(), $this);
+        $variable = new Parse\Variable($data, $this->random());
         $if_counter = 0;
 
         $record = array();
@@ -56,6 +58,9 @@ class Parse extends Core {
                 $assign->find($key);
                 $record['assign']['tag'] = $key;
                 $record = Parse\Assign::row($record, $this->random());
+                $variable->data($assign->data());
+                $record['variable']['tag'] = $key;
+                $record = $variable->find($record);
             }
             $if->data($assign->data());
             $record = $if::create($list, $record['string'], $this->random());
@@ -75,10 +80,14 @@ class Parse extends Core {
             $assign->find($key);
             $record['assign']['tag'] = $key;
             $record = Parse\Assign::row($record, $this->random());
+            $variable->data($assign->data());
+            $record['variable']['tag'] = $key;
+            $record = $variable->find($record);
         }
         $this->data($assign->data());
         $string = $record['string'];
-        $string= Parse\Token::restore_return($string, $this->random());
+        $string = Parse\Token::restore_return($string, $this->random());
+        $string = Parse\Literal::remove($string);
         echo $string;
         debug($this->data());
         die('end parser tests');

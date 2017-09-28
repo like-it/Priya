@@ -55,6 +55,21 @@ class Variable extends Core {
         }
     }
 
+    public function find($record=array()){
+        $attribute = substr($record['variable']['tag'], 1, -1);
+        if(substr($attribute,0, 1) != '$'){
+            return $record;
+        }
+        $modifier_list = explode('|', $attribute);
+        $attribute = array_shift($modifier_list);
+        if(strpos($attribute, '=') !== false){
+            return $record;
+        }
+        $explode = explode($record['variable']['tag'], $record['string'], 2);
+        $record['string'] = implode($this->replace($attribute), $explode);
+        return $record;
+    }
+
     public function replace($input=null){
         $original = $input;
         if(
@@ -111,6 +126,9 @@ class Variable extends Core {
                         if($output != null){
                             $output_type = Variable::type($output);
                         }
+                        if($attribute == 'omg3'){
+                            debug($value, 'omg3');
+                        }
                         if($output === null){
                             if(in_array($type, array(
                                     Token::TYPE_ARRAY,
@@ -162,6 +180,8 @@ class Variable extends Core {
 //                 debug($input, 'input in replace');
 //                 debug($output);
             }
+//             debug($output);
+//             debug(debug_backtrace(true));
             return $output;
         }
     }
