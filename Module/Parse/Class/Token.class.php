@@ -23,6 +23,7 @@ class Token extends Core {
     const TYPE_SET = 'set';
     const TYPE_OPEN = 'open';
     const TYPE_CLOSE = 'close';
+    const TYPE_FUNCTION = 'function';
 
     public static function all($token=''){
         $tokens = token_get_all('<?php $variable=' . $token . ';');
@@ -343,7 +344,6 @@ class Token extends Core {
     }
 
     public static function variable($parse=array(), Variable $variable){
-//         debug($parse);
         $item = array();
         $key = null;
         $unset = array();
@@ -369,6 +369,9 @@ class Token extends Core {
                 $record = Token::cast($record);
                 $parse[$nr] = $record;
             }
+            if($record['value'] == ')' && $record['set']['depth'] == 1){
+                continue;
+            }
             if(!empty($item)){
                 if($record['type'] == Token::TYPE_WHITESPACE){
                     $item['value'] = $variable->replace($item['value']);
@@ -382,10 +385,20 @@ class Token extends Core {
                     $unset = array();
                     $key = null;
                 } else {
+//                     debug($record, 'record -->');
                     $item['value'] .= $record['value'];
                     $unset[] = $nr;
                 }
             }
+        }
+        if(!empty($item)){
+            $item['value'] = $variable->replace($item['value']);
+            $item['type'] = Variable::type($item['value']);
+            $item = Token::cast($item);
+            foreach($unset as $unset_key){
+                unset($parse[$unset_key]);
+            }
+            $parse[$key] = $item;
         }
         return $parse;
     }
@@ -702,6 +715,9 @@ class Token extends Core {
             case 'T_DOT' :
                 return Token::TYPE_DOT;
             break;
+            case 'T_EMPTY' :
+                return Token::TYPE_FUNCTION;
+            break;
             case Token::TYPE_STRING:
             case Token::TYPE_MIXED:
             case Token::TYPE_NULL:
@@ -743,6 +759,39 @@ class Token extends Core {
         $replace[] = "\n";
         $value = str_replace($search, $replace, $value);
         return $value;
+    }
+
+    public static function method($parse=array(), Variable $variable){
+        //first math.equation
+        $function = reset($parse);
+        if($function['type'] != Token::TYPE_FUNCTION){
+            return $parse;
+        }
+        array_shift($parse);
+        $collect = false;
+        $parameter = array();
+        foreach ($parse as $nr => $record){
+            if($record['value'] == '(' && $record['set']['depth'] == 1){
+                $collect = true;
+                unset($parse[$nr]);
+                continue;
+            }
+            if($record['value'] == ')' && $record['set']['depth'] == 1){
+                $collect = false;
+                unset($parse[$nr]);
+                continue;
+            }
+            if(!empty($collect)){
+                $parameter[] = $record;
+                unset($parse[$nr]);
+            }
+        }
+        //check for multiple parameters...
+        $parameter = Token::variable($parameter, $variable);
+        $function['parameter'] = $parameter;
+        $function = Method::execute($function, $variable);
+        array_unshift($parse, $function);
+        return $parse;
     }
 }
 

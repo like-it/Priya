@@ -42,7 +42,6 @@ class Parse extends Core {
 
         $assign = new Parse\Assign($data, $this->random());
         $if = new Parse\Control_If($data, $this->random());
-
         $if_counter = 0;
 
         $record = array();
@@ -55,6 +54,8 @@ class Parse extends Core {
                     break;
                 }
                 $assign->find($key);
+                $record['assign']['tag'] = $key;
+                $record = Parse\Assign::row($record, $this->random());
             }
             $if->data($assign->data());
             $record = $if::create($list, $record['string'], $this->random());
@@ -68,16 +69,19 @@ class Parse extends Core {
             $if_counter++;
         }
         $assign->data($if->data());
-        $string = $record['string'];
-        $string= Parse\Token::restore_return($string, $this->random());
 
         foreach($list as $value){
             $key = key($value);
             $assign->find($key);
+            $record['assign']['tag'] = $key;
+            $record = Parse\Assign::row($record, $this->random());
         }
         $this->data($assign->data());
+        $string = $record['string'];
+        $string= Parse\Token::restore_return($string, $this->random());
         echo $string;
         debug($this->data());
         die('end parser tests');
+        return $string;
     }
 }

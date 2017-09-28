@@ -1,16 +1,12 @@
 Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
-
-
-
-
-{$math.int.water = 5.6}
-
-{empty($math.int.water)}
-
-
-
+{$math.int.water =
+5.6
+}
+{$empty = empty($math.int.water)}
+{$empty2 = empty(null)}
+test
 {if $math.int.water == 5.6 &&
     (
         newline == 2ewline ||

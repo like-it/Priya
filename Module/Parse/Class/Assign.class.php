@@ -121,7 +121,29 @@ class Assign extends Core {
         return $depth;
     }
 
-
+    public static function row($record=array(), $random=''){
+        $string = Token::restore_return($record['string'], $random);
+        $tag = Token::restore_return($record['assign']['tag'], $random);
+        $explode = explode('=', substr($tag, 1, -1), 2);
+        if(!empty($explode[0]) && substr($explode[0], 0, 1) == '$' && count($explode) == 2){
+            $anchor = '[' . $random . '][anchor]';
+            $string = str_replace($tag, $anchor, $string);
+            $explode = explode("\n", $string);
+            foreach($explode as $nr => $row){
+                if(trim($row) == $anchor){
+                    unset($explode[$nr]);
+                    break;
+                }
+                $explode[$nr] = str_replace($anchor, '', $row, $count);
+                if($count > 0){
+                    break;
+                }
+            }
+            $string = implode("\n", $explode);
+            $record['string'] = Newline::replace($string, $random);
+        }
+        return $record;
+    }
 
     public function find($input=null){
         if($input === null){
@@ -136,10 +158,12 @@ class Assign extends Core {
         $assign = false;
         $parse = array();
         $count = 0;
+//         debug($tag, 'tag');
         $explode = explode('=', substr($tag, 1, -1), 2);
 
         if(!empty($explode[0]) && substr($explode[0], 0, 1) == '$' && count($explode) == 2){
             $attribute = substr(rtrim($explode[0]), 1);
+//             debug($attribute, 'attribute');
             $value = trim($explode[1], ' ');
             if(
                 substr($attribute,-1) == '-' ||
@@ -178,6 +202,7 @@ class Assign extends Core {
 
             $parse = Token::parse($create);
             $parse = Token::variable($parse, $variable);
+            $parse = Token::method($parse, $variable);
             $math = Token::create_equation($parse);
             if($math !== null){
                 $this->data($attribute, $math);
@@ -235,7 +260,6 @@ class Assign extends Core {
                 }
                 return;
             }
-            debug('expand find');
         }
     }
 
