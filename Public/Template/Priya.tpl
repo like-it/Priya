@@ -1,6 +1,7 @@
 Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
+{$eq = is_equation(multiply)}
 {$math.int.water =
 5.6
 }
@@ -96,8 +97,6 @@ how to detect if it is  multiply, are we going to use
      * then check for is_number & operator::arithmetic
      */
 {/function}
-
-{is_equation(multiply)}
 
 {literal}{test{}{}}{/literal}
 
