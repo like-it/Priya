@@ -69,8 +69,10 @@ class Method extends Core {
             $result['method'] .= $record['value'];
         }
         if($is_method){
+            debug($is_method);
             $result['type'] = Token::TYPE_METHOD;
             $result['parameter'] = Parameter::get($parameter, $variable);
+            debug($result, 'result');
             //add cast as well on the method...
             return $result;
         }

@@ -2,6 +2,23 @@ Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
 
+{$count = Object.count({
+    "test" : "testing",
+    "awesome" : "da shit",
+    "freaky" : "real:ly?",
+    test2 : 'tes:t3',
+    bool : true,
+    numeric: 1,
+    float: 4.9,
+    deep : {
+        bool : true,
+        deeper : {
+            test : test
+        },
+        float: 1.0
+    }
+})}
+
 {$eq = (object) array.in(test2, ['shit','poep','schijt', "test", $start])}
 
 {$eq2 = is.equation(multiply, 'mu,ltiple')}

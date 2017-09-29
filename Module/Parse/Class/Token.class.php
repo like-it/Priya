@@ -174,7 +174,16 @@ class Token extends Core {
                     $record['set']['depth'] = $set_depth;
                     $set_depth--;
                 }
-            } else {
+            }
+            elseif(Token::is_bracket($token, Token::TYPE_OPEN)){
+                $set_depth++;
+                $record['set']['depth'] = $set_depth;
+            }
+            elseif(Token::is_bracket($token, Token::TYPE_CLOSE)){
+                $record['set']['depth'] = $set_depth;
+                $set_depth--;
+            }
+            else {
                 $record['set']['depth'] = $set_depth;
             }
 
@@ -716,6 +725,8 @@ class Token extends Core {
             break;
             case 'T_SQUARE_BRACKET_OPEN' :
             case 'T_SQUARE_BRACKET_CLOSE':
+            case 'T_BRACKET_OPEN' :
+            case 'T_BRACKET_CLOSE' :
                 return Token::TYPE_BRACKET;
                 break;
             case 'T_WHITESPACE' :
@@ -776,6 +787,7 @@ class Token extends Core {
     public static function method($parse=array(), Variable $variable, $parser=null){
         //first math.equation
         $method = Method::get($parse, $variable);
+        debug($method);
         if($method === false){
             return $parse;
         }
