@@ -14,6 +14,26 @@ use stdClass;
 trait Object {
 
     public static function object($input='', $output='object',$type='root'){
+        if(is_bool($input)){
+            if($output == 'object' || $output == 'json'){
+                $data = new stdClass();
+                if(empty($input)){
+                    $data->false = false;
+                } else {
+                    $data->true = true;
+                }
+                if($output == 'json'){
+                    $data = json_encode($data);
+                }
+                debug($data);
+                return $data;
+            }
+            elseif($output == 'array') {
+                return array($input);
+            } else {
+                trigger_error('unknown output in object');
+            }
+        }
         if(is_array($input) && $output == 'object'){
             return self::array_object($input);
         }

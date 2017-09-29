@@ -1,7 +1,10 @@
 Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
-{$eq = is_equation(multiply)}
+
+{$eq = (object) array.in(test2, ['shit','poep','schijt', "test", $start])}
+
+{$eq2 = is.equation(multiply, 'mu,ltiple')}
 {$math.int.water =
 5.6
 }

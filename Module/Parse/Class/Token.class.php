@@ -16,14 +16,16 @@ class Token extends Core {
     const TYPE_VARIABLE = 'variable';
     const TYPE_OPERATOR = 'operator';
     const TYPE_DOT = 'dot';
+    const TYPE_COMMA = 'comma';
     const TYPE_MIXED = 'mixed';
     const TYPE_WHITESPACE = 'whitespace';
     const TYPE_STATEMENT = 'statement';
     const TYPE_PARENTHESE = 'parenthese';
+    const TYPE_BRACKET = 'bracket';
     const TYPE_SET = 'set';
     const TYPE_OPEN = 'open';
     const TYPE_CLOSE = 'close';
-    const TYPE_FUNCTION = 'function';
+    const TYPE_METHOD = 'method';
 
     public static function all($token=''){
         $tokens = token_get_all('<?php $variable=' . $token . ';');
@@ -615,7 +617,7 @@ class Token extends Core {
                 return $record;
                 break;
             case Token::TYPE_ARRAY:
-                if(!empty($record[$attribute])){
+                if(isset($record[$attribute])){
                     $record[$attribute] =  Token::object($record[$attribute], 'array');
                 } else {
                     $record['value'] =  array();
@@ -626,7 +628,8 @@ class Token extends Core {
                 return $record;
                 break;
             case Token::TYPE_OBJECT:
-                if(!empty($record[$attribute])){
+                if(isset($record[$attribute])){
+                    debug($record[$attribute], 'so...');
                     $record[$attribute] =  Token::object($record[$attribute]);
                 } else {
                     $record[$attribute] =  new stdClass();
@@ -669,6 +672,7 @@ class Token extends Core {
             case 'T_ENCAPSED_AND_WHITESPACE' :
             case 'T_NS_SEPARATOR' :
             case 'T_DOUBLE_QUOTE' :
+            case 'T_ARRAY' :		//might needs its own type
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
@@ -710,14 +714,21 @@ class Token extends Core {
             case 'T_PARENTHESE_CLOSE':
                 return Token::TYPE_PARENTHESE;
             break;
+            case 'T_SQUARE_BRACKET_OPEN' :
+            case 'T_SQUARE_BRACKET_CLOSE':
+                return Token::TYPE_BRACKET;
+                break;
             case 'T_WHITESPACE' :
                 return Token::TYPE_WHITESPACE;
             break;
             case 'T_DOT' :
                 return Token::TYPE_DOT;
             break;
+            case 'T_COMMA' :
+                return Token::TYPE_COMMA;
+            break;
             case 'T_EMPTY' :
-                return Token::TYPE_FUNCTION;
+                return Token::TYPE_METHOD;
             break;
             case Token::TYPE_STRING:
             case Token::TYPE_MIXED:
@@ -764,8 +775,20 @@ class Token extends Core {
 
     public static function method($parse=array(), Variable $variable, $parser=null){
         //first math.equation
-        $function = reset($parse);
-        if($function['type'] != Token::TYPE_FUNCTION){
+        $method = Method::get($parse, $variable);
+        if($method === false){
+            return $parse;
+        }
+        if($method['type'] == Token::TYPE_METHOD){
+            $method= Method::execute($method, $variable);
+            $method= Token::cast($method);
+            $parse = array();
+            $parse[] = $method;
+        }
+        return $parse;
+        /*
+        $method= reset($parse); //empty
+        if($method['type'] != Token::TYPE_METHOD){
             return $parse;
         }
         array_shift($parse);
@@ -793,6 +816,7 @@ class Token extends Core {
         $function = Method::execute($function, $variable);
         array_unshift($parse, $function);
         return $parse;
+        */
     }
 }
 

@@ -4,6 +4,7 @@
     "web" : "web",
     "time" : "time"
 },
+"count" : 3,
 "start" : 3.232,
 "var" : "{$start}",
 "test" : "{$start}",

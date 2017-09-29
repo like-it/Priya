@@ -234,10 +234,7 @@ class Assign extends Core {
                     if($record['type'] == Token::TYPE_WHITESPACE){
                         continue;
                     }
-                    if($record['type'] == Token::TYPE_STRING && isset($record['value']) && substr($record['value'], 0, 1) == '\'' && substr($record['value'], -1, 1) == '\''){
-                        $record['value'] = substr($record['value'], 1, -1);
-                        $record['value'] = str_replace('\\\'', '\'', $record['value']);
-                    }
+                    $record = Value::get($record);
                     if(empty($item)){
                         $item = $record;
                         continue;
