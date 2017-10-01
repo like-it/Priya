@@ -1,6 +1,21 @@
 Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
+rename $in=2ng to $this
+{$i2ng = {
+    what : "wate2r",
+    "what2" : "{$i2ng.what}"
+}}
+
+
+{$tostring = {
+    what : "wate3r",
+    __tostring : "{$tostring.what} {$what} {$start}"
+}}
+{$tostring}
+
+
+
 {$qwer =  $start}
 {$qwe =  !! $start}
 {$test13 = {

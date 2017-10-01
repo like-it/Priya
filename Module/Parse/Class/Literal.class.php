@@ -32,8 +32,8 @@ class Literal extends Core {
         $search = array(
                 '[' . $random .'][literal]',
                 '[' . $random .'][/literal]',
-                '[' . $random .'][curley_open]',
-                '[' . $random .'][curley_close]'
+                '[' . $random .'][curly_open]',
+                '[' . $random .'][curly_close]'
         );
         $replace = array(
                 Literal::OPEN,
@@ -50,8 +50,8 @@ class Literal extends Core {
             $literal = Literal::get($value);
             $search = Literal::OPEN . $literal . Literal::CLOSE;
             $literal= str_replace(array('{', '}'), array(
-                    '[' . $random . '][curley_open]',
-                    '[' . $random . '][curley_close]'
+                    '[' . $random . '][curly_open]',
+                    '[' . $random . '][curly_close]'
 
             ), $literal);
             $replace = '[' . $random . '][literal]' . $literal . '[' . $random .'][/literal]';

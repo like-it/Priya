@@ -27,25 +27,25 @@ class Parse extends Core {
         }
     }
 
-    public function compile($string, $data, $keep=false){
+    public function compile($string, $keep=false){
         if(
-                is_null($string) ||
-                is_bool($string) ||
-                is_float($string) ||
-                is_int($string) ||
-                is_numeric($string)
-                ){
-                    return $string;
+            is_null($string) ||
+            is_bool($string) ||
+            is_float($string) ||
+            is_int($string) ||
+            is_numeric($string)
+        ){
+            return $string;
         }
         if (is_array($string)){
             foreach($string as $nr => $line){
-                $string[$nr] = $this->compile($line, $data, $keep);
+                $string[$nr] = $this->compile($line, $keep);
             }
             return $string;
         }
         elseif(is_object($string)){
             foreach ($string as $key => $value){
-                $string->{$key} = $this->compile($value, $data, $keep);
+                $string->{$key} = $this->compile($value, $keep);
             }
             return $string;
         } else {
@@ -62,6 +62,17 @@ class Parse extends Core {
             $tag = new Parse\Tag($string, $this->random());
             $list = $tag->find();
 
+            $data = $this->data();
+
+            if(key(reset($list)) == '{$ing.what}'){
+
+                debug($this->data(), 'in this????');
+                debug($data, 'data');
+                die;
+            }
+            //$data should be $this->data();
+
+
             $assign = new Parse\Assign($data, $this->random(), $this);
             $if = new Parse\Control_If($data, $this->random(), $this);
             $variable = new Parse\Variable($data, $this->random());
@@ -70,6 +81,8 @@ class Parse extends Core {
 
             $record = array();
             $record['string'] = $string;
+
+//             debug($list, 'list');
 
             while($if::has($list)){
                 foreach($list as $value){
@@ -99,17 +112,22 @@ class Parse extends Core {
 
             foreach($list as $value){
                 $key = key($value);
+
                 $assign->find($key);
                 $record['assign']['tag'] = $key;
                 $record = Parse\Assign::row($record, $this->random());
+
                 $variable->data($assign->data());
                 $record['variable']['tag'] = $key;
                 $record = $variable->find($record);
+
+                $method->data($variable->data());
                 $record['method']['tag'] = $key;
-//                 debug($key, 'key');
                 $record = $method->find($record, $variable, $this);
             }
-            $this->data($assign->data());
+            $if->data($method->data());
+            $this->data($if->data());
+
             $string = $record['string'];
 
             if(is_string($string)){

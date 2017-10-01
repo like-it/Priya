@@ -57,10 +57,10 @@ class Token extends Core {
                         $tokens[$key][2] = 'T_SQUARE_BRACKET_CLOSE';
                     break;
                     case '{' :
-                        $tokens[$key][2] = 'T_CURLEY_OPEN';
+                        $tokens[$key][2] = 'T_CURLY_OPEN';
                     break;
                     case '}' :
-                        $tokens[$key][2] = 'T_CURLEY_CLOSE';
+                        $tokens[$key][2] = 'T_CURLY_CLOSE';
                     break;
                     case ',' :
                         $tokens[$key][2] = 'T_COMMA';
@@ -235,7 +235,7 @@ class Token extends Core {
         }
     }
 
-    public static function create_object($value= '', Variable $variable, $parser=null){
+    public static function create_object($value= '', $attribute='', Variable $variable, $parser=null){
         if(is_array($value)){
             $tokens = $value;
         } else {
@@ -256,9 +256,9 @@ class Token extends Core {
                 if(is_array($value)){
                     $parse = Token::parse($value);
                     $parse = Token::variable($parse, $variable);
+                    //if is_object($parse... assign the attributes
                     $parse = Token::method($parse, $variable, $parser);
                     $value = Token::string($value, $variable);
-
                 }
                 if($record['is_cast'] === true){
                     $explode = explode($record['cast'], $value, 2);
@@ -269,6 +269,9 @@ class Token extends Core {
                 $record['original'] = $record['value'];
                 $record['token'] = $tokens;
                 $record['value'] = Token::object($record['value']);
+                foreach($record['value'] as $key => $assign){
+                    $parser->data($attribute . '.' . $key, $assign);
+                }
                 $record['value'] = $parser->compile($record['value'], $parser->data(), true);
                 return $record;
             }
@@ -432,15 +435,28 @@ class Token extends Core {
                     $record['invert'] = false;
                 }
                 $record = Token::Exclamation($record);
-                $record['type'] = Variable::type($record['value']);
+                if($record['type'] == Token::TYPE_VARIABLE){
+                    $record['is_variable'] = true;
+                }
+                $record['type'] = Variable::type($record['value']); //change to value::type...
                 $record = Token::cast($record);
+
                 $parse[$nr] = $record;
             }
             if($record['value'] == ')' && $record['set']['depth'] == 1){
                 continue;
             }
             if(!empty($item)){
-                if($record['type'] == Token::TYPE_WHITESPACE){
+                if(
+                    (
+                        $record['type'] == Token::TYPE_WHITESPACE  &&
+                        $item['type'] == Token::TYPE_VARIABLE
+                    ) ||
+                    (
+                        $record['type'] = Token::TYPE_BRACKET &&
+                        $record['value'] == '}'
+                    )
+                ){
                     $item['has_exclamation'] = $has_exclamation;
                     $item['exclamation_count'] = $exclamation_count;
                     if($item['exclamation_count'] % 2 == 1){
@@ -449,8 +465,11 @@ class Token extends Core {
                         $item['invert'] = false;
                     }
                     $item['value'] = $variable->replace($item['value']);
-                    $item= Token::Exclamation($item);
-                    $item['type'] = Variable::type($item['value']);
+                    $item = Token::Exclamation($item);
+                    if($item['type'] == Token::TYPE_VARIABLE){
+                        $item['is_variable'] = true;
+                    }
+                    $item['type'] = Variable::type($item['value']); //change to value::type...
                     $item = Token::cast($item);
                     foreach($unset as $unset_key){
                         unset($parse[$unset_key]);
@@ -475,7 +494,10 @@ class Token extends Core {
             }
             $item['value'] = $variable->replace($item['value']);
             $item= Token::Exclamation($item);
-            $item['type'] = Variable::type($item['value']);
+            if($item['type'] == Token::TYPE_VARIABLE){
+                $item['is_variable'] = true;
+            }
+            $item['type'] = Variable::type($item['value']); //change to value::type...
             $item = Token::cast($item);
             foreach($unset as $unset_key){
                 unset($parse[$unset_key]);
@@ -575,22 +597,22 @@ class Token extends Core {
     public static function is_bracket($token=array(), $type=null){
         if($type === null){
             if(isset($token[2]) && in_array($token[2], array(
-                    'T_CURLEY_OPEN',
-                    'T_CURLEY_CLOSE',
+                    'T_CURLY_OPEN',
+                    'T_CURLY_CLOSE',
             ))){
                 return true;
             }
         }
         elseif($type == Token::TYPE_OPEN){
             if(isset($token[2]) && in_array($token[2], array(
-                    'T_CURLEY_OPEN',
+                    'T_CURLY_OPEN',
             ))){
                 return true;
             }
         }
         elseif($type == Token::TYPE_CLOSE){
             if(isset($token[2]) && in_array($token[2], array(
-                    'T_CURLEY_CLOSE',
+                    'T_CURLY_CLOSE',
             ))){
                 return true;
             }
@@ -727,6 +749,7 @@ class Token extends Core {
     public static function string($tokens=array(), Variable $variable){
         $string = '';
         $is_string = false;
+        $is_variable = false;
         foreach($tokens as $nr => $token){
             if(isset($token[1])){
                 if(substr($token[1], 0, 1) == '\'' && substr($token[1], -1, 1) == '\''){
@@ -739,6 +762,9 @@ class Token extends Core {
                 }
                 if($token[1] == '"'){
                     $is_string = true;
+                }
+                if($token[2] == 'T_VARIABLE'){
+                    $is_variable = true;
                 }
                 if($is_string === true){
                     if(in_array($token[2], array(
@@ -773,7 +799,9 @@ class Token extends Core {
                         'T_ARRAY',
                         'T_OBJECT',
                     ))){
-                        $token[1] = '"' . $token[1] . '"';
+                        if($is_variable === false){
+                            $token[1] = '"' . $token[1] . '"';
+                        }
                     }
                     elseif(in_array($token[2], array(
                         'T_VARIABLE'
@@ -784,8 +812,6 @@ class Token extends Core {
                 if(is_object($token[1]) || is_array($token[1])){
                     $string .= json_encode($token[1]);
                     //pre-check if method then dont come here...
-                    debug($string, 'here it goes wrong');
-                    debug($token);
                     continue;
                 }
                 $string .= $token[1];
@@ -859,10 +885,10 @@ class Token extends Core {
             break;
             case 'T_SQUARE_BRACKET_OPEN' :
             case 'T_SQUARE_BRACKET_CLOSE':
-            case 'T_CURLEY_OPEN' :
-            case 'T_CURLEY_CLOSE' :
+            case 'T_CURLY_OPEN' :
+            case 'T_CURLY_CLOSE' :
                 return Token::TYPE_BRACKET;
-                break;
+            break;
             case 'T_WHITESPACE' :
             case 'T_RETURN' :
                 return Token::TYPE_WHITESPACE;

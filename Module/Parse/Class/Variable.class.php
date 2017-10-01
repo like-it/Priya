@@ -65,9 +65,23 @@ class Variable extends Core {
         if(strpos($attribute, '=') !== false){
             return $record;
         }
-        debug($record, 'record in find');
         $explode = explode($record['variable']['tag'], $record['string'], 2);
-        $record['string'] = implode($this->replace($attribute), $explode);
+        $replace = $this->replace($attribute);
+        if(is_object($replace)){
+            if(
+                isset($replace->__tostring) &&
+                !is_array($replace->__tostring) &&
+                !is_object($replace->__tostring)
+            ){
+                $replace = $replace->__tostring;
+            } else {
+                $replace = ''; //(object) ?
+            }
+        }
+        elseif(is_array($replace)){
+            $replace = ''; //(array) ?
+        }
+        $record['string'] = implode($replace, $explode);
         return $record;
     }
 
@@ -107,7 +121,6 @@ class Variable extends Core {
                     if($attribute === false){
                         $output = $input;
                     } else {
-//                         debug($attribute, 'attr');
                         $output = $this->data($attribute);
                         $output = Variable::value($output);
                     }
@@ -125,6 +138,9 @@ class Variable extends Core {
                         $value = $this->data($attribute);
                         $value = Variable::value($value);
                         $type = Variable::type($value);
+                        debug($value, 'val2ue'); //set this->Data(attribute,value);
+                        debug($attribute, 'attri2bute');
+                        debug($input, 'inp2ut');
                         if($output != null){
                             $output_type = Variable::type($output);
                         }

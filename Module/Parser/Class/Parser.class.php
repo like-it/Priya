@@ -62,7 +62,7 @@ class Parser extends Data {
 
         $parser = new Parse($this->handler(), $this->route(), $this->data());
 
-        $read = $parser->compile($read, $this->data());
+        $read = $parser->compile($read);
 
         debug($read, 'document');
         debug($parser->data());
