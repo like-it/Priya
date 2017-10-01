@@ -22,7 +22,7 @@ class Template extends Main {
         $url = $this->data('dir.priya.public') . 'Template/' .basename($this->request('url'), '.json') . '.tpl';
 
         $file = new File();
-        $data = $this->object_merge($this->data(), $this->request());
+        $data = Template::object_merge($this->data(), $this->request());
         $url = $this->parser('object')->compile($url, $data);
         $read =  $this->parser('object')->compile($file->read($url), $data);
         return $read;

@@ -269,9 +269,9 @@ class Result extends Parser {
         $route = $this->route();
         $smarty->assign('route', $this->object($route->data(), 'array'));
         if(get_class($route) == 'Priya\Module\Route'){
-            $error = $this->object_merge($error, $this->object_merge($this->object($this->error(), 'array'), $this->object($route->error(), 'array')));
+            $error = Result::object_merge($error, $this->object_merge($this->object($this->error(), 'array'), $this->object($route->error(), 'array')));
         } else {
-            $error = $this->object_merge($error, $this->object($this->error(), 'array'));
+            $error = Result::object_merge($error, $this->object($this->error(), 'array'));
         }
         $smarty->assign('error', $error);
         $message = array();
@@ -279,7 +279,7 @@ class Result extends Parser {
             $message = $session['message'];
             $this->session('delete', 'message');
         }
-        $message = $this->object_merge($message, $this->object($this->message(), 'array'));
+        $message = Result::object_merge($message, $this->object($this->message(), 'array'));
         $smarty->assign('message', $message);
         if(isset($data['contentType']) && isset($data['contentType'][$contentType]) && isset($data['contentType'][$contentType]['script'])){
             $smarty->assign('script', $data['contentType'][$contentType]['script']);

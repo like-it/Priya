@@ -8,7 +8,7 @@
  * 	-	all
  */
 
-function function_empty($argumentList=array(), $variable=null){
+function function_is_empty($argumentList=array(), $variable=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }

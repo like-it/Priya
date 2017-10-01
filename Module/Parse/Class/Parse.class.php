@@ -21,76 +21,111 @@ class Parse extends Core {
         if($data !== null){
             $this->handler($handler);
             $this->route($route);
-            $this->data($this->object_merge($this->data(), $data));
+            $this->data(Parse::object_merge($this->data(), $data));
         } else {
-            $this->data($this->object_merge($this->data(), $handler));
+            $this->data(Parse::object_merge($this->data(), $handler));
         }
     }
 
     public function compile($string, $data, $keep=false){
-        $random = $this->random();
-        if(empty($random)){
-            $random = Parse\Random::create();
-            while(stristr($string, $random) !== false){
-                $random = Parse\Random::create();
-            }
-            $this->random($random);
+        if(
+                is_null($string) ||
+                is_bool($string) ||
+                is_float($string) ||
+                is_int($string) ||
+                is_numeric($string)
+                ){
+                    return $string;
         }
-        $string = Parse\Newline::replace($string, $this->random());
+        if (is_array($string)){
+            foreach($string as $nr => $line){
+                $string[$nr] = $this->compile($line, $data, $keep);
+            }
+            return $string;
+        }
+        elseif(is_object($string)){
+            foreach ($string as $key => $value){
+                $string->{$key} = $this->compile($value, $data, $keep);
+            }
+            return $string;
+        } else {
+            $random = $this->random();
+            if(empty($random)){
+                $random = Parse\Random::create();
+                while(stristr($string, $random) !== false){
+                    $random = Parse\Random::create();
+                }
+                $this->random($random);
+            }
+            $string = Parse\Newline::replace($string, $this->random());
 
-        $tag = new Parse\Tag($string, $this->random());
-        $list = $tag->find();
+            $tag = new Parse\Tag($string, $this->random());
+            $list = $tag->find();
 
-        $assign = new Parse\Assign($data, $this->random(), $this);
-        $if = new Parse\Control_If($data, $this->random(), $this);
-        $variable = new Parse\Variable($data, $this->random());
-        $if_counter = 0;
+            $assign = new Parse\Assign($data, $this->random(), $this);
+            $if = new Parse\Control_If($data, $this->random(), $this);
+            $variable = new Parse\Variable($data, $this->random());
+            $method = new Parse\Method($data, $this->random());
+            $if_counter = 0;
 
-        $record = array();
-        $record['string'] = $string;
+            $record = array();
+            $record['string'] = $string;
 
-        while($if::has($list)){
-            foreach($list as $value){
-                $key = key($value);
-                if(substr($key, 0, 3) == '{if'){
+            while($if::has($list)){
+                foreach($list as $value){
+                    $key = key($value);
+                    if(substr($key, 0, 3) == '{if'){
+                        break;
+                    }
+                    $assign->find($key);
+                    $record['assign']['tag'] = $key;
+                    $record = Parse\Assign::row($record, $this->random());
+                    $variable->data($assign->data());
+                    $record['variable']['tag'] = $key;
+                    $record = $variable->find($record);
+                }
+                $if->data($assign->data());
+                $record = $if::create($list, $record['string'], $this->random());
+                $record = $if->statement($record);
+
+                $list = $tag->find($record['string']);
+                if($if_counter >= $if::MAX){
+                    debug('max reached in if::has');
                     break;
                 }
+                $if_counter++;
+            }
+            $assign->data($if->data());
+
+            foreach($list as $value){
+                $key = key($value);
                 $assign->find($key);
                 $record['assign']['tag'] = $key;
                 $record = Parse\Assign::row($record, $this->random());
                 $variable->data($assign->data());
                 $record['variable']['tag'] = $key;
                 $record = $variable->find($record);
+                $record['method']['tag'] = $key;
+//                 debug($key, 'key');
+                $record = $method->find($record, $variable, $this);
             }
-            $if->data($assign->data());
-            $record = $if::create($list, $record['string'], $this->random());
-            $record = $if->statement($record);
+            $this->data($assign->data());
+            $string = $record['string'];
 
-            $list = $tag->find($record['string']);
-            if($if_counter >= $if::MAX){
-                debug('max reached in if::has');
-                break;
+            if(is_string($string)){
+                $string = Parse\Token::restore_return($string, $this->random());
+                $string = Parse\Literal::restore($string, $this->random());
+                $string = Parse\Literal::remove($string);
+                return $string;
+            } else {
+                /**
+                 * do we need to parse the object ?
+                 * - variables
+                 * - methods
+                 * - literal
+                 */
+                return $string;
             }
-            $if_counter++;
         }
-        $assign->data($if->data());
-
-        foreach($list as $value){
-            $key = key($value);
-            $assign->find($key);
-            $record['assign']['tag'] = $key;
-            $record = Parse\Assign::row($record, $this->random());
-            $variable->data($assign->data());
-            $record['variable']['tag'] = $key;
-            $record = $variable->find($record);
-        }
-        $this->data($assign->data());
-        $string = $record['string'];
-        $string = Parse\Token::restore_return($string, $this->random());
-        $string = Parse\Literal::remove($string);
-        echo $string;
-        debug($this->data());
-        die('end parser tests');
-        return $string;
     }
 }

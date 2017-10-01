@@ -196,17 +196,25 @@ class Assign extends Core {
             //before create_object assign variable needed
             $create = Token::restore_return($value, $this->random());
             $original = $create;
+            $variable = new Variable($this->data(), $this->random());
             $create = Token::all($create);
-            $object = Token::create_object($create);
+            $object = Token::create_object($create, $variable, $this->parser());
             if(!empty($object)){
-                $variable = new Variable($this->data(), $this->random());
+                //allow variables defined in quotes = "{$var}{$var2}"
+                //but having curly_brackets in quotes is nicer.
+                //but having valid json in source is more importand
+                //so object.merge($var, $var2)
+                /**
+                 * if is object, the object needs to be parsed again
+                 *
+                 */
                 $object['value'] = $variable->replace($object['value']);
                 //is variable data changed?
                 $object = Token::cast($object);
                 $this->data($attribute, $object['value']);
                 return;
             }
-            $array = Token::create_array($create);
+            $array = Token::create_array($create, $variable);
             if(!empty($array)){
                 $variable = new Variable($this->data(), $this->random());
                 $array['value'] = $variable->replace($array['value']);
@@ -276,6 +284,7 @@ class Assign extends Core {
                 return;
             }
         }
+        return;
     }
 
     private function variable($string='', $type=null){

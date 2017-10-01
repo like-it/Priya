@@ -74,7 +74,7 @@ class Application extends Parser {
         if(file_exists($url)){
             $this->read($url);
         }
-        $this->data($this->object_merge($this->data(),$this->object($data)));
+        $this->data(Application::object_merge($this->data(),$this->object($data)));
         $this->cli();
         if(empty($this->data('dir.priya.root'))){
             $this->data('dir.priya.root',
@@ -222,7 +222,7 @@ class Application extends Parser {
                     $result = $file->read($url);
                     $object = new stdClass();
                     $object->url = $this->handler()->url();
-                    $object = $this->object_merge($object, $this->object($result));
+                    $object = Application::object_merge($object, $this->object($result));
                     $result = $this->object($object, 'json');
                 } else {
                     if($ext == 'js'){

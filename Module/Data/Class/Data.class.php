@@ -19,7 +19,7 @@ class Data extends Core {
     public $data;
 
     public function __construct($handler=null, $route=null, $data=null){
-        $this->data($this->object_merge($this->data(), $handler));
+        $this->data(Data::object_merge($this->data(), $handler));
     }
 
     public function data($attribute=null, $value=null, $type=null){
@@ -615,7 +615,7 @@ class Data extends Core {
                         if(empty($merge)){
                             $nodeList->{$jid} = $node;
                         } else {
-                            $nodeList->{$jid} = $this->object_merge($item, $node);
+                            $nodeList->{$jid} = Data::object_merge($item, $node);
                         }
                         break;
                     }

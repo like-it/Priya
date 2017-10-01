@@ -25,7 +25,6 @@ trait Object {
                 if($output == 'json'){
                     $data = json_encode($data);
                 }
-                debug($data);
                 return $data;
             }
             elseif($output == 'array') {
@@ -331,7 +330,7 @@ trait Object {
         return null;
     }
 
-    public function object_merge(){
+    public static function object_merge(){
         $objects = func_get_args();
         $main = array_shift($objects);
         if(empty($main) && !is_array($main)){
@@ -344,7 +343,7 @@ trait Object {
                         $main[$key] = $value;
                     } else {
                         if(is_array($value) && is_array($main[$key])){
-                            $main[$key] = $this->object_merge($main[$key], $value);
+                            $main[$key] = self::object_merge($main[$key], $value);
                         } else {
                             $main[$key] = $value;
                         }
@@ -357,7 +356,7 @@ trait Object {
                         $main->{$key} = $value;
                     } else {
                         if(is_object($value) && is_object($main->{$key})){
-                            $main->{$key} = $this->object_merge($main->{$key}, $value);
+                            $main->{$key} = self::object_merge($main->{$key}, $value);
                         } else {
                             $main->{$key} = $value;
                         }

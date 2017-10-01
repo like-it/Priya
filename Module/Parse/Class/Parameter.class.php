@@ -19,8 +19,6 @@ class Parameter extends Core {
         $count_object = 0;
         while(Parameter::has_object($parse)){
             $parse = Parameter::create_object($parse);
-            debug($parse);
-            die;
             if($count_object > Parameter::MAX_OBJECT){
                 break;
             }
@@ -104,19 +102,23 @@ class Parameter extends Core {
                     $json .= $record['value'];
                     continue;
                 }
-                //maybe change single quotes to double quotes (in value)
                 $record = Value::format_json($record);
-                $json .= $record['value'];
+                if($record['type'] == Token::TYPE_BOOLEAN){
+                    if(!empty($record['value'])){
+                        $json .= 'true';
+                    } else {
+                        $json .= 'false';
+                    }
+                } else {
+                    $json .= $record['value'];
+                }
                 unset($parse[$nr]);
             }
         }
         if(isset($key)){
             $item['type'] = Token::TYPE_OBJECT;
-            debug($json, 'json', true);
             $item['value'] = json_decode($json);
             $parse[$key] = $item;
-            debug($item, 'item');
-            die;
         }
         return $parse;
     }
@@ -189,8 +191,6 @@ class Parameter extends Core {
         if(isset($key)){
             $item['type'] = Token::TYPE_ARRAY;
             $item['value'] = $array;
-            debug($item);
-            die;
             $parse[$key] = $item;
         }
         return $parse;

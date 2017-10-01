@@ -30,19 +30,26 @@ class Value extends Core {
                 $record['value'] += 0;
             }
             elseif(is_bool($record['value'])){
-
-            } else {
+                //do nothing
+            }
+            elseif(is_null($record['value'])){
+                //do nothing
+            }else {
                 switch($record['value']){
                     case ':';
                     case '{';
                     case '}':
+                    case '[':
+                    case ']':
                     break;
                     default:
                         $record['value'] = '"' . $record['value'] . '"';
                     break;
                 }
             }
-
+            if(substr($record['value'], 0, 2) == '"{' && substr($record['value'], -2 ,2) == '}"'){
+                $record['value'] = substr($record['value'], 1, -1);
+            }
         }
         return $record;
     }

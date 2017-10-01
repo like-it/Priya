@@ -28,14 +28,30 @@ class Literal extends Core {
         );
     }
 
+    public static function restore($value='', $random=''){
+        $search = array(
+                '[' . $random .'][literal]',
+                '[' . $random .'][/literal]',
+                '[' . $random .'][curley_open]',
+                '[' . $random .'][curley_close]'
+        );
+        $replace = array(
+                Literal::OPEN,
+                Literal::CLOSE,
+                '{',
+                '}'
+        );
+        return str_replace($search, $replace, $value);
+    }
+
     public static function replace($value='', $random=''){
         $literal = Literal::get($value);
         while($literal != ''){
             $literal = Literal::get($value);
             $search = Literal::OPEN . $literal . Literal::CLOSE;
             $literal= str_replace(array('{', '}'), array(
-                    '[' . $random . '][bracket_open]',
-                    '[' . $random . '][bracket_close]'
+                    '[' . $random . '][curley_open]',
+                    '[' . $random . '][curley_close]'
 
             ), $literal);
             $replace = '[' . $random . '][literal]' . $literal . '[' . $random .'][/literal]';

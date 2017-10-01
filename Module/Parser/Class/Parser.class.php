@@ -26,9 +26,9 @@ class Parser extends Data {
         if($data !== null){
             $this->handler($handler);
             $this->route($route);
-            $this->data($this->object_merge($this->data(), $data));
+            $this->data(Parser::object_merge($this->data(), $data));
         } else {
-            $this->data($this->object_merge($this->data(), $handler));
+            $this->data(Parser::object_merge($this->data(), $handler));
         }
     }
 
@@ -57,10 +57,6 @@ class Parser extends Data {
             }
             $this->request($attribute, $decode);
         }
-        //$data = $this->object_merge($data, $this->request());
-        //$this->data($this->object_merge($data, $this->data())); // <-> ?
-
-
         $file = new File();
         $read = $file->read($this->data('dir.priya.public') . 'Template/Priya.tpl');
 
@@ -68,6 +64,7 @@ class Parser extends Data {
 
         $read = $parser->compile($read, $this->data());
 
+        debug($read, 'document');
         debug($parser->data());
 
         die('end parsing');

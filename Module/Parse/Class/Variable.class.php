@@ -65,6 +65,7 @@ class Variable extends Core {
         if(strpos($attribute, '=') !== false){
             return $record;
         }
+        debug($record, 'record in find');
         $explode = explode($record['variable']['tag'], $record['string'], 2);
         $record['string'] = implode($this->replace($attribute), $explode);
         return $record;
@@ -117,6 +118,7 @@ class Variable extends Core {
                 foreach ($list as $nr => $subList){
                     foreach ($subList as $search => $empty){
                         if(substr($search, 1, 1) != '$'){
+                            $output = $input;
                             continue;
                         }
                         $attribute = substr($search, 2, -1);
@@ -125,9 +127,6 @@ class Variable extends Core {
                         $type = Variable::type($value);
                         if($output != null){
                             $output_type = Variable::type($output);
-                        }
-                        if($attribute == 'omg3'){
-                            debug($value, 'omg3');
                         }
                         if($output === null){
                             if(in_array($type, array(
@@ -147,7 +146,7 @@ class Variable extends Core {
                             $record['type'] = $type;
                         } else {
                             if($type == Token::TYPE_OBJECT && $output_type == Token::TYPE_OBJECT){
-                                $output = $this->object_merge($output, $value);
+                                $output = Variable::object_merge($output, $value);
                                 continue;
                             }
                             elseif($type == Token::TYPE_ARRAY && $output_type == Token::TYPE_ARRAY){
@@ -175,13 +174,7 @@ class Variable extends Core {
                         }
                     }
                 }
-//                 debug($output, 'output');
-//                 debug($list, 'list');
-//                 debug($input, 'input in replace');
-//                 debug($output);
             }
-//             debug($output);
-//             debug(debug_backtrace(true));
             return $output;
         }
     }

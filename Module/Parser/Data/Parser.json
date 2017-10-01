@@ -8,9 +8,11 @@
 "start" : 3.232,
 "var" : "{$start}",
 "test" : "{$start}",
-"entity_decode" : {
-    "html" : "html",
-    "script" : "script",
-    "link" : "link"
+"entity" : {
+    "decode" : {
+        "html" : "html",
+        "script" : "script",
+        "link" : "link"
+    }
 }
 }

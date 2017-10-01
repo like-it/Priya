@@ -76,7 +76,7 @@ class Memory extends Data{
         $object->host = Memory::DEFAULT_HOST;
         $object->port = Memory::DEFAULT_PORT;
         $object->weight = Memory::DEFAULT_WEIGHT;
-        $object = $this->object_merge($object, $server);
+        $object = Memory::object_merge($object, $server);
         return $object;
     }
 
