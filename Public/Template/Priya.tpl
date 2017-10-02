@@ -4,8 +4,11 @@ _______________________________________________________________________________
 rename $in2ng to $this (cant be done...)
 
 {$tostring = {
-    what : "wate3r",
-    __tostring : "{$tostring.what} {$start}"
+    "what" :
+      {
+      "test": "{Is.object($entity)}"
+      },
+    "__tostring" : "{$tostring.what.test} {$start}"
 }}
 
 {$i2ng = {

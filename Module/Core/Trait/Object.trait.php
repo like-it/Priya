@@ -40,10 +40,20 @@ trait Object {
             $input = trim($input);
             if($output=='object'){
                 if(substr($input,0,1)=='{' && substr($input,-1,1)=='}'){
-                    return json_decode($input);
+                    $json = json_decode($input);
+                    if(json_last_error()){
+                        debug(json_last_error(), 'json error');
+                        debug(json_last_error_msg(), 'message');
+                    }
+                    return $json;
                 }
                 elseif(substr($input,0,1)=='[' && substr($input,-1,1)==']'){
-                    return json_decode($input);
+                    $json = json_decode($input);
+                    if(json_last_error()){
+                        debug(json_last_error(), 'json error');
+                        debug(json_last_error_msg(), 'message');
+                    }
+                    return $json;
                 }
             }
             elseif(stristr($output, 'json') !== false){

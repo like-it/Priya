@@ -820,6 +820,9 @@ class Token extends Core {
                         $token[1] = $variable->replace($token[1]);
                     }
                 }
+                if($token[2] == 'T_COMMA'){
+                    $is_variable = false;
+                }
                 if(is_object($token[1]) || is_array($token[1])){
                     $string .= json_encode($token[1]);
                     //pre-check if method then dont come here...
