@@ -10,6 +10,7 @@ _______________________________________________________________________________
     __tostring : "{$tostring.what.test} wow {$start}"
 }}
 {$tostring}
+{is.object($entity)}
 
 {$qwer =  $start}
 {$qwe =  !! $start}
