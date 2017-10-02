@@ -4,8 +4,8 @@ _______________________________________________________________________________
 {$tostring = {
     "what" :
       {
-      "is" : no,
-      boolean : "{is.object($entity)}",
+      "is" : { yes:no},
+      boolean : "{is.object($tostring.what.is)}",
       "test": "{Is.object($tostring.what.is)}"
       },
     __tostring : "{$tostring.what.test} wow {$start}"
