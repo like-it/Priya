@@ -1,20 +1,22 @@
 Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
-rename $in=2ng to $this
+rename $in2ng to $this (cant be done...)
+
+{$tostring = {
+    what : "wate3r",
+    __tostring : "{$tostring.what} {$start}"
+}}
+
 {$i2ng = {
     what : "wate2r",
     "what2" : "{$i2ng.what}"
 }}
 
-
-{$tostring = {
-    what : "wate3r",
-    __tostring : "{$tostring.what} {$what} {$start}"
-}}
+add parent to create_object_token to get to this replace this with parent
 {$tostring}
 
-
+{$i2ng}(object)
 
 {$qwer =  $start}
 {$qwe =  !! $start}

@@ -121,6 +121,11 @@ class Variable extends Core {
                     if($attribute === false){
                         $output = $input;
                     } else {
+                        if($attribute == 'this.what'){
+                            debug($input);
+//                             debug(debug_backtrace(true));
+                            die;
+                        }
                         $output = $this->data($attribute);
                         $output = Variable::value($output);
                     }

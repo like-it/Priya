@@ -255,7 +255,7 @@ class Token extends Core {
                 $record['type'] = Token::TYPE_OBJECT;
                 if(is_array($value)){
                     $parse = Token::parse($value);
-                    $parse = Token::variable($parse, $variable);
+                    $parse = Token::variable($parse, $variable, $attribute);
                     //if is_object($parse... assign the attributes
                     $parse = Token::method($parse, $variable, $parser);
                     $value = Token::string($value, $variable);
@@ -266,6 +266,7 @@ class Token extends Core {
                 } else {
                     $record['value'] = $value;
                 }
+                $record['attribute'] = $attribute;
                 $record['original'] = $record['value'];
                 $record['token'] = $tokens;
                 $record['value'] = Token::object($record['value']);
@@ -397,7 +398,7 @@ class Token extends Core {
         return $record;
     }
 
-    public static function variable($parse=array(), Variable $variable){
+    public static function variable($parse=array(), Variable $variable, $attribute=null){
         $item = array();
         $key = null;
         $unset = array();
@@ -428,6 +429,9 @@ class Token extends Core {
             elseif(empty($item)) {
                 $record['has_exclamation'] = $has_exclamation;
                 $record['exclamation_count'] = $exclamation_count;
+                if($attribute !== null){
+                    $record['value'] = str_replace('$this.', '$' . $attribute . '.', $record['value']);
+                }
                 $record['value'] = $variable->replace($record['value']);
                 if($record['exclamation_count'] % 2 == 1){
                     $record['invert'] = true;
@@ -459,6 +463,9 @@ class Token extends Core {
                 ){
                     $item['has_exclamation'] = $has_exclamation;
                     $item['exclamation_count'] = $exclamation_count;
+                    if($attribute !== null){
+                        $item['value'] = str_replace('$this.', '$' . $attribute . '.', $item['value']);
+                    }
                     if($item['exclamation_count'] % 2 == 1){
                         $item['invert'] = true;
                     } else {
@@ -487,6 +494,10 @@ class Token extends Core {
         if(!empty($item)){
             $item['has_exclamation'] = $has_exclamation;
             $item['exclamation_count'] = $exclamation_count;
+            if($attribute !== null){
+                $item['value'] = str_replace('$this.', '$' . $attribute . '.', $item['value']);
+                debug($item, 'here');
+            }
             if($item['exclamation_count'] % 2 == 1){
                 $item['invert'] = true;
             } else {

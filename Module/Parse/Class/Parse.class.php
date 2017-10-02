@@ -63,16 +63,6 @@ class Parse extends Core {
             $list = $tag->find();
 
             $data = $this->data();
-
-            if(key(reset($list)) == '{$ing.what}'){
-
-                debug($this->data(), 'in this????');
-                debug($data, 'data');
-                die;
-            }
-            //$data should be $this->data();
-
-
             $assign = new Parse\Assign($data, $this->random(), $this);
             $if = new Parse\Control_If($data, $this->random(), $this);
             $variable = new Parse\Variable($data, $this->random());
@@ -96,6 +86,7 @@ class Parse extends Core {
                     $variable->data($assign->data());
                     $record['variable']['tag'] = $key;
                     $record = $variable->find($record);
+                    //add method
                 }
                 $if->data($assign->data());
                 $record = $if::create($list, $record['string'], $this->random());
@@ -119,6 +110,7 @@ class Parse extends Core {
 
                 $variable->data($assign->data());
                 $record['variable']['tag'] = $key;
+                //need parent
                 $record = $variable->find($record);
 
                 $method->data($variable->data());

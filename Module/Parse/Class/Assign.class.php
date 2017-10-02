@@ -228,7 +228,7 @@ class Assign extends Core {
             //an equation can be a variable, if it is undefined it will be + 0
 
             $parse = Token::parse($create);
-            $parse = Token::variable($parse, $variable);
+            $parse = Token::variable($parse, $variable, $attribute);
             $parse = Token::method($parse, $variable, $this->parser());
             $math = Token::create_equation($parse);
             if($math !== null){
