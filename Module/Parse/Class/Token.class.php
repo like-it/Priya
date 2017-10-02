@@ -674,6 +674,15 @@ class Token extends Core {
 
     public static function cast($record=array(), $attribute='value'){
         if(empty($record['is_cast'])){
+            if($record[$attribute] === 'true'){
+                $record[$attribute] = true;
+            }
+            elseif($record[$attribute] === 'false'){
+                $record[$attribute] = false;
+            }
+            elseif($record[$attribute] === 'null'){
+                $record[$attribute] = null;
+            }
             return $record;
         }
         switch ($record['cast']){
@@ -854,6 +863,18 @@ class Token extends Core {
         }
         if(is_string($string)){
             $string = str_replace('""', '', $string);
+            if(
+                strpos($string, '{"') !== false &&
+                strpos($string, '"(') !== false
+            ){
+                $explode = explode('{"', $string, 2);
+                $string = implode('{', $explode);
+                $explode = explode('"."', $string);
+                $string = implode('.', $explode);
+                $explode = explode('"(', $string, 2);
+                $string = implode('(', $explode);
+                debug($string, 'string');
+            }
         }
         return $string;
     }
@@ -998,6 +1019,12 @@ class Token extends Core {
             $method= Token::cast($method);
             $method['type'] = Token::TYPE_METHOD;
             $parse = array();
+            if($method === 'true'){
+                $method = true;
+            }
+            elseif($method === 'false'){
+                $method = false;
+            }
             $parse[] = $method;
         }
         return $parse;

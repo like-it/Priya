@@ -116,12 +116,22 @@ class Variable extends Core {
                 $replace = 'false';
             }
         }
-        $item = array(
-
-        );
+        elseif(is_null($replace)){
+            $replace = 'null';
+        }
+        $item = array();
         $item = $record;
         $item['replace'] = $replace;
         $item = Token::cast($item, 'replace');
+        if($item['replace'] === true){
+            $item['replace'] = 'true';
+        }
+        elseif($item['replace'] === false){
+            $item['replace'] = 'false';
+        }
+        elseif($item['replace'] === null){
+            $item['replace'] = 'null';
+        }
         $record['string'] = implode($item['replace'], $explode);
         unset($record['cast']);
         unset($record['is_cast']);
