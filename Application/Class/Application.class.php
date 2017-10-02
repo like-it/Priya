@@ -41,7 +41,7 @@ class Application extends Parser {
     public function __construct($autoload=null, $data=null){
         $this->cwd(getcwd());
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
-        set_error_handler(array('Priya\Module\Core','handler_error'));
+//         set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->data('time.start', microtime(true));
         $this->data('priya.environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());

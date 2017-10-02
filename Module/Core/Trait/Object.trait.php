@@ -42,16 +42,16 @@ trait Object {
                 if(substr($input,0,1)=='{' && substr($input,-1,1)=='}'){
                     $json = json_decode($input);
                     if(json_last_error()){
-                        debug(json_last_error(), 'json error');
-                        debug(json_last_error_msg(), 'message');
+                        debug($input, 'input');
+                        trigger_error(json_last_error_msg(), E_USER_ERROR);
                     }
                     return $json;
                 }
                 elseif(substr($input,0,1)=='[' && substr($input,-1,1)==']'){
                     $json = json_decode($input);
                     if(json_last_error()){
-                        debug(json_last_error(), 'json error');
-                        debug(json_last_error_msg(), 'message');
+                        debug($input, 'input');
+                        trigger_error(json_last_error_msg(), E_USER_ERROR);
                     }
                     return $json;
                 }

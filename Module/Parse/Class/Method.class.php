@@ -159,8 +159,6 @@ class Method extends Core {
         $name = 'function_' . str_replace('.', '_', strtolower($function['method']));
         if(file_exists($url)){
             require_once $url;
-        } else {
-            debug($url . ' not found');
         }
         if(function_exists($name)){
             $argument = array();
@@ -185,7 +183,8 @@ class Method extends Core {
                 }
             }
         } else {
-            debug('function (' . $name . ') not exists');
+            trigger_error('function (' . $name . ') not exists', E_USER_ERROR);
+            die;
         }
         return $function;
     }

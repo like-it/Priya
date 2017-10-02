@@ -6,7 +6,7 @@ rename $in2ng to $this (cant be done...)
 {$tostring = {
     "what" :
       {
-      "test": "{Is.object($entity)}"
+      "test": "{Is.object({tada: "yses", var: $entity.decode.html})}"
       },
     "__tostring" : "{$tostring.what.test} {$start}"
 }}

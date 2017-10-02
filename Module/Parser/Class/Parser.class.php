@@ -39,7 +39,7 @@ class Parser extends Data {
         foreach($allowed as $key => $allow){
             $data = $this->object_set($key, $this->data($allow), $data, 'root');
         }
-        $list = $this->data('entity_decode');
+        $list = $this->data('entity.decode');
         foreach($list as $target => $attribute){
             $decode = $this->request($attribute);
             if(is_array($decode) || is_object($decode)){
@@ -236,6 +236,9 @@ class Parser extends Data {
     private function capture($string=''){
         $append = $this->data('capture.append');
 //         $this->debug($append);
+        if(!is_array($append)){
+            return $string;
+        }
         foreach($append as $capture){
             $string = function_capture_append($string, $capture, $this);
         }

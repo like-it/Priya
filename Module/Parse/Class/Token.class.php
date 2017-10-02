@@ -834,6 +834,9 @@ class Token extends Core {
                 $string .= 'null';
             }
         }
+        if(is_string($string)){
+            $string = str_replace('""', '', $string);
+        }
         return $string;
     }
 
@@ -884,6 +887,7 @@ class Token extends Core {
             case 'T_BOOLEAN_OR'; 	//might need a different one
                 return  Token::TYPE_OPERATOR;
             break;
+            case 'T_VAR' :
             case 'T_VARIABLE' :
                 return Token::TYPE_VARIABLE;
             break;
