@@ -57,12 +57,40 @@ class Variable extends Core {
 
     public function find($record=array()){
         $attribute = substr($record['variable']['tag'], 1, -1);
+        $tokens = Token::all($attribute);
+        foreach($tokens as $nr => $token){
+            if(!isset($record['is_cast'])){
+                $record['is_cast'] = Token::is_cast($token);
+                if($record['is_cast'] === true){
+                    $record['cast'] = Token::type(Token::get($token));
+                }
+            }
+        }
+        if(
+            !empty($record['is_cast']) &&
+            (
+                $record['cast'] == 'boolean' ||
+                $record['cast'] == 'bool'
+            )
+        ){
+            $attribute = ltrim(str_replace('(bool)', '', $attribute), ' ');
+//             $temp = explode('(bool)', $record['string'], 2);
+//             $record['string'] = imlode('', $temp);
+        }
+        elseif(!empty($record['is_cast']) && !empty($record['cast'])){
+            $attribute = ltrim(str_replace('(' . $record['cast'] . ')', '', $attribute), ' ');
+//             $temp = explode('(' . $record['cast'] . ')', $record['string'], 2);
+//             $record['string'] = implode('', $temp);
+        }
         if(substr($attribute,0, 1) != '$'){
+            //cast record string
             return $record;
         }
         $modifier_list = explode('|', $attribute);
         $attribute = array_shift($modifier_list);
         if(strpos($attribute, '=') !== false){
+            unset($record['cast']);
+            unset($record['is_cast']);
             return $record;
         }
         $explode = explode($record['variable']['tag'], $record['string'], 2);
@@ -81,7 +109,22 @@ class Variable extends Core {
         elseif(is_array($replace)){
             $replace = ''; //(array) ?
         }
-        $record['string'] = implode($replace, $explode);
+        elseif(is_bool($replace)){
+            if($replace === true){
+                $replace = 'true';
+            } else {
+                $replace = 'false';
+            }
+        }
+        $item = array(
+
+        );
+        $item = $record;
+        $item['replace'] = $replace;
+        $item = Token::cast($item, 'replace');
+        $record['string'] = implode($item['replace'], $explode);
+        unset($record['cast']);
+        unset($record['is_cast']);
         return $record;
     }
 

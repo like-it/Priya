@@ -187,7 +187,7 @@ class Control_If extends Core {
         return $record;
     }
 
-    public function statement($record=array()){
+    public function statement($record=array(), $parser=null){
         $create = Token::restore_return($record['if']['statement'], $this->random());
         $create = str_replace('{if ', '', substr($create, 0, -1));
         $variable = new Variable($this->data(), $this->random());
@@ -195,7 +195,7 @@ class Control_If extends Core {
         // an equeation can have functions.
         $parse = Token::parse($create);
         $parse = Token::variable($parse, $variable);
-        $math = Token::create_equation($parse);
+        $math = Token::create_equation($parse, $variable, $parser);
         $record = Control_If::execute($record, $math, $this->random());	//rename to execute...
         return $record;
     }

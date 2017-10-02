@@ -186,6 +186,13 @@ class Method extends Core {
             trigger_error('function (' . $name . ') not exists', E_USER_ERROR);
             die;
         }
+        if(is_bool($function['value'])){
+            if($function['value'] === true){
+                $function['value'] = 'true';
+            } else {
+                $function['value'] = 'false';
+            }
+        }
         return $function;
     }
 

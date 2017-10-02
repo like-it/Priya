@@ -164,7 +164,7 @@ class Operator extends Core {
         return $operator;
     }
 
-    public static function statement($statement=array()){
+    public static function statement($statement=array(), Variable $variable, $parser=null){
         //add original
         $left = array();
         $right = array();
@@ -196,10 +196,11 @@ class Operator extends Core {
             }
         }
         $operator['left_parse'] = $left;
+        $operator['left_parse'] = Token::method($left, $variable, $parser);
+        /*
+         * add method parse to left & right
+         */
         $operator['right_parse'] = $right;
-        if(count($operator['left_parse']) > 1){
-            debug($operator, 'left parse > 1');
-        }
         if(count($operator['right_parse']) > 1){
             if(count($operator['right_parse'] == 2 && count($operator['left_parse']) == 1)){
                 $wrong_value = array_shift($operator['left_parse']);

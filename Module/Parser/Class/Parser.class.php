@@ -61,9 +61,10 @@ class Parser extends Data {
         $read = $file->read($this->data('dir.priya.public') . 'Template/Priya.tpl');
 
         $parser = new Parse($this->handler(), $this->route(), $this->data());
-
+        $original = $read;
         $read = $parser->compile($read);
 
+        debug($original, 'original');
         debug($read, 'document');
         debug($parser->data());
 

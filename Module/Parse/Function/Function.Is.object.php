@@ -13,7 +13,5 @@ function function_is_object($argumentList=array(), $parser=null){
         $argumentList = (array) $argumentList;
     }
     $object = array_shift($argumentList);
-    debug($object, 'object');
-    die;
     return is_object($object);
 }

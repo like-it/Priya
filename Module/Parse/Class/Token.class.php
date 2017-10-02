@@ -522,7 +522,7 @@ class Token extends Core {
      * @todo
      * - add cast
      */
-    public static function create_equation($parse=null){
+    public static function create_equation($parse=null, Variable $variable, $parser=null){
         $set_counter = 0;
 
         if(Operator::has($parse) === false){
@@ -535,7 +535,7 @@ class Token extends Core {
             $operator_counter = 0;
             while (Operator::has($statement)){
                 $operator_counter++;
-                $statement = Operator::statement($statement);
+                $statement = Operator::statement($statement, $variable, $parser);
                 if($operator_counter > Operator::MAX){
                     break;
                 }
@@ -550,7 +550,7 @@ class Token extends Core {
         $operator_counter = 0;
         while (Operator::has($parse)){
             $operator_counter++;
-            $parse = Operator::statement($parse);
+            $parse = Operator::statement($parse, $variable, $parser);
             if($operator_counter >= Operator::MAX){
                 break;
             }
@@ -698,6 +698,12 @@ class Token extends Core {
                 elseif(is_array($record[$attribute]) || is_object($record[$attribute])){
                     $record[$attribute] = 0;
                 } else {
+                    if($record[$attribute] === 'false'){
+                        $record[$attribute] = 0;
+                    }
+                    if($record[$attribute] === 'true'){
+                        $record[$attribute] = 1;
+                    }
                     $record[$attribute] = (int) round($record[$attribute] + 0);
                 }
                 $record['is_cast'] = false;
@@ -711,6 +717,12 @@ class Token extends Core {
                 }elseif(is_array($record[$attribute]) || is_object($record[$attribute])){
                     $record[$attribute] = 0.0;
                 } else {
+                    if($record[$attribute] == 'false'){
+                        $record[$attribute] = 0;
+                    }
+                    if($record[$attribute] == 'true'){
+                        $record[$attribute] = 1;
+                    }
                     $record[$attribute] = floatval($record[$attribute]);
                 }
                 $record['is_cast'] = false;
@@ -719,6 +731,12 @@ class Token extends Core {
                 return $record;
                 break;
             case Token::TYPE_BOOLEAN:
+                if($record[$attribute] == 'false'){
+                    $record[$attribute] = 0;
+                }
+                if($record[$attribute] == 'true'){
+                    $record[$attribute] = 1;
+                }
                 if(!empty($record[$attribute])){
                     $record[$attribute] =  true;
                 } else {
