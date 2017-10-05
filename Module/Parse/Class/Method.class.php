@@ -14,9 +14,10 @@ class Method extends Core {
     public function find($record=array(), Variable $variable, \Priya\Module\Parse $parser){
         $method = substr($record['method']['tag'], 1, -1);
         $parse = Token::parse($method);
-        $parse = Token::method($parse, $variable, $parser);
-        if($parse[0]['type'] == Token::TYPE_METHOD){
-            $method = $parse[0];
+        $record['parse'] = $parse;
+        $record = Token::method($record, $variable, $parser);
+        if($record['parse'][0]['type'] == Token::TYPE_METHOD){
+            $method = $record['parse'][0];
         } else {
             return $record;
         }
@@ -52,7 +53,7 @@ class Method extends Core {
         return $record;
     }
 
-    public static function get($parse=array(), Variable $variable){
+    public static function get($parse=array(), Variable $variable, $parser=null, $depth=0){
         $has_string = false;
         $is_method = false;
         $requirement = false;
@@ -91,7 +92,7 @@ class Method extends Core {
             if(
                 $record['type'] == Token::TYPE_PARENTHESE &&
                 $record['value'] == '(' &&
-                $record['set']['depth'] == 1 &&
+                $record['set']['depth'] == $depth + 1 &&
                 $has_string === true
             ){
                 $requirement = true;
@@ -103,17 +104,19 @@ class Method extends Core {
                 !(
                     $record['type'] === Token::TYPE_PARENTHESE &&
                     $record['value'] === ')' &&
-                    $record['set']['depth'] === 1
+                    $record['set']['depth'] == $depth + 1
                 )
             ){
                 $parameter[] = $record;
-                $result['value'] .= $record['value'];
+                if($record['type'] != Token::TYPE_DOT){
+                    $result['value'] .= $record['value'];
+                }
                 continue;
             }
             if(
                 $record['type'] == Token::TYPE_PARENTHESE &&
                 $record['value'] == ')' &&
-                $record['set']['depth'] == 1 &&
+                $record['set']['depth'] == $depth + 1 &&
                 $requirement === true
               ){
                 $result['value'] .= $record['value'];
@@ -137,6 +140,7 @@ class Method extends Core {
         if($is_method){
             $result['type'] = Token::TYPE_METHOD;
             $result['parameter'] = Parameter::get($parameter, $variable);
+//             $result['parameter'] = Token::method($result['parameter'], $variable, $parser, 1);
             $count = substr_count($result['method'], '!');
             if($count > 0){
                 $result['has_exclamation'] = true;
@@ -169,8 +173,9 @@ class Method extends Core {
                     }
                 }
             }
-            $function['execute'] = $name($argument, $parser);
+            $function = $name($function, $argument, $parser);
             $function['value'] = $function['execute'];
+
             if($function['has_exclamation'] === true){
                 if($function['invert'] === true){
                     if(empty($function['value'])){

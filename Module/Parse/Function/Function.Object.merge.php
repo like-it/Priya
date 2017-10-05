@@ -8,7 +8,7 @@
  * 	-	all
  */
 
-function function_object_merge($argumentList=array(), $parser=null){
+function function_object_merge($function=array(), $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
@@ -16,5 +16,6 @@ function function_object_merge($argumentList=array(), $parser=null){
     foreach($argumentList as $argument){
         $object = $parser::object_merge($object, $argument);
     }
-    return $object;
+    $function['execute'] = $object;
+    return $function;
 }

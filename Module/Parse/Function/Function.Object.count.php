@@ -8,10 +8,11 @@
  * 	-	all
  */
 
-function function_object_count($argumentList=array(), $parser=null){
+function function_object_count($function=array(), $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
     $object = array_shift($argumentList);
-    return count(get_object_vars($object));
+    $function['execute'] = count(get_object_vars($object));
+    return $function;
 }

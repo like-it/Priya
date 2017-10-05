@@ -229,7 +229,10 @@ class Assign extends Core {
 
             $parse = Token::parse($create);
             $parse = Token::variable($parse, $variable, $attribute);
-            $parse = Token::method($parse, $variable, $this->parser());
+            $method = array();
+            $method['parse'] = $parse;
+            $method = Token::method($method, $variable, $this->parser());
+            $parse = $method['parse'];
             $math = Token::create_equation($parse, $variable, $this->parser());
             if($math !== null){
                 $this->data($attribute, $math);

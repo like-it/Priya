@@ -40,6 +40,17 @@ trait Object {
             $input = trim($input);
             if($output=='object'){
                 if(substr($input,0,1)=='{' && substr($input,-1,1)=='}'){
+                    $input = str_replace(
+                        array(
+                            "\r",
+                            "\n"
+                        ),
+                        array(
+                            '',
+                            ''
+                        ),
+                        $input
+                    );
                     $json = json_decode($input);
                     if(json_last_error()){
                         debug($input, 'input');
@@ -48,6 +59,17 @@ trait Object {
                     return $json;
                 }
                 elseif(substr($input,0,1)=='[' && substr($input,-1,1)==']'){
+                    $input = str_replace(
+                        array(
+                            "\r",
+                            "\n"
+                        ),
+                        array(
+                            '',
+                            ''
+                        ),
+                        $input
+                    );
                     $json = json_decode($input);
                     if(json_last_error()){
                         debug($input, 'input');

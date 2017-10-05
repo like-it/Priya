@@ -8,7 +8,7 @@
  * 	-	all
  */
 
-function function_is_empty($argumentList=array(), $variable=null){
+function function_is_empty($function=array(), $argumentList=array(), $variable=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
@@ -28,5 +28,6 @@ function function_is_empty($argumentList=array(), $variable=null){
             unset($list[$nr]);
         }
     }
-    return empty($list);
+    $function['execute']  = empty($list);
+    return $function;
 }

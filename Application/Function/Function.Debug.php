@@ -20,19 +20,28 @@ function debug($debug=null, $title=null, $is_export=false){
         echo '<li class="file" title="File: ' . $trace[0]['file'] . '"><span class="title">File:</span><span class="value">'. $trace[0]['file'] .'</span></li>';
         echo '<li class="line" title="Line: ' . $trace[0]['line'] . '"><span class="title">Line:</span><span class="value">'. $trace[0]['line'] .'</span></li>';
         echo '<li class="argument-list"><ul>';
-        foreach($trace[1]['args'][0] as $nr => $argument){
-            echo '<li class="argument">' . json_encode($argument, JSON_PRETTY_PRINT) . '</li>';
+        /*
+        if(isset($trace[1]) && isset($trace[1]['args']) && isset($trace[1]['args'][0])){
+            if(is_array($trace[1]['args'][0])){
+                foreach($trace[1]['args'][0] as $nr => $argument){
+                    echo '<li class="argument">' . json_encode($argument, JSON_PRETTY_PRINT) . '</li>';
+                }
+            } else {
+//                 echo '<li class="argument">' . json_encode($trace[1]['args'][0], JSON_PRETTY_PRINT) . '</li>';
+            }
         }
+        */
         echo '</ul></li>';
         echo '</ul>';
         echo '</div>';
         echo '<div class="body">';
         if(!empty($is_export)){
             var_export($debug);
+
         } else {
             var_dump($debug);
         }
-
+        echo '<hr>';
         echo '</div>';
         echo '</section>';
     }

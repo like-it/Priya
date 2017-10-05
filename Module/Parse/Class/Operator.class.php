@@ -196,11 +196,16 @@ class Operator extends Core {
             }
         }
         $operator['left_parse'] = $left;
-        $operator['left_parse'] = Token::method($left, $variable, $parser);
-        /*
-         * add method parse to left & right
-         */
-        $operator['right_parse'] = $right;
+        $method = array();
+        $method['parse'] = $left;
+        $method = Token::method($method, $variable, $parser);
+        $operator['left_parse'] = $method['parse'];
+
+        $method = array();
+        $method['parse'] = $right;
+        $method = Token::method($method, $variable, $parser);
+        $operator['right_parse'] = $method['parse'];
+
         if(count($operator['right_parse']) > 1){
             if(count($operator['right_parse'] == 2 && count($operator['left_parse']) == 1)){
                 $wrong_value = array_shift($operator['left_parse']);

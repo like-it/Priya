@@ -17,6 +17,7 @@ class Token extends Core {
     const TYPE_OPERATOR = 'operator';
     const TYPE_DOT = 'dot';
     const TYPE_COLON = 'colon';
+    const TYPE_SEMI_COLON = 'semi-colon';
     const TYPE_COMMA = 'comma';
     const TYPE_MIXED = 'mixed';
     const TYPE_WHITESPACE = 'whitespace';
@@ -257,7 +258,10 @@ class Token extends Core {
                     $parse = Token::parse($value);
                     $parse = Token::variable($parse, $variable, $attribute);
                     //if is_object($parse... assign the attributes
-                    $parse = Token::method($parse, $variable, $parser);
+                    $method = array();
+                    $method['parse'] = $parse;
+                    $method = Token::method($method, $variable, $parser);
+                    $parse = $method['parse'];
                     $value = Token::string($value, $variable);
                 }
                 if($record['is_cast'] === true){
@@ -959,6 +963,8 @@ class Token extends Core {
             case 'T_COLON' :
                 return Token::TYPE_COLON;
             break;
+            case 'T_SEMI_COLON' :
+                return Token::TYPE_SEMI_COLON;
             case 'T_EXCLAMATION' :
                 return Token::TYPE_EXCLAMATION;
             break;
@@ -1009,13 +1015,15 @@ class Token extends Core {
         return $value;
     }
 
-    public static function method($parse=array(), Variable $variable, $parser=null){
-        $method = Method::get($parse, $variable);
+    public static function method($record=array(), Variable $variable, $parser=null, $depth=0){
+        $method = Method::get($record['parse'], $variable, $parser, $depth);
         if($method === false){
-            return $parse;
+            return $record;;
         }
         if($method['type'] == Token::TYPE_METHOD){
-            $method= Method::execute($method, 	$parser);
+            $method['string'] = $record['string'];
+            $method= Method::execute($method, $parser);
+            $record['string'] = $method['string'];
             $method= Token::cast($method);
             $method['type'] = Token::TYPE_METHOD;
             $parse = array();
@@ -1027,7 +1035,8 @@ class Token extends Core {
             }
             $parse[] = $method;
         }
-        return $parse;
+        $record['parse'] = $parse;
+        return $record;
     }
 }
 

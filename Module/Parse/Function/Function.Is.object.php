@@ -8,10 +8,11 @@
  * 	-	all
  */
 
-function function_is_object($argumentList=array(), $parser=null){
+function function_is_object($function=array(), $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
     $object = array_shift($argumentList);
-    return is_object($object);
+    $function['execute'] = is_object($object);
+    return $function;
 }
