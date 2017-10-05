@@ -34,7 +34,7 @@ function function_capture_append($function=array(), $argumentList=array(), $pars
                 $array = array();
             }
             $tmp[1] = $parser->compile($tmp[1], $parser->data());
-            $array[] = $tmp[1];
+            $array[] = trim($tmp[1]);
             $parser->data($attribute, $array);
             $search = '{capture.append' . $string . '{/capture}';
             $string_length = strlen($value);
@@ -56,6 +56,7 @@ function function_capture_append($function=array(), $argumentList=array(), $pars
                 $value = implode("\n", $var);
                 $value= Newline::replace($value, $parser->random());
             }
+            break;
         }
     }
     $function['string'] = $value;

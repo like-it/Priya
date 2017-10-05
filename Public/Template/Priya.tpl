@@ -15,13 +15,20 @@ _______________________________________________________________________________
         console.log('yeah');
     }
 </script>{/literal}{/Capture}
-{Capture.append('script')}{literal}<script type="text/javascript">
+{Capture.append('script')}
+{literal}
+<script type="text/javascript">
     console.log('test2');
     console.log('{/literal}{$priya.built}{literal}');
     if(1 == 1){
         console.log('whoohoo');
     }
-</script>{/literal}{/Capture}
+</script>
+{/literal}
+{/Capture}
+{Capture.append('link')}
+<link rel="stylesheet" href="{/literal}{$web.root}{literal}Priya/Public/Css/Main.css?{/literal}{$revision}">
+{/Capture}
 {$tostring = {
     "what" :
       {
