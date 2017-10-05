@@ -27,7 +27,7 @@ _______________________________________________________________________________
 {/literal}
 {/Capture}
 {Capture.append('link')}
-<link rel="stylesheet" href="{/literal}{$web.root}{literal}Priya/Public/Css/Main.css?{/literal}{$revision}">
+<link rel="stylesheet" href="{$web.root}Priya/Public/Css/Main.css?{$priya.version}">
 {/Capture}
 {$tostring = {
     "what" :
