@@ -5,6 +5,7 @@ namespace Priya\Module\Parse;
 use Priya\Module\Core\Object;
 
 class Method extends Core {
+    const MAX = 1024;
 
     public function __construct($data=null, $random=null){
         $this->data($data);
@@ -59,10 +60,27 @@ class Method extends Core {
         $requirement = false;
         $parameter = array();
         $result = array();
+        $list = array();
         foreach($parse as $record){
+            if(!isset($record['type'])){
+                debug($parse);
+                debug($record, 'type');
+                die;
+            }
             if($record['type'] == Token::TYPE_WHITESPACE){
+                $list[] = $record;
                 continue;
             }
+            if($record['type'] == Token::TYPE_OPERATOR){
+                $list[] = $record;
+                continue;
+            }
+            /*
+            if($record['type'] == Token::TYPE_WHITESPACE){
+                $list[] = $record;
+                continue;
+            }
+            */
             if(empty($result)){
                 $result = $record;
                 $result['method'] = '';
@@ -70,6 +88,7 @@ class Method extends Core {
             }
             if($record['type'] == Token::TYPE_DOT){
                 $result['value'] .= $record['value'];
+                $list[] = $record;
             }
             if(
                 $record['type'] == Token::TYPE_STRING &&
@@ -78,6 +97,7 @@ class Method extends Core {
                 $has_string = true;
                 $result['method'] .= $record['value'];
                 $result['value'] .= $record['value'];
+                $list[] = $record;
                 continue;
             }
             if(
@@ -87,6 +107,7 @@ class Method extends Core {
                 $has_string = true;
                 $result['method'] .= $record['value'];
                 $result['value'] .= $record['value'];
+                $list[] = $record;
                 continue;
             }
             if(
@@ -97,6 +118,7 @@ class Method extends Core {
             ){
                 $requirement = true;
                 $result['value'] .= $record['value'];
+                $list[] = $record;
                 continue;
             }
             if(
@@ -108,6 +130,7 @@ class Method extends Core {
                 )
             ){
                 $parameter[] = $record;
+                $list[] = $record;
                 if($record['type'] != Token::TYPE_DOT){
                     $result['value'] .= $record['value'];
                 }
@@ -120,6 +143,7 @@ class Method extends Core {
                 $requirement === true
               ){
                 $result['value'] .= $record['value'];
+                $list[] = $record;
                 $is_method = true;
                 break;
             }
@@ -136,6 +160,7 @@ class Method extends Core {
             }
             */
             $result['method'] .= $record['value'];
+            $list[] = $record;
         }
         if($is_method){
             $result['type'] = Token::TYPE_METHOD;
@@ -153,6 +178,7 @@ class Method extends Core {
                 $result['invert'] = false;
             }
             $result['method'] = str_replace('!', '', $result['method']);
+            $result['parse_method'] = $list;
             return $result;
         }
         return false;

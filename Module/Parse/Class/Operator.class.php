@@ -169,6 +169,8 @@ class Operator extends Core {
         $left = array();
         $right = array();
         $operator = array();
+        debug($statement, 'statement');
+        die;
         foreach($statement as $nr => $record){
             if(Operator::is($record)){
                 if(!empty($operator)){

@@ -35,9 +35,21 @@ function debug($debug=null, $title=null, $is_export=false){
         echo '</ul>';
         echo '</div>';
         echo '<div class="body">';
-        if(!empty($is_export)){
+        if(
+            !is_array($debug) &&
+            !is_object($debug)
+        ){
+            if(is_null($debug)){
+                echo '<font color="#3465a4">null</font>' . "\r\n";
+            }
+            elseif($debug === false){
+                echo '<font color="#3465a4">false</font>' . "\r\n";
+            } else {
+                echo '<font color="#3465a4">' . $debug . '</font>' . "\r\n";
+            }
+        }
+        elseif(!empty($is_export)){
             var_export($debug);
-
         } else {
             var_dump($debug);
         }

@@ -195,7 +195,16 @@ class Control_If extends Core {
         // an equeation can have functions.
         $parse = Token::parse($create);
         $parse = Token::variable($parse, $variable);
+        //method before create_equation ?
+
+        $method = array();
+        $method['parse'] = $parse;
+        $method = Token::method($method, $variable, $this->parser());
+        $parse = $method['parse'];
+        debug($parse, 'parse');
+        die;
         $math = Token::create_equation($parse, $variable, $parser);
+        die;
         $record = Control_If::execute($record, $math, $this->random());	//rename to execute...
         return $record;
     }

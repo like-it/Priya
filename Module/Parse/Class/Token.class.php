@@ -409,6 +409,7 @@ class Token extends Core {
         $unset = array();
         $has_exclamation = false;
         $exclamation_count = 0;
+        $is_variable = false;
         foreach ($parse as $nr => $record){
             $possible_dot = next($parse);
             if(!isset($record['value'])){
@@ -420,12 +421,14 @@ class Token extends Core {
             if($record['type'] == Token::TYPE_EXCLAMATION && empty($item)){
                 $has_exclamation = true;
                 $exclamation_count++;
-                unset($parse[$nr]);
+                $unset[] = $nr;
+//                 unset($parse[$nr]);
                 continue;
             }
             if($record['type'] != Token::TYPE_VARIABLE && empty($item)){
                 continue;
             }
+            $is_variable = true;
             if(isset($possible_dot) && $possible_dot['type'] == Token::TYPE_DOT && empty($item)){
                 $item = $record;
                 $key = $nr;
@@ -487,6 +490,7 @@ class Token extends Core {
                         unset($parse[$unset_key]);
                     }
                     $parse[$key] = $item;
+                    debug($item, 'item');
                     $item = array();
                     $unset = array();
                     $key = null;
@@ -518,7 +522,13 @@ class Token extends Core {
             foreach($unset as $unset_key){
                 unset($parse[$unset_key]);
             }
+            $unset = array();
             $parse[$key] = $item;
+        }
+        if($is_variable === true){
+            foreach($unset as $unset_key){
+                unset($parse[$unset_key]);
+            }
         }
         return $parse;
     }
@@ -536,6 +546,8 @@ class Token extends Core {
         while(Set::has($parse)){
             $set_counter++;
             $set = Set::get($parse);
+            debug($set, 'set');
+            die;
             $statement = Set::statement($set);
             $operator_counter = 0;
             while (Operator::has($statement)){
@@ -1020,26 +1032,68 @@ class Token extends Core {
     }
 
     public static function method($record=array(), Variable $variable, $parser=null, $depth=0){
-        $method = Method::get($record['parse'], $variable, $parser, $depth);
-        if($method === false){
-            return $record;;
-        }
-        if($method['type'] == Token::TYPE_METHOD){
-            $method['string'] = $record['string'];
-            $method= Method::execute($method, $parser);
-            $record['string'] = $method['string'];
-            $method= Token::cast($method);
-            $method['type'] = Token::TYPE_METHOD;
-            $parse = array();
-            if($method === 'true'){
-                $method = true;
+        $counter = 0;
+        $has_method = false;
+        while($counter  <= Method::MAX){
+            $method = Method::get($record['parse'], $variable, $parser, $depth);
+            $list = array();
+            if($method === false && $has_method === false){
+                return $record;
             }
-            elseif($method === 'false'){
-                $method = false;
+            elseif($method === false && $has_method === true){
+                return $record;
+            } else {
+                $has_method = true;
+                $list = $record['parse'];
+                if($method['type'] == Token::TYPE_METHOD){
+                    if(!isset($record['string'])){
+                        $method['string'] = '';
+                    } else {
+                        $method['string'] = $record['string'];
+                    }
+                    $method = Method::execute($method, $parser);
+                    $record['string'] = $method['string'];
+                    $method = Token::cast($method);
+                    $method['type'] = Token::TYPE_METHOD;
+                    $parse = array();
+                    if(!empty($previous)){
+                        $array[] = $previous;
+                        $parse[] = $previous;
+                        unset($previous);
+                    }
+                    if($method === 'true'){
+                        $method = true;
+                    }
+                    elseif($method === 'false'){
+                        $method = false;
+                    }
+                    $parse[] = $method;
+                }
+                $record['parse'] = $parse;
+
+                $previous = current($parse);
+                unset($previous['parse_method']);
+                if(!empty($method['parse_methpd']) && is_array($method['parse_method'])){
+                    foreach($method['parse_method'] as $parse){
+                        foreach($list as $nr => $item){
+                            if($item == $parse){
+                                unset($list[$nr]);
+                            }
+                        }
+                    }
+                }
+                foreach($list as $item){
+                    $record['parse'][] = $item;
+                }
+                if($counter >4){
+                    debug($record, 'record');
+                    break;
+                }
+                $counter++;
             }
-            $parse[] = $method;
         }
-        $record['parse'] = $parse;
+        debug($record, 'record');
+        die;
         return $record;
     }
 }
