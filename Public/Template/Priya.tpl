@@ -8,6 +8,9 @@ Welcome to PRIYA
 {/literal}
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
+{if !In.array(test, [test, test2]) && empty(tada)}
+    ja dat is waar...
+{/if}
 {Capture.append('script')}{literal}<script type="text/javascript">
     console.log('test');
     console.log('{/literal}{$priya.version}{literal}');

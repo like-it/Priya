@@ -206,6 +206,9 @@ class Operator extends Core {
         $method = Token::method($method, $variable, $parser);
         $operator['right_parse'] = $method['parse'];
 
+        debug($operator, 'operator');
+        die;
+
         if(count($operator['right_parse']) > 1){
             if(count($operator['right_parse'] == 2 && count($operator['left_parse']) == 1)){
                 $wrong_value = array_shift($operator['left_parse']);
@@ -267,6 +270,7 @@ class Operator extends Core {
             $operator['right'] = $right_statement[0]['value'];
             $statement = array();
         }
+        debug($operator, 'operator');
         $operator = Operator::execute($operator);
         array_unshift($statement, $operator);
         return $statement;

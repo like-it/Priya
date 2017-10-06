@@ -29,6 +29,7 @@ class Token extends Core {
     const TYPE_CLOSE = 'close';
     const TYPE_METHOD = 'method';
     const TYPE_EXCLAMATION = 'exclamation';
+    const TYPE_CONTROL = 'control';
 
     public static function all($token=''){
         $tokens = token_get_all('<?php $variable=' . $token . ';');
@@ -971,6 +972,9 @@ class Token extends Core {
             case 'T_EMPTY' :
             case 'T_ISSET' :
                 return Token::TYPE_METHOD;
+            break;
+            case 'T_IF' :
+                return Token::TYPE_CONTROL;
             break;
             case Token::TYPE_STRING:
             case Token::TYPE_MIXED:
