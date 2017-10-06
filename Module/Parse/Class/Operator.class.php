@@ -169,8 +169,6 @@ class Operator extends Core {
         $left = array();
         $right = array();
         $operator = array();
-        debug($statement, 'statement');
-        die;
         foreach($statement as $nr => $record){
             if(Operator::is($record)){
                 if(!empty($operator)){
@@ -207,9 +205,6 @@ class Operator extends Core {
         $method['parse'] = $right;
         $method = Token::method($method, $variable, $parser);
         $operator['right_parse'] = $method['parse'];
-
-        debug($operator, 'operator');
-        die;
 
         if(count($operator['right_parse']) > 1){
             if(count($operator['right_parse'] == 2 && count($operator['left_parse']) == 1)){
@@ -257,10 +252,10 @@ class Operator extends Core {
             $right_statement = $statement;
             array_unshift($right_statement, $operator['right_parse'][0]);
             if(count($right_statement) > 1){
-                $right_statement = Operator::statement($right_statement);
+                $right_statement = Operator::statement($right_statement, $variable, $parser);
                 $right_statement_count = 0;
                 while(count($right_statement) > 1 && $right_statement[0]['value'] === true){
-                    $right_statement = Operator::statement($right_statement);
+                    $right_statement = Operator::statement($right_statement, $variable, $parser);
                     $right_statement_count++;
                     if($right_statement_count >= Operator::MAX){
                         debug('$right_statement_count >= Operator::MAX');

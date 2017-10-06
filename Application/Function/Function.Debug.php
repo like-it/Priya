@@ -44,6 +44,9 @@ function debug($debug=null, $title=null, $is_export=false){
             }
             elseif($debug === false){
                 echo '<font color="#3465a4">false</font>' . "\r\n";
+            }
+            elseif($debug === true){
+                echo '<font color="#3465a4">true</font>' . "\r\n";
             } else {
                 echo '<font color="#3465a4">' . $debug . '</font>' . "\r\n";
             }

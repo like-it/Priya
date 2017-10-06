@@ -2093,7 +2093,12 @@ priya.prototype.trigger = function (trigger, bubble, cancel){
     });
     //event.initEvent(trigger, true, true);
     event.synthetic = true;
-    this.dispatchEvent(event, true);
+    if(typeof this.dispatchEvent == 'undefined'){
+        console.log('dispatch problem');
+        console.log(this);
+    } else {
+        this.dispatchEvent(event, true);
+    }
 }
 
 priya.prototype.attach = function (element){

@@ -62,6 +62,13 @@ class Method extends Core {
         $result = array();
         $list = array();
         foreach($parse as $record){
+            if(
+                $record['type'] == Token::TYPE_METHOD &&
+                isset($record['execute']) &&
+                $record['execute'] === true
+            ){
+                continue;
+            }
             if(!isset($record['type'])){
                 debug($parse);
                 debug($record, 'type');
@@ -224,6 +231,7 @@ class Method extends Core {
                 $function['value'] = 'false';
             }
         }
+        $function['is_executed'] = true;
         return $function;
     }
 

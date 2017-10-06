@@ -8,7 +8,7 @@ Welcome to PRIYA
 {/literal}
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
-{if !Array.in(test, [test, test2]) && is.empty(tada) && Is.empty()}
+{if Array.in(test, [test, test2]) && !is.empty(tada) && Is.empty()}
     ja dat is waar...
 {/if}
 {Capture.append('script')}{literal}<script type="text/javascript">
