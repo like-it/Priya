@@ -147,6 +147,7 @@ class Method extends Core {
                                         break;
                                     }
                                     unset($list[$previous_list_nr]);
+                                    unset($parse_method[$previous_list_nr]);
                                 }
                             }
                             $previous_list_nr = $list_nr;
