@@ -201,8 +201,6 @@ class Control_If extends Core {
         $method['parse'] = $parse;
         $method = Token::method($method, $variable, $this->parser());
         $parse = $method['parse'];
-        debug($method, 'method');
-        die;
         $math = Token::create_equation($parse, $variable, $parser);
         $record = Control_If::execute($record, $math, $this->random());	//rename to execute...
         return $record;

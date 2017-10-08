@@ -539,17 +539,22 @@ class Token extends Core {
      */
     public static function create_equation($parse=null, Variable $variable, $parser=null){
         $set_counter = 0;
-
         if(Operator::has($parse) === false){
+            if(count($parse) == 1){
+                $record = reset($parse);
+                if(is_bool($record['value'])){
+                    return $record['value'];
+                } else {
+                }
+            }
             return;
         }
-        debug($parse,'first method ?');
         while(Set::has($parse)){
             $set_counter++;
             $set = Set::get($parse);
             $statement = Set::statement($set);
+//             debug($set, 'set is wrong, need has_exclamation & invert on first?');
             $operator_counter = 0;
-            debug($statement, 'statem');
             if(empty($statement)){
                 debug($parse, 'parse');
                 die;
@@ -564,9 +569,10 @@ class Token extends Core {
                 }
             }
             $record = reset($statement);
-            debug($record, 'set depth = ?');
             $record['set']['depth']--;
             $parse = Set::replace($parse, $set, $record);
+            $parse = Set::exclamation($parse);
+            //test variable..
             if($set_counter > Set::MAX){
                 break;
             }
@@ -1064,69 +1070,23 @@ class Token extends Core {
                 }
             }
             if($attribute !== false){
-                $record['parse'][$attribute] = $method;
-                ksort($record['parse']);
-            }
-            //has_exclamation is wrong
-            //invert is wrong
-            /*
-             * parse['method'] contains set, so method remove set....S
-             */
-            debug($method, 'method in token');
-            $method = Method::get($record['parse'], $variable, $parser);
-            $counter++;
-            if($counter >= 3){
-                break;
-            }
-
-            continue;
-            if($method['type'] == Token::TYPE_METHOD){
                 if(!isset($record['string'])){
                     $method['string'] = '';
                 } else {
                     $method['string'] = $record['string'];
                 }
                 $method = Method::execute($method, $parser);
-                $record['string'] = $method['string'];
                 $method = Token::cast($method);
                 $method['type'] = Token::TYPE_METHOD;
+                $record['string'] = $method['string'];
+                $record['parse'][$attribute] = $method;
+                ksort($record['parse']);
             }
-            if(
-                !empty($method['parse_method']) &&
-                is_array($method['parse_method'])
-            ){
-                foreach($method['parse_method'] as $parse){
-                    if($parse['type'] == Token::TYPE_OPERATOR){
-                        $list[] = $parse;
-                        break; //1 at a time
-                    }
-                }
-            }
-            if($method !== false){
-                $list[$key] = $method;
-            }
-
+            $method = Method::get($record['parse'], $variable, $parser);
             $counter++;
-            if($counter >= 3){
+            if($counter >= Method::MAX){
                 break;
             }
-            continue;
-        }
-        if(empty($list)){
-            return $record;
-        }
-        elseif(
-            empty($record['parse']) &&
-            !empty($list)
-        ){
-            $record['parse'] = $list;
-        } else {
-            foreach ($list as $nr => $item){
-                $record['parse'][$nr] = $item;
-            }
-            ksort($record['parse']);
-//             debug($record, 'record[\'parse\'] & list should merge');
-//             debug($list, 'list');
         }
         return $record;
     }

@@ -169,7 +169,6 @@ class Operator extends Core {
         $left = array();
         $right = array();
         $operator = array();
-        debug($statement, 'statement');
         foreach($statement as $nr => $record){
             if(Operator::is($record)){
                 if(!empty($operator)){
@@ -207,15 +206,6 @@ class Operator extends Core {
         $method = Token::method($method, $variable, $parser);
         $operator['right_parse'] = $method['parse'];
 
-        if(count($operator['right_parse']) > 1){
-            if(count($operator['right_parse'] == 2 && count($operator['left_parse']) == 1)){
-                $wrong_value = array_shift($operator['left_parse']);
-                $operator['left_parse'][] = array_shift($operator['right_parse']);
-            } else{
-                debug($operator, 'right parse > 1');
-            }
-        }
-//         debug($statement);
         foreach($operator['left_parse']as $nr => $record){
             $record = Token::cast($record);
             if(!isset($operator['left'])){
@@ -240,16 +230,6 @@ class Operator extends Core {
             die;
         }
         if($operator['value'] == '&&' || $operator['value'] == '||'){
-            //
-            /* $operator['right_parse'] = invalid should be calculated
-             * $operator['right'] = result of the calculated right_parse
-             *
-             * move right parse to statement
-             * //execute statement on the current statement
-             * // result should be right / right_parse
-             *
-             * .
-             */
             $right_statement = $statement;
             array_unshift($right_statement, $operator['right_parse'][0]);
             if(count($right_statement) > 1){

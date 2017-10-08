@@ -14,12 +14,79 @@ class Set extends Core {
         return false;
     }
 
+    public static function exclamation($parse=array()){
+        $exclamation = 0;
+        foreach($parse as $nr => $record){
+            if($record['type'] == Token::TYPE_EXCLAMATION){
+                unset($parse[$nr]);
+                $exclamation++;
+            }
+            if($exclamation > 0){
+                if($record['type'] == Token::TYPE_WHITESPACE){
+                    continue;
+                }
+                elseif($record['type'] == Token::TYPE_METHOD){
+                    $record['has_exclamation'] = true;
+                    if($exclamation % 2 == 1){
+                        $record['invert'] = true;
+                    } else {
+                        $record['invert'] = false;
+                    }
+                    if($record['has_exclamation'] === true){
+                        if($record['invert'] === true){
+                            if(empty($record['value'])){
+                                $record['value'] = true;
+                            } else {
+                                $record['value'] = false;
+                            }
+                            $record['invert'] = false;
+                        } else {
+                            $record['value'] = (bool) $record['value'];
+                        }
+                    }
+                    $parse[$nr] = $record;
+                }
+                elseif($record['type'] == Token::TYPE_VARIABLE){
+                    $record['has_exclamation'] = true;
+                    if($exclamation % 2 == 1){
+                        $record['invert'] = true;
+                    } else {
+                        $record['invert'] = false;
+                    }
+                    if($record['has_exclamation'] === true){
+                        if($record['invert'] === true){
+                            if(empty($record['value'])){
+                                $record['value'] = true;
+                            } else {
+                                $record['value'] = false;
+                            }
+                            $record['invert'] = false;
+                        } else {
+                            $record['value'] = (bool) $record['value'];
+                        }
+                    }
+
+
+
+                    $parse[$nr] = $record;
+                    die;
+                }
+            }
+
+        }
+        return $parse;
+    }
+
     public static function get($parse=array()){
         $highest = Set::highest($parse);
         $is_set = false;
         $set = array();
+        $exclamation = array();
         $statement = '';
         foreach ($parse as $nr => $record){
+            if($record['type'] == Token::TYPE_EXCLAMATION){
+                $exclamation[$nr] = $record;
+            }
             if(isset($record['set']) && isset($record['set']['depth']) && $record['set']['depth'] == $highest){
                 //first one found
                 $is_set = true;

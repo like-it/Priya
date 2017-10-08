@@ -108,6 +108,7 @@ class Method extends Core {
                     if($result['method'] == ''){
                         debug($list, 'hebben we een probleem');
                     }
+                    $result['set']['depth'] = $method_part['set']['depth'];
                     $result['parameter']  = Parameter::get($parameter, $variable);
                     $result['parse_method'] = $parse_method; //all records of parse which is used to create the method
                     return $result;
@@ -351,6 +352,7 @@ class Method extends Core {
                     } else {
                         $function['value'] = false;
                     }
+                    $function['invert'] = false;
                 } else {
                     $function['value'] = (bool) $function['value'];
                 }

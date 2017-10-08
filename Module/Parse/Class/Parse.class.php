@@ -91,7 +91,6 @@ class Parse extends Core {
                 $if->data($assign->data());
                 $record = $if::create($list, $record['string'], $this->random());
                 $record = $if->statement($record, $this);
-//                 debug($record, 'record');
                 $list = $tag->find($record['string']);
                 if($if_counter >= $if::MAX){
                     debug('max reached in if::has');
