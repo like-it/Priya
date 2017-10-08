@@ -16,10 +16,19 @@ class Method extends Core {
         $method = substr($record['method']['tag'], 1, -1);
         $parse = Token::parse($method);
         $record['parse'] = $parse;
+        //this has to find the first method in parse & return it!
         $record = Token::method($record, $variable, $parser);
-        if($record['parse'][0]['type'] == Token::TYPE_METHOD){
+        if(
+            isset($record['parse']) &&
+            isset($record['parse'][0]) &&
+            isset($record['parse'][0]['type']) &&
+            $record['parse'][0]['type'] == Token::TYPE_METHOD
+        ){
             $method = $record['parse'][0];
         } else {
+            return $record;
+        }
+        if(!isset($record['string'])){
             return $record;
         }
         $explode = explode($record['method']['tag'], $record['string'], 2);
@@ -54,6 +63,129 @@ class Method extends Core {
         return $record;
     }
 
+    public static function get($parse=array(), Variable $variable, $parser=null){
+        $is_method = false;
+        $possible_method = false;
+        $list = array();
+        $parameter = array();
+        $result = array();
+        $parse_method = array();
+        $method_has_name = false;
+        foreach ($parse as $nr => $record){
+//
+            if(
+                $record['type'] == Token::TYPE_METHOD &&
+                isset($record['method'])
+            ){
+                continue;
+            }
+            if($is_method === true){
+                if(
+                    $record['type'] == Token::TYPE_PARENTHESE &&
+                    $record['value'] == ')' &&
+                    $method_part['set']['depth'] + 1 == $record['set']['depth']
+                ){
+                    $parse_method[$nr] = $record;
+                    $result = array();
+                    $result['type'] = Token::TYPE_METHOD;
+                    $result['value'] = '';
+                    $result['method'] = '';
+                    foreach($list as $list_nr => $list_value){
+                        $result['method'] .= $list_value['value'];
+                    }
+                    $count = substr_count($result['method'], '!');
+                    if($count > 0){
+                        $result['has_exclamation'] = true;
+                    } else {
+                        $result['has_exclamation'] = false;
+                    }
+                    if($count % 2 == 1){
+                        $result['invert'] = true;
+                    } else {
+                        $result['invert'] = false;
+                    }
+                    $result['method'] = str_replace('!', '', $result['method']);
+                    if($result['method'] == ''){
+                        debug($list, 'hebben we een probleem');
+                    }
+                    $result['parameter']  = Parameter::get($parameter, $variable);
+                    $result['parse_method'] = $parse_method; //all records of parse which is used to create the method
+                    return $result;
+                }
+                $parameter[] = $record;
+                $parse_method[$nr] = $record;
+                continue;
+            }
+            if(
+                $record['type'] == Token::TYPE_PARENTHESE &&
+                $record['value'] == '(' &&
+                $possible_method === true
+            ){
+                foreach($list as $list_nr => $list_value){
+                    if(
+                        in_array(
+                            $list_value['type'],
+                            array(
+                                Token::TYPE_STRING,
+                                Token::TYPE_METHOD,
+                            )
+                        )
+                    ){
+                        $method_has_name = true;
+                    }
+                }
+                $method_part = end($list);
+                if($method_part['set']['depth'] + 1 == $record['set']['depth']){
+                    if($method_has_name === true){
+                        $is_method = true;
+                        $previous_list_nr = false;
+                        foreach($list as $list_nr => $list_value){
+                            if($previous_list_nr !== false && $list_nr - $previous_list_nr > 1){
+                                //everthing before this out
+                                foreach($list as $previous_list_nr => $previous_list_value){
+                                    if($list_nr == $previous_list_nr){
+                                        break;
+                                    }
+                                    unset($list[$previous_list_nr]);
+                                }
+                            }
+                            $previous_list_nr = $list_nr;
+                        }
+                    }
+                }
+                $parse_method[$nr] = $record;
+            }
+            if(
+                $record['type'] == Token::TYPE_PARENTHESE  &&
+                $is_method === false
+            ){
+                continue;
+            }
+
+            if(
+                in_array(
+                    $record['type'],
+                    array(
+                        Token::TYPE_STRING,
+                        Token::TYPE_METHOD,
+                        Token::TYPE_DOT
+                    )
+                )
+            ){
+//                 debug($list, 'remove exclamation before (');
+                $possible_method = true;
+                $list[$nr] = $record;
+                $parse_method[$nr] = $record;
+            }
+            if($record['type'] == Token::TYPE_EXCLAMATION){
+                $list[$nr] = $record;
+                $parse_method[$nr] = $record;
+            }
+        }
+        return false;
+    }
+
+    /*
     public static function get($parse=array(), Variable $variable, $parser=null, $depth=0){
         $has_string = false;
         $is_method = false;
@@ -61,11 +193,11 @@ class Method extends Core {
         $parameter = array();
         $result = array();
         $list = array();
+        Method::remove_parenthese($parse, $variable, $parser);
         foreach($parse as $record){
             if(
                 $record['type'] == Token::TYPE_METHOD &&
-                isset($record['execute']) &&
-                $record['execute'] === true
+                isset($record['execute'])
             ){
                 continue;
             }
@@ -82,12 +214,18 @@ class Method extends Core {
                 $list[] = $record;
                 continue;
             }
-            /*
-            if($record['type'] == Token::TYPE_WHITESPACE){
+            if($record['type'] == Token::TYPE_PARENTHESE){
                 $list[] = $record;
-                continue;
+                if($record['value'] == '('){
+                    $depth++;
+                    if($has_string === false){
+                        continue;
+                    }
+                } else {
+                    $depth--;
+                }
             }
-            */
+
             if(empty($result)){
                 $result = $record;
                 $result['method'] = '';
@@ -123,6 +261,7 @@ class Method extends Core {
                 $record['set']['depth'] == $depth + 1 &&
                 $has_string === true
             ){
+                debug('yeah');
                 $requirement = true;
                 $result['value'] .= $record['value'];
                 $list[] = $record;
@@ -147,7 +286,7 @@ class Method extends Core {
                 $record['type'] == Token::TYPE_PARENTHESE &&
                 $record['value'] == ')' &&
                 $record['set']['depth'] == $depth + 1 &&
-                $requirement === true
+                 $requirement === true
               ){
                 $result['value'] .= $record['value'];
                 $list[] = $record;
@@ -157,18 +296,12 @@ class Method extends Core {
             if(is_object($record['value'])){
                 return false;
             }
-            /*
-            if(is_bool($record['value'])){
-                if(!empty($record['value'])){
-                    $result['method'] = 'true';
-                } else {
-                    $result['method'] = 'false';
-                }
-            }
-            */
             $result['method'] .= $record['value'];
             $list[] = $record;
         }
+        debug($is_method, 'is_method');
+        debug($result, 'result');
+
         if($is_method){
             $result['type'] = Token::TYPE_METHOD;
             $result['parameter'] = Parameter::get($parameter, $variable);
@@ -190,6 +323,7 @@ class Method extends Core {
         }
         return false;
     }
+    */
 
     public static function execute($function=array(), \Priya\Module\Parse $parser){
         $url = __DIR__ . '/../Function/Function.' . ucfirst($function['method']) . '.php';

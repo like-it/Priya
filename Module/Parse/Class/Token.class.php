@@ -490,7 +490,7 @@ class Token extends Core {
                         unset($parse[$unset_key]);
                     }
                     $parse[$key] = $item;
-                    debug($item, 'item');
+//                     debug($item, 'item');
                     $item = array();
                     $unset = array();
                     $key = null;
@@ -543,19 +543,28 @@ class Token extends Core {
         if(Operator::has($parse) === false){
             return;
         }
+        debug($parse,'first method ?');
         while(Set::has($parse)){
             $set_counter++;
             $set = Set::get($parse);
             $statement = Set::statement($set);
             $operator_counter = 0;
+            debug($statement, 'statem');
+            if(empty($statement)){
+                debug($parse, 'parse');
+                die;
+                break;
+            }
             while (Operator::has($statement)){
                 $operator_counter++;
                 $statement = Operator::statement($statement, $variable, $parser);
+
                 if($operator_counter > Operator::MAX){
                     break;
                 }
             }
             $record = reset($statement);
+            debug($record, 'set depth = ?');
             $record['set']['depth']--;
             $parse = Set::replace($parse, $set, $record);
             if($set_counter > Set::MAX){
@@ -1040,27 +1049,37 @@ class Token extends Core {
                 $parse['type'] == Token::TYPE_METHOD &&
                 $parse['is_executed'] === true
             ){
-                debug($record);
                 return $record;
             }
         }
-
-        while($counter  <= Method::MAX){
-            $method = Method::get($record['parse'], $variable, $parser, $depth);
-//             debug($method, 'method');
-            $key = false;
+        $method = Method::get($record['parse'], $variable, $parser);
+        while($method !== false){
+            $attribute = false;
             if(!empty($method['parse_method']) && is_array($method['parse_method'])){
-                foreach($method['parse_method'] as $parse){
-                    foreach($record['parse'] as $nr => $item){
-                        if($item == $parse){
-                            if(empty($key)){
-                                $key = $nr;
-                            }
-                            unset($record['parse'][$nr]);
-                        }
+                foreach($method['parse_method'] as $key => $parse){
+                    if($attribute === false){
+                        $attribute = $key;
                     }
+                    unset($record['parse'][$key]);
                 }
             }
+            if($attribute !== false){
+                $record['parse'][$attribute] = $method;
+                ksort($record['parse']);
+            }
+            //has_exclamation is wrong
+            //invert is wrong
+            /*
+             * parse['method'] contains set, so method remove set....S
+             */
+            debug($method, 'method in token');
+            $method = Method::get($record['parse'], $variable, $parser);
+            $counter++;
+            if($counter >= 3){
+                break;
+            }
+
+            continue;
             if($method['type'] == Token::TYPE_METHOD){
                 if(!isset($record['string'])){
                     $method['string'] = '';
@@ -1083,78 +1102,33 @@ class Token extends Core {
                     }
                 }
             }
+            if($method !== false){
+                $list[$key] = $method;
+            }
 
-            $list[] = $method;
-//             $record['parse'][$key] = $method;
-//             ksort($record['parse']);
-//             array_unshift($record['parse'], $method);
-//             debug($record, 'record');
-
-//             debug($method);
             $counter++;
             if($counter >= 3){
                 break;
             }
             continue;
-            $list = array();
-            if($method === false && $has_method === false){
-                return $record;
-            }
-            elseif($method === false && $has_method === true){
-                return $record;
-            } else {
-                $has_method = true;
-                $list = $record['parse'];
-                if($method['type'] == Token::TYPE_METHOD){
-                    if(!isset($record['string'])){
-                        $method['string'] = '';
-                    } else {
-                        $method['string'] = $record['string'];
-                    }
-                    $method = Method::execute($method, $parser);
-                    $record['string'] = $method['string'];
-                    $method = Token::cast($method);
-                    $method['type'] = Token::TYPE_METHOD;
-                    $parse = array();
-                    if(!empty($previous)){
-                        $array[] = $previous;
-                        $parse[] = $previous;
-                        unset($previous);
-                    }
-                    if($method === 'true'){
-                        $method = true;
-                    }
-                    elseif($method === 'false'){
-                        $method = false;
-                    }
-                    $parse[] = $method;
-                }
-                $record['parse'] = $parse;
-
-                $previous = current($parse);
-                unset($previous['parse_method']);
-                if(!empty($method['parse_methpd']) && is_array($method['parse_method'])){
-                    foreach($method['parse_method'] as $parse){
-                        foreach($list as $nr => $item){
-                            if($item == $parse){
-                                unset($list[$nr]);
-                            }
-                        }
-                    }
-                }
-                foreach($list as $item){
-                    $record['parse'][] = $item;
-                }
-                if($counter >2){
-                    debug($record, 'record');
-                    die;
-                    break;
-                }
-                $counter++;
-            }
         }
-        $method['parse'] = $list;
-        return $method;
+        if(empty($list)){
+            return $record;
+        }
+        elseif(
+            empty($record['parse']) &&
+            !empty($list)
+        ){
+            $record['parse'] = $list;
+        } else {
+            foreach ($list as $nr => $item){
+                $record['parse'][$nr] = $item;
+            }
+            ksort($record['parse']);
+//             debug($record, 'record[\'parse\'] & list should merge');
+//             debug($list, 'list');
+        }
+        return $record;
     }
 }
 

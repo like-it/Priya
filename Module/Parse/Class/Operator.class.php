@@ -169,6 +169,7 @@ class Operator extends Core {
         $left = array();
         $right = array();
         $operator = array();
+        debug($statement, 'statement');
         foreach($statement as $nr => $record){
             if(Operator::is($record)){
                 if(!empty($operator)){
@@ -267,7 +268,6 @@ class Operator extends Core {
             $operator['right'] = $right_statement[0]['value'];
             $statement = array();
         }
-        debug($operator, 'operator');
         $operator = Operator::execute($operator);
         array_unshift($statement, $operator);
         return $statement;

@@ -140,6 +140,10 @@ class Assign extends Core {
     }
 
     public static function row($record=array(), $random=''){
+        if(!isset($record['string'])){
+            debug($record, 'record no string in row');
+            return $record;
+        }
         $string = Token::restore_return($record['string'], $random);
         $tag = Token::restore_return($record['assign']['tag'], $random);
         $explode = explode('=', substr($tag, 1, -1), 2);

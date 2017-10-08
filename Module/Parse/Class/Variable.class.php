@@ -93,6 +93,9 @@ class Variable extends Core {
             unset($record['is_cast']);
             return $record;
         }
+        if(!isset($record['string'])){
+            return $record;
+        }
         $explode = explode($record['variable']['tag'], $record['string'], 2);
         $replace = $this->replace($attribute);
         if(is_object($replace)){

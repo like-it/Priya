@@ -8,8 +8,16 @@ Welcome to PRIYA
 {/literal}
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
-{if Array.in(test, [test, test2]) && !is.empty(tada) && Is.empty()}
+{if (!is.empty(tada) || !!(Is.empty()))}
     ja dat is waar...
+{else}
+    still need the else
+{/if}
+
+{if Array.in(test, [test, test2]) && (is.empty(tada) || Is.empty())}
+    ja dat is waar...
+{else}
+    still need the else
 {/if}
 {Capture.append('script')}{literal}<script type="text/javascript">
     console.log('test');
