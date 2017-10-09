@@ -399,8 +399,18 @@ class Method extends Core {
     */
 
     public static function execute($function=array(), \Priya\Module\Parse $parser){
-        $url = __DIR__ . '/../Function/Function.' . ucfirst($function['method']) . '.php';
-        $name = 'function_' . str_replace('.', '_', strtolower($function['method']));
+        $name = str_replace(
+            array(
+                '..',
+                 '//',
+                 '\\',
+            ),
+            '',
+            ucfirst($function['method'])
+        );
+
+        $url = __DIR__ . '/../Function/Function.' . $name . '.php';
+        $name = 'function_' . str_replace('.', '_', strtolower($name));
         if(file_exists($url)){
             require_once $url;
         }

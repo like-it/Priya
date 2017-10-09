@@ -952,7 +952,8 @@ class Token extends Core {
             case 'T_NS_SEPARATOR' :
             case 'T_DOUBLE_QUOTE' :
             case 'T_ARRAY' :		//might needs its own type
-            case 'T_IS' : 	//might needs its own type
+            case 'T_IS' : 			//might needs its own type
+            case 'T_DEFAULT' : 		//might needs its own type
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :

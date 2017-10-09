@@ -11,6 +11,9 @@ _______________________________________________________________________________
 {$method = 'awesome'}
 {$target = 'body'}
 
+
+{$default = $notfound | default2:["me","arrays", "no ob{}jects", true, 1.0, $count] | json}
+
 {if !is.empty($method) && !is.empty($target)}
 has method & target
 {$method}
