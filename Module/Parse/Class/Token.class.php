@@ -409,7 +409,13 @@ class Token extends Core {
         $unset = array();
         $has_exclamation = false;
         $exclamation_count = 0;
+        $exclamation_check = false;
         $is_variable = false;
+
+        /*
+         * first find the variable
+         * from there upwards till (
+         */
         foreach ($parse as $nr => $record){
             $possible_dot = next($parse);
             if(!isset($record['value'])){
@@ -418,6 +424,8 @@ class Token extends Core {
             if(!isset($record['type'])){
                 continue;
             }
+            $exclamation_parse[$nr] = $record;
+            /*
             if($record['type'] == Token::TYPE_EXCLAMATION && empty($item)){
                 $has_exclamation = true;
                 $exclamation_count++;
@@ -425,10 +433,28 @@ class Token extends Core {
 //                 unset($parse[$nr]);
                 continue;
             }
+            */
             if($record['type'] != Token::TYPE_VARIABLE && empty($item)){
                 continue;
             }
             $is_variable = true;
+            if($exclamation_check === false){
+                krsort($exclamation_parse);
+                foreach($exclamation_parse as $exclamation_nr => $exclamation_value){
+                    if($exclamation_value['type'] == Token::TYPE_EXCLAMATION){
+                        $has_exclamation = true;
+                        $exclamation_count++;
+                        $unset[] = $exclamation_nr;
+                    }
+                    if(
+                        $exclamation_value['type'] == Token::TYPE_PARENTHESE &&
+                        $exclamation_value['value'] == '('
+                    ){
+                        break;
+                    }
+                }
+            }
+
             if(isset($possible_dot) && $possible_dot['type'] == Token::TYPE_DOT && empty($item)){
                 $item = $record;
                 $key = $nr;
@@ -490,7 +516,6 @@ class Token extends Core {
                         unset($parse[$unset_key]);
                     }
                     $parse[$key] = $item;
-//                     debug($item, 'item');
                     $item = array();
                     $unset = array();
                     $key = null;
@@ -1079,6 +1104,7 @@ class Token extends Core {
                     $method['string'] = $record['string'];
                 }
                 $method = Method::execute($method, $parser);
+
                 $method = Method::exclamation($record, $method, $parser);
                 $record = Method::remove_exclamation($record);
                 $method = Token::cast($method);
