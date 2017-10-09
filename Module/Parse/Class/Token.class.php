@@ -1058,7 +1058,10 @@ class Token extends Core {
                 return $record;
             }
         }
+//         debug($record, 'record');
         $method = Method::get($record['parse'], $variable, $parser);
+//         debug($method);
+//         die;
         while($method !== false){
             $attribute = false;
             if(!empty($method['parse_method']) && is_array($method['parse_method'])){
@@ -1076,6 +1079,8 @@ class Token extends Core {
                     $method['string'] = $record['string'];
                 }
                 $method = Method::execute($method, $parser);
+                $method = Method::exclamation($record, $method, $parser);
+                $record = Method::remove_exclamation($record);
                 $method = Token::cast($method);
                 $method['type'] = Token::TYPE_METHOD;
                 $record['string'] = $method['string'];

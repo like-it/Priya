@@ -113,6 +113,7 @@ class Parse extends Core {
                 $record = $variable->find($record);
                 $method->data($variable->data());
                 $record['method']['tag'] = $key;
+//                 debug($record, 'record');
                 $record = $method->find($record, $variable, $this);
             }
             $if->data($method->data());

@@ -17,14 +17,17 @@ class Method extends Core {
         $parse = Token::parse($method);
         $record['parse'] = $parse;
         //this has to find the first method in parse & return it!
+        $is_method = false;
         $record = Token::method($record, $variable, $parser);
-        if(
-            isset($record['parse']) &&
-            isset($record['parse'][0]) &&
-            isset($record['parse'][0]['type']) &&
-            $record['parse'][0]['type'] == Token::TYPE_METHOD
-        ){
-            $method = $record['parse'][0];
+        //fix has_Exclamation
+        foreach($record['parse'] as $key => $value){
+            if($value['type'] == Token::TYPE_METHOD){
+                $is_method = true;
+                break;
+            }
+        }
+        if($is_method === true){
+            $method = $value;
         } else {
             return $record;
         }
@@ -63,6 +66,67 @@ class Method extends Core {
         return $record;
     }
 
+    public static function exclamation($record=array(), $method=array(), $parser=null){
+        $parse = $record['parse'];
+        krsort($parse); //from back to ( (beginning of set)
+        $exclamation_count = 0;
+        foreach($parse as $nr => $record){
+            if(
+                $record['type'] == Token::TYPE_PARENTHESE &&
+                $record['value'] == ')'
+            ){
+                continue;
+            }
+            if($record['type'] == Token::TYPE_EXCLAMATION){
+                $exclamation_count++;
+            }
+            if(
+                $record['type'] == Token::TYPE_PARENTHESE &&
+                $record['value'] == '('
+            ){
+                break;
+            }
+        }
+        $method['exclamation_count'] = $exclamation_count;
+        if($exclamation_count > 0){
+            $method['has_exclamation'] = true;
+        } else {
+            $method['has_exclamation'] = false;
+        }
+        if($exclamation_count% 2 == 1){
+            $method['invert'] = true;
+        } else {
+            $method['invert'] = false;
+        }
+        $method['method'] = str_replace('!', '', $method['method']);
+        $method = Token::Exclamation($method);
+        return $method;
+    }
+
+    public static function remove_exclamation($record=array()){
+        $parse = $record['parse'];
+        krsort($parse); //from back to ( (beginning of set)
+        foreach($parse as $nr => $item){
+            if(
+                $item['type'] == Token::TYPE_PARENTHESE &&
+                $item['value'] == ')'
+            ){
+                continue;
+            }
+            if($item['type'] == Token::TYPE_EXCLAMATION){
+                unset($record['parse'][$nr]);
+            }
+            if(
+                $item['type'] == Token::TYPE_PARENTHESE &&
+                $item['value'] == '('
+            ){
+                break;
+            }
+        }
+        return $record;
+    }
+
+
     public static function get($parse=array(), Variable $variable, $parser=null){
         $is_method = false;
         $possible_method = false;
@@ -94,6 +158,7 @@ class Method extends Core {
                         $result['method'] .= $list_value['value'];
                     }
                     $count = substr_count($result['method'], '!');
+                    $result['exclamation_count'] = $count;
                     if($count > 0){
                         $result['has_exclamation'] = true;
                     } else {
