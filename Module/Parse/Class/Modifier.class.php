@@ -17,7 +17,7 @@ class Modifier extends Core {
         );
 
         $url = __DIR__ . '/../Modifier/Modifier.' . $name . '.php';
-        $name = 'function_' . str_replace('.', '_', strtolower($name));
+        $name = 'modifier_' . str_replace('.', '_', strtolower($name));
         if(file_exists($url)){
             require_once $url;
         } else {
@@ -66,34 +66,10 @@ class Modifier extends Core {
                 }
             }
         }
-        debug($operator);
-        debug($argumentList,'wouldnt arrays & objects would be beautifull');
-        die;
-        $modified = $name($value, $argumentList);
-    debug($attribute);
-        debug($operator, 'operator');
-        die;
-        /*
-        if(function_exists($name)){
-            $argument = array();
-            if(isset($function['parameter'])){
-                foreach ($function['parameter'] as $parameter){
-                    if(isset($parameter['value']) || $parameter['value'] === null){
-                        $argument[] = $parameter['value'];
-                    }
-                }
-            }
-
-
-
-            $function = $name($function, $argument, $parser);
-
-        */
-
-
-
-        debug($operator, 'operator');
-        die;
+        $operator['execute'] = $name($value, $argumentList);
+        $operator['value'] = $operator['execute'];
+        debug($operator['value']);
+        return $operator;
     }
 
 }

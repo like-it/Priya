@@ -84,7 +84,12 @@ class Operator extends Core {
             return $operator;
         }
         $operator['operator'] = $operator['value'];
-        $operator['execute'] = $operator['left'] . $operator['operator'] . $operator['right'];
+        if(
+            !is_array($operator['left']) &&
+            !is_array($operator['right'])
+        ){
+            $operator['execute'] = $operator['left'] . $operator['operator'] . $operator['right'];
+        }
 //         debug($operator, 'execute');
         //add % & ** >= <=
         $original = $operator['value'];
@@ -138,8 +143,9 @@ class Operator extends Core {
                 $modifier = reset($operator['right_parse']);
                 if(is_string($modifier['value'])){
                     $operator = Modifier::execute($operator, $variable, $parser);
-                    debug($operator);
-                    die;
+                    unset($operator['left']);
+                    unset($operator['right']);
+                    $operator['modified_is_executed'] = true;
                 } else {
                     $operator['value'] = $operator['left'] | $operator['right'];
                 }
@@ -167,7 +173,7 @@ class Operator extends Core {
             debug($operator, 'no value');
         }
         $operator['type'] = Variable::type($operator['value']);
-//         debug($operator, 'operator');
+        debug($operator, 'operator');
         return $operator;
     }
 
@@ -257,6 +263,7 @@ class Operator extends Core {
         }
         $operator = Operator::execute($operator, $variable, $parser);
         array_unshift($statement, $operator);
+        debug($statement, 'statement');
         return $statement;
     }
 

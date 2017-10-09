@@ -623,6 +623,13 @@ class Token extends Core {
             }
             elseif(is_bool($record['value'])){
                 return $record['value'];
+            }
+            if(
+                is_array($record['value']) &&
+                isset($record['modified_is_executed']) &&
+                $record['modified_is_executed'] === true
+            ){
+                return $record['value'];
             } else {
                 return;
             }
