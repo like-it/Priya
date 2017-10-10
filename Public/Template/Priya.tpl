@@ -9,7 +9,12 @@ Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
 {$currenttime = null}
-{$currenttime  | date.format}
+{$currenttime
+
+ |
+ date.format
+
+ }
 {$method = 'awesome'}
 {$target = 'body'}
 {$time.test = $currenttime | date.format : "Y-m-d H:i:s" : "+1 week"}

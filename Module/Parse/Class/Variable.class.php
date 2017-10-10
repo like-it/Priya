@@ -85,7 +85,7 @@ class Variable extends Core {
         $modifier_list = explode('|', $attribute);
         $attribute = trim(array_shift($modifier_list), ' ');
         if(!empty($modifier_list)){
-            $modifier = implode('|', $modifier_list);
+            $modifier = Token::restore_return(implode('|', $modifier_list), $this->random());
         } else {
             $modifier = '';
         }
