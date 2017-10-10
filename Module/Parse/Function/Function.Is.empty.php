@@ -12,11 +12,8 @@ function function_is_empty($function=array(), $argumentList=array(), $variable=n
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $list = array();
-    foreach($argumentList as $argument){
-        $list[] = $argument;
-    }
-    foreach($list as $nr => $argument){
+    $argument = array_shift($argumentList);
+    if(is_string($argument)){
         $argument = str_replace('"null"', '', $argument);
         $argument = str_replace('"false"', '',$argument);
         $argument = str_replace('""', '', $argument);
@@ -24,10 +21,7 @@ function function_is_empty($function=array(), $argumentList=array(), $variable=n
         $argument = str_replace('"0"', '', $argument);
         $argument = str_replace('0.0', '', $argument);
         $argument = str_replace('0', '', $argument);
-        if(empty($argument)){
-            unset($list[$nr]);
-        }
     }
-    $function['execute']  = empty($list);
+    $function['execute']  = empty($argument);
     return $function;
 }

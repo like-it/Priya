@@ -17,9 +17,11 @@ _______________________________________________________________________________
  }
 {$method = 'awesome'}
 {$target = 'body'}
-{$time.test = $currenttime | date.format : "Y-m-d H:i:s" : "+1 week"}
+{$time.test = $currenttime
+|
+ date.format : "Y-m-d H:i:s" : "+1 week"}
 {$dont.forget = 'test'}
-{$default = $notfound | default2:["me","arrays", "no ob{}jects", true, 1.0, $count] | json}
+{$default = $notfound | default2:{"test":"test"}}
 {if !is.empty($method) && !is.empty($target)}
 has method & target
 {$method}

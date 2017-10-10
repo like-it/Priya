@@ -254,7 +254,10 @@ class Token extends Core {
                     continue;
                 }
             }
-            if(Token::is_bracket($token, Token::TYPE_OPEN) && Token::is_bracket(end($tokens) ,  Token::TYPE_CLOSE)){
+            if(
+                Token::is_bracket($token, Token::TYPE_OPEN) &&
+                Token::is_bracket(end($tokens) ,  Token::TYPE_CLOSE)
+            ){
                 $record['type'] = Token::TYPE_OBJECT;
                 if(is_array($value)){
                     $parse = Token::parse($value);
@@ -275,10 +278,19 @@ class Token extends Core {
                 $record['attribute'] = $attribute;
                 $record['original'] = $record['value'];
                 $record['token'] = $tokens;
+                debug($record, 'shouldnt be an object type?');
+                die;
                 $record['value'] = Token::object($record['value']);
-                foreach($record['value'] as $key => $assign){
-                    $parser->data($attribute . '.' . $key, $assign);
+                if(
+                    is_array($record['value']) ||
+                    is_object($record['value'])
+                ){
+                    foreach($record['value'] as $key => $assign){
+                        $parser->data($attribute . '.' . $key, $assign);
+                    }
                 }
+                debug($record, 'rec');
+
                 $record['value'] = $parser->compile($record['value'], $parser->data(), true);
                 return $record;
             }
