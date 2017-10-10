@@ -13,18 +13,24 @@ function modifier_date_format($value=null, $argumentList=array()){
     }
     $format = array_shift($argumentList);
     $time = array_shift($argumentList);
-    if(is_string($time)){
+    if(!is_numeric($time)){
         $time = strtotime($time);
     }
     if(!empty($value) || ($value === 0 || $value === '0')){
-        $time = $value;
+        if(is_numeric($value)){
+            $time = $value;
+        } else {
+            $time = strtotime($time);
+        }
+
     }
     if(empty($format)){
         $format = 'Y-m-d H:i:s';
     }
-    if($time === null){
-        return date($format);
+    if($time === null || $time === false){
+        $date = date($format);
     } else {
-        return date($format, $time);
+        $date = date($format, $time);
     }
+    return $date;
 }
