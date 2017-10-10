@@ -8,11 +8,12 @@ Welcome to PRIYA
 {/literal}
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
+{$currenttime = null}
+{$currenttime | date.format}
 {$method = 'awesome'}
 {$target = 'body'}
-{$time.timer = $currenttime | date.format::0}
 {$time.test = $currenttime | date.format : "Y-m-d H:i:s" : "+1 week"}
-
+{$dont.forget = 'test'}
 {$default = $notfound | default2:["me","arrays", "no ob{}jects", true, 1.0, $count] | json}
 {if !is.empty($method) && !is.empty($target)}
 has method & target

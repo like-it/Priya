@@ -86,7 +86,10 @@ class Parse extends Core {
                     $variable->data($assign->data());
                     $record['variable']['tag'] = $key;
                     $record = $variable->find($record);
-                    //add method
+                    $method->data($variable->data());
+                    $record['method']['tag'] = $key;
+                    $record = $method->find($record, $variable, $this);
+                    $assign->data($method->data());
                 }
                 $if->data($assign->data());
                 $record = $if::create($list, $record['string'], $this->random());
@@ -109,11 +112,9 @@ class Parse extends Core {
 
                 $variable->data($assign->data());
                 $record['variable']['tag'] = $key;
-                //need parent
                 $record = $variable->find($record);
                 $method->data($variable->data());
                 $record['method']['tag'] = $key;
-//                 debug($record, 'record');
                 $record = $method->find($record, $variable, $this);
             }
             $if->data($method->data());

@@ -267,7 +267,6 @@ class Assign extends Core {
                     }
                 }
                 if(!isset($item['value'])){
-                    debug($parse, 'empty value');
                     $this->data($attribute, null);
                     return;
                 }
