@@ -17,6 +17,7 @@ class Token extends Core {
     const TYPE_OPERATOR = 'operator';
     const TYPE_DOT = 'dot';
     const TYPE_COLON = 'colon';
+    const TYPE_DOUBLE_COLON = 'double-colon';
     const TYPE_SEMI_COLON = 'semi-colon';
     const TYPE_COMMA = 'comma';
     const TYPE_MIXED = 'mixed';
@@ -625,7 +626,6 @@ class Token extends Core {
                 return $record['value'];
             }
             if(
-                is_array($record['value']) &&
                 isset($record['modified_is_executed']) &&
                 $record['modified_is_executed'] === true
             ){
@@ -775,7 +775,11 @@ class Token extends Core {
                     if($record[$attribute] === 'true'){
                         $record[$attribute] = 1;
                     }
-                    $record[$attribute] = (int) round($record[$attribute] + 0);
+                    if(!is_numeric($record[$attribute])){
+                        $record[$attribute] = 0;
+                    } else {
+                        $record[$attribute] = (int) round($record[$attribute] + 0);
+                    }
                 }
                 $record['is_cast'] = false;
                 $record['type'] = Token::TYPE_INT;
@@ -1021,6 +1025,9 @@ class Token extends Core {
             break;
             case 'T_COLON' :
                 return Token::TYPE_COLON;
+            break;
+            case 'T_DOUBLE_COLON' :
+                return Token::TYPE_DOUBLE_COLON;
             break;
             case 'T_SEMI_COLON' :
                 return Token::TYPE_SEMI_COLON;

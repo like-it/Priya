@@ -4,8 +4,37 @@ namespace Priya\Module\Parse;
 
 class Modifier extends Core {
 
+    public static function get($parse=array()){
+        $modifier = false;
+        foreach($parse['right_parse'] as $nr => $record){
+            if($modifier === false){
+                $modifier = $record;
+                continue;
+            }
+            if($record['type'] == Token::TYPE_DOUBLE_COLON){
+                break;
+            }
+            if($record['type'] == Token::TYPE_COLON){
+                break;
+            } else {
+                $modifier['value'] .= $record['value'];
+            }
+        }
+        return $modifier;
+    }
+
+    public static function is($parse=array()){
+        if($parse['value'] == '|'){
+            $part = reset($parse['right_parse']);
+            if($part['type'] == Token::TYPE_STRING){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static function execute($operator=array(), Variable $variable, $parser=null){
-        $modifier = reset($operator['right_parse']);
+        $modifier = Modifier::get($operator);
         $name = str_replace(
             array(
                 '..',
@@ -29,8 +58,20 @@ class Modifier extends Core {
         $collect = false;
         $key = 0;
         foreach($operator['right_parse'] as $nr => $parse){
-            if($parse['type'] == Token::TYPE_COLON){
+            if(
+                in_array(
+                    $parse['type'],
+                    array(
+                        Token::TYPE_COLON,
+                        Token::TYPE_DOUBLE_COLON
+                    )
+                )
+            ){
                 $key++;
+                if($parse['type'] == Token::TYPE_DOUBLE_COLON){
+                    $argumentList[$key] = null;
+                    $key++;
+                }
                 $collect = true;
                 $is_array = false;
                 continue;
@@ -68,7 +109,12 @@ class Modifier extends Core {
         }
         $operator['execute'] = $name($value, $argumentList);
         $operator['value'] = $operator['execute'];
-        debug($operator['value']);
+        $part = reset($operator['right_parse']);
+        if(!empty($part['is_cast'])){
+            $operator['is_cast'] = $part['is_cast'];
+            $operator['cast'] = $part['cast'];
+        }
+        $operator= Token::cast($operator);
         return $operator;
     }
 

@@ -173,7 +173,6 @@ class Operator extends Core {
             debug($operator, 'no value');
         }
         $operator['type'] = Variable::type($operator['value']);
-        debug($operator, 'operator');
         return $operator;
     }
 
@@ -219,8 +218,12 @@ class Operator extends Core {
         $method = Token::method($method, $variable, $parser);
         $operator['right_parse'] = $method['parse'];
 
+        $is_modifier = 	Modifier::is($operator);
+
         foreach($operator['left_parse']as $nr => $record){
-            $record = Token::cast($record);
+            if($is_modifier === false){
+                $record = Token::cast($record);
+            }
             if(!isset($operator['left'])){
                 $operator['left'] = $record['value'];
             } else {
@@ -229,7 +232,9 @@ class Operator extends Core {
             $operator['left_parse'][$nr] = $record;
         }
         foreach($operator['right_parse']as $nr => $record){
-            $record = Token::cast($record);
+            if($is_modifier === false){
+                $record = Token::cast($record);
+            }
             if(!isset($operator['right'])){
                 $operator['right'] = $record['value'];
             } else {
@@ -263,7 +268,6 @@ class Operator extends Core {
         }
         $operator = Operator::execute($operator, $variable, $parser);
         array_unshift($statement, $operator);
-        debug($statement, 'statement');
         return $statement;
     }
 
