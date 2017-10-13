@@ -46,11 +46,13 @@ class Control_If extends Core {
         $reset = reset($parse);
         $collect = false;
         $value = '';
+        $has_else = false;
         foreach($parse as $nr => $record){
             if($record['depth'] == $reset['depth']){
                 $collect = true;
             }
             if($record['depth'] == $reset['depth'] && stristr($record['string'], '{else}') !== false){
+                $has_else = true;
                 $part = explode('{else}', $record['string'], 2);
                 if(count($part) == 1){
                     $value .= $record['string'];
@@ -66,10 +68,12 @@ class Control_If extends Core {
                 $collect = false;
             }
         }
-        $reverse = strrev($value);
-        $reverse = explode('}fi/{', $reverse, 2);
-        if(isset($reverse[1])){
-            $value = strrev($reverse[1]);
+        if($has_else === false){
+            $reverse = strrev($value);
+            $reverse = explode('}fi/{', $reverse, 2);
+            if(isset($reverse[1])){
+                $value = strrev($reverse[1]);
+            }
         }
         $explode = explode($if, $value);
         if(count($explode) == 2){

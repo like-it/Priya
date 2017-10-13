@@ -9,9 +9,7 @@ Welcome to PRIYA
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
 {if is.empty($method) && is.empty($target)}
-has method & target
-{/if}
-{$currenttime
+has method & target{/if}{$currenttime
 
  |
  date.format
