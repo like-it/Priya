@@ -7,7 +7,11 @@ class Set extends Core {
 
     public static function has($parse=array()){
         foreach ($parse as $nr => $record){
-            if(!empty($record['set']) && !empty($record['set']['depth'])){
+            if(
+                !empty($record['set']) &&
+                !empty($record['set']['depth']) &&
+                $record['value'] == '('
+            ){
                 return true;
             }
         }

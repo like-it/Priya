@@ -66,6 +66,11 @@ class Control_If extends Core {
                 $collect = false;
             }
         }
+        $reverse = strrev($value);
+        $reverse = explode('}fi/{', $reverse, 2);
+        if(isset($reverse[1])){
+            $value = strrev($reverse[1]);
+        }
         $explode = explode($if, $value);
         if(count($explode) == 2){
             return $explode[1];
@@ -124,6 +129,7 @@ class Control_If extends Core {
                 $raw = $value;
                 $depth = Control_If::depth($raw);
                 $true = Control_If::true($depth, $if);
+                debug($true);
                 $false = Control_If::false($depth);
                 if($false === false){
                     $result['if']['true'] = $true;
