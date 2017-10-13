@@ -204,15 +204,6 @@ class Assign extends Core {
             $create = Token::all($create);
             $object = Token::create_object($create, $attribute, $variable, $this->parser());
             if(!empty($object)){
-//                 debug($object, 'object');
-                //allow variables defined in quotes = "{$var}{$var2}"
-                //but having curly_brackets in quotes is nicer.
-                //but having valid json in source is more important
-                //so object.merge($var, $var2)
-                /**
-                 * if is object, the object needs to be parsed again
-                 *
-                 */
                 $object['value'] = $variable->replace($object['value']);
                 //is variable data changed?
                 $object = Token::cast($object);

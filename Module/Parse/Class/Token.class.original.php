@@ -239,56 +239,6 @@ class Token extends Core {
     }
 
     public static function create_object($value= '', $attribute='', Variable $variable, $parser=null){
-        $parse = Token::parse($value);
-        $object_start = false;
-        $object_end = false;
-        foreach($parse as $nr => $record){
-            if($record['value'] == '{'){
-                $object_start = true;
-            }
-            if($record['value'] == '}'){
-                $object_end = true;
-            }
-            if($record['type'] == Token::TYPE_OPERATOR){
-                return array();
-            }
-            if(
-                $object_start === true &&
-                $object_end === true
-            ){
-                $parse = Token::variable($parse, $variable, $attribute);
-                //if is_object($parse... assign the attributes
-                $method = array();
-                $method['parse'] = $parse;
-                $method = Token::method($method, $variable, $parser);
-                $parse = $method['parse'];
-                $value = Token::string($value, $variable);
-                $result = array();
-                $result['type'] = Token::TYPE_OBJECT;
-                if($record['is_cast'] === true){
-                    $explode = explode($record['cast'], $value, 2);
-                    $$result['value'] = ltrim($explode[1], ') ');
-                } else {
-                    $result['value'] = $value;
-                }
-                $result['attribute'] = $attribute;
-                $result['original'] = $result['value'];
-                $result['value'] = Token::object($result['value']);
-                if(
-                    is_array($result['value']) ||
-                    is_object($result['value'])
-                ){
-                    foreach($result['value'] as $key => $assign){
-                        $parser->data($attribute . '.' . $key, $assign);
-                    }
-                }
-                $result['value'] = $parser->compile($result['value'], $parser->data(), true);
-                return $result;
-                break;
-            }
-        }
-        return array();
-
         if(is_array($value)){
             $tokens = $value;
         } else {
@@ -304,7 +254,6 @@ class Token extends Core {
                     continue;
                 }
             }
-//             if(Token::is_operator)
 //             debug($token, 'token');
             if(
                 Token::is_bracket($token, Token::TYPE_OPEN) &&
@@ -482,7 +431,6 @@ class Token extends Core {
          * first find the variable
          * from there upwards till (
          */
-//         debug($parse, 'par');
         foreach ($parse as $nr => $record){
             $possible_dot = next($parse);
             if(!isset($record['value'])){
@@ -492,6 +440,15 @@ class Token extends Core {
                 continue;
             }
             $exclamation_parse[$nr] = $record;
+            /*
+            if($record['type'] == Token::TYPE_EXCLAMATION && empty($item)){
+                $has_exclamation = true;
+                $exclamation_count++;
+                $unset[] = $nr;
+//                 unset($parse[$nr]);
+                continue;
+            }
+            */
             if($record['type'] != Token::TYPE_VARIABLE && empty($item)){
                 continue;
             }
@@ -524,8 +481,7 @@ class Token extends Core {
                 if($attribute !== null){
                     $record['value'] = str_replace('$this.', '$' . $attribute . '.', $record['value']);
                 }
-                $modifier = Token::modifier($parse);
-                $record['value'] = $variable->replace($record['value'], $modifier);
+                $record['value'] = $variable->replace($record['value']);
                 if($record['exclamation_count'] % 2 == 1){
                     $record['invert'] = true;
                 } else {
@@ -564,7 +520,6 @@ class Token extends Core {
                     } else {
                         $item['invert'] = false;
                     }
-//                     debug($item, 'item');
                     $item['value'] = $variable->replace($item['value']);
                     $item = Token::Exclamation($item);
                     if($item['type'] == Token::TYPE_VARIABLE){
@@ -590,6 +545,7 @@ class Token extends Core {
             $item['exclamation_count'] = $exclamation_count;
             if($attribute !== null){
                 $item['value'] = str_replace('$this.', '$' . $attribute . '.', $item['value']);
+                debug($item, 'here');
             }
             if($item['exclamation_count'] % 2 == 1){
                 $item['invert'] = true;
@@ -617,20 +573,6 @@ class Token extends Core {
         return $parse;
     }
 
-    public static function modifier($parse=array()){
-        $modifier = '';
-        $collect = false;
-        foreach($parse as $nr => $record){
-            if($record['value'] == '|'){
-                $collect = true;
-            }
-            if($collect === true){
-                $modifier .= $record['value'];
-            }
-        }
-        return $modifier;
-    }
-
     /**
      * @todo
      * - add cast
@@ -654,9 +596,7 @@ class Token extends Core {
 //             debug($set, 'set is wrong, need has_exclamation & invert on first?');
             $operator_counter = 0;
             if(empty($statement)){
-                debug(set::has($parse));
-                debug($set, 'set');
-                debug($parse, 'parse empty statement');
+                debug($parse, 'parse');
                 die;
                 break;
             }

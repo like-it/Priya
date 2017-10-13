@@ -8,7 +8,9 @@ Welcome to PRIYA
 {/literal}
 _______________________________________________________________________________
 -------------------------------------------------------------------------------
-{$currenttime = null}
+{if is.empty($method) && is.empty($target)}
+has method & target
+{/if}
 {$currenttime
 
  |
@@ -21,7 +23,6 @@ _______________________________________________________________________________
 |
  date.format : "Y-m-d H:i:s" : "+1 week"}
 {$dont.forget = 'test'}
-{$default = $notfound | default2:{"test":"test"}}
 {if !is.empty($method) && !is.empty($target)}
 has method & target
 {$method}

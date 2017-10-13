@@ -3,12 +3,20 @@
 namespace Priya\Module\Parse;
 
 class Modifier extends Core {
+    const MAX = 1024;
 
     public static function get($parse=array()){
         $modifier = false;
         foreach($parse as $nr => $record){
             if($record['type'] == Token::TYPE_WHITESPACE){
                 continue;
+            }
+            if($record['value'] == '|'){
+                if($modifier === false){
+                    continue;
+                } else {
+                    break;
+                }
             }
             if($modifier === false){
                 $modifier = $record;
@@ -36,52 +44,94 @@ class Modifier extends Core {
         return false;
     }
 
+    public static function remove($parse=array()){
+        $modifier = false;
+        foreach($parse as $nr => $record){
+            if($record['type'] == Token::TYPE_WHITESPACE){
+                unset($parse[$nr]);
+                continue;
+            }
+            if($record['value'] == '|'){
+                if($modifier === false){
+                    unset($parse[$nr]);
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            if($modifier === false){
+                $modifier = $record;
+                unset($parse[$nr]);
+                continue;
+            }
+            if($modifier !== false){
+                unset($parse[$nr]);
+            }
+        }
+        return $parse;
+    }
+
+    /**
+     * @todo
+     * -	multiple modifiers;
+     */
     public static function find($value='', $modifier=''){
         $parse = Token::parse($modifier);
-        $modifier = Modifier::get($parse);
-        if($modifier === false){
-            return $value;
+        $counter = 0;
+        while($modifier = Modifier::get($parse)){
+            if($modifier === false){
+                return $value;
+            }
+            $argument = Modifier::argument($parse);
+            $name = str_replace(
+                array(
+                    '..',
+                    '//',
+                    '\\',
+                ),
+                '',
+                ucfirst($modifier['value'])
+            );
+            $url = __DIR__ . '/../Modifier/Modifier.' . $name . '.php';
+            $name = 'modifier_' . str_replace('.', '_', strtolower($name));
+            if(file_exists($url)){
+                require_once $url;
+            } else {
+                trigger_error('Modifier (' . $name .') not found (' . $url . ')', E_USER_ERROR);
+            }        ;
+            $value = $name($value, $argument);
+            if(!empty($modifier['is_cast'])){
+                $record = array();
+                $record['value'] = $value;
+                $record['is_cast'] = $modifier['is_cast'];
+                $record['cast'] = $modifier['cast'];
+                $record = Token::cast($record);
+                $value = $record['value'];
+            }
+            $parse = Modifier::remove($parse);
+            $counter++;
+            if($counter > Modifier::MAX){
+                break;
+            }
         }
-        $argument = Modifier::argument($parse);
-        $name = str_replace(
-            array(
-                '..',
-                '//',
-                '\\',
-            ),
-            '',
-            ucfirst($modifier['value'])
-        );
-
-        $url = __DIR__ . '/../Modifier/Modifier.' . $name . '.php';
-        $name = 'modifier_' . str_replace('.', '_', strtolower($name));
-        if(file_exists($url)){
-            require_once $url;
-        } else {
-            trigger_error('Modifier (' . $name .') not found (' . $url . ')', E_USER_ERROR);
-        }        ;
-        $value = $name($value, $argument);
-
-        if(!empty($modifier['is_cast'])){
-            $record = array();
-            $record['value'] = $value;
-            $record['is_cast'] = $modifier['is_cast'];
-            $record['cast'] = $modifier['cast'];
-            $record= Token::cast($record);
-            return $record['value'];
-
-        } else {
-            return $value;
-        }
+        return $value;
     }
 
     public static function argument($parse=array()){
         $argumentList = array();
         $collect = false;
         $key = 0;
+        $is_modifier = false;
         foreach($parse as $nr => $record){
             if($record['type'] == Token::TYPE_WHITESPACE){
                 continue;
+            }
+            if($record['value'] == '|'){
+                if($is_modifier === false){
+                    $is_modifier = true;
+                } else {
+                    return $argumentList;
+                }
             }
             $record =  Value::get($record);
             if(

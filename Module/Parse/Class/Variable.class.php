@@ -183,6 +183,7 @@ class Variable extends Core {
                     } else {
                         $output = $this->data($attribute);
                         $output = Variable::value($output);
+//                         debug($modifier, 'modifier');
                         $output = Modifier::find($output, $modifier);
                     }
                 } else {
