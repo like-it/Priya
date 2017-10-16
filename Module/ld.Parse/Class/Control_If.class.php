@@ -133,6 +133,7 @@ class Control_If extends Core {
                 $raw = $value;
                 $depth = Control_If::depth($raw);
                 $true = Control_If::true($depth, $if);
+                debug($true);
                 $false = Control_If::false($depth);
                 if($false === false){
                     $result['if']['true'] = $true;
