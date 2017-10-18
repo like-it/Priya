@@ -39,6 +39,9 @@ class Variable extends Core {
     }
 
     public static function value($mixed=null){
+        if(is_numeric($mixed)){
+            return $mixed + 0;
+        }
         switch($mixed){
             case 'true':
                 return true;
@@ -139,6 +142,15 @@ class Variable extends Core {
         $record['string'] = implode($item['replace'], $explode);
         unset($record['cast']);
         unset($record['is_cast']);
+        if($record['string'] == 'null'){
+            $record['string'] = null;
+        }
+        elseif($record['string'] == 'true'){
+            $record['string'] = true;
+        }
+        elseif($record['string'] == 'false'){
+            $record['string'] = false;
+        }
         return $record;
     }
 
@@ -183,8 +195,21 @@ class Variable extends Core {
                     } else {
                         $output = $this->data($attribute);
                         $output = Variable::value($output);
-//                         debug($modifier, 'modifier');
-                        $output = Modifier::find($output, $modifier);
+                        $output = Modifier::find($output, $modifier, $this);
+                        $attr = $output;
+                        if(substr($attr, 0, 1) == '{' && substr($attr, -1) == '}'){
+                            $attr = substr($attr, 1, -1);
+                        }
+                        while(substr($attr, 0, 1) == '$'){
+                            $find['string'] = $output;
+                            $find['variable']['tag'] = $output;
+                            $find = $this->find($find);
+                            $output = $find['string'];
+                            $attr = $output;
+                            if(substr($attr, 0, 1) == '{' && substr($attr, -1) == '}'){
+                                $attr = substr($attr, 1, -1);
+                            }
+                        }
                     }
                 } else {
                     $output = $input;

@@ -1,0 +1,19 @@
+{
+"allow" : {
+    "public_html" : "public_html",
+    "web" : "web",
+    "time" : "time"
+},
+"boolean" : true,
+"count" : 3,
+"start" : 3.232,
+"var" : "{$start}",
+"test" : "{$start}",
+"entity" : {
+    "decode" : {
+        "html" : "html",
+        "script" : "script",
+        "link" : "link"
+    }
+}
+}

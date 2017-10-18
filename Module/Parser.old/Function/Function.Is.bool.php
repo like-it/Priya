@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author 		Remco van der Velde
  * @since 		2017-04-20
@@ -7,12 +8,9 @@
  * 	-	all
  */
 
-function modifier_default2($value=null, $argumentList=array()){
+function function_is_bool($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    if(empty($value) && count($argumentList) >= 1){
-        return end($argumentList);
-    }
-    return $value;
+    return is_bool(array_shift($argumentList));
 }

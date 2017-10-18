@@ -142,7 +142,7 @@ class Operator extends Core {
             case '|' :
                 $modifier = reset($operator['right_parse']);
                 if(is_string($modifier['value'])){
-                    $operator = Modifier::execute($operator);
+                    $operator = Modifier::execute($operator, $variable);
                     unset($operator['left']);
                     unset($operator['right']);
                     $operator['modified_is_executed'] = true;

@@ -75,14 +75,14 @@ class Modifier extends Core {
      * @todo
      * -	multiple modifiers;
      */
-    public static function find($value='', $modifier=''){
+    public static function find($value='', $modifier='', Variable $variable){
         $parse = Token::parse($modifier);
         $counter = 0;
         while($modifier = Modifier::get($parse)){
             if($modifier === false){
                 return $value;
             }
-            $argument = Modifier::argument($parse);
+            $argument = Modifier::argument($parse, $variable);
             $name = str_replace(
                 array(
                     '..',
@@ -98,7 +98,7 @@ class Modifier extends Core {
                 require_once $url;
             } else {
                 trigger_error('Modifier (' . $name .') not found (' . $url . ')', E_USER_ERROR);
-            }        ;
+            }
             $value = $name($value, $argument);
             if(!empty($modifier['is_cast'])){
                 $record = array();
@@ -117,7 +117,7 @@ class Modifier extends Core {
         return $value;
     }
 
-    public static function argument($parse=array()){
+    public static function argument($parse=array(), Variable $variable){
         $argumentList = array();
         $collect = false;
         $key = 0;
@@ -183,10 +183,22 @@ class Modifier extends Core {
                 }
             }
         }
+        foreach($argumentList as $key => $argument){
+            if(substr($argument, 0, 1) == '$'){
+                $attribute = substr($argument, 1);
+                if($attribute === false){
+                    continue;
+                } else {
+                    $argumentList[$key] = Variable::value(
+                        $variable->data($attribute)
+                    );
+                }
+            }
+        }
         return $argumentList;
     }
 
-    public static function execute($operator=array()){
+    public static function execute($operator=array(), Variable $variable){
         $modifier = Modifier::get($operator['right_parse']);
         $name = str_replace(
             array(
@@ -206,7 +218,7 @@ class Modifier extends Core {
             trigger_error('Modifier (' . $name .') not found (' . $url . ')', E_USER_ERROR);
         }
         $before = reset($operator['left_parse']);
-        $argument = Modifier::argument($operator['right_parse']);
+        $argument = Modifier::argument($operator['right_parse'], $variable);
         $value = $before['value'];
         $operator['execute'] = $name($value, $argument);
         $operator['value'] = $operator['execute'];

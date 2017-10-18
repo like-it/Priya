@@ -118,6 +118,10 @@ class Result extends Parser {
     }
 
     public function createTemplate($template=''){
+        if($template != ''){
+            debug($template);
+            die;
+        }
         $contentType = $this->request('contentType');
         $data = $this->data();
         $template_list = array();
@@ -420,6 +424,11 @@ class Result extends Parser {
         $environment = $this->data('priya.environment');
         if(!empty($environment)){
             $tpl->environment($environment);
+        }
+        if($template ==	'{$module}'){
+            debug('found');
+            debug(debug_backtrace(true));
+            die;
         }
         $url = $tpl->tpl_load($template);
         if(empty($url)){

@@ -25,6 +25,15 @@ class Parse extends Core {
         } else {
             $this->data(Parse::object_merge($this->data(), $handler));
         }
+        $this->data($this->compile($this->data()));
+    }
+
+    public function read($url=''){
+        $read = parent::read($url);
+        if(!empty($read)){
+            return $this->data($this->compile($this->data(), $this->data()));
+        }
+        return $read;
     }
 
     public function compile($string, $keep=false){
@@ -83,12 +92,15 @@ class Parse extends Core {
                     $assign->find($key);
                     $record['assign']['tag'] = $key;
                     $record = Parse\Assign::row($record, $this->random());
+
                     $variable->data($assign->data());
                     $record['variable']['tag'] = $key;
                     $record = $variable->find($record);
+
                     $method->data($variable->data());
                     $record['method']['tag'] = $key;
                     $record = $method->find($record, $variable, $this);
+
                     $assign->data($method->data());
                 }
                 $if->data($assign->data());
@@ -112,18 +124,19 @@ class Parse extends Core {
 
                 $variable->data($assign->data());
                 $record['variable']['tag'] = $key;
+//                 debug($record);
                 $record = $variable->find($record);
+
+//                 debug($record['variable']['tag']);
+
                 $method->data($variable->data());
                 $record['method']['tag'] = $key;
                 $record = $method->find($record, $variable, $this);
+
+                $assign->data($method->data());
             }
             $if->data($method->data());
             $this->data($if->data());
-
-            if(!isset($record['string'])){
-                debug($record, 'no string');
-                die;
-            }
 
             $string = $record['string'];
 
