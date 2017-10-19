@@ -74,7 +74,7 @@ class Parse extends Core {
             $data = $this->data();
             $assign = new Parse\Assign($data, $this->random(), $this);
             $if = new Parse\Control_If($data, $this->random(), $this);
-            $variable = new Parse\Variable($data, $this->random());
+            $variable = new Parse\Variable($data, $this->random(), $this);
             $method = new Parse\Method($data, $this->random());
             $if_counter = 0;
 

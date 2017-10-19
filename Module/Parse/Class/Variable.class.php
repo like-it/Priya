@@ -4,9 +4,27 @@ namespace Priya\Module\Parse;
 
 class Variable extends Core {
 
-    public function __construct($data=null, $random=null){
+    private $parser;
+
+    public function __construct($data=null, $random=null, $parser=null){
         $this->data($data);
         $this->random($random);
+        $this->parser($parser);
+    }
+
+    public function parser($parser=null){
+        if($parser !== null){
+            $this->setParser($parser);
+        }
+        return $this->getParser();
+    }
+
+    private function setParser($parser=''){
+        $this->parser= $parser;
+    }
+
+    private function getParser(){
+        return $this->parser;
     }
 
     public static function type($mixed=null){
@@ -196,20 +214,9 @@ class Variable extends Core {
                         $output = $this->data($attribute);
                         $output = Variable::value($output);
                         $output = Modifier::find($output, $modifier, $this);
-                        $attr = $output;
-                        if(substr($attr, 0, 1) == '{' && substr($attr, -1) == '}'){
-                            $attr = substr($attr, 1, -1);
-                        }
-                        while(substr($attr, 0, 1) == '$'){
-                            $find['string'] = $output;
-                            $find['variable']['tag'] = $output;
-                            $find = $this->find($find);
-                            $output = $find['string'];
-                            $attr = $output;
-                            if(substr($attr, 0, 1) == '{' && substr($attr, -1) == '}'){
-                                $attr = substr($attr, 1, -1);
-                            }
-                        }
+
+                        $output = $this->parser()->compile($output);
+                        //parse comile again on output
                     }
                 } else {
                     $output = $input;
