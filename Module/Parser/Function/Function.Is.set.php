@@ -8,10 +8,11 @@
  * 	-	all
  */
 
-function function_is_set($value=null, $argumentList=array(), $parser=null){
+function function_is_set($function=array(), $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
     $argument = reset($argumentList);
-    return isset($argument);
+    $function['execute']  = isset($argument);
+    return $function;
 }

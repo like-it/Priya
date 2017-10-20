@@ -8,9 +8,10 @@
  * 	-	all
  */
 
-function function_is_array($value=null, $argumentList=array(), $parser=null){
+function function_is_array($function=array(), $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    return is_array(array_shift($argumentList));
+    $function['execute'] =  is_array(array_shift($argumentList));
+    return $function;
 }

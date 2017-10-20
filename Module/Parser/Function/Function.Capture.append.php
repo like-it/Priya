@@ -8,13 +8,19 @@
  * 	-	all
  */
 
-function function_capture_append($value=null, $argumentList=array(), $parser=null){
+use Priya\Module\Parser\Token;
+use Priya\Module\Parser\Newline;
+
+function function_capture_append($function=array(), $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
+    $attribute = trim(array_shift($argumentList), '"\'');
+    $value = $function['string'];
+    $value = str_ireplace('{capture.append', '{capture.append', $value);
+    $value = str_ireplace('{/capture}', '{/capture}', $value);
     $value = str_replace('{capture.append', '{capture.append[' . $parser->random() . ']', $value);
-
-    $explode = $parser->explode_single(array('{/capture}', '{capture.append'), $value);
+    $explode = $parser->explode_single(array('{/capture}', '{capture.append'), $value, 2);
 
     foreach($explode as $string){
         $temp = explode('[' . $parser->random() . '](', $string, 2);
@@ -23,19 +29,37 @@ function function_capture_append($value=null, $argumentList=array(), $parser=nul
             if(count($tmp) != 2){
                 continue;
             }
-            $key = trim(reset($tmp), '\'"');
-
-            $array = $parser->data($key);
+            $array = $parser->data($attribute);
             if(empty($array) || !is_array($array)){
                 $array = array();
             }
-            $parser->test = true;
             $tmp[1] = $parser->compile($tmp[1], $parser->data());
-            $array[] = $tmp[1];
-            $parser->data($key, $array);
+            $array[] = trim($tmp[1]);
+            $parser->data($attribute, $array);
             $search = '{capture.append' . $string . '{/capture}';
-            $value = str_replace($search, '', $value);
+            $string_length = strlen($value);
+            $replace_length = str_replace($search, '', $value);
+
+            $key = '[' . $parser->random() . '][capture]';
+            $value = str_replace($search, $key, $value);
+            if(strlen($string_length) == $replace_length){
+                debug('str_replace not working');
+            } else {
+                $value = Token::restore_return($value, $parser->random());
+                $var = explode("\n", $value);
+                foreach($var as $nr => $var_value){
+                    if(trim($var_value) == $key){
+                        unset($var[$nr]);
+                        break;
+                    }
+                }
+                $value = implode("\n", $var);
+                $value= Newline::replace($value, $parser->random());
+            }
+            break;
         }
     }
-    return $value;
+    $function['string'] = $value;
+    $function['execute'] = '';
+    return $function;
 }

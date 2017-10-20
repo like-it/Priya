@@ -8,7 +8,7 @@
  * 	-	all
  */
 
-function function_array_in($value=null, $argumentList=array(), $parser=null){
+function function_array_in($function=array(),$argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
@@ -16,8 +16,9 @@ function function_array_in($value=null, $argumentList=array(), $parser=null){
     $haystack = array_shift($argumentList);
     $strict = array_shift($argumentList);
     if(!empty($strict)){
-        return in_array($needle, $haystack, true);
+        $function['execute'] = in_array($needle, $haystack, true);
     } else {
-        return in_array($needle, $haystack);
+        $function['execute'] = in_array($needle, $haystack);
     }
+    return $function;
 }
