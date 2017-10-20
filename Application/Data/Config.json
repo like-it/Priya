@@ -17,6 +17,8 @@
     },
     "priya": {
         "environment": "production",
+        "comment" : "/*comment*/",
+        "special_comment" : "/**comment*/",
         "version": "{$priya.major|default:0}.{$priya.minor|default:0}.{$priya.patch|default:0}",
         "major": 0,
         "minor": 1,

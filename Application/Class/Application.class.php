@@ -144,8 +144,9 @@ class Application extends Parser {
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
-        chdir($this->data('dir.priya.application')); //uncomment causes Parser to create an empty input even in this if statement
-
+        if($this->data('dir.priya.application')){
+            chdir($this->data('dir.priya.application'));
+        }
         if(empty($autoload)){
             $autoload = new \Priya\Module\Autoload();
             $autoload->addPrefix('Priya',  dirname(Application::DIR) . Application::DS);

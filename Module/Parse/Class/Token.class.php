@@ -31,6 +31,7 @@ class Token extends Core {
     const TYPE_METHOD = 'method';
     const TYPE_EXCLAMATION = 'exclamation';
     const TYPE_CONTROL = 'control';
+    const TYPE_AT = 'at';
 
     public static function all($token=''){
         $tokens = token_get_all('<?php $variable=' . $token . ';');
@@ -88,6 +89,9 @@ class Token extends Core {
                     break;
                     case '$' :
                         $tokens[$key][2] = 'T_DOLLAR_SIGN';
+                    break;
+                    case '@' :
+                        $tokens[$key][2] = 'T_AT';
                     break;
                     case '&&' :
                         $tokens[$key][2] = 'T_BOOLEAN_AND';
@@ -924,7 +928,7 @@ class Token extends Core {
         }
     }
 
-    public static function string($tokens=array(), Variable $variable){
+    public static function string($tokens=array(), Variable $variable=null){
         $string = '';
         $is_string = false;
         $is_variable = false;
@@ -981,9 +985,14 @@ class Token extends Core {
                             $token[1] = '"' . $token[1] . '"';
                         }
                     }
-                    elseif(in_array($token[2], array(
-                        'T_VARIABLE'
-                    ))){
+                    elseif(
+                        in_array(
+                            $token[2], array(
+                                'T_VARIABLE'
+                            )
+                        ) &&
+                        is_object($variable)
+                    ){
                         $token[1] = $variable->replace($token[1]);
                     }
                 }
@@ -1148,6 +1157,18 @@ class Token extends Core {
     }
 
     public static function remove_comment($string=''){
+        $tokens = Token::all($string);
+        $string = '';
+        foreach($tokens as $nr => $token){
+            if(!isset($token[2])){
+                var_dump($token);
+                die;
+            }
+            if($token[2] == 'T_COMMENT'){
+                continue;
+            }
+            $string .= $token[1];
+        }
         return $string;
     }
 
