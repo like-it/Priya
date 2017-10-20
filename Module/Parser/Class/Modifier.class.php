@@ -75,7 +75,7 @@ class Modifier extends Core {
      * @todo
      * -	multiple modifiers;
      */
-    public static function find($value='', $modifier='', Variable $variable){
+    public static function find($value='', $modifier='', Variable $variable, $parser=null){
         $parse = Token::parse($modifier);
         $counter = 0;
         while($modifier = Modifier::get($parse)){
@@ -99,7 +99,7 @@ class Modifier extends Core {
             } else {
                 trigger_error('Modifier (' . $name .') not found (' . $url . ')', E_USER_ERROR);
             }
-            $value = $name($value, $argument);
+            $value = $name($value, $argument, $parser);
             if(!empty($modifier['is_cast'])){
                 $record = array();
                 $record['value'] = $value;
@@ -198,7 +198,7 @@ class Modifier extends Core {
         return $argumentList;
     }
 
-    public static function execute($operator=array(), Variable $variable){
+    public static function execute($operator=array(), Variable $variable, $parser=null){
         $modifier = Modifier::get($operator['right_parse']);
         $name = str_replace(
             array(
@@ -220,7 +220,7 @@ class Modifier extends Core {
         $before = reset($operator['left_parse']);
         $argument = Modifier::argument($operator['right_parse'], $variable);
         $value = $before['value'];
-        $operator['execute'] = $name($value, $argument);
+        $operator['execute'] = $name($value, $argument, $parser);
         $operator['value'] = $operator['execute'];
         $part = reset($operator['right_parse']);
         if(!empty($part['is_cast'])){

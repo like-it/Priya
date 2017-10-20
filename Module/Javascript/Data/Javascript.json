@@ -1,0 +1,13 @@
+{
+"@see" : "http://priya.software/Documentation/Javascript",
+"name" : "{$url|basename:'.json'}",
+"core" : "{$web.root}Priya/Public/Js/Prototype/Core/",
+"prototype" : "{$core|dir.name}",
+"test" : "{$core}",
+"extension" : ".prototype.js",
+"require" : {
+    "file" : [
+        "{$prototype}Usleep{$extension}"
+    ]
+}
+}

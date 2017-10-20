@@ -313,11 +313,13 @@ class Application extends Parser {
                 }
             }
         }
-        if(is_object($result) && isset($result->html)){
+        if(is_object($result)){
             if($contentType == Handler::CONTENT_TYPE_JSON){
                 $result = $this->object($result, 'json');
             } else {
-                $result = $result->html;
+                if(isset($result->html)){
+                    $result = $result->html;
+                }
             }
         }
         elseif(is_string($result)){

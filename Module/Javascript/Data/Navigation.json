@@ -1,0 +1,54 @@
+{
+    "title": "Priya.Navigation",
+    "keywords": "",
+    "description": "Priya.Navigation",
+    "author": "Remco van der Velde",
+    "distibrution": "Global",
+    "icon": "fav.ico",
+    "rating": "General",
+    "revisit": "1 Week",
+    "update": "2015-06-09 22:45:20",
+    "link": "",
+    "template": "{$module}",
+    "script": "",
+    "authors": {
+        "name": "Remco van der Velde",
+        "email": "remco.pc@outlook.com"
+    },
+    "support": {
+        "email": "remco.pc@outlook.com"
+    },
+    "contentType": {
+        "application/json": {
+            "template": [
+                "{$template}"
+            ],
+            "link": [
+                "{$link}"
+            ],
+            "script": [
+                "<script type=\"text/javascript\" src=\"{$web.root}Priya/Public/Js/Prototype/NodeList.prototype.js?{$priya.revision | default:\"{$priya.version}\"}\" data-require-once=\"true\"></script>",
+                "{$script}"
+            ]
+        }
+    },
+    "menu": {
+      "1" : {
+        "jid":"1",
+        "url":"{$web.root}",
+        "target": "body",
+        "method": "replace",
+        "title":"Refresh"
+      },
+      "2" : {
+        "jid":"2",
+        "url":"{route('priya-system-monitor')}",
+        "title":"System.Monitor"
+      },
+      "3" : {
+        "jid":"3",
+        "url":"{route('app-issue-detail')}",
+        "title":"Issues"
+      }
+    }
+}

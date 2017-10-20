@@ -213,7 +213,7 @@ class Variable extends Core {
                     } else {
                         $output = $this->data($attribute);
                         $output = Variable::value($output);
-                        $output = Modifier::find($output, $modifier, $this);
+                        $output = Modifier::find($output, $modifier, $this, $this->parser());
 
                         $output = $this->parser()->compile($output);
                         //parse comile again on output
@@ -229,6 +229,7 @@ class Variable extends Core {
                             continue;
                         }
                         $attribute = substr($search, 2, -1);
+                        debug($attribute);
                         $value = $this->data($attribute);
                         $value = Variable::value($value);
                         $type = Variable::type($value);

@@ -81,8 +81,6 @@ class Parser extends Core {
             $record = array();
             $record['string'] = $string;
 
-//             debug($list, 'list');
-
             while($if::has($list)){
                 foreach($list as $value){
                     $key = key($value);
@@ -103,7 +101,7 @@ class Parser extends Core {
 
                     $assign->data($method->data());
                 }
-                $if->data($assign->data());
+//                 $if->data($assign->data());
                 $record = $if::create($list, $record['string'], $this->random());
                 $record = $if->statement($record, $this);
                 $list = $tag->find($record['string']);
@@ -113,7 +111,7 @@ class Parser extends Core {
                 }
                 $if_counter++;
             }
-            $assign->data($if->data());
+//             $assign->data($if->data());
 
             foreach($list as $value){
                 $key = key($value);
@@ -122,21 +120,18 @@ class Parser extends Core {
                 $record['assign']['tag'] = $key;
                 $record = Parser\Assign::row($record, $this->random());
 
-                $variable->data($assign->data());
+//                 $variable->data($assign->data());
                 $record['variable']['tag'] = $key;
-//                 debug($record);
                 $record = $variable->find($record);
 
-//                 debug($record['variable']['tag']);
-
-                $method->data($variable->data());
+//                 $method->data($variable->data());
                 $record['method']['tag'] = $key;
                 $record = $method->find($record, $variable, $this);
 
-                $assign->data($method->data());
+//                 $assign->data($method->data());
             }
-            $if->data($method->data());
-            $this->data($if->data());
+            $if->data($assign->data());
+//             $this->data($if->data());
 
             $string = $record['string'];
 

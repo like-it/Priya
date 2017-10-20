@@ -23,34 +23,23 @@
         ],
         "translate": false
     },
-     "priya-parser": {
-        "path": "Application\/Parser",
-        "default": {
-            "controller": "Priya.Module.Parser.run",
-            "format": "html",
-            "language": "en"
-        },
-        "method": [
-            "POST"
-        ],
-        "translate": false
-    },
-    "priya-template": {
-        "path": "Application\/Template\/{$template}",
-        "default": {
-            "controller": "Priya.Module.Template.run",
-            "format": "html",
-            "language": "en"
-        },
-        "method": [
-            "POST"
-        ],
-        "translate": false
-    },
     "Indent": {
         "path": "Priya/Module/Indent/Public/Css/Indent.css",
         "default": {
             "controller": "Priya.Module.Indent.css",
+            "format": "html",
+            "language": "en"
+        },
+        "method": [
+            "GET",
+            "POST"
+        ],
+        "translate": false
+    },
+    "Javascript": {
+        "path": "Priya/Javascript",
+        "default": {
+            "controller": "Priya.Module.Javascript.run",
             "format": "html",
             "language": "en"
         },

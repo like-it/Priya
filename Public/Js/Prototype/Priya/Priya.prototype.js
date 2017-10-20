@@ -23,7 +23,7 @@ var priya = function (url){
     this.load = 0;
     this.hit = 0;
     this.collect.url = url;
-    this.get(url + 'Priya/Public/Data/Priya.json', function(url, data){
+    this.get(url + 'Priya/Javascript', function(url, data){
         priya.collect.data = {};
         priya.collect.data.toLoad = 1;
         priya.collect.require.toLoad--;
@@ -106,23 +106,7 @@ var priya = function (url){
                 console.log(priya.collect);
                 //priya.collect = priya.object_merge(data, priya.collect);
             });
-            /*
-            require([
-
-            ], function(){
-                priya.expose('window');
-            });
-            */
-            /*
-            require([
-                core + 'Request.prototype.js'
-            ], function(){
-
-            });
-            */
         });
-
-
     });
 }
 
@@ -1486,7 +1470,12 @@ priya.prototype.get = function (url, script){
                 priya.collect.require.loaded++;
                 script(url, data);
             } else {
-                priya.debug(xhttp.responseText);
+                if(typeof priya.debug !== 'undefined' && typeof run !== 'undefined' ){
+                    priya.debug(xhttp.responseText);
+                } else {
+                    console.log(xhttp.responseText);
+                }
+
             }
         }
     };

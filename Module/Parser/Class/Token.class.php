@@ -37,7 +37,15 @@ class Token extends Core {
         array_shift($tokens); //remove php tag
         array_shift($tokens); //remove $variable
         array_shift($tokens); //remove =
-        array_pop($tokens); //remove ;
+        if(end($tokens) == ';'){
+            array_pop($tokens); //remove ;
+        } else {
+            // on // this should do...
+            $temp = end($tokens);
+            $key = key($tokens);
+            $temp[1] = substr($temp[1],0, -1);
+            $tokens[$key] = $temp;
+        }
 
         foreach ($tokens as $key => $token){
             if(is_array($token)){
@@ -1156,6 +1164,14 @@ class Token extends Core {
     }
 
     public static function remove_comment($string=''){
+        /*
+        if(stristr($string,'http') !== false){
+            $tokens = Token::all($string);
+            var_dump($string);
+            var_dump($tokens);
+        }
+        return $string;
+        */
         $tokens = Token::all($string);
         $string = '';
         foreach($tokens as $nr => $token){
@@ -1163,7 +1179,7 @@ class Token extends Core {
                 var_dump($token);
                 die;
             }
-            if($token[2] == 'T_COMMENT'){
+            if($token[2] == 'T_COMMENT' && stristr($token[1], '//') === false){
                 continue;
             }
             $string .= $token[1];
