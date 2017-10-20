@@ -31,7 +31,6 @@ class Token extends Core {
     const TYPE_METHOD = 'method';
     const TYPE_EXCLAMATION = 'exclamation';
     const TYPE_CONTROL = 'control';
-    const TYPE_AT = 'at';
 
     public static function all($token=''){
         $tokens = token_get_all('<?php $variable=' . $token . ';');
