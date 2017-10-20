@@ -1147,6 +1147,10 @@ class Token extends Core {
         return null;
     }
 
+    public static function remove_comment($string=''){
+        return $string;
+    }
+
     public static function restore_return($value='', $random=''){
         $search = array();
         $search[] = '[' . $random . '][return]';

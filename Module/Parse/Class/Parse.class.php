@@ -144,6 +144,7 @@ class Parse extends Core {
                 $string = Parse\Token::restore_return($string, $this->random());
                 $string = Parse\Literal::restore($string, $this->random());
                 $string = Parse\Literal::remove($string);
+                $string = Parse\Token::remove_comment($string);
                 return $string;
             } else {
                 /**
