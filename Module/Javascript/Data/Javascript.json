@@ -3,26 +3,42 @@
 "name" : "{$url|basename:'.json'}",
 "core" : "{$web.root}Priya/Public/Js/Prototype/Core/",
 "prototype" : "{$core|dir.name}",
-"web" : "{object.merge($web,{prototype: $prototype, core: $core})}",
 "extension" : ".prototype.js",
+"collect" : {
+    "web" : "{object.merge($web,{prototype: $prototype, core: $core})}",
+    "expose" : {
+        "namespace" : "_",
+        "require" : "require",
+        "window" : {
+            "isset" : "isset",
+            "empty" : "empty",
+            "microtime" : "microtime",
+            "trim" : "trim",
+            "run" : "run",
+            "select" : "select",
+            "get" : "get",
+            "request" : "request"
+        }
+    }
+},
 "require" : {
     "core" : [
-        "{$web.core}CLosest{$extension}",
-        "{$web.core}Collection{$extension}",
-        "{$web.core}Content{$extension}",
-        "{$web.core}Debug{$extension}",
-        "{$web.core}Empty{$extension}",
-        "{$web.core}Exception{$extension}",
-        "{$web.core}Isset{$extension}",
-        "{$web.core}Microtime{$extension}",
-        "{$web.core}Request{$extension}",
-        "{$web.core}Run{$extension}",
-        "{$web.core}Script{$extension}",
-        "{$web.core}Select{$extension}",
-        "{$web.core}Trim{$extension}"
+        "{$core}CLosest{$extension}",
+        "{$core}Collection{$extension}",
+        "{$core}Content{$extension}",
+        "{$core}Debug{$extension}",
+        "{$core}Empty{$extension}",
+        "{$core}Exception{$extension}",
+        "{$core}Isset{$extension}",
+        "{$core}Microtime{$extension}",
+        "{$core}Request{$extension}",
+        "{$core}Run{$extension}",
+        "{$core}Script{$extension}",
+        "{$core}Select{$extension}",
+        "{$core}Trim{$extension}"
     ],
     "file" : [
-        "{$web.prototype}Usleep{$extension}"
+        "{$prototype}Usleep{$extension}"
     ]
 }
 }

@@ -31,6 +31,13 @@ var priya = function (url){
             priya.collect.data.loaded = 0;
             console.log('data malformed in get' + url);
         }
+        if(data.collect){
+            var index;
+            for(index in data.collect){
+                priya.collect[index] = data.collect[index];
+            }
+        }
+        /*
         priya.collect.expose = {
             'namespace' : '_',
             'require' : 'require',
@@ -45,12 +52,15 @@ var priya = function (url){
             'get' : 'get',
             'request' : 'request'
         };
+        */
         //require needs this
         priya.expose();
         priya.collect.data.loaded = 1;
         priya.collect.require.loaded--;
         priya.collect.data.file = [];
         priya.collect.data.file.push(url);
+        /*
+        priya.collect.web =
         priya.collect.dir = {};
         priya.collect.dir.ds = '/';
         priya.collect.dir.root = priya.collect.url;
@@ -59,7 +69,7 @@ var priya = function (url){
         var core = priya.collect.dir.core = priya.collect.dir.prototype + 'Core/';
         //var core = priya.collect.url + 'Priya/Public/Js/Prototype/Core/';
        // var parser = priya.collect.dir.prototype + 'Parser/'; //serverside parsing for now (how much !!!)
-
+        */
         if(data.require.core){
             require(data.require.core, function(){
                 priya.expose('window');
@@ -67,6 +77,8 @@ var priya = function (url){
                     require(data.require.file, function(){
                         priya.usleep(200);
                         priya.debug('debugged');
+                        console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^DEBUG');
+                        console.log(priya.collect);
                     });
                 }
             });
@@ -273,6 +285,8 @@ priya.prototype.debug = function(data){
         this.select('body').append(node);
 
         node.on('open', function(){
+            alert('open debug');
+            alert(node);
             node.select('div.head').closest('.debug').addClass('has-head');
             node.select('div.menu').closest('.debug').addClass('has-menu');
             node.select('div.icon').closest('.debug').addClass('has-icon');
@@ -281,6 +295,7 @@ priya.prototype.debug = function(data){
             node.loader('remove');
         });
         node.on('close', function(){
+            alert('close debug');
             priya.select('.debug').removeClass('display-block');
         });
         node.on('debug', function(){
@@ -384,7 +399,7 @@ priya.prototype.debug = function(data){
         node.trigger('open');
     } else {
         node.trigger('open');
-        node.loader('remove');
+        //node.loader('remove');
     }
 }
 

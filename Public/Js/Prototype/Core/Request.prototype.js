@@ -1,5 +1,5 @@
 _('prototype').request = function (url, data, script){
-    var core = priya.collect.dir.core;
+    var core = priya.collect.web.core;
     require([
         core + 'Empty.prototype.js',
         core + 'Data.prototype.js',
