@@ -8,6 +8,7 @@ _('prototype').request = function (url, data, script){
         core + 'Content.prototype.js',
         core + 'Refresh.prototype.js'
     ], function(){
+        alert('can do request here');
           //priya.collect = priya.object_merge(priya.collect, data);
     });
     /*
