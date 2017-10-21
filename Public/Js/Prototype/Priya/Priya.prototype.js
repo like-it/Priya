@@ -59,55 +59,18 @@ var priya = function (url){
         var core = priya.collect.dir.core = priya.collect.dir.prototype + 'Core/';
         //var core = priya.collect.url + 'Priya/Public/Js/Prototype/Core/';
        // var parser = priya.collect.dir.prototype + 'Parser/'; //serverside parsing for now (how much !!!)
-        require([
-            core + 'Empty.prototype.js',
-            core + 'Isset.prototype.js',
-            core + 'Microtime.prototype.js',
-            core + 'Trim.prototype.js',
-            core + 'Exception.prototype.js',
-            core + 'Debug.prototype.js',
-            core + 'Collection.prototype.js',
-            core + 'Request.prototype.js',
-            core + 'Select.prototype.js',
-            core + 'Run.prototype.js',
-            core + 'Closest.prototype.js',
-            core + 'Content.prototype.js',
-            core + 'Script.prototype.js',
-        ], function(){
-            priya.expose('window');
-            priya.debug(data);
-//                priya.collect = priya.object_merge(priya.collect, data);
-            //data.url = priya.collect.url;
-            priya.request(priya.collect.url + 'Application/Parser/', data, function(url, data){
-                //priya.collect = data;
-                console.log("COPARE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                console.log(priya.collect);
-                console.log(data);
 
-                var index;
-                for(index in data){
-                    if(data[index] == null){
-                        delete data[index];
-                        continue;
-                    }
+        if(data.require.core){
+            require(data.require.core, function(){
+                priya.expose('window');
+                if(data.require.file){
+                    require(data.require.file, function(){
+                        priya.usleep(200);
+                        priya.debug('debugged');
+                    });
                 }
-
-                priya.collect.parser = data;
-                //priya.collect.require = data.require;
-                console.log('AFTER PARSING........................................');
-                console.log(priya.collect.parser.require.file);
-                require([
-                    data.require.file,
-                ], function(){
-                    _('prototype').usleep('200');
-                    console.log(priya.collect.parser.script);
-                    priya.script(priya.collect.parser);
-                    console.log('parseble require options');
-                });
-                console.log(priya.collect);
-                //priya.collect = priya.object_merge(data, priya.collect);
             });
-        });
+        }
     });
 }
 

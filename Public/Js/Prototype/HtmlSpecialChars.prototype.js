@@ -170,5 +170,3 @@ module.exports = function html_entity_decode (string, quoteStyle) { // eslint-di
   tmpStr = tmpStr.split('&#039;').join("'")
   return tmpStr
 }
-
-

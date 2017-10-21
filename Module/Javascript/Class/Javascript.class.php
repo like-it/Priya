@@ -22,7 +22,7 @@ class Javascript extends Main {
         $read = $data->read(__CLASS__);
         $parser = new Parser($this->data());
         foreach($read as $key => $value){
-            $value = $parser->compile($value, true);
+            $value = $parser->compile($value, $this->data());
             $this->data($key, $value);
             $parser->data($this->data());
             $read->$key = $value;
