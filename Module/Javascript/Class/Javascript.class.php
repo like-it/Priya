@@ -20,22 +20,13 @@ class Javascript extends Main {
     public function output(){
         $data = new Data();
         $read = $data->read(__CLASS__);
-        $read = $this->parser('object')->compile($read, $this->data());
-        var_dump($this->data('web'));
-        var_dump($read);
-        die;
-
-
-
-//         $compile = $data->compile()
-
-
-        $read = $data->read(__CLASS__);
-//         $data = $this->data();
-
-        var_dump($read);
-        die;
-
-
+        $parser = new Parser($this->data());
+        foreach($read as $key => $value){
+            $value = $parser->compile($value, true);
+            $this->data($key, $value);
+            $parser->data($this->data());
+            $read->$key = $value;
+        }
+        return $read;
     }
 }

@@ -25,7 +25,7 @@ class Parser extends Core {
         } else {
             $this->data(Parser::object_merge($this->data(), $handler));
         }
-        $this->data($this->compile($this->data()));
+        $this->data($this->compile($this->data(), $this->data()));
     }
 
     public function read($url=''){
@@ -36,7 +36,7 @@ class Parser extends Core {
         return $read;
     }
 
-    public function compile($string, $keep=false){
+    public function compile($string, $data=null, $keep=false){
         if(
             is_null($string) ||
             is_bool($string) ||
@@ -48,13 +48,13 @@ class Parser extends Core {
         }
         if (is_array($string)){
             foreach($string as $nr => $line){
-                $string[$nr] = $this->compile($line, $keep);
+                $string[$nr] = $this->compile($line, $data, $keep);
             }
             return $string;
         }
         elseif(is_object($string)){
             foreach ($string as $key => $value){
-                $string->{$key} = $this->compile($value, $keep);
+                $string->{$key} = $this->compile($value, $data, $keep);
             }
             return $string;
         } else {
@@ -71,7 +71,8 @@ class Parser extends Core {
             $tag = new Parser\Tag($string, $this->random());
             $list = $tag->find();
 
-            $data = $this->data();
+            $data = $this->object($data);
+
             $assign = new Parser\Assign($data, $this->random(), $this);
             $if = new Parser\Control_If($data, $this->random(), $this);
             $variable = new Parser\Variable($data, $this->random(), $this);
@@ -91,17 +92,12 @@ class Parser extends Core {
                     $record['assign']['tag'] = $key;
                     $record = Parser\Assign::row($record, $this->random());
 
-                    $variable->data($assign->data());
                     $record['variable']['tag'] = $key;
-                    $record = $variable->find($record);
+                    $record = $variable->find($record, $keep);
 
-                    $method->data($variable->data());
                     $record['method']['tag'] = $key;
                     $record = $method->find($record, $variable, $this);
-
-                    $assign->data($method->data());
                 }
-//                 $if->data($assign->data());
                 $record = $if::create($list, $record['string'], $this->random());
                 $record = $if->statement($record, $this);
                 $list = $tag->find($record['string']);
@@ -111,7 +107,6 @@ class Parser extends Core {
                 }
                 $if_counter++;
             }
-//             $assign->data($if->data());
 
             foreach($list as $value){
                 $key = key($value);
@@ -120,19 +115,12 @@ class Parser extends Core {
                 $record['assign']['tag'] = $key;
                 $record = Parser\Assign::row($record, $this->random());
 
-//                 $variable->data($assign->data());
                 $record['variable']['tag'] = $key;
-                $record = $variable->find($record);
+                $record = $variable->find($record, $keep);
 
-//                 $method->data($variable->data());
                 $record['method']['tag'] = $key;
                 $record = $method->find($record, $variable, $this);
-
-//                 $assign->data($method->data());
             }
-            $if->data($assign->data());
-//             $this->data($if->data());
-
             $string = $record['string'];
 
             if(is_string($string)){
@@ -151,5 +139,17 @@ class Parser extends Core {
                 return $string;
             }
         }
+    }
+
+    public function recursive_compile($list='', $children='nodeList'){
+        if(is_object($list)){
+            foreach ($list as $jid => $node){
+                if(isset($node->{$children})){
+                    $node->{$children} = $this->recursive_compile($node->{$children}, $children);
+                }
+                $node = $this->compile($node, $node);
+            }
+        }
+        return $list;
     }
 }

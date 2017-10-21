@@ -76,7 +76,7 @@ class Variable extends Core {
         }
     }
 
-    public function find($record=array()){
+    public function find($record=array(), $keep=false){
         $attribute = substr($record['variable']['tag'], 1, -1);
         $tokens = Token::all($attribute);
         foreach($tokens as $nr => $token){
@@ -119,7 +119,12 @@ class Variable extends Core {
             return $record;
         }
         $explode = explode($record['variable']['tag'], $record['string'], 2);
-        $replace = $this->replace($attribute, $modifier);
+        $replace = $this->replace($attribute, $modifier, $keep);
+        if($attribute == '$web'){
+//             debug('found');
+//             debug($replace);
+//             die;
+        }
         if(is_object($replace)){
             if(
                 isset($replace->__tostring) &&
@@ -127,12 +132,10 @@ class Variable extends Core {
                 !is_object($replace->__tostring)
             ){
                 $replace = $replace->__tostring;
-            } else {
-                $replace = ''; //(object) ?
             }
         }
         elseif(is_array($replace)){
-            $replace = ''; //(array) ?
+            //do nothing with replace
         }
         elseif(is_bool($replace)){
             if($replace === true){
@@ -141,8 +144,11 @@ class Variable extends Core {
                 $replace = 'false';
             }
         }
-        elseif(is_null($replace)){
+        elseif(is_null($replace) && $keep == false){
             $replace = 'null';
+        }
+        elseif(is_null($replace) && $keep == true){
+            $replace = $record['variable']['tag'];
         }
         $item = array();
         $item = $record;
@@ -157,7 +163,12 @@ class Variable extends Core {
         elseif($item['replace'] === null){
             $item['replace'] = 'null';
         }
-        $record['string'] = implode($item['replace'], $explode);
+        if(is_array($item['replace']) || is_object($item['replace'])){
+            $record['string'] = $item['replace'];
+        } else {
+            $record['string'] = implode($item['replace'], $explode);
+        }
+
         unset($record['cast']);
         unset($record['is_cast']);
         if($record['string'] == 'null'){
@@ -172,7 +183,7 @@ class Variable extends Core {
         return $record;
     }
 
-    public function replace($input=null, $modifier=''){
+    public function replace($input=null, $modifier='', $keep=false){
         $original = $input;
         if(
             (
@@ -212,10 +223,13 @@ class Variable extends Core {
                         $output = $input;
                     } else {
                         $output = $this->data($attribute);
+                        if($output === null && $keep === true){
+                            return $output;
+                        }
                         $output = Variable::value($output);
                         $output = Modifier::find($output, $modifier, $this, $this->parser());
 
-                        $output = $this->parser()->compile($output);
+                        $output = $this->parser()->compile($output, $this->parser->data());
                         //parse comile again on output
                     }
                 } else {

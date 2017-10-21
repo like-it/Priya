@@ -11,7 +11,7 @@ function modifier_parse($value=null, $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $value =  $parser->compile($value);
+    $value =  $parser->compile($value, $parser->data());
     debug($value);
     die;
 }

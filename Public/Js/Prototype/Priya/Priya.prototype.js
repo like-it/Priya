@@ -75,6 +75,7 @@ var priya = function (url){
             core + 'Script.prototype.js',
         ], function(){
             priya.expose('window');
+            priya.debug(data);
 //                priya.collect = priya.object_merge(priya.collect, data);
             //data.url = priya.collect.url;
             priya.request(priya.collect.url + 'Application/Parser/', data, function(url, data){

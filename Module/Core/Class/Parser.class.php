@@ -26,9 +26,19 @@ class Parser extends Data {
         }
         $object_parser= $this->get_object_parser();
         if($object_parser === null){
-            $this->set_object_parser(new \Priya\Module\Parser());
-            $this->get_object_parser()->route($this->route());
-            $this->get_object_parser()->handler($this->handler());
+            $this->set_object_parser(
+                new \Priya\Module\Parser(
+                    $this->handler(),
+                    $this->route()
+                )
+            );
+            $this->get_object_parser()->data($this->data());
+
+//             var_dump($this->get_object_parser()->data());
+//             die;
+
+//             $this->get_object_parser()->route($this->route());
+//             $this->get_object_parser()->handler($this->handler());
         }
         return $this->get_object_parser();
     }
