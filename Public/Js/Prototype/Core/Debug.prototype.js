@@ -1,5 +1,5 @@
 _('prototype').debug = function (data){
-    alert('twice');
+    var string = 'Loading Debug...';
     var core = priya.collect.web.core;
     require([
         core + 'AddClass.prototype.js',
@@ -9,7 +9,6 @@ _('prototype').debug = function (data){
         core + 'Content.prototype.js',
         core + 'Run.prototype.js'
     ], function(){
-        alert('2 times');
         var node = run('.debug');
         if(!node){
             var node = priya.create('div', 'dialog no-select debug');
@@ -95,7 +94,6 @@ _('prototype').debug = function (data){
             }
             var item = priya.create('pre', '');
             item.html(data);
-            alert('done');
             debug.append(item);
             //wrong syntax
             //var scrollable = debug.closest('has', 'scrollbar', 'vertical');

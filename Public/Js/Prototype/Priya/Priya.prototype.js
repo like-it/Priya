@@ -618,6 +618,7 @@ priya.prototype.createSelector = function(element){
     return selector;
 }
 
+/*
 priya.prototype.html = function (html, where){
     if(typeof where == 'undefined'){
         where = 'inner';
@@ -645,6 +646,7 @@ priya.prototype.html = function (html, where){
         }
     }
 }
+*/
 
 /*
 priya.prototype.closest = function (attribute, node, type){

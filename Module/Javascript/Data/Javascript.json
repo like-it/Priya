@@ -35,7 +35,8 @@
         "{$core}Run{$extension}",
         "{$core}Script{$extension}",
         "{$core}Select{$extension}",
-        "{$core}Trim{$extension}"
+        "{$core}Trim{$extension}",
+        "{$core}Html{$extension}"
     ],
     "file" : [
         "{$prototype}Usleep{$extension}"
