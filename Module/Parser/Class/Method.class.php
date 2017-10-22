@@ -419,6 +419,10 @@ class Method extends Core {
             if(isset($function['parameter'])){
                 foreach ($function['parameter'] as $parameter){
                     if(isset($parameter['value']) || $parameter['value'] === null){
+                        if($parameter['type'] == Token::TYPE_STRING && substr($parameter['value'], 0, 1) == '\'' && substr($parameter['value'], -1) == '\''){
+                            $parameter['value'] = substr($parameter['value'], 1, -1);
+                            $parameter['value'] = str_replace('\\\'', '\'', $parameter['value']);
+                        }
                         $argument[] = $parameter['value'];
                     }
                 }
