@@ -1195,8 +1195,6 @@ priya.prototype.script = function (data, closure){
         return data;
     }
     var index;
-    console.log('IN SCRipt ((((((((((((((((((((((((((((((((((((((');
-    console.log(data.script);
     for(index in data.script){
         if(data.script[index].substr(0, 4) == '&lt;'){
             data.script[index] = data.script[index].toString()
@@ -1322,7 +1320,6 @@ priya.prototype.addScriptSrc = function (data){
 
 priya.prototype.addScriptText = function (data){
     var tag = this.readTag(data);
-    console.log(tag);
     if(!this.isset(tag['tagName']) || tag['tagName'] != 'script'){
         return;
     }
