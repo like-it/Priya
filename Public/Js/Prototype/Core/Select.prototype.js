@@ -124,7 +124,7 @@ _('prototype').select = function(selector){
 */
 _('prototype').select = function(selector){
     if(this.nodeName){
-        console.log('NODENAME_________________________________:' + this.nodeName);
+//        console.log('NODENAME_________________________________:' + this.nodeName);
     }
     if(Object.prototype.toString.call(priya) == '[object Function]'){
         //console.log('has a priya..............................');
@@ -139,8 +139,8 @@ _('prototype').select = function(selector){
                     return false;
                 }
             }
-            console.log(Object.prototype.toString.call(this));
-            console.log(this);
+//            console.log(Object.prototype.toString.call(this));
+//            console.log(this);
             object = this;
         }
     }

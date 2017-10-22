@@ -218,6 +218,8 @@ priya.prototype.require= function(url, closure){
                  */
                 if(priya.collect.require.loaded == priya.collect.require.toLoad){
                     closure();
+                    return true;
+
                 }
                 /*
                 console.log('found true: ' + url);

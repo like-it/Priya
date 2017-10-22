@@ -1,9 +1,4 @@
 _('prototype').closest = function(attribute, node, type){
-    console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$CLOSEST');
-    console.log(this);
-    console.log(node);
-    console.log(priya);
-    console.log(window.priya);
     var parent;
     if(this.function_exists(node)){
         parent = this.parent();
@@ -38,11 +33,6 @@ _('prototype').closest = function(attribute, node, type){
         if(this === parent && parent === node){
             parent = this.attach(this.parentNode);
         }
-        console.log('#####################################################');
-        console.log(this);
-        console.log(parent);
-        console.log(attribute);
-        console.log(node);
         var select = parent.select(attribute);
         if(typeof select == 'object' && select.tagName == 'PRIYA-NODE'){
             delete select;
