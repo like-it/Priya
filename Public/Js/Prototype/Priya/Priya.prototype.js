@@ -14,7 +14,7 @@
  *
  * @changeLog
  * 1.0
- *  -	all
+ *  -    all
  */
 
 var priya = function (url){
@@ -37,39 +37,13 @@ var priya = function (url){
                 priya.collect[index] = data.collect[index];
             }
         }
-        /*
-        priya.collect.expose = {
-            'namespace' : '_',
-            'require' : 'require',
-        };
-        priya.collect.expose.window = {
-            'isset' : 'isset',
-            'empty' : 'empty',
-            'microtime' : 'microtime',
-            'trim' : 'trim',
-            'run' : 'run',
-            'select' : 'select',
-            'get' : 'get',
-            'request' : 'request'
-        };
-        */
         //require needs this
         priya.expose();
         priya.collect.data.loaded = 1;
         priya.collect.require.loaded--;
         priya.collect.data.file = [];
         priya.collect.data.file.push(url);
-        /*
-        priya.collect.web =
-        priya.collect.dir = {};
-        priya.collect.dir.ds = '/';
-        priya.collect.dir.root = priya.collect.url;
-        priya.collect.dir.js = priya.collect.dir.root + 'Priya/Public/Js/';
-        priya.collect.dir.prototype = priya.collect.dir.js + 'Prototype/';
-        var core = priya.collect.dir.core = priya.collect.dir.prototype + 'Core/';
-        //var core = priya.collect.url + 'Priya/Public/Js/Prototype/Core/';
-       // var parser = priya.collect.dir.prototype + 'Parser/'; //serverside parsing for now (how much !!!)
-        */
+
         if(data.require.core){
             require(data.require.core, function(){
                 priya.expose('window');
@@ -77,8 +51,6 @@ var priya = function (url){
                     require(data.require.file, function(){
                         priya.usleep(200);
                         priya.debug('debugged');
-                        console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^DEBUG');
-                        console.log(priya.collect);
                     });
                 }
             });
@@ -133,8 +105,6 @@ priya.prototype.expose = function (collection, attribute){
                 var expose = this.collect.expose[collection];
                 for(index in expose){
                     var name = expose[index];
-                    console.log(index);
-                    console.log(name);
                     window[name] = _('prototype')[index].bind(window);
                 }
             }
@@ -218,6 +188,7 @@ priya.prototype.requireElement= function(url, closure){
 priya.prototype.require= function(url, closure){
     var script = document.querySelectorAll('script');
     var call = Object.prototype.toString.call(url);
+    console.log('__REQUIRE___________________________________________________');
     if(call === '[object Array]'){
         var i;
         for(i=0; i < url.length; i++){
@@ -242,7 +213,16 @@ priya.prototype.require= function(url, closure){
                     priya.requireElement(item, closure);
                 }
             } else {
+                /**
+                 * closure goes wrong, should only execute once !
+                 */
+                if(priya.collect.require.loaded == priya.collect.require.toLoad){
+                    closure();
+                }
+                /*
+                console.log('found true: ' + url);
                 closure();
+                */
             }
         }
         return true;
@@ -273,134 +253,6 @@ priya.prototype.require= function(url, closure){
         }
     }
 
-}
-
-
-priya.prototype.debug = function(data){
-    var string = 'Opening debug...';
-    var node = run('.debug');
-    if(!node){
-        var node = this.create('div', 'dialog no-select debug');
-        node.html('<div class="head"><i class="icon icon-bug"></i><h2>Debug</h2></div><div class="menu"><ul class="tab-head"><li class="tab-debug selected"><p>Debug</p></li><li class="tab-collection"><p>Collection</p></li><li class="tab-session"><p>Session</p></li></ul></div><div class="body"><div class="tab tab-body tab-debug selected"></div><div class="tab tab-body tab-collection"></div><div class="tab tab-body tab-session"></div></div><div class="footer"><button type="button" class="button-default button-close">Close</button><button type="button" class="button-default button-debug-clear"><i class="icon-trash"></i></button></div></div>');
-        this.select('body').append(node);
-
-        node.on('open', function(){
-            alert('open debug');
-            alert(node);
-            node.select('div.head').closest('.debug').addClass('has-head');
-            node.select('div.menu').closest('.debug').addClass('has-menu');
-            node.select('div.icon').closest('.debug').addClass('has-icon');
-            node.select('div.footer').closest('.debug').addClass('has-footer');
-            node.addClass('display-block');
-            node.loader('remove');
-        });
-        node.on('close', function(){
-            alert('close debug');
-            priya.select('.debug').removeClass('display-block');
-        });
-        node.on('debug', function(){
-            priya.select('.debug .tab-head li').removeClass('selected');
-            priya.select('.debug .tab-body').removeClass('selected');
-            var node = priya.select('.debug .tab-body.tab-debug');
-            node.addClass('selected');
-            //wrong syntax
-            //var scrollable = node.closest('has', 'scrollbar', 'vertical');
-            //scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
-        });
-        node.on('debug-clear', function(){
-            var debug = run('.debug .tab-body.tab-debug');
-            debug.html('');
-        });
-        node.on('collection', function(){
-            priya.select('.debug .tab-head li').removeClass('selected');
-            priya.select('.debug .tab-body').removeClass('selected');
-            var node = priya.select('.debug .tab-body.tab-collection');
-            node.addClass('selected');
-            var collection = priya.collection();
-            if (typeof JSON.decycle == "function") {
-                collection = JSON.decycle(collection);
-            }
-            collection = JSON.stringify(collection, null, 2);
-            node.html('<pre>' + collection + '</pre>');
-            console.log(node.html());
-        });
-        node.on('session', function(){
-            priya.select('.debug .tab-head li').removeClass('selected');
-            priya.select('.debug .tab-body').removeClass('selected');
-            var node = priya.select('.debug .tab-body.tab-session');
-            node.addClass('selected');
-
-            var request = {};
-            request.method = 'replace';
-            request.target = '.tab-body.tab-session';
-
-            priya.request(priya.collection('url') + 'Priya.System.Session', request);
-
-            node.html('<pre>Retrieving session...</pre>');
-        });
-
-        node.select('.button-close').on('click', function(){
-            node.trigger('close');
-        });
-        node.select('.button-debug-clear').on('click', function(){
-            node.trigger('debug-clear');
-        });
-        node.select('.tab-head .tab-collection').on('click', function(){
-            node.trigger('collection');
-            this.addClass('selected');
-        });
-        node.select('.tab-head .tab-debug').on('click', function(){
-            node.trigger('debug');
-            this.addClass('selected');
-        });
-        node.select('.tab-head .tab-session').on('click', function(){
-            node.trigger('session');
-            this.addClass('selected');
-        });
-
-    }
-    var debug = select('.debug .tab-body.tab-debug');
-    if(typeof data == 'string'){
-        if(data == 'run'){
-            data = string;
-        }
-        var item = this.create('pre', '');
-        item.html(data);
-        console.log(debug);
-        debug.append(item);
-        //wrong syntax
-        //var scrollable = debug.closest('has', 'scrollbar', 'vertical');
-        //scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
-        node.trigger('open');
-        if(data == string){
-            setTimeout(function(){
-                item.remove();
-            }, 1500);
-        }
-    }
-    else if(typeof data == 'object'){
-        var remove = this.collection('debug');
-        if(remove){
-            var index;
-            for(index in remove){
-                priya.debug(index);
-                delete data.index;
-            }
-        }
-        if (typeof JSON.decycle == "function") {
-            data = JSON.decycle(data);
-        }
-        data = JSON.stringify(data, null, 2);
-        var item = this.create('pre', '');
-        item.html(data);
-        debug.append(item);
-        var scrollable = debug.closest('has', 'scrollbar', 'vertical');
-        scrollable.scrollbar('to', {'x': 0, 'y': scrollable.scrollbar('height')});
-        node.trigger('open');
-    } else {
-        node.trigger('open');
-        //node.loader('remove');
-    }
 }
 
 priya.prototype.find = function(selector, attach) {
