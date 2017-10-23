@@ -23,7 +23,7 @@
 },
 "require" : {
     "core" : [
-        "{$core}CLosest{$extension}",
+        "{$core}Closest{$extension}",
         "{$core}Collection{$extension}",
         "{$core}Content{$extension}",
         "{$core}Debug{$extension}",

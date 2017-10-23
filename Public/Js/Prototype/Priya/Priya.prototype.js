@@ -1522,6 +1522,10 @@ priya.prototype.trigger = function (trigger, bubble, cancel){
 }
 
 priya.prototype.attach = function (element){
+    if(element.tagName == 'PRIYA-NODE'){
+        console.log(element);
+    }
+
     if(element === null){
         return false;
     }
@@ -1543,12 +1547,20 @@ priya.prototype.attach = function (element){
     } else {
         dom = this;
     }
+    if(element.tagName == 'PRIYA-NODE'){
+        console.log(element);
+        console.log(typeof dom);
+        console.log(dom);
+    }
     for(property in dom){
         if(typeof dom[property] != 'function'){
             continue;
         }
         if(property == 'parentNode'){
             continue;
+        }
+        if(property == 'closest'){
+            console.log('bind closest');
         }
         element[property] = dom[property].bind(element);
     }
