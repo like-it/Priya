@@ -26,6 +26,7 @@
         "{$core}Closest{$extension}",
         "{$core}Collection{$extension}",
         "{$core}Content{$extension}",
+        "{$core}Create{$extension}",
         "{$core}Debug{$extension}",
         "{$core}Empty{$extension}",
         "{$core}Exception{$extension}",
