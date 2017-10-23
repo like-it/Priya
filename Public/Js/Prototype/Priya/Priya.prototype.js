@@ -293,9 +293,6 @@ priya.prototype.attach = function (element){
         if(property == 'parentNode'){
             continue;
         }
-        if(property == 'closest'){
-            console.log('bind closest');
-        }
         element[property] = dom[property].bind(element);
     }
     element['parent'] = dom['parentNode'].bind(element);
