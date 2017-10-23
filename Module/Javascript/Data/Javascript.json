@@ -30,6 +30,7 @@
         "{$core}Empty{$extension}",
         "{$core}Exception{$extension}",
         "{$core}Isset{$extension}",
+        "{$core}Is_nodelist{$extension}",
         "{$core}Microtime{$extension}",
         "{$core}Request{$extension}",
         "{$core}Run{$extension}",
