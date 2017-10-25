@@ -1,3 +1,6 @@
+/**
+ * required in priya
+ */
 _('prototype').attach = function(element){
     if(element.tagName == 'PRIYA-NODE'){
         console.log(element);

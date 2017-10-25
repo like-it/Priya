@@ -1,5 +1,7 @@
 {
     "autoload": {
+        "Main.tpl": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Main.tpl",
+        "Tab.tpl": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Tab.tpl",
         "Priya\\Application": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Application\/Class\/Application.class.php",
         "Priya\\Module\\Core\\Parser": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Class\/Parser.class.php",
         "Priya\\Module\\Core\\Data": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Data\/Class\/Data.class.php",
@@ -28,6 +30,9 @@
         "Priya\\Module\\Core\\Main": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Class\/Main.class.php",
         "Priya\\Module\\Core\\Result": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Class\/Result.class.php",
         "Priya\\Module\\Autoload\\Tpl": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Autoload\/Class\/Tpl.class.php",
-        "App\/File\/Manager\/Overview": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Overview.tpl"
+        "App\/File\/Manager\/Overview": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Overview.tpl",
+        "App\\File\\Manager\\Tree": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Class\/Tree.class.php",
+        "Priya\\Module\\File\\Dir": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/File\/Class\/Dir.class.php",
+        "App\/File\/Manager\/Tree": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Tree.tpl"
     }
 }
