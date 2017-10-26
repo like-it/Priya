@@ -22,7 +22,6 @@ priya.script = function (data, closure){
         setTimeout(function(){
             priya.script(data, ++attempt);
             priya.hit++;
-            priya.debug('waiting on load...');
         }, parseFloat(1/30));
         return data;
     }

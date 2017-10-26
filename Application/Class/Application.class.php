@@ -33,6 +33,8 @@ class Application extends Parser {
     const TEMP = 'Temp';
     const CACHE = 'Cache';
     const PUBLIC_HTML = 'Public';
+    const CSS = 'Css';
+    const JAVASCRIPT = 'Javascript';
     const CONFIG = 'Config.json';
     const CUSTOM = 'Custom.json';
     const ROUTE = 'Route.json';

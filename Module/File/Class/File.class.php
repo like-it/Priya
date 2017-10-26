@@ -1,19 +1,38 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 namespace Priya\Module;
 
+use stdClass;
+
 class File {
     const CHMOD = 0640;
+    const TYPE = 'File';
     const SCHEME_HTTP = 'http';
 
     public static function dir($directory=''){
         return str_replace('\\\/', DIRECTORY_SEPARATOR, rtrim($directory,'\\\/')) . DIRECTORY_SEPARATOR;
+    }
+
+    public static function info(stdClass $node){
+        $rev = strrev($node->name);
+        $explode = explode('.', $rev, 2);
+        if(count($explode) == 2){
+            $ext = strrev($explode[0]);
+            $node->extension = strtolower($ext);
+            $node->filetype = ucfirst(strtolower($ext)) . ' ' . strtolower(File::TYPE);
+        } else {
+            $node->extension = '';
+            $node->filetype = File::TYPE;
+        }
+        $node->mtime = filemtime($node->url);
+        $node->size = filesize($node->url);
+        return $node;
     }
 
     public static function chown($url='', $owner=null, $group=null){

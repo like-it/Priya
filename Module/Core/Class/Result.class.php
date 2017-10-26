@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module\Core;
@@ -69,7 +69,7 @@ class Result extends Parser {
         $ignore = array();
         $ignore[] = 'users';
         $ignore[] = 'contentType';
-// 		$ignore[] = 'autoload';
+//         $ignore[] = 'autoload';
         $this->data('ignore', $ignore);
     }
 
@@ -167,8 +167,8 @@ class Result extends Parser {
             Application::DATA .
             Application::DS
         ;
-        $dir_compile = $dir_cache . 'Compile' .	Application::DS;
-        $dir_cache .=  'Cache' .	Application::DS;
+        $dir_compile = $dir_cache . 'Compile' .    Application::DS;
+        $dir_cache .=  'Cache' .    Application::DS;
         if(is_dir($dir_compile) === false){
             mkdir($dir_compile, Dir::CHMOD, true);
         }
@@ -234,7 +234,7 @@ class Result extends Parser {
         $smarty->setCompileDir($dir_compile);
         $smarty->setCacheDir($dir_cache);
         $smarty->setConfigDir('');
-        $smarty->addPluginsDir($dir_module_smarty . Application::PLUGIN . Application::DS);	//priya plugins...
+        $smarty->addPluginsDir($dir_module_smarty . Application::PLUGIN . Application::DS);    //priya plugins...
         $smarty->assign('class', $this->dom_class($class));
         $smarty->assign('template_list', $template_list);
 
@@ -245,7 +245,7 @@ class Result extends Parser {
         foreach($plugin_dir as $location){
             $location = File::dir($location);
             if(is_dir($location)){
-                $smarty->addPluginsDir($location);	//own plugins...
+                $smarty->addPluginsDir($location);    //own plugins...
             }
         }
         $data = $this->object($this->data(), 'array');
@@ -271,8 +271,8 @@ class Result extends Parser {
             $this->session('delete', 'error');
         }
         $route = $this->route();
-        $smarty->assign('route', $this->object($route->data(), 'array'));
         if(get_class($route) == 'Priya\Module\Route'){
+            $smarty->assign('route', $this->object($route->data(), 'array'));
             $error = Result::object_merge($error, $this->object_merge($this->object($this->error(), 'array'), $this->object($route->error(), 'array')));
         } else {
             $error = Result::object_merge($error, $this->object($this->error(), 'array'));
@@ -425,7 +425,7 @@ class Result extends Parser {
         if(!empty($environment)){
             $tpl->environment($environment);
         }
-        if($template ==	'{$module}'){
+        if($template ==    '{$module}'){
             debug('found');
             debug(debug_backtrace(true));
             die;
