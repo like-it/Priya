@@ -17,6 +17,9 @@ priya.link = function (data, closure){
             data.addEventListener('load', function(event){
                 closure();
             }, false);
+            data.addEventListener('error', function(event){
+                closure();
+            }, false);
         }
         return data;
     } else {
