@@ -1,6 +1,5 @@
 {
     "autoload": {
-        "App\/File\/Manager\/Tree": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Tree.tpl",
         "Priya\\Application": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Application\/Class\/Application.class.php",
         "Priya\\Module\\Core\\Parser": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Class\/Parser.class.php",
         "Priya\\Module\\Core\\Data": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Data\/Class\/Data.class.php",
