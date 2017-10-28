@@ -1,7 +1,5 @@
 {
     "autoload": {
-        "Main.tpl": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Main.tpl",
-        "Tab.tpl": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Tab.tpl",
         "Priya\\Application": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Application\/Class\/Application.class.php",
         "Priya\\Module\\Core\\Parser": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Class\/Parser.class.php",
         "Priya\\Module\\Core\\Data": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Data\/Class\/Data.class.php",
@@ -25,14 +23,14 @@
         "Priya\\Module\\Parser\\Modifier": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Parser\/Class\/Modifier.class.php",
         "Priya\\Module\\Parser\\Value": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Parser\/Class\/Value.class.php",
         "Priya\\Module\\Route": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Route\/Class\/Route.class.php",
-        "App\\File\\Manager\\Overview": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Class\/Overview.class.php",
+        "App\\File\\Manager\\Nodelist": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Class\/Nodelist.class.php",
         "App\\Core": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/Core\/Class\/Core.class.php",
         "Priya\\Module\\Core\\Main": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Class\/Main.class.php",
         "Priya\\Module\\Core\\Result": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Class\/Result.class.php",
-        "Priya\\Module\\Autoload\\Tpl": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Autoload\/Class\/Tpl.class.php",
-        "App\/File\/Manager\/Overview": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Overview.tpl",
-        "App\\File\\Manager\\Nodelist": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Class\/Nodelist.class.php",
         "Priya\\Module\\File\\Dir": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/File\/Class\/Dir.class.php",
-        "App\/File\/Manager\/Nodelist": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Nodelist.tpl"
+        "Priya\\Module\\Autoload\\Tpl": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Autoload\/Class\/Tpl.class.php",
+        "App\/File\/Manager\/Nodelist": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Nodelist.tpl",
+        "App\\File\\Manager\\Expand": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Class\/Expand.class.php",
+        "App\/File\/Manager\/Expand": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/App\/File\/Manager\/Template\/Expand.tpl"
     }
 }

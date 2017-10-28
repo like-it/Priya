@@ -5,6 +5,9 @@ priya.css = function(attribute, value){
         }
         return this.computedStyle(attribute);
     }
+    if(typeof this.style == 'undefined'){
+        return '';
+    }
     if(attribute == 'has'){
         return !!this.style[value];
     }

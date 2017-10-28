@@ -17,7 +17,13 @@ priya.addClass = function(className){
             }
         } else {
             if(this.stristr(this.className, name) === false){
-                this.classList.add(name);
+                if(typeof this.classList == 'object'){
+                    this.classList.add(name);
+                } else {
+                    this.debug('error in classlist with ' + this.classname + ' ' + name);
+                    console.log(this);
+                }
+
             }
         }
     }

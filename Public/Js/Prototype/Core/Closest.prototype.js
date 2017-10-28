@@ -33,6 +33,10 @@ _('prototype').closest = function(attribute, node, type){
         if(this === parent && parent === node){
             parent = this.attach(this.parentNode);
         }
+        if(parent.tagName.toLowerCase() == attribute.toLowerCase()){
+            parent = this.attach(parent);
+            return parent;
+        }
 
         var select = parent.select(attribute);
         if(typeof select == 'object' && select.tagName == 'PRIYA-NODE'){
