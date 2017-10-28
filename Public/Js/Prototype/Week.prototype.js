@@ -14,4 +14,3 @@ _('prototype').week = function (date) {
 }
 
 priya.week = _('prototype').week;
-console.log('Week embedded !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');

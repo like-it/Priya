@@ -157,7 +157,6 @@ priya.prototype.requireElement= function(url, closure){
 priya.prototype.require= function(url, closure){
     var script = document.querySelectorAll('script');
     var call = Object.prototype.toString.call(url);
-    console.log('__REQUIRE___________________________________________________');
     if(call === '[object Array]'){
         var i;
         for(i=0; i < url.length; i++){

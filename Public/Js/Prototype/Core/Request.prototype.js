@@ -10,15 +10,12 @@ _('prototype').request = function (url, data, script){
         core + 'Refresh.prototype.js',
         core + 'Debug.prototype.js',
     ], function(){
-        console.log(url);
-        console.log('REQUEST !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         if(typeof url == 'object' && url !== null){
             data = url;
             console.log(url);
             console.log(typeof null);
             console.log(typeof url);
             url = '';
-            console.log(data);
             if (typeof data.altKey != "undefined") {//event
                 priya.debug('event');
                 var event = data;

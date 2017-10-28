@@ -44,10 +44,6 @@ priya.attribute = function (attribute, value){
             else if(typeof value == 'object' && typeof value.nodeType != 'undefined'){
                 selector = value.tagName;
                 if(typeof selector == 'undefined' && value instanceof HTMLDocument){
-                    /*
-                    var priya = this.attach(this.create('element', selector));
-                    priya.data('selector', selector);
-                    */
                     return value;
                 }
                 selector = selector.toLowerCase();
@@ -64,8 +60,6 @@ priya.attribute = function (attribute, value){
                     this.attribute(attribute + '-' + attr, value[attr]);
                 }
             } else {
-                console.log(attribute);
-                console.log(value);
                 this.setAttribute(attribute, value);
             }
 
