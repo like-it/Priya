@@ -22,6 +22,16 @@
         "Priya\\Module\\Parser\\Operator": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Parser\/Class\/Operator.class.php",
         "Priya\\Module\\Parser\\Modifier": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Parser\/Class\/Modifier.class.php",
         "Priya\\Module\\Parser\\Value": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Parser\/Class\/Value.class.php",
-        "Priya\\Module\\Route": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Route\/Class\/Route.class.php"
+        "Priya\\Module\\Route": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Route\/Class\/Route.class.php",
+        "Priya\\Gui\\Navigation": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya.Gui\/Navigation\/Class\/Navigation.class.php",
+        "Priya\\Gui\\Core\\Main": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya.Gui\/Core\/Class\/Main.class.php",
+        "Priya\\Module\\Core\\Main": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Class\/Main.class.php",
+        "Priya\\Module\\Core\\Result": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Core\/Class\/Result.class.php",
+        "Priya\\Module\\Autoload\\Data": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Autoload\/Class\/Data.class.php",
+        "Priya\\Module\\Parser\\Parameter": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Parser\/Class\/Parameter.class.php",
+        "Priya\\Module\\Autoload\\Tpl": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya\/Module\/Autoload\/Class\/Tpl.class.php",
+        "Priya\/Gui\/Navigation": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya.Gui\/Navigation\/Template\/Navigation.tpl",
+        "Priya.Gui\/\/Navigation\/\/Menu.tpl": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya.Gui\/\/Navigation\/Menu\/Template\/Menu.tpl",
+        "Priya.Gui\/\/Navigation\/\/Overview.tpl": "\/mnt\/c\/Server\/Priya.Gui\/Vendor\/Priya.Gui\/\/Navigation\/Overview\/Template\/Overview.tpl"
     }
 }
