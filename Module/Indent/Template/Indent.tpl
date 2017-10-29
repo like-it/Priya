@@ -1,7 +1,6 @@
-.indent *{
-    padding-left: 10%;
+.indent {
 }
-{for $i=2; $i <= 99; $i++}
+{for $i=1; $i <= 1024; $i++}
 .indent-{$i} *{
     padding-left: {$i}0%;
 }

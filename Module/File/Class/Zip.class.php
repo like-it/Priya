@@ -14,7 +14,7 @@ use Priya\Module\File;
 
 class Zip {
 
-    public function extract($archive='', $target='', $update=false){
+    public function unpack($archive='', $target='', $update=false){
         if(empty($archive)){
             return false;
         }
@@ -81,7 +81,7 @@ class Zip {
             } else {
                 $result['error'][] = $node->url;
             }
-            $result['extract'][] = $node->url;
+            $result['unpack'][] = $node->url;
         }
         return $result;
     }

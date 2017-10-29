@@ -1,0 +1,2424 @@
+{
+    "country": {
+        "1": {
+            "jid": 1,
+            "country": "Albania",
+            "phone": {
+                "prefix": "355"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "2": {
+            "jid": 2,
+            "country": "Algeria",
+            "phone": {
+                "prefix": "213"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "3": {
+            "jid": 3,
+            "country": "Andorra",
+            "phone": {
+                "prefix": "376"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "4": {
+            "jid": 4,
+            "country": "Angola",
+            "phone": {
+                "prefix": "244"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "5": {
+            "jid": 5,
+            "country": "Anguilla",
+            "phone": {
+                "prefix": "264"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "6": {
+            "jid": 6,
+            "country": "Antigua and Barbuda",
+            "phone": {
+                "prefix": "268"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "7": {
+            "jid": 7,
+            "country": "Argentina",
+            "phone": {
+                "prefix": "54"
+            },
+            "timezone": {
+                "start": "-03:00",
+                "end": ""
+            }
+        },
+        "8": {
+            "jid": 8,
+            "country": "Armenia",
+            "phone": {
+                "prefix": "374"
+            },
+            "timezone": {
+                "start": "+04:00",
+                "end": ""
+            }
+        },
+        "9": {
+            "jid": 9,
+            "country": "Aruba",
+            "phone": {
+                "prefix": "297"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "10": {
+            "jid": 10,
+            "country": "Ascension Island",
+            "phone": {
+                "prefix": "247"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "11": {
+            "jid": 11,
+            "country": "Australia",
+            "phone": {
+                "prefix": "61"
+            },
+            "timezone": {
+                "start": "+10:00",
+                "end": "+07:00"
+            }
+        },
+        "12": {
+            "jid": 12,
+            "country": "Austria",
+            "phone": {
+                "prefix": "43"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "13": {
+            "jid": 13,
+            "country": "Azerbaijan",
+            "phone": {
+                "prefix": "994"
+            },
+            "timezone": {
+                "start": "+04:00",
+                "end": ""
+            }
+        },
+        "14": {
+            "jid": 14,
+            "country": "Bahamas",
+            "phone": {
+                "prefix": "242"
+            },
+            "timezone": {
+                "start": "-05:00",
+                "end": ""
+            }
+        },
+        "15": {
+            "jid": 15,
+            "country": "Bahrain",
+            "phone": {
+                "prefix": "973"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "16": {
+            "jid": 16,
+            "country": "Bangladesh",
+            "phone": {
+                "prefix": "880"
+            },
+            "timezone": {
+                "start": "+06:00",
+                "end": ""
+            }
+        },
+        "17": {
+            "jid": 17,
+            "country": "Barbados",
+            "phone": {
+                "prefix": "246"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "18": {
+            "jid": 18,
+            "country": "Belarus",
+            "phone": {
+                "prefix": "375"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "19": {
+            "jid": 19,
+            "country": "Belgium",
+            "phone": {
+                "prefix": "32"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "20": {
+            "jid": 20,
+            "country": "Belize",
+            "phone": {
+                "prefix": "501"
+            },
+            "timezone": {
+                "start": "-06:00",
+                "end": ""
+            }
+        },
+        "21": {
+            "jid": 21,
+            "country": "Benin",
+            "phone": {
+                "prefix": "229"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "22": {
+            "jid": 22,
+            "country": "Bermuda",
+            "phone": {
+                "prefix": "441"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "23": {
+            "jid": 23,
+            "country": "Bhutan",
+            "phone": {
+                "prefix": "975"
+            },
+            "timezone": {
+                "start": "+05:30",
+                "end": ""
+            }
+        },
+        "24": {
+            "jid": 24,
+            "country": "Bolivia",
+            "phone": {
+                "prefix": "591"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "25": {
+            "jid": 25,
+            "country": "Bosnia",
+            "phone": {
+                "prefix": "387"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "26": {
+            "jid": 26,
+            "country": "Botswana",
+            "phone": {
+                "prefix": "267"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "27": {
+            "jid": 27,
+            "country": "Brazil",
+            "phone": {
+                "prefix": "55"
+            },
+            "timezone": {
+                "start": "-03:00",
+                "end": "-05:00"
+            }
+        },
+        "28": {
+            "jid": 28,
+            "country": "Brunei",
+            "phone": {
+                "prefix": "673"
+            },
+            "timezone": {
+                "start": "+08:00",
+                "end": ""
+            }
+        },
+        "29": {
+            "jid": 29,
+            "country": "Bulgaria",
+            "phone": {
+                "prefix": "359"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "30": {
+            "jid": 30,
+            "country": "Burkina Faso",
+            "phone": {
+                "prefix": "226"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "31": {
+            "jid": 31,
+            "country": "Burundi",
+            "phone": {
+                "prefix": "257"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "32": {
+            "jid": 32,
+            "country": "Cambodia",
+            "phone": {
+                "prefix": "855"
+            },
+            "timezone": {
+                "start": "+07:00",
+                "end": ""
+            }
+        },
+        "33": {
+            "jid": 33,
+            "country": "Cameroon",
+            "phone": {
+                "prefix": "237"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "34": {
+            "jid": 34,
+            "country": "Canada",
+            "phone": {
+                "prefix": "1"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": "-08:00"
+            }
+        },
+        "35": {
+            "jid": 35,
+            "country": "Cape Verde Islands",
+            "phone": {
+                "prefix": "238"
+            },
+            "timezone": {
+                "start": "-01:00",
+                "end": ""
+            }
+        },
+        "36": {
+            "jid": 36,
+            "country": "Cayman Islands",
+            "phone": {
+                "prefix": "345"
+            },
+            "timezone": {
+                "start": "-05:00",
+                "end": ""
+            }
+        },
+        "37": {
+            "jid": 37,
+            "country": "Central Africa Republic",
+            "phone": {
+                "prefix": "236"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "38": {
+            "jid": 38,
+            "country": "Chad",
+            "phone": {
+                "prefix": "235"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "39": {
+            "jid": 39,
+            "country": "Chile",
+            "phone": {
+                "prefix": "56"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "40": {
+            "jid": 40,
+            "country": "China",
+            "phone": {
+                "prefix": "86"
+            },
+            "timezone": {
+                "start": "+08:00",
+                "end": ""
+            }
+        },
+        "41": {
+            "jid": 41,
+            "country": "Columbia",
+            "phone": {
+                "prefix": "57"
+            },
+            "timezone": {
+                "start": "-05:00",
+                "end": ""
+            }
+        },
+        "42": {
+            "jid": 42,
+            "country": "Comoros Island",
+            "phone": {
+                "prefix": "269"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "43": {
+            "jid": 43,
+            "country": "Congo",
+            "phone": {
+                "prefix": "242"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "44": {
+            "jid": 44,
+            "country": "Cook Islands",
+            "phone": {
+                "prefix": "682"
+            },
+            "timezone": {
+                "start": "-10:00",
+                "end": ""
+            }
+        },
+        "45": {
+            "jid": 45,
+            "country": "Costa Rica",
+            "phone": {
+                "prefix": "506"
+            },
+            "timezone": {
+                "start": "-06:00",
+                "end": ""
+            }
+        },
+        "46": {
+            "jid": 46,
+            "country": "Croatia",
+            "phone": {
+                "prefix": "385"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "47": {
+            "jid": 47,
+            "country": "Cuba",
+            "phone": {
+                "prefix": "53"
+            },
+            "timezone": {
+                "start": "-03:00",
+                "end": ""
+            }
+        },
+        "48": {
+            "jid": 48,
+            "country": "Cyprus",
+            "phone": {
+                "prefix": "357"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "49": {
+            "jid": 49,
+            "country": "Czech Republic",
+            "phone": {
+                "prefix": "420"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "50": {
+            "jid": 50,
+            "country": "Democratic Republic of Congo (Zaire)",
+            "phone": {
+                "prefix": "243"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": "+01:00"
+            }
+        },
+        "51": {
+            "jid": 51,
+            "country": "Denmark",
+            "phone": {
+                "prefix": "45"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "52": {
+            "jid": 52,
+            "country": "Diego Garcia",
+            "phone": {
+                "prefix": "246"
+            },
+            "timezone": {
+                "start": "+05:00",
+                "end": ""
+            }
+        },
+        "53": {
+            "jid": 53,
+            "country": "Djibouti",
+            "phone": {
+                "prefix": "253"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "54": {
+            "jid": 54,
+            "country": "Dominica Islands",
+            "phone": {
+                "prefix": "767"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "55": {
+            "jid": 55,
+            "country": "Dominican Republic",
+            "phone": {
+                "prefix": "809"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "56": {
+            "jid": 56,
+            "country": "Ecuador",
+            "phone": {
+                "prefix": "593"
+            },
+            "timezone": {
+                "start": "-05:00",
+                "end": ""
+            }
+        },
+        "57": {
+            "jid": 57,
+            "country": "Egypt",
+            "phone": {
+                "prefix": "20"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "58": {
+            "jid": 58,
+            "country": "El Salvador",
+            "phone": {
+                "prefix": "503"
+            },
+            "timezone": {
+                "start": "-06:00",
+                "end": ""
+            }
+        },
+        "59": {
+            "jid": 59,
+            "country": "Equatorial Guinea",
+            "phone": {
+                "prefix": "240"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "60": {
+            "jid": 60,
+            "country": "Eritrea",
+            "phone": {
+                "prefix": "291"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "61": {
+            "jid": 61,
+            "country": "Estonia",
+            "phone": {
+                "prefix": "372"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "62": {
+            "jid": 62,
+            "country": "Ethiopia",
+            "phone": {
+                "prefix": "251"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "63": {
+            "jid": 63,
+            "country": "Faeroe Islands",
+            "phone": {
+                "prefix": "298"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "64": {
+            "jid": 64,
+            "country": "Falkland Islands",
+            "phone": {
+                "prefix": "500"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "65": {
+            "jid": 65,
+            "country": "Fiji Islands",
+            "phone": {
+                "prefix": "679"
+            },
+            "timezone": {
+                "start": "+12:00",
+                "end": ""
+            }
+        },
+        "66": {
+            "jid": 66,
+            "country": "Finland",
+            "phone": {
+                "prefix": "358"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "67": {
+            "jid": 67,
+            "country": "France",
+            "phone": {
+                "prefix": "33"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "68": {
+            "jid": 68,
+            "country": "French Guiana\u00a0",
+            "phone": {
+                "prefix": "594"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "69": {
+            "jid": 69,
+            "country": "French Polynesia",
+            "phone": {
+                "prefix": "689"
+            },
+            "timezone": {
+                "start": "-10:00",
+                "end": ""
+            }
+        },
+        "70": {
+            "jid": 70,
+            "country": "Gabon",
+            "phone": {
+                "prefix": "241"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "71": {
+            "jid": 71,
+            "country": "Georgia",
+            "phone": {
+                "prefix": "995"
+            },
+            "timezone": {
+                "start": "+04:00",
+                "end": ""
+            }
+        },
+        "72": {
+            "jid": 72,
+            "country": "Germany",
+            "phone": {
+                "prefix": "49"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "73": {
+            "jid": 73,
+            "country": "Ghana",
+            "phone": {
+                "prefix": "233"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "74": {
+            "jid": 74,
+            "country": "Gibraltar",
+            "phone": {
+                "prefix": "350"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "75": {
+            "jid": 75,
+            "country": "Greece",
+            "phone": {
+                "prefix": "30"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "76": {
+            "jid": 76,
+            "country": "Greenland",
+            "phone": {
+                "prefix": "299"
+            },
+            "timezone": {
+                "start": "-03:00",
+                "end": ""
+            }
+        },
+        "77": {
+            "jid": 77,
+            "country": "Grenada",
+            "phone": {
+                "prefix": "473"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "78": {
+            "jid": 78,
+            "country": "Guadeloupe",
+            "phone": {
+                "prefix": "590"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "79": {
+            "jid": 79,
+            "country": "Guam",
+            "phone": {
+                "prefix": "671"
+            },
+            "timezone": {
+                "start": "+10:00",
+                "end": ""
+            }
+        },
+        "80": {
+            "jid": 80,
+            "country": "Guatemala",
+            "phone": {
+                "prefix": "502"
+            },
+            "timezone": {
+                "start": "-06:00",
+                "end": ""
+            }
+        },
+        "81": {
+            "jid": 81,
+            "country": "Guinea Bissau",
+            "phone": {
+                "prefix": "245"
+            },
+            "timezone": {
+                "start": "-01:00",
+                "end": ""
+            }
+        },
+        "82": {
+            "jid": 82,
+            "country": "Guinea Republic",
+            "phone": {
+                "prefix": "224"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "83": {
+            "jid": 83,
+            "country": "Guyana",
+            "phone": {
+                "prefix": "592"
+            },
+            "timezone": {
+                "start": "-03:00",
+                "end": ""
+            }
+        },
+        "84": {
+            "jid": 84,
+            "country": "Haiti",
+            "phone": {
+                "prefix": "509"
+            },
+            "timezone": {
+                "start": "-05:00",
+                "end": ""
+            }
+        },
+        "85": {
+            "jid": 85,
+            "country": "Honduras",
+            "phone": {
+                "prefix": "503"
+            },
+            "timezone": {
+                "start": "-06:00",
+                "end": ""
+            }
+        },
+        "86": {
+            "jid": 86,
+            "country": "Hong Kong",
+            "phone": {
+                "prefix": "852"
+            },
+            "timezone": {
+                "start": "+08:00",
+                "end": ""
+            }
+        },
+        "87": {
+            "jid": 87,
+            "country": "Hungary",
+            "phone": {
+                "prefix": "36"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "88": {
+            "jid": 88,
+            "country": "Iceland",
+            "phone": {
+                "prefix": "354"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "89": {
+            "jid": 89,
+            "country": "India",
+            "phone": {
+                "prefix": "91"
+            },
+            "timezone": {
+                "start": "+05:30",
+                "end": ""
+            }
+        },
+        "90": {
+            "jid": 90,
+            "country": "Indonesia",
+            "phone": {
+                "prefix": "62"
+            },
+            "timezone": {
+                "start": "+09:00",
+                "end": "+07:00"
+            }
+        },
+        "91": {
+            "jid": 91,
+            "country": "Iran",
+            "phone": {
+                "prefix": "98"
+            },
+            "timezone": {
+                "start": "+03:30",
+                "end": ""
+            }
+        },
+        "92": {
+            "jid": 92,
+            "country": "Iraq",
+            "phone": {
+                "prefix": "964"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "93": {
+            "jid": 93,
+            "country": "Ireland",
+            "phone": {
+                "prefix": "353"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "94": {
+            "jid": 94,
+            "country": "Israel",
+            "phone": {
+                "prefix": "972"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "95": {
+            "jid": 95,
+            "country": "Italy",
+            "phone": {
+                "prefix": "39"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "96": {
+            "jid": 96,
+            "country": "Ivory Coast",
+            "phone": {
+                "prefix": "225"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "97": {
+            "jid": 97,
+            "country": "Jamaica",
+            "phone": {
+                "prefix": "876"
+            },
+            "timezone": {
+                "start": "-05:00",
+                "end": ""
+            }
+        },
+        "98": {
+            "jid": 98,
+            "country": "Japan",
+            "phone": {
+                "prefix": "81"
+            },
+            "timezone": {
+                "start": "+09:00",
+                "end": ""
+            }
+        },
+        "99": {
+            "jid": 99,
+            "country": "Jordan",
+            "phone": {
+                "prefix": "962"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "100": {
+            "jid": 100,
+            "country": "Kazakhstan",
+            "phone": {
+                "prefix": "7"
+            },
+            "timezone": {
+                "start": "+06:00",
+                "end": ""
+            }
+        },
+        "101": {
+            "jid": 101,
+            "country": "Kenya",
+            "phone": {
+                "prefix": "254"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "102": {
+            "jid": 102,
+            "country": "Kiribati",
+            "phone": {
+                "prefix": "686"
+            },
+            "timezone": {
+                "start": "+12:00",
+                "end": ""
+            }
+        },
+        "103": {
+            "jid": 103,
+            "country": "Korea",
+            "phone": {
+                "prefix": " North"
+            },
+            "timezone": {
+                "start": "850",
+                "end": "+09:00"
+            }
+        },
+        "104": {
+            "jid": 104,
+            "country": "Korea",
+            "phone": {
+                "prefix": " South"
+            },
+            "timezone": {
+                "start": "82",
+                "end": "+09:00"
+            }
+        },
+        "105": {
+            "jid": 105,
+            "country": "Kuwait",
+            "phone": {
+                "prefix": "965"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "106": {
+            "jid": 106,
+            "country": "Kyrgyzstan",
+            "phone": {
+                "prefix": "996"
+            },
+            "timezone": {
+                "start": "+06:00",
+                "end": ""
+            }
+        },
+        "107": {
+            "jid": 107,
+            "country": "Laos",
+            "phone": {
+                "prefix": "856"
+            },
+            "timezone": {
+                "start": "+07:00",
+                "end": ""
+            }
+        },
+        "108": {
+            "jid": 108,
+            "country": "latvia",
+            "phone": {
+                "prefix": "371"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "109": {
+            "jid": 109,
+            "country": "Lebanon",
+            "phone": {
+                "prefix": "961"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "110": {
+            "jid": 110,
+            "country": "Lesotho",
+            "phone": {
+                "prefix": "266"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "111": {
+            "jid": 111,
+            "country": "Liberia",
+            "phone": {
+                "prefix": "231"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "112": {
+            "jid": 112,
+            "country": "Libya",
+            "phone": {
+                "prefix": "218"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "113": {
+            "jid": 113,
+            "country": "Liechtenstein",
+            "phone": {
+                "prefix": "423"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "114": {
+            "jid": 114,
+            "country": "Lithuania",
+            "phone": {
+                "prefix": "370"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "115": {
+            "jid": 115,
+            "country": "Luxembourg",
+            "phone": {
+                "prefix": "352"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "116": {
+            "jid": 116,
+            "country": "Macau",
+            "phone": {
+                "prefix": "853"
+            },
+            "timezone": {
+                "start": "+08:00",
+                "end": ""
+            }
+        },
+        "117": {
+            "jid": 117,
+            "country": "Macedonia (Fyrom)",
+            "phone": {
+                "prefix": "389"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "118": {
+            "jid": 118,
+            "country": "Madagascar",
+            "phone": {
+                "prefix": "261"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "119": {
+            "jid": 119,
+            "country": "Malawi",
+            "phone": {
+                "prefix": "265"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "120": {
+            "jid": 120,
+            "country": "Malaysia",
+            "phone": {
+                "prefix": "60"
+            },
+            "timezone": {
+                "start": "+08:00",
+                "end": ""
+            }
+        },
+        "121": {
+            "jid": 121,
+            "country": "Maldives Republic",
+            "phone": {
+                "prefix": "960"
+            },
+            "timezone": {
+                "start": "+05:00",
+                "end": ""
+            }
+        },
+        "122": {
+            "jid": 122,
+            "country": "Mali",
+            "phone": {
+                "prefix": "223"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "123": {
+            "jid": 123,
+            "country": "Malta",
+            "phone": {
+                "prefix": "356"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "124": {
+            "jid": 124,
+            "country": "Mariana Islands",
+            "phone": {
+                "prefix": "670"
+            },
+            "timezone": {
+                "start": "+10:00",
+                "end": ""
+            }
+        },
+        "125": {
+            "jid": 125,
+            "country": "Marshall Islands",
+            "phone": {
+                "prefix": "692"
+            },
+            "timezone": {
+                "start": "+10:00",
+                "end": ""
+            }
+        },
+        "126": {
+            "jid": 126,
+            "country": "Martinique",
+            "phone": {
+                "prefix": "596"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "127": {
+            "jid": 127,
+            "country": "Mauritius",
+            "phone": {
+                "prefix": "230"
+            },
+            "timezone": {
+                "start": "+04:00",
+                "end": ""
+            }
+        },
+        "128": {
+            "jid": 128,
+            "country": "Mayotte Islands",
+            "phone": {
+                "prefix": "269"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "129": {
+            "jid": 129,
+            "country": "Mexico",
+            "phone": {
+                "prefix": "52"
+            },
+            "timezone": {
+                "start": "-06:00",
+                "end": "-08:00"
+            }
+        },
+        "130": {
+            "jid": 130,
+            "country": "Micronesia",
+            "phone": {
+                "prefix": "691"
+            },
+            "timezone": {
+                "start": "+10:00",
+                "end": ""
+            }
+        },
+        "131": {
+            "jid": 131,
+            "country": "Moldova",
+            "phone": {
+                "prefix": "373"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "132": {
+            "jid": 132,
+            "country": "Monaco",
+            "phone": {
+                "prefix": "377"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "133": {
+            "jid": 133,
+            "country": "Mongolia",
+            "phone": {
+                "prefix": "976"
+            },
+            "timezone": {
+                "start": "+08:00",
+                "end": ""
+            }
+        },
+        "134": {
+            "jid": 134,
+            "country": "Montserrat",
+            "phone": {
+                "prefix": "664"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "135": {
+            "jid": 135,
+            "country": "Morocco",
+            "phone": {
+                "prefix": "212"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "136": {
+            "jid": 136,
+            "country": "Mozambique",
+            "phone": {
+                "prefix": "258"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "137": {
+            "jid": 137,
+            "country": "Myanmar (Burma)",
+            "phone": {
+                "prefix": "95"
+            },
+            "timezone": {
+                "start": "+06:30",
+                "end": ""
+            }
+        },
+        "138": {
+            "jid": 138,
+            "country": "Namibia",
+            "phone": {
+                "prefix": "264"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "139": {
+            "jid": 139,
+            "country": "Nauru",
+            "phone": {
+                "prefix": "674"
+            },
+            "timezone": {
+                "start": "+12:00",
+                "end": ""
+            }
+        },
+        "140": {
+            "jid": 140,
+            "country": "Nepal",
+            "phone": {
+                "prefix": "977"
+            },
+            "timezone": {
+                "start": "+05:45",
+                "end": ""
+            }
+        },
+        "141": {
+            "jid": 141,
+            "country": "Netherlands",
+            "phone": {
+                "prefix": "31"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "142": {
+            "jid": 142,
+            "country": "Netherlands Antilles",
+            "phone": {
+                "prefix": "599"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "143": {
+            "jid": 143,
+            "country": "New Caledonia",
+            "phone": {
+                "prefix": "687"
+            },
+            "timezone": {
+                "start": "+11:00",
+                "end": ""
+            }
+        },
+        "144": {
+            "jid": 144,
+            "country": "New Zealand",
+            "phone": {
+                "prefix": "64"
+            },
+            "timezone": {
+                "start": "+12:00",
+                "end": ""
+            }
+        },
+        "145": {
+            "jid": 145,
+            "country": "Nicaragua",
+            "phone": {
+                "prefix": "505"
+            },
+            "timezone": {
+                "start": "-06:00",
+                "end": ""
+            }
+        },
+        "146": {
+            "jid": 146,
+            "country": "Niger",
+            "phone": {
+                "prefix": "227"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "147": {
+            "jid": 147,
+            "country": "Nigeria",
+            "phone": {
+                "prefix": "234"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "148": {
+            "jid": 148,
+            "country": "Niue Island",
+            "phone": {
+                "prefix": "683"
+            },
+            "timezone": {
+                "start": "-11:00",
+                "end": ""
+            }
+        },
+        "149": {
+            "jid": 149,
+            "country": "Norfolk Island",
+            "phone": {
+                "prefix": "672"
+            },
+            "timezone": {
+                "start": "+11:30",
+                "end": ""
+            }
+        },
+        "150": {
+            "jid": 150,
+            "country": "Norway",
+            "phone": {
+                "prefix": "47"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "151": {
+            "jid": 151,
+            "country": "Oman",
+            "phone": {
+                "prefix": "968"
+            },
+            "timezone": {
+                "start": "+04:00",
+                "end": ""
+            }
+        },
+        "152": {
+            "jid": 152,
+            "country": "Pakistan",
+            "phone": {
+                "prefix": "92"
+            },
+            "timezone": {
+                "start": "+05:00",
+                "end": ""
+            }
+        },
+        "153": {
+            "jid": 153,
+            "country": "Palau",
+            "phone": {
+                "prefix": "680"
+            },
+            "timezone": {
+                "start": "+09:00",
+                "end": ""
+            }
+        },
+        "154": {
+            "jid": 154,
+            "country": "Palestine",
+            "phone": {
+                "prefix": "970"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "155": {
+            "jid": 155,
+            "country": "Panama",
+            "phone": {
+                "prefix": "507"
+            },
+            "timezone": {
+                "start": "-05:00",
+                "end": ""
+            }
+        },
+        "156": {
+            "jid": 156,
+            "country": "Papua New Guinea",
+            "phone": {
+                "prefix": "675"
+            },
+            "timezone": {
+                "start": "+10:00",
+                "end": ""
+            }
+        },
+        "157": {
+            "jid": 157,
+            "country": "Paraguay",
+            "phone": {
+                "prefix": "595"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "158": {
+            "jid": 158,
+            "country": "Peru",
+            "phone": {
+                "prefix": "51"
+            },
+            "timezone": {
+                "start": "-05:00",
+                "end": ""
+            }
+        },
+        "159": {
+            "jid": 159,
+            "country": "Philippines",
+            "phone": {
+                "prefix": "63"
+            },
+            "timezone": {
+                "start": "+08:00",
+                "end": ""
+            }
+        },
+        "160": {
+            "jid": 160,
+            "country": "Poland",
+            "phone": {
+                "prefix": "48"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "161": {
+            "jid": 161,
+            "country": "Portugal",
+            "phone": {
+                "prefix": "351"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "162": {
+            "jid": 162,
+            "country": "Puerto Rico",
+            "phone": {
+                "prefix": "787"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "163": {
+            "jid": 163,
+            "country": "Qatar",
+            "phone": {
+                "prefix": "974"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "164": {
+            "jid": 164,
+            "country": "Reunion Island",
+            "phone": {
+                "prefix": "262"
+            },
+            "timezone": {
+                "start": "+04:00",
+                "end": ""
+            }
+        },
+        "165": {
+            "jid": 165,
+            "country": "Romania",
+            "phone": {
+                "prefix": "40"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "166": {
+            "jid": 166,
+            "country": "Russia",
+            "phone": {
+                "prefix": "7"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "167": {
+            "jid": 167,
+            "country": "Rwanda",
+            "phone": {
+                "prefix": "250"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "168": {
+            "jid": 168,
+            "country": "Samoa (American)",
+            "phone": {
+                "prefix": "684"
+            },
+            "timezone": {
+                "start": "-11:00",
+                "end": ""
+            }
+        },
+        "169": {
+            "jid": 169,
+            "country": "Samoa (Western)",
+            "phone": {
+                "prefix": "685"
+            },
+            "timezone": {
+                "start": "-11:00",
+                "end": ""
+            }
+        },
+        "170": {
+            "jid": 170,
+            "country": "San Marino",
+            "phone": {
+                "prefix": "378"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "171": {
+            "jid": 171,
+            "country": "Sao Tome & Principe",
+            "phone": {
+                "prefix": "239"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "172": {
+            "jid": 172,
+            "country": "Saudi Arabia",
+            "phone": {
+                "prefix": "966"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "173": {
+            "jid": 173,
+            "country": "Senegal",
+            "phone": {
+                "prefix": "221"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "174": {
+            "jid": 174,
+            "country": "Serbia",
+            "phone": {
+                "prefix": "381"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "175": {
+            "jid": 175,
+            "country": "Seychelles",
+            "phone": {
+                "prefix": "248"
+            },
+            "timezone": {
+                "start": "+04:00",
+                "end": ""
+            }
+        },
+        "176": {
+            "jid": 176,
+            "country": "Sierra Leone",
+            "phone": {
+                "prefix": "232"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "177": {
+            "jid": 177,
+            "country": "Singapore",
+            "phone": {
+                "prefix": "65"
+            },
+            "timezone": {
+                "start": "+08:00",
+                "end": ""
+            }
+        },
+        "178": {
+            "jid": 178,
+            "country": "Slovak Republic",
+            "phone": {
+                "prefix": "421"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "179": {
+            "jid": 179,
+            "country": "Slovenia",
+            "phone": {
+                "prefix": "386"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "180": {
+            "jid": 180,
+            "country": "Solomon Islands",
+            "phone": {
+                "prefix": "677"
+            },
+            "timezone": {
+                "start": "+11:00",
+                "end": ""
+            }
+        },
+        "181": {
+            "jid": 181,
+            "country": "Somalia",
+            "phone": {
+                "prefix": "252"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "182": {
+            "jid": 182,
+            "country": "South Africa",
+            "phone": {
+                "prefix": "27"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "183": {
+            "jid": 183,
+            "country": "Spain",
+            "phone": {
+                "prefix": "34"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "184": {
+            "jid": 184,
+            "country": "Sri Lanka",
+            "phone": {
+                "prefix": "94"
+            },
+            "timezone": {
+                "start": "+05:30",
+                "end": ""
+            }
+        },
+        "185": {
+            "jid": 185,
+            "country": "St Helena",
+            "phone": {
+                "prefix": "290"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "186": {
+            "jid": 186,
+            "country": "St Kitts & Nevia",
+            "phone": {
+                "prefix": "869"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "187": {
+            "jid": 187,
+            "country": "St Lucia",
+            "phone": {
+                "prefix": "758"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "188": {
+            "jid": 188,
+            "country": "Sudan",
+            "phone": {
+                "prefix": "249"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "189": {
+            "jid": 189,
+            "country": "Surinam",
+            "phone": {
+                "prefix": "597"
+            },
+            "timezone": {
+                "start": "-03:30",
+                "end": ""
+            }
+        },
+        "190": {
+            "jid": 190,
+            "country": "Swaziland",
+            "phone": {
+                "prefix": "268"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "191": {
+            "jid": 191,
+            "country": "Sweden",
+            "phone": {
+                "prefix": "46"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "192": {
+            "jid": 192,
+            "country": "Switzerland",
+            "phone": {
+                "prefix": "41"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "193": {
+            "jid": 193,
+            "country": "Syria",
+            "phone": {
+                "prefix": "963"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "194": {
+            "jid": 194,
+            "country": "Taiwan",
+            "phone": {
+                "prefix": "886"
+            },
+            "timezone": {
+                "start": "+08:00",
+                "end": ""
+            }
+        },
+        "195": {
+            "jid": 195,
+            "country": "Tajikistan",
+            "phone": {
+                "prefix": "992"
+            },
+            "timezone": {
+                "start": "+06:00",
+                "end": ""
+            }
+        },
+        "196": {
+            "jid": 196,
+            "country": "Tanzania",
+            "phone": {
+                "prefix": "255"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "197": {
+            "jid": 197,
+            "country": "Thailand",
+            "phone": {
+                "prefix": "66"
+            },
+            "timezone": {
+                "start": "+07:00",
+                "end": ""
+            }
+        },
+        "198": {
+            "jid": 198,
+            "country": "The Gambia",
+            "phone": {
+                "prefix": "220"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "199": {
+            "jid": 199,
+            "country": "Togo",
+            "phone": {
+                "prefix": "228"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "200": {
+            "jid": 200,
+            "country": "Tonga",
+            "phone": {
+                "prefix": "676"
+            },
+            "timezone": {
+                "start": "+13:00",
+                "end": ""
+            }
+        },
+        "201": {
+            "jid": 201,
+            "country": "Trinidad & Tobago",
+            "phone": {
+                "prefix": "868"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "202": {
+            "jid": 202,
+            "country": "Tunisia",
+            "phone": {
+                "prefix": "216"
+            },
+            "timezone": {
+                "start": "+01:00",
+                "end": ""
+            }
+        },
+        "203": {
+            "jid": 203,
+            "country": "Turkey",
+            "phone": {
+                "prefix": "90"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "204": {
+            "jid": 204,
+            "country": "Turkmenistan",
+            "phone": {
+                "prefix": "993"
+            },
+            "timezone": {
+                "start": "+05:00",
+                "end": ""
+            }
+        },
+        "205": {
+            "jid": 205,
+            "country": "Turks & Caicos Islands",
+            "phone": {
+                "prefix": "649"
+            },
+            "timezone": {
+                "start": "-05:00",
+                "end": ""
+            }
+        },
+        "206": {
+            "jid": 206,
+            "country": "Tuvalu",
+            "phone": {
+                "prefix": "688"
+            },
+            "timezone": {
+                "start": "+12:00",
+                "end": ""
+            }
+        },
+        "207": {
+            "jid": 207,
+            "country": "Uganda",
+            "phone": {
+                "prefix": "256"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "208": {
+            "jid": 208,
+            "country": "Ukraine",
+            "phone": {
+                "prefix": "380"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "209": {
+            "jid": 209,
+            "country": "United Arab Emirates",
+            "phone": {
+                "prefix": "971"
+            },
+            "timezone": {
+                "start": "+04:00",
+                "end": ""
+            }
+        },
+        "210": {
+            "jid": 210,
+            "country": "United Kingdom",
+            "phone": {
+                "prefix": "44"
+            },
+            "timezone": {
+                "start": "",
+                "end": ""
+            }
+        },
+        "211": {
+            "jid": 211,
+            "country": "Uruguay",
+            "phone": {
+                "prefix": "598"
+            },
+            "timezone": {
+                "start": "-03:00",
+                "end": ""
+            }
+        },
+        "212": {
+            "jid": 212,
+            "country": "USA",
+            "phone": {
+                "prefix": "1"
+            },
+            "timezone": {
+                "start": "-05:00",
+                "end": "-11:00"
+            }
+        },
+        "213": {
+            "jid": 213,
+            "country": "Uzbekistan",
+            "phone": {
+                "prefix": "998"
+            },
+            "timezone": {
+                "start": "+06:00",
+                "end": ""
+            }
+        },
+        "214": {
+            "jid": 214,
+            "country": "Vanuatu",
+            "phone": {
+                "prefix": "678"
+            },
+            "timezone": {
+                "start": "+11:00",
+                "end": ""
+            }
+        },
+        "215": {
+            "jid": 215,
+            "country": "Venezuela",
+            "phone": {
+                "prefix": "58"
+            },
+            "timezone": {
+                "start": "-04:00",
+                "end": ""
+            }
+        },
+        "216": {
+            "jid": 216,
+            "country": "Vietnam",
+            "phone": {
+                "prefix": "84"
+            },
+            "timezone": {
+                "start": "+07:00",
+                "end": ""
+            }
+        },
+        "217": {
+            "jid": 217,
+            "country": "Wallis & Futuna Islands",
+            "phone": {
+                "prefix": "681"
+            },
+            "timezone": {
+                "start": "+12:00",
+                "end": ""
+            }
+        },
+        "218": {
+            "jid": 218,
+            "country": "Yemen Arab Republic",
+            "phone": {
+                "prefix": "967"
+            },
+            "timezone": {
+                "start": "+03:00",
+                "end": ""
+            }
+        },
+        "219": {
+            "jid": 219,
+            "country": "Zambia",
+            "phone": {
+                "prefix": "260"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        },
+        "220": {
+            "jid": 220,
+            "country": "Zimbabwe",
+            "phone": {
+                "prefix": "263"
+            },
+            "timezone": {
+                "start": "+02:00",
+                "end": ""
+            }
+        }
+    }
+}

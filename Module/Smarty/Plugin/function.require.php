@@ -17,7 +17,7 @@ function smarty_function_require($params, $template)
     $result = new Priya\Module\Core\Result(new Priya\Module\Handler());
 
     if(isset($params['environment'])){
-        $result->data('environment', Application::ENVIRONMENT);
+        $result->data('priya.environment', Application::ENVIRONMENT);
     }
     if(isset($vars['autoload'])){
         $result->data('autoload', $vars['autoload']);

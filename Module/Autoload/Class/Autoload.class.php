@@ -1,18 +1,21 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- *  -	all
- *  -	lowered the l of Autoload
+ *  -    all
+ *  -    lowered the l of Autoload
  */
 
 namespace Priya\Module;
 
 use stdClass;
+use Priya\Application;
 
 class Autoload{
+    const DIR = __DIR__;
+    const FILE = 'Autoload.json';
     const EXT_PHP = 'php';
     const EXT_TPL = 'tpl';
     const EXT_JSON = 'json';
@@ -20,12 +23,15 @@ class Autoload{
     const EXT_TRAIT_PHP = 'trait.php';
 
     private $expose;
+    private $read;
+    private $resource;
+    protected $fileList;
 
     public $prefixList = array();
     public $environment = 'production';
 
     public function register($method='load', $prepend=false){
-        $this->environment('development');
+//         $this->environment('development');
         $functions = spl_autoload_functions();
         if(is_array($functions)){
             foreach($functions as $function){
@@ -106,11 +112,17 @@ class Autoload{
         return false;
     }
 
-    public function fileList($item=array()){
+    public function fileList($item=array(), $url=''){
         if(empty($item)){
             return array();
         }
+        if(empty($this->read)){
+            $this->read = $this->read($url);
+        }
         $data = array();
+        if(isset($this->read->autoload) && isset($this->read->autoload->{$item['load']})){
+            $data[] = $this->read->autoload->{$item['load']};
+        }
         $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_CLASS_PHP;
         $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_PHP;
         $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_TRAIT_PHP;
@@ -129,11 +141,20 @@ class Autoload{
         $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
         $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_CLASS_PHP;
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
-        $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR. 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
-        $data[] =  '[---]';
+        if(empty($item['dirName'])){
+            $data[] = $item['directory'] . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_CLASS_PHP;
+            $data[] = $item['directory'] . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
+            $data[] = $item['directory'] . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
+            $data[] = $item['directory'] . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
+            $data[] =  '[---]';
+        } else {
+            $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_CLASS_PHP;
+            $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
+            $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
+            $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
+            $data[] =  '[---]';
+        }
+
         $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_CLASS_PHP;
         $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_TRAIT_PHP;
         $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_PHP;
@@ -142,13 +163,24 @@ class Autoload{
         $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_TRAIT_PHP;
         $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
-        return $data;
+
+        $this->fileList[$item['baseName']][] = $data;
+
+        $result = array();
+        foreach($data as $nr => $file){
+            if($file === '[---]'){
+                $file = $file . $nr;
+            }
+            $result[$file] = $file;
+        }
+        return $result;
     }
 
     public function locate($load=null){
+        $dir = dirname(Autoload::DIR) . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;
+        $url = $dir . Autoload::FILE;
         $load = ltrim($load, '\\');
         $prefixList = $this->getPrefixList();
-        $list = array();
         if(!empty($prefixList)){
             foreach($prefixList as $nr => $item){
                 if(empty($item['prefix'])){
@@ -175,6 +207,9 @@ class Autoload{
                     $item['file'] = $load;
                 }
                 if(!empty($item['file'])){
+                    $item['load'] = $load;
+                    $item['file'] = str_replace('\\', DIRECTORY_SEPARATOR, $item['file']);
+                    $item['file'] = str_replace('.'  . DIRECTORY_SEPARATOR , DIRECTORY_SEPARATOR, $item['file']);
                     $item['baseName'] = basename(
                         $this->removeExtension($item['file'],
                             array(
@@ -183,27 +218,38 @@ class Autoload{
 
                             )
                     ));
+                    $item['baseName'] = explode(DIRECTORY_SEPARATOR, $item['baseName'], 2);
+                    $item['baseName'] = end($item['baseName']);
                     $item['dirName'] = dirname($item['file']);
-                    $fileList = $this->fileList($item);
+                    if($item['dirName'] == '.'){
+                        unset($item['dirName']);
+                    }
+                    $fileList = $this->fileList($item, $url);
                     if(is_array($fileList) && empty($this->expose())){
                         foreach($fileList as $nr => $file){
+                            if(substr($file, 0, 5) == '[---]'){
+                                continue;
+                            }
                             if(file_exists($file)){
+                                $this->write($url, $file, $load);
                                 return $file;
                             }
                         }
                     }
-                    $list[] = $fileList;
                 }
             }
         }
-        if($this->environment()=='development' || !empty($this->expose())){
+        if($this->environment() == 'development' || !empty($this->expose())){
             $object = new stdClass();
             $attribute = 'Priya\Module\Exception\Error';
             if(!empty($this->expose())){
                 $attribute = $load;
             }
-            $object->{$attribute} = $list;
+            if(isset($this->fileList[$item['baseName']])){
+                $object->{$attribute} = $this->fileList[$item['baseName']];
+            }
             echo json_encode($object, JSON_PRETTY_PRINT);
+            debug(debug_backtrace());
             if(ob_get_level() !== 0){
                 ob_flush();
             }
@@ -212,6 +258,64 @@ class Autoload{
             }
         }
         return false;
+    }
+
+    public function __destruct(){
+        if(!empty($this->resource)){
+            fclose($this->resource);
+        }
+    }
+
+    private function write($url='', $file='', $class=''){
+        if(empty($this->read)){
+            $this->read = $this->read($url);
+        }
+        if(empty($this->read->autoload)){
+            $this->read->autoload = new stdClass();
+        }
+        $this->read->autoload->{$class} = (string) $file;
+
+        $data = (string) json_encode($this->read, JSON_PRETTY_PRINT);
+        $fwrite = 0;
+        if(empty($this->resource)){
+            $dir = dirname($url);
+            if(is_dir($dir) === false){
+                mkdir($dir, 0777, true);
+            }
+            $this->resource = fopen($url, 'w');
+        }
+        if($this->resource === false){
+            return $this->resource;
+        }
+        $lock = flock($this->resource, LOCK_EX);
+        fseek($this->resource, 0);
+        for ($written = 0; $written < strlen($data); $written += $fwrite) {
+            $fwrite = fwrite($this->resource, substr($data, $written));
+            if ($fwrite === false) {
+                break;
+            }
+        }
+        if(!empty($this->resource)){
+            flock($this->resource, LOCK_UN);
+        }
+        if($written != strlen($data)){
+            return false;
+        } else {
+            return $fwrite;
+        }
+    }
+
+    private function read($url=''){
+        if(file_exists($url) === false){
+            $this->read = new stdClass();
+            return $this->read;
+        }
+        $this->read =  json_decode(implode('',file($url)));
+        if(empty($this->read)){
+            $this->read = new stdClass();
+        }
+        return $this->read;
+
     }
 
     private function removeExtension($filename='', $extension=array()){

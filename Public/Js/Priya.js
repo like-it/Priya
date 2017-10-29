@@ -1,4 +1,4 @@
-    (function(funcName, baseObj) {
+(function(funcName, baseObj) {
     // The public function name defaults to window.docReady
     // but you can pass in your own object and own function name and those will be used
     // if you want to put them in a different namespace
@@ -13,7 +13,15 @@
     function ready() {
         //need to add .wait or similar for all includes
         if(typeof priya == 'undefined'){
-            setTimeout(ready,1);
+            setTimeout(ready, 1/30);
+            return;
+        }
+        var require = {};
+        if(typeof priya.collect != 'undefined' && typeof priya.collect.require == 'object'){
+            require = priya.collect.require;
+        }
+        if(require.toLoad != require.loaded){
+            setTimeout(ready, 1/30);
             return;
         }
         if (!readyFired) {
@@ -96,7 +104,15 @@ var priya;
     var web = window.location.protocol + '//' + window.location.host + '/';
     var node = include(web + 'Priya/Public/Js/Prototype/Priya/Priya.prototype.js');
     node.addEventListener('load', function(event){
-        priya = new priya();
-        priya.run();
+        priya = new priya(web);
+        //ready();
+        /*
+        var require = priya.collection('require');
+        if(require.toLoad != require.loaded){
+            setTimeout(function(){
+                priya.wait();
+            }, 1/30);
+        }
+        */
     }, false);
 })();

@@ -37,8 +37,12 @@ class Core {
             echo Core::object($exception, 'json');
             return true;
         } else {
-            var_dump($exception);
-            die;
+            if(isset($exception->xdebug_message)){
+                echo $exception->xdebug_message;
+            } else {
+                var_dump($exception);
+                die;
+            }
         }
     }
 
@@ -53,6 +57,10 @@ class Core {
         $error['file'] = $file;
         $error['line'] = $line;
         $error['context'] = $context;
+        var_dump($error);
+        die;
+
+        /*
         $handler = new Handler();
         if($handler->contentType() == Handler::CONTENT_TYPE_JSON){
             echo Core::object($error, 'json');
@@ -61,6 +69,7 @@ class Core {
             var_dump($error);
             die;
         }
+        */
     }
 
     public function handler($handler=null){
@@ -463,7 +472,7 @@ class Core {
             }
             elseif($attribute !== null){
                 if($type == 'delete'){
-                    $delete = $this->deleteMessagedeleteMessage($attribute);
+                    $delete = $this->deleteMessage($attribute);
                     //add delete when parent is empty
                     $nodeList = $this->message('nodeList');
                     if(!empty($nodeList) && is_array($nodeList)){
@@ -648,7 +657,11 @@ class Core {
 
     public function autoload($autoload=null){
         if($autoload !== null){
-            $this->setAutoload($autoload);
+            if($autoload == 'delete' || $autoload == 'remove'){
+                $this->setAutoload(null);
+            } else {
+                $this->setAutoload($autoload);
+            }
         }
         return $this->getAutoload();
     }
@@ -661,56 +674,7 @@ class Core {
         return $this->autoload;
     }
 
-    public function debug($output='',$isExport=false,$isDie=false){
-        if($this->handler()->contentType() == Handler::CONTENT_TYPE_JSON){
-            echo $this->object($output, 'json');
-        } else {
-            if($this->handler()->method() == Handler::METHOD_CLI){
-                $cli = new Cli();
-                $cols = $cli->tput('columns');
-                $rows = $cli->tput('rows');
-
-                echo PHP_EOL;
-                if(
-                        is_string($output) &&
-                        in_array($output, array(
-                                '***',
-                                '!!!',
-                                '---',
-                                '+++',
-                                '___',
-                                '===',
-                                '^^^',
-                                '$$$',
-                                '###',
-                                '@@@',
-                                '%%%',
-                                '&&&'
-                        ))
-                        ){
-                            $char = substr($output, 0, 1);
-                            for($i=0; $i< $cols; $i++){
-                                echo $char;
-                            }
-                            return;
-                } else {
-                    $char = '_';
-                    for($i=0; $i< $cols; $i++){
-                        echo $char;
-                    }
-                }
-                echo PHP_EOL;
-            }
-            if(empty($isExport)){
-                var_dump($output);
-            } else {
-                var_export($output);
-            }
-            echo PHP_EOL;
-        }
-        if(!empty($isDie)){
-            die;
-        }
-
+    public function debug($output='', $title=null, $isExport=false){
+        debug($output, $title, $isExport);
     }
 }

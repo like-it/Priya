@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module\Core;
@@ -26,7 +26,13 @@ class Parser extends Data {
         }
         $object_parser= $this->get_object_parser();
         if($object_parser === null){
-            $this->set_object_parser(new \Priya\Module\Parser());
+            $this->set_object_parser(
+                new \Priya\Module\Parser(
+                    $this->handler(),
+                    $this->route()
+                )
+            );
+            $this->get_object_parser()->data($this->data());
             $this->get_object_parser()->route($this->route());
             $this->get_object_parser()->handler($this->handler());
         }
@@ -41,11 +47,11 @@ class Parser extends Data {
         return $this->object_parser;
     }
 
-    public function parser($attribute=null, $value=null){
-        if($attribute == 'object'){
+    public function parser($data=null, $value=null){
+        if($data== 'object'){
             return $this->object_parser();
         } else {
-            return $this->object_parser()->compile($attribute, $value);
+            return $this->object_parser()->compile($data, $value);
         }
     }
 

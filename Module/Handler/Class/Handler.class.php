@@ -361,8 +361,12 @@ class Handler extends \Priya\Module\Core\Data{
             if(!isset($old->nodeList)){
                 $input = new stdClass();
                 $input->nodeList = array();
-                foreach($old as $node){
-                    $input->nodeList[] = $node;
+                foreach($old as $key => $node){
+                    if(is_numeric($key)){
+                        $input->nodeList[] = $node;
+                    } else {
+                        $input->nodeList[] = array($key => $node);
+                    }
                 }
                 $input = json_encode($input);
             }
@@ -464,6 +468,9 @@ class Handler extends \Priya\Module\Core\Data{
         }
     }
     public function session($attribute=null, $value=null){
+        if($attribute == 'has'){
+            return isset($_SESSION);
+        }
         if(!isset($_SESSION)){
             session_start();
             $_SESSION['id'] = session_id();

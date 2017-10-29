@@ -10,24 +10,27 @@ php_flag display_errors on
 php_flag html_errors on
 php_flag  log_errors on
 php_value error_log  ../log/PHP_errors.log
-RewriteEngine On
 
-#
-# Don't rewrite if dir/link/file exists
-#
+<IfModule mod_rewrite.c>
+    RewriteEngine On
 
-RewriteCond %{REQUEST_FILENAME} -f [OR]
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteRule .* - [L]
+    #
+    # Don't rewrite if dir/link/file exists
+    #
 
-#
-# Handle in route class...
-#
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule .* - [L]
 
-RewriteCond %{HTTPS} off
-RewriteRule .* - [E=REQUEST_SCHEME:http]
+    #
+    # Handle in route class...
+    #
 
-RewriteCond %{HTTPS} on
-RewriteRule .* - [E=REQUEST_SCHEME:https]
+    RewriteCond %{HTTPS} off
+    RewriteRule .* - [E=REQUEST_SCHEME:http]
 
-RewriteRule ^/?(.*)$ /index.php?request=$1 [L,QSA]
+    RewriteCond %{HTTPS} on
+    RewriteRule .* - [E=REQUEST_SCHEME:https]
+
+    RewriteRule ^/?(.*)$ /index.php?request=$1 [L,QSA]
+</IfModule>

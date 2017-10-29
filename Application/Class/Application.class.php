@@ -1,14 +1,15 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya;
 
+use stdClass;
 use Priya\Module\File;
 use Priya\Module\Handler;
 use Priya\Module\Core\Parser;
@@ -23,13 +24,17 @@ class Application extends Parser {
     const MODULE = 'Module';
     const TEMPLATE = 'Template';
     const PLUGIN = 'Plugin';
+    const PAGE = 'Page';
     const DATA = 'Data';
     const BACKUP = 'Backup';
     const RESTORE = 'Restore';
     const UPDATE = 'Update';
     const VENDOR = 'Vendor';
     const TEMP = 'Temp';
+    const CACHE = 'Cache';
     const PUBLIC_HTML = 'Public';
+    const CSS = 'Css';
+    const JAVASCRIPT = 'Javascript';
     const CONFIG = 'Config.json';
     const CUSTOM = 'Custom.json';
     const ROUTE = 'Route.json';
@@ -37,8 +42,8 @@ class Application extends Parser {
 
     public function __construct($autoload=null, $data=null){
         $this->cwd(getcwd());
-        set_exception_handler(array('Priya\Module\Core','handler_exception'));
-        set_error_handler(array('Priya\Module\Core','handler_error'));
+//         set_exception_handler(array('Priya\Module\Core','handler_exception'));
+//         set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->data('time.start', microtime(true));
         $this->data('priya.environment', Application::ENVIRONMENT);
         $this->data('module', $this->module());
@@ -71,7 +76,7 @@ class Application extends Parser {
         if(file_exists($url)){
             $this->read($url);
         }
-        $this->data($this->object_merge($this->data(),$this->object($data)));
+        $this->data(Application::object_merge($this->data(),$this->object($data)));
         $this->cli();
         if(empty($this->data('dir.priya.root'))){
             $this->data('dir.priya.root',
@@ -141,8 +146,9 @@ class Application extends Parser {
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
-        chdir($this->data('dir.priya.application')); //uncomment causes Parser to create an empty input even in this if statement
-
+        if($this->data('dir.priya.application')){
+            chdir($this->data('dir.priya.application'));
+        }
         if(empty($autoload)){
             $autoload = new \Priya\Module\Autoload();
             $autoload->addPrefix('Priya',  dirname(Application::DIR) . Application::DS);
@@ -175,13 +181,12 @@ class Application extends Parser {
         $this->route()->create('Application.Install');
         $this->route()->create('Application.Update');
         $this->route()->create('Application.Parser');
-        $this->route()->create('Application.Sdl');
-        $this->route()->create('Application.Gui');
         $this->route()->create('Application.Cache.Clear');
         $this->route()->create('Test');
     }
 
     public function run(){
+        $this->autoload()->environment($this->data('priya.environment'));
         chdir($this->data('dir.priya.application'));
         $request = $this->request('request');
         if($request ===  $this->data('parser.request') && $request !== null){
@@ -215,7 +220,17 @@ class Application extends Parser {
                     $parser = new Parser();
                     $file = new File();
                     $result = $parser->data('object')->compile($file->read($url), $data->data());
+                } elseif($ext == 'json'){
+                    $file = new File();
+                    $result = $file->read($url);
+                    $object = new stdClass();
+                    $object->url = $this->handler()->url();
+                    $object = Application::object_merge($object, $this->object($result));
+                    $result = $this->object($object, 'json');
                 } else {
+                    if($ext == 'js'){
+//                         sleep(rand(1, 10)); //testing async
+                    }
                     $file = new File();
                     $result = $file->read($url);
                 }
@@ -300,11 +315,13 @@ class Application extends Parser {
                 }
             }
         }
-        if(is_object($result) && isset($result->html)){
+        if(is_object($result)){
             if($contentType == Handler::CONTENT_TYPE_JSON){
                 $result = $this->object($result, 'json');
             } else {
-                $result = $result->html;
+                if(isset($result->html)){
+                    $result = $result->html;
+                }
             }
         }
         elseif(is_string($result)){
@@ -318,6 +335,45 @@ class Application extends Parser {
 //          404
         }
         chdir($this->cwd());  //for Parser
+        return $result;
+    }
+
+    public function page($request=''){
+        $this->data('request', $request);
+        $this->data('dir.priya.page', $this->data('dir.priya.root') . Application::PAGE . Application::DS);
+        $this->data('dir.module.page', $this->data('dir.module.root') . Application::PAGE . Application::DS);
+
+        $result = new stdClass();
+
+        $parser = new \Priya\Module\Parser();
+        $parser->data($this->data());
+        $file = new \Priya\Module\File();
+        $url = $this->data('dir.module.page') . 'Request.priya';
+        if(file_exists($url)){
+            var_dump('parse this one');
+        } else {
+            $url = $this->data('dir.priya.page') . 'Request.priya';
+            if(file_exists($url)){
+                $parser->data('input', $file->read($url));
+                $parser->data($parser->compile($parser->data(), $parser->data()));
+
+                var_dump($parser->data());
+
+                var_Dump($parser->data('script'));
+                die;
+
+                $result->script[] = $parser->data('input');
+
+                if($this->data('request.contentType') == Handler::CONTENT_TYPE_JSON){
+                    $result = $this->object($result, 'json');
+                } else {
+
+                }
+
+            } else {
+                var_dump('parse not found');
+            }
+        }
         return $result;
     }
 

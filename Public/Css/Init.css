@@ -56,16 +56,23 @@ input[type="submit"] {
 
 }
 
-
-.button-default {
-    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(224, 224, 224, 1) 100%);
-    background-repeat: repeat-x;
-    border: 1px solid #dbdbdb;
+button,
+input[type="submit"]
+{
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
     border-radius: 4px;
-    padding: 5px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-.button-default:hover {
-    background-color: rgba(224, 224, 224, 1);
-    background-position: 0 -15px;
 }

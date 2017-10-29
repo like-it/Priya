@@ -15,15 +15,23 @@ use Priya\Application;
 class Data extends Core {
     const DIR = __DIR__;
 
-    private $url;
-    private $data;
+    public $url;
+    public $data;
 
     public function __construct($handler=null, $route=null, $data=null){
-        $this->data($this->object_merge($this->data(), $handler));
+        $this->data(Data::object_merge($this->data(), $handler));
     }
 
-    public function data($attribute=null, $value=null){
+    public function data($attribute=null, $value=null, $type=null){
         if($attribute !== null){
+            if($attribute == 'set'){
+                $this->object_delete($value, $this->data()); //for sorting an object
+                $this->object_set($value, $type, $this->data());
+                return $this->object_get($value, $this->data());
+            }
+            elseif($attribute == 'get'){
+                return $this->object_get($value, $this->data());
+            }
             if($value !== null){
                 if($attribute=='delete'){
                     return $this->deleteData($value);
@@ -169,7 +177,7 @@ class Data extends Core {
             $module = $url;
         }
         $autoload = $this->autoload();
-        if(empty($autoload)){
+        if(empty($autoload) || !$autoload instanceof \Priya\Module\Autoload\Data){
             $tmp = explode('\\', trim(str_replace(Application::DS, '\\',$url),'\\'));
             $class = array_pop($tmp);
             $namespace = implode('\\', $tmp);
@@ -202,6 +210,8 @@ class Data extends Core {
         if($url !== false){
             $this->url($url);
         }
+
+
         $file = new File();
         $read = $file->read($url);
         $read = $this->object($read);
@@ -605,7 +615,7 @@ class Data extends Core {
                         if(empty($merge)){
                             $nodeList->{$jid} = $node;
                         } else {
-                            $nodeList->{$jid} = $this->object_merge($item, $node);
+                            $nodeList->{$jid} = Data::object_merge($item, $node);
                         }
                         break;
                     }

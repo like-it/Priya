@@ -14,21 +14,81 @@ use stdClass;
 trait Object {
 
     public static function object($input='', $output='object',$type='root'){
+        if(is_bool($input)){
+            if($output == 'object' || $output == 'json'){
+                $data = new stdClass();
+                if(empty($input)){
+                    $data->false = false;
+                } else {
+                    $data->true = true;
+                }
+                if($output == 'json'){
+                    $data = json_encode($data);
+                }
+                return $data;
+            }
+            elseif($output == 'array') {
+                return array($input);
+            } else {
+                trigger_error('unknown output in object');
+            }
+        }
+        if(is_array($input) && $output == 'object'){
+            return self::array_object($input);
+        }
         if(is_string($input)){
             $input = trim($input);
             if($output=='object'){
-                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}' && stristr($input,':')){
-                    return json_decode($input);
+                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}'){
+                    $input = str_replace(
+                        array(
+                            "\r",
+                            "\n"
+                        ),
+                        array(
+                            '',
+                            ''
+                        ),
+                        $input
+                    );
+                    $json = json_decode($input);
+                    if(json_last_error()){
+                        debug($input, 'input');
+                        trigger_error(json_last_error_msg(), E_USER_ERROR);
+                    }
+                    return $json;
+                }
+                elseif(substr($input,0,1)=='[' && substr($input,-1,1)==']'){
+                    $input = str_replace(
+                        array(
+                            "\r",
+                            "\n"
+                        ),
+                        array(
+                            '',
+                            ''
+                        ),
+                        $input
+                    );
+                    $json = json_decode($input);
+                    if(json_last_error()){
+                        debug($input, 'input');
+                        trigger_error(json_last_error_msg(), E_USER_ERROR);
+                    }
+                    return $json;
                 }
             }
             elseif(stristr($output, 'json') !== false){
-                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}' && stristr($input,':')){
+                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}'){
                     $input = json_decode($input);
                 }
             }
             elseif($output=='array'){
-                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}' && stristr($input,':')){
-                    return json_decode($input,true);
+                if(substr($input,0,1)=='{' && substr($input,-1,1)=='}'){
+                    return json_decode($input, true);
+                }
+                elseif(substr($input,0,1)=='[' && substr($input,-1,1)==']'){
+                    return json_decode($input, true);
                 }
             }
         }
@@ -55,6 +115,28 @@ trait Object {
         } else {
             trigger_error('unknown output in object');
         }
+    }
+
+    public static function array_object($array=array()){
+        $object = new stdClass();
+        foreach ($array as $key => $value){
+            if(is_array($value)){
+                $object->{$key} = self::array_object($value);
+            } else {
+                $object->{$key} = $value;
+            }
+        }
+        return $object;
+    }
+
+    public static function is_nested_array($array=array()){
+        $array = (array) $array;
+        foreach($array as $key => $value){
+            if(is_array($value)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public function explode_single($delimiter=array(), $string='', $internal=array()){
@@ -280,9 +362,12 @@ trait Object {
         return null;
     }
 
-    public function object_merge(){
+    public static function object_merge(){
         $objects = func_get_args();
         $main = array_shift($objects);
+        if(empty($main) && !is_array($main)){
+            $main = new stdClass();
+        }
         foreach($objects as $nr => $object){
             if(is_array($object)){
                 foreach($object as $key => $value){
@@ -290,7 +375,7 @@ trait Object {
                         $main[$key] = $value;
                     } else {
                         if(is_array($value) && is_array($main[$key])){
-                            $main[$key] = $this->object_merge($main[$key], $value);
+                            $main[$key] = self::object_merge($main[$key], $value);
                         } else {
                             $main[$key] = $value;
                         }
@@ -303,7 +388,7 @@ trait Object {
                         $main->{$key} = $value;
                     } else {
                         if(is_object($value) && is_object($main->{$key})){
-                            $main->{$key} = $this->object_merge($main->{$key}, $value);
+                            $main->{$key} = self::object_merge($main->{$key}, $value);
                         } else {
                             $main->{$key} = $value;
                         }

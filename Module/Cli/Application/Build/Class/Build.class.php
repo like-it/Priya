@@ -144,7 +144,7 @@ class Build extends Cli {
                     $data->data('delete', $key);
                 }
             }
-            $config->data($this->object_merge($config->data(), $data->data()));
+            $config->data(Build::object_merge($config->data(), $data->data()));
             $config->data('autoload', $autoload);
             $config->write($url);
 

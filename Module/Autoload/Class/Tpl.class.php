@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 
 namespace Priya\Module\Autoload;
@@ -31,7 +31,7 @@ class Tpl extends Autoload {
         return false;
     }
 
-    public function filelist($item=array()){
+    public function filelist($item=array(), $url=''){
         if(empty($item)){
             return array();
         }
@@ -73,18 +73,25 @@ class Tpl extends Autoload {
                 $data[] = $item['directory'] . $directory . $file . Application::DS . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
                 $data[] = $item['directory'] . $directory . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
                 $data[] = $item['directory'] . $file . Application::DS . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
-                $data[] = $item['directory'] . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
+                //$data[] = $item['directory'] . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension']; //not allowed
                 $dir = explode(Application::TEMPLATE, $item['directory'], 2);
                 $dir = implode('', $dir);
                 $dir = rtrim($dir, Application::DS) . Application::DS;
                 $data[] = $dir . $directory . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
-                $data[] = $dir . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
+//                 $data[] = $dir . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension']; //not allowed
+                if(count(explode(Application::DS, $item['dirName'], 3)) === 3){ //allowed
+                    $data[] = $item['directory'] . Application::TEMPLATE . Application::DS . $file . '.' . $item['extension'];
+                    $data[] = $dir . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
+                }
             }
             $data[] = $item['directory'] . $item['baseName'] . Application::DS . Application::TEMPLATE . Application::DS . $item['baseName'] . '.' . $item['extension'];
             $data[] = '[---]';
             $data[] = $item['directory'] . $item['file'] . '.' . $item['extension'];
             $data[] = '[---]';
         }
+
+        $this->fileList[$item['baseName']][] = $data;
+//         var_dump($data);
         return $data;
     }
 }

@@ -35,5 +35,18 @@
             "POST"
         ],
         "translate": false
+    },
+    "Javascript": {
+        "path": "Priya/Javascript",
+        "default": {
+            "controller": "Priya.Module.Javascript.run",
+            "format": "html",
+            "language": "en"
+        },
+        "method": [
+            "GET",
+            "POST"
+        ],
+        "translate": false
     }
 }

@@ -74,7 +74,7 @@ class Update extends Cli {
         $this->extract($archive, $target, 'Priya-' .basename($url, '.zip'));
         $this->output('Extracting archive....' . PHP_EOL);
 
-        $this->output('Extracting complete....' . PHP_EOL);
+        $this->output('Extract complete....' . PHP_EOL);
 
     }
 

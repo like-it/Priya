@@ -27,7 +27,7 @@ class Data extends Core {
         } else {
             parent::__construct($handler, $route);
         }
-        $this->data($this->object_merge($this->data(), $data));
+        $this->data(Data::object_merge($this->data(), $data));
     }
 
     public function object_data($object_data=null){

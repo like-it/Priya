@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 
 namespace Priya\Module\File;
@@ -82,8 +82,8 @@ class Dir {
         if(is_dir($url) === false){
             return false;
         }
-        chdir($url);
-        if ($handle = opendir($url)) {
+        @chdir($url);
+        if ($handle = @opendir($url)) {
             while (false !== ($entry = readdir($handle))) {
                 $recursiveList = array();
                 if($entry == '.' || $entry == '..'){
@@ -124,7 +124,9 @@ class Dir {
                 }
             }
         }
-        closedir($handle);
+        if(is_resource($handle)){
+            closedir($handle);
+        }
         return $list;
     }
 
