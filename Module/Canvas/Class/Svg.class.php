@@ -1,16 +1,17 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 namespace Priya\Module\Canvas;
 
 use Priya\Module\File;
+use Priya\Module\Core\Main;
 
-class Svg extends \Priya\Module\Core\NodeList {
+class Svg extends Main {
     const DIR = __DIR__;
 
     public function run($result=''){

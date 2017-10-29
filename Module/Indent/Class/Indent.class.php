@@ -10,8 +10,9 @@
 namespace Priya\Module;
 
 use Priya\Application;
+use Priya\Module\Core\Main;
 
-class Indent extends \Priya\Module\Core\NodeList {
+class Indent extends Main {
     const DIR = __DIR__;
     const FILE = 'Indent.css';
 
