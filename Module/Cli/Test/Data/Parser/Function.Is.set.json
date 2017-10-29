@@ -1,0 +1,21 @@
+{
+"title": "Test.Parser.Function.Is.set",
+"author": "Remco van der Velde",
+"web" : {
+    "root" : "http:://{$test.variable}/"
+},
+"test" : {
+    "function_isset_2" : "{!!is.set($test.value, \"\")};{!is.set($test.variable)};",
+    "function_isset_1" : "{if is.set($test.test)}Is.set{else}Not is.set{/if}",
+    "value" : "1",
+    "variable" : "Priya",
+    "function_isset_3" : "!{!!is.set($test.value)};"
+},
+"output" : {
+    "value" : "1",
+    "variable" : "Priya",
+    "function_isset_1" : "Not is.set",
+    "function_isset_2":  "true;false;",
+    "function_isset_3":  "!true;"
+}
+}

@@ -119,6 +119,7 @@ class Parser extends Core {
                 $record = $variable->find($record, $keep);
 
                 $record['method']['tag'] = $key;
+//                 var_dump($record);
                 $record = $method->find($record, $variable, $this);
             }
             $string = $record['string'];

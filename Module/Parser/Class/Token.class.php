@@ -481,6 +481,7 @@ class Token extends Core {
     }
 
     public static function variable($parse=array(), Variable $variable, $attribute=null){
+        $parse = Variable::fix($parse);
         $item = array();
         $key = null;
         $unset = array();
@@ -493,7 +494,6 @@ class Token extends Core {
          * first find the variable
          * from there upwards till (
          */
-//         debug($parse, 'par');
         foreach ($parse as $nr => $record){
             $possible_dot = next($parse);
             if(!isset($record['value'])){
@@ -507,6 +507,7 @@ class Token extends Core {
                 continue;
             }
             $is_variable = true;
+
             if($exclamation_check === false){
                 krsort($exclamation_parse);
                 foreach($exclamation_parse as $exclamation_nr => $exclamation_value){
@@ -576,6 +577,9 @@ class Token extends Core {
                         $item['invert'] = false;
                     }
                     $modifier = Token::modifier($parse);
+                    var_dump('2');
+                    var_dump($item);
+                    die;
                     $item['value'] = $variable->replace($item['value'], $modifier);
                     $item = Token::Exclamation($item);
                     if($item['type'] == Token::TYPE_VARIABLE){
@@ -607,6 +611,9 @@ class Token extends Core {
             } else {
                 $item['invert'] = false;
             }
+            var_dump('3');
+            var_dump($item);
+            die;
             $item['value'] = $variable->replace($item['value']);
             $item= Token::Exclamation($item);
             if($item['type'] == Token::TYPE_VARIABLE){
@@ -1052,9 +1059,9 @@ class Token extends Core {
             case 'T_ENCAPSED_AND_WHITESPACE' :
             case 'T_NS_SEPARATOR' :
             case 'T_DOUBLE_QUOTE' :
-            case 'T_ARRAY' :		//might needs its own type
-            case 'T_IS' : 			//might needs its own type
-            case 'T_DEFAULT' : 		//might needs its own type
+            case 'T_ARRAY' :        //might needs its own type
+            case 'T_IS' :             //might needs its own type
+            case 'T_DEFAULT' :         //might needs its own type
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
@@ -1079,8 +1086,8 @@ class Token extends Core {
             case 'T_IS_NOT_IDENTICAL' :
             case 'T_SL' :
             case 'T_SR' :
-            case 'T_BOOLEAN_AND';	//might need a different one
-            case 'T_BOOLEAN_OR'; 	//might need a different one
+            case 'T_BOOLEAN_AND';    //might need a different one
+            case 'T_BOOLEAN_OR';     //might need a different one
                 return  Token::TYPE_OPERATOR;
             break;
             case 'T_VAR' :
@@ -1164,25 +1171,11 @@ class Token extends Core {
     }
 
     public static function remove_comment($string=''){
-        /*
-        if(stristr($string,'http') !== false){
-            $tokens = Token::all($string);
-            var_dump($string);
-            var_dump($tokens);
-        }
-        return $string;
-        */
         $tokens = Token::all($string);
-        $string = '';
         foreach($tokens as $nr => $token){
-            if(!isset($token[2])){
-                var_dump($token);
-                die;
-            }
             if($token[2] == 'T_COMMENT' && stristr($token[1], '//') === false){
-                continue;
+                $string = str_replace($token[1], '', $string);
             }
-            $string .= $token[1];
         }
         return $string;
     }
