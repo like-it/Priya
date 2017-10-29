@@ -481,6 +481,7 @@ class Token extends Core {
     }
 
     public static function variable($parse=array(), Variable $variable, $attribute=null){
+        $parse = Variable::fix($parse);
         $item = array();
         $key = null;
         $unset = array();
@@ -493,7 +494,6 @@ class Token extends Core {
          * first find the variable
          * from there upwards till (
          */
-//         debug($parse, 'par');
         foreach ($parse as $nr => $record){
             $possible_dot = next($parse);
             if(!isset($record['value'])){
@@ -507,6 +507,7 @@ class Token extends Core {
                 continue;
             }
             $is_variable = true;
+
             if($exclamation_check === false){
                 krsort($exclamation_parse);
                 foreach($exclamation_parse as $exclamation_nr => $exclamation_value){
@@ -576,6 +577,9 @@ class Token extends Core {
                         $item['invert'] = false;
                     }
                     $modifier = Token::modifier($parse);
+                    var_dump('2');
+                    var_dump($item);
+                    die;
                     $item['value'] = $variable->replace($item['value'], $modifier);
                     $item = Token::Exclamation($item);
                     if($item['type'] == Token::TYPE_VARIABLE){
@@ -607,6 +611,9 @@ class Token extends Core {
             } else {
                 $item['invert'] = false;
             }
+            var_dump('3');
+            var_dump($item);
+            die;
             $item['value'] = $variable->replace($item['value']);
             $item= Token::Exclamation($item);
             if($item['type'] == Token::TYPE_VARIABLE){

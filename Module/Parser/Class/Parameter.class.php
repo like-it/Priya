@@ -32,6 +32,7 @@ class Parameter extends Core {
             ){
                 continue;
             }
+            $record = Value::get($record);
             $record= Token::cast($record);
             $result[] = $record;
         }

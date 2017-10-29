@@ -76,6 +76,68 @@ class Variable extends Core {
         }
     }
 
+    public static function fix($parse=array()){
+        $result = array();
+        $is_variable = false;
+        $has_variable = false;
+        $collect = false;
+        foreach($parse as $nr => $record){
+            if($record['type'] == Token::TYPE_VARIABLE){
+                $has_variable = true;
+                $is_variable = $nr;
+                $result[$nr] = $record;
+                continue;
+            }
+            if($is_variable !== false){
+                if(substr($record['value'], 0, 1) == '.'){
+                    $collect = true;
+                }
+            }
+            if(
+                $collect === true &&
+                !in_array(
+                    $record['type'],
+                    array(
+                        Token::TYPE_DOT,
+                        Token::TYPE_STRING
+                    )
+                )
+            ){
+                $collect = false;
+            }
+            if(
+                $collect === true &&
+                $record['value'] == '"'
+            ){
+                $collect = false;
+            }
+            if($collect === true){
+                $result[$is_variable]['value'] .= $record['value'];
+                continue;
+            }
+            $result[$nr] = $record;
+        }
+        if($has_variable === true){
+            foreach($result as $nr => $record){
+                if($record['type'] == Token::TYPE_VARIABLE){
+                    $previous = prev($result);
+                    $key = key($result);
+                    if($previous['value'] == '"'){
+                        unset($result[$key]);
+                    }
+                    $next = next($result);
+                    $key = key($result);
+                    if($next['value'] == '"'){
+                        unset($result[$key]);
+                        break;
+                    }
+                }
+                next($result);
+            }
+        }
+        return $result;
+    }
+
     public function find($record=array(), $keep=false){
         $attribute = substr($record['variable']['tag'], 1, -1);
         $tokens = Token::all($attribute);
@@ -228,6 +290,8 @@ class Variable extends Core {
                         }
                         $output = Variable::value($output);
                         $output = Modifier::find($output, $modifier, $this, $this->parser());
+//                         var_dump($output);
+//                         die;
                         $output = $this->parser()->compile($output, $this->parser()->data());
                         //parse comile again on output
                     }
