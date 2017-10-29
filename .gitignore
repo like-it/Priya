@@ -1,7 +1,8 @@
 .buildpath
 .project
 org.*
-Module/Smarty/Data/
 Application/Data/Custom.json
 Application/Data/Restore/
 Application/Data/Update/
+Module/Autoload/Data/
+Module/Smarty/Data/
