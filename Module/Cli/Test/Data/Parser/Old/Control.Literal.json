@@ -1,0 +1,21 @@
+{
+"title": "Test.Parser.Control.Literal",
+"web" : {
+    "root" : "http://{$test.variable}/"
+},
+"test" : {
+    "value" : "value",
+    "variable" : "Priya",
+    "control_literal_1" : "{$test.variable}{literal}{$test.variable}{/literal}",
+    "control_literal_2" : "{$test.variable}{literal}{$test.value}{literal}{/literal}{/literal}{$test.variable}2{/literal}",
+    "control_literal_3" : "{literal}{$test.value}{literal}l{/literal}iter{/literal}{$web.root}{empty({$test.value})}"
+},
+"output" : {
+    "value" : "value",
+    "int" : 1,
+    "variable" : "Priya",
+    "control_literal_1" : "Priya{literal}{$test.variable}{/literal}",
+    "control_literal_2" : "Priya{literal}{$test.value}{/literal}Priya2",
+    "control_literal_3" : "{literal}{$test.value}{/literal}literhttp:\/\/Priya\/false"
+}
+}
