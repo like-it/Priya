@@ -1171,25 +1171,11 @@ class Token extends Core {
     }
 
     public static function remove_comment($string=''){
-        /*
-        if(stristr($string,'http') !== false){
-            $tokens = Token::all($string);
-            var_dump($string);
-            var_dump($tokens);
-        }
-        return $string;
-        */
         $tokens = Token::all($string);
-        $string = '';
         foreach($tokens as $nr => $token){
-            if(!isset($token[2])){
-                var_dump($token);
-                die;
-            }
             if($token[2] == 'T_COMMENT' && stristr($token[1], '//') === false){
-                continue;
+                $string = str_replace($token[1], '', $string);
             }
-            $string .= $token[1];
         }
         return $string;
     }

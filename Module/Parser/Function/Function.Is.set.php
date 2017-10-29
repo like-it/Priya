@@ -12,10 +12,11 @@ function function_is_set($function=array(), $argumentList=array(), $parser=null)
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    var_dump($argumentList);
-    die;
-    $argument = reset($argumentList);
-
-    $function['execute']  = isset($argument);
+    foreach($argumentList as $argument){
+        $function['execute']  = isset($argument);
+        if($function['execute'] === false){
+            return $function;
+        }
+    }
     return $function;
 }
