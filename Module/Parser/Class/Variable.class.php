@@ -228,8 +228,7 @@ class Variable extends Core {
                         }
                         $output = Variable::value($output);
                         $output = Modifier::find($output, $modifier, $this, $this->parser());
-
-                        $output = $this->parser()->compile($output, $this->parser->data());
+                        $output = $this->parser()->compile($output, $this->parser()->data());
                         //parse comile again on output
                     }
                 } else {

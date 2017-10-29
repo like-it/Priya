@@ -1052,9 +1052,9 @@ class Token extends Core {
             case 'T_ENCAPSED_AND_WHITESPACE' :
             case 'T_NS_SEPARATOR' :
             case 'T_DOUBLE_QUOTE' :
-            case 'T_ARRAY' :		//might needs its own type
-            case 'T_IS' : 			//might needs its own type
-            case 'T_DEFAULT' : 		//might needs its own type
+            case 'T_ARRAY' :        //might needs its own type
+            case 'T_IS' :             //might needs its own type
+            case 'T_DEFAULT' :         //might needs its own type
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
@@ -1079,8 +1079,8 @@ class Token extends Core {
             case 'T_IS_NOT_IDENTICAL' :
             case 'T_SL' :
             case 'T_SR' :
-            case 'T_BOOLEAN_AND';	//might need a different one
-            case 'T_BOOLEAN_OR'; 	//might need a different one
+            case 'T_BOOLEAN_AND';    //might need a different one
+            case 'T_BOOLEAN_OR';     //might need a different one
                 return  Token::TYPE_OPERATOR;
             break;
             case 'T_VAR' :
