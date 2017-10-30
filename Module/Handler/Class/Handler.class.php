@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module;
@@ -352,7 +352,7 @@ class Handler extends \Priya\Module\Core\Data{
                 if(!is_array($input->nodeList)){
                     $input->nodeList = (array) $input->nodeList;
                 }
-                $input->nodeList[] = $_REQUEST;		//strange but works...
+                $input->nodeList[] = $_REQUEST;        //strange but works...
                 $input = json_encode($input);
             }
         }
@@ -424,6 +424,46 @@ class Handler extends \Priya\Module\Core\Data{
             $_SERVER['HTTP_HOST'] .
             '/'
         ;
+    }
+
+    public function domain(){
+        if(empty($_SERVER['HTTP_HOST'])){
+            return false;
+        }
+        $host = $_SERVER['HTTP_HOST'];
+        $explode = explode('.', $host);
+        if(count($explode) >= 2){
+            array_pop($explode);
+            return array_pop($explode);
+        }
+        return false;
+    }
+
+    public function subdomain(){
+        if(empty($_SERVER['HTTP_HOST'])){
+            return false;
+        }
+        $host = $_SERVER['HTTP_HOST'];
+        $explode = explode('.', $host);
+        if(count($explode) > 2){
+            array_pop($explode);
+            array_pop($explode);
+            return implode('.', $explode);
+        }
+        return false;
+
+    }
+
+    public function extension(){
+        if(empty($_SERVER['HTTP_HOST'])){
+            return false;
+        }
+        $host = $_SERVER['HTTP_HOST'];
+        $explode = explode('.', $host);
+        if(count($explode) > 1){
+            return array_pop($explode);
+        }
+        return false;
     }
 
     public function scheme(){
@@ -858,7 +898,7 @@ class Handler extends \Priya\Module\Core\Data{
                     if($duration === null){
                         $duration = 60*60*24*365*2; // 2 years
                     }
-                    $result = @setcookie($attribute, $value, time() +	 $duration, "/");
+                    $result = @setcookie($attribute, $value, time() +     $duration, "/");
                     if(!empty($result) && $this->method() == Handler::METHOD_CLI){
                         $_COOKIE[$attribute] = $value;
                     }
