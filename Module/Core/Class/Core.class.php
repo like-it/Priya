@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module;
@@ -70,6 +70,25 @@ class Core {
             die;
         }
         */
+    }
+
+    public static function sentence($sentence=''){
+        $sentence= explode('.', $sentence);
+        foreach ($sentence as $nr => $part){
+            $sentence[$nr] = ucfirst($part);
+        }
+        $sentence = implode('.', $sentence);
+        $sentence= explode('!', $sentence);
+        foreach ($sentence as $nr => $part){
+            $sentence[$nr] = ucfirst($part);
+        }
+        $sentence = implode('!', $sentence);
+        $sentence= explode('?', $sentence);
+        foreach ($sentence as $nr => $part){
+            $sentence[$nr] = ucfirst($part);
+        }
+        $sentence = implode('?', $sentence);
+        return $sentence;
     }
 
     public function handler($handler=null){

@@ -33,6 +33,7 @@ class Application extends Parser {
     const TEMP = 'Temp';
     const CACHE = 'Cache';
     const PUBLIC_HTML = 'Public';
+    const SUBDOMAIN = 'Subdomain';
     const CSS = 'Css';
     const JAVASCRIPT = 'Javascript';
     const CONFIG = 'Config.json';
@@ -143,6 +144,13 @@ class Application extends Parser {
             $this->data('public_html', Application::PUBLIC_HTML);
             $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);
         }
+        if(empty($this->data('dir.subdomain'))){
+            $this->data('dir.subdomain',
+                $this->data('dir.root') .
+                Application::SUBDOMAIN .
+                Application::DS
+            );
+        }
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
@@ -201,7 +209,13 @@ class Application extends Parser {
             $tmp = explode($this->data('prefix'), $url, 2);
             $url = implode('', $tmp);
         }
-        $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+        $subdomain = $this->handler()->subDomain();
+        if($subdomain === false){
+            $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+        } else{
+            $subdomain = Module\Core::sentence($subdomain);
+            $url = $this->data('dir.subdomain') . $subdomain . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+        }
         $allowed_contentType = $this->data('contentType');
         if(isset($allowed_contentType->{$ext})){
             $result = null;
@@ -220,7 +234,8 @@ class Application extends Parser {
                     $parser = new Parser();
                     $file = new File();
                     $result = $parser->data('object')->compile($file->read($url), $data->data());
-                } elseif($ext == 'json'){
+                }
+                elseif($ext == 'json'){
                     $file = new File();
                     $result = $file->read($url);
                     $object = new stdClass();
