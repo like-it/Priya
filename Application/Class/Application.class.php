@@ -33,7 +33,7 @@ class Application extends Parser {
     const TEMP = 'Temp';
     const CACHE = 'Cache';
     const PUBLIC_HTML = 'Public';
-    const SUBDOMAIN = 'Subdomain';
+    const HOST = 'Host';
     const CSS = 'Css';
     const JAVASCRIPT = 'Javascript';
     const CONFIG = 'Config.json';
@@ -144,10 +144,10 @@ class Application extends Parser {
             $this->data('public_html', Application::PUBLIC_HTML);
             $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);
         }
-        if(empty($this->data('dir.subdomain'))){
-            $this->data('dir.subdomain',
+        if(empty($this->data('dir.host'))){
+            $this->data('dir.host',
                 $this->data('dir.root') .
-                Application::SUBDOMAIN .
+                Application::HOST .
                 Application::DS
             );
         }
@@ -209,17 +209,34 @@ class Application extends Parser {
             $tmp = explode($this->data('prefix'), $url, 2);
             $url = implode('', $tmp);
         }
-        $subdomain = $this->handler()->subDomain();
-        if($subdomain === false){
-            $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-        } else{
-            $subdomain = Module\Core::sentence($subdomain);
-            $url = $this->data('dir.subdomain') . $subdomain . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-        }
         $allowed_contentType = $this->data('contentType');
         if(isset($allowed_contentType->{$ext})){
+            $host = $this->handler()->host(false);
+            if($host=== false){
+                $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+            } else{
+                $subdomain = $this->handler()->subDomain();
+                if($subdomain === false || $subdomain == 'www'){
+                    $url_tmp = $this->data('dir.host') . str_replace('www.', '', $host) . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    $dir =  $this->data('dir.host') . str_replace('www.', '', $host);
+                } else {
+                    $url_tmp = $this->data('dir.host') . $host . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    $dir = $this->data('dir.host') . $host ;
+                    if(!file_exists($dir)){
+                        $domain = $this->handler()->domain();
+                        $extension = $this->handler()->extension();
+                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                        $dir = $this->data('dir.host') . $domain . '.' . $extension;
+                    }
+                }
+                $url = $url_tmp;
+                if(!file_exists($dir)){
+                    $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                }
+            }
             $result = null;
             $contentType = $allowed_contentType->{$ext};
+
             if(file_exists($url) && strstr(strtolower($url), strtolower($this->data('public_html'))) !== false){
                 if(!headers_sent()){
                     header('Last-Modified: '. filemtime($url));
@@ -243,9 +260,6 @@ class Application extends Parser {
                     $object = Application::object_merge($object, $this->object($result));
                     $result = $this->object($object, 'json');
                 } else {
-                    if($ext == 'js'){
-//                         sleep(rand(1, 10)); //testing async
-                    }
                     $file = new File();
                     $result = $file->read($url);
                 }

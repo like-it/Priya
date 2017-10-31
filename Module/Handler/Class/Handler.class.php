@@ -942,17 +942,21 @@ class Handler extends \Priya\Module\Core\Data{
         return false;
     }
 
-    public function host(){
+    public function host($include_scheme = true){
         if(isset($_SERVER['HTTP_HOST'])){
             $domain = $_SERVER['HTTP_HOST'];
         }
         elseif(isset($_SERVER['SERVER_NAME'])){
             $domain = $_SERVER['SERVER_NAME'];
         }
-        $scheme = $this->scheme();
-        $host = '';
-        if(isset($scheme) && isset($domain)){
-            $host = $scheme . '://' . $domain . '/';
+        if($include_scheme) {
+            $scheme = $this->scheme();
+            $host = '';
+            if(isset($scheme) && isset($domain)){
+                $host = $scheme . '://' . $domain . '/';
+            }
+        } else {
+            $host = $domain;
         }
         return $host;
     }
