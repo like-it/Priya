@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-11-07
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-11-07
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  * @note
  *  - In Smarty bash coloring isn't working.
  */
@@ -13,7 +13,8 @@ namespace Priya;
 
 $object = array();
 
-echo 'Please create an administrator account:' . PHP_EOL;
+echo 'Install:' . PHP_EOL;
+/*
 $this->data('node.user.username', $this->read('input', 'username: '));
 $this->data('node.user.email', $this->read('input', 'email: '));
 $this->data('node.user.password.main', $this->read('input-hidden', 'password: '));
@@ -38,3 +39,4 @@ $this->data('config.mail.password.repeat', $this->read('input-hidden', 'password
 
 
 var_Dump($this->data());
+*/
