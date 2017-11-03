@@ -6,3 +6,4 @@ Application/Data/Restore/
 Application/Data/Update/
 Module/Autoload/Data/*
 Module/Smarty/Data/*
+Module/Parser/Function/Function.List.php
