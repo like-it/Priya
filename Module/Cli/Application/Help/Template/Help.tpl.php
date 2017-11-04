@@ -24,6 +24,8 @@ echo "  " . 'test <class> <file>            (this will test the <class> with <fi
 echo "  " . 'cache/clear                    (clear cache)' . PHP_EOL;
 echo "  " . 'config                         (current configuration in json format)' . PHP_EOL;
 echo "  " . 'parser                         (generates a parser file (speed up parsing))' . PHP_EOL;
+echo "  " . 'locate <route>                 (this will list all available locations of the class <route> name)' . PHP_EOL;
+
 /*
 echo "  " . 'install                        (install Priya)' . PHP_EOL;
 echo "  " . 'update --version=<version>       (update Priya to latest version)' . PHP_EOL;
