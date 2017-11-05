@@ -20,6 +20,8 @@ use Priya\Module\File\Dir;
 class Application extends Parser {
     const DS = DIRECTORY_SEPARATOR;
     const DIR = __DIR__;
+    const PRIYA = 'Priya';
+    const BIN = 'Bin';
     const ENVIRONMENT = 'development';
     const MODULE = 'Module';
     const TEMPLATE = 'Template';
@@ -85,8 +87,8 @@ class Application extends Parser {
                 Application::DS
             );
         }
-        if(empty($this->data('priya.module.dir'))){
-            $this->data('priya.module.dir',
+        if(empty($this->data('priya.dir.module'))){
+            $this->data('priya.dir.module',
                 dirname($this->data('priya.dir.application')) .
                 Application::DS .
                 Application::MODULE .
@@ -182,14 +184,9 @@ class Application extends Parser {
         $this->route()->create('Application.Help');
         $this->route()->create('Application.Error');
         $this->route()->create('Application.Route');
-        $this->route()->create('Application.Restore');
-        $this->route()->create('Application.Pull');
-        $this->route()->create('Application.Push');
-        $this->route()->create('Application.Build');
-        $this->route()->create('Application.Install');
-        $this->route()->create('Application.Update');
         $this->route()->create('Application.Parser');
-        $this->route()->create('Application.Cache.Clear');
+        $this->route()->create('Application.Cache');
+        $this->route()->create('Application.Check');
         $this->route()->create('Test');
     }
 
