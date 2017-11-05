@@ -1,5 +1,6 @@
 .buildpath
 .project
+.settings
 org.*
 Application/Data/Custom.json
 Application/Data/Restore/

@@ -125,7 +125,13 @@ class Result extends Parser {
         $contentType = $this->request('contentType');
         $data = $this->data();
         $template_list = array();
-        if(empty($template) && isset($data->contentType) && isset($data->contentType->{$contentType}) && isset($data->contentType->{$contentType}->template)){
+        if(
+            empty($template) &&
+            isset($data) &&
+            isset($data->contentType) &&
+            isset($data->contentType->{$contentType}) &&
+            isset($data->contentType->{$contentType}->template)
+        ){
             $list = $data->contentType->{$contentType}->template;
             foreach($list as $template){
                 $url = $this->locateTemplate($template);

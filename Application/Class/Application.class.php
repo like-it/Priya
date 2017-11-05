@@ -209,7 +209,7 @@ class Application extends Parser {
             $tmp = explode($this->data('prefix'), $url, 2);
             $url = implode('', $tmp);
         }
-        $allowed_contentType = $this->data('contentType');
+        $allowed_contentType = $this->data('priya.contentType');
         if(isset($allowed_contentType->{$ext})){
             $host = $this->handler()->host(false);
             if($host=== false){

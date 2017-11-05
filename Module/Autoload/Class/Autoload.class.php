@@ -11,7 +11,6 @@
 namespace Priya\Module;
 
 use stdClass;
-use Priya\Application;
 
 class Autoload{
     const DIR = __DIR__;
@@ -25,6 +24,7 @@ class Autoload{
     private $expose;
     private $read;
     private $resource;
+
     protected $fileList;
 
     public $prefixList = array();
