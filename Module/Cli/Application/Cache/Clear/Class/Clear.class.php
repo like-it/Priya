@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module\Cli\Application\Cache;
@@ -31,7 +31,7 @@ class Clear extends Cli {
 
     private function clearSmarty(){
         $url =
-            $this->data('dir.priya.module') .
+            $this->data('priya.dir.module') .
               'Smarty' .
               Application::DS .
               'Data' .

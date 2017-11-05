@@ -35,7 +35,7 @@ class Parser extends Cli {
     public function create($attribute=''){
         if(strtolower($attribute) == 'functionlist'){
             $url =
-                $this->data('dir.priya.module') .
+                $this->data('priya.dir.module') .
                 'Parser' . Application::DS .
                 'Function' . Application::DS
             ;

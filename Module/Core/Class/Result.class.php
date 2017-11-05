@@ -542,7 +542,7 @@ class Result extends Parser {
 
     public function application(){
         $autoload = new Autoload();
-        $autoload->addPrefix('Priya',  $this->data('dir.priya.application'));
+        $autoload->addPrefix('Priya',  $this->data('priya.dir.application'));
         $autoload->register();
         $autoload->environment(Application::ENVIRONMENT);
 
