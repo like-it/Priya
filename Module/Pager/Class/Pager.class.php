@@ -1,16 +1,15 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module;
 
 use stdClass;
-use Priya\Application;
 use Priya\Module\Core\Data;
 
 class Pager extends Data {

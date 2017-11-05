@@ -1,14 +1,11 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-01-2016
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-01-2016
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
-
-use Priya\Application;
-use Priya\Module\Core\Object;
 
 function smarty_function_text_time($params, $template)
 {

@@ -12,7 +12,6 @@ namespace Priya\Module;
 use stdClass;
 use Priya\Application;
 use Priya\Module\Core\Object;
-use Priya\Module\Core\Cli;
 
 class Core {
     use Core\Object;
