@@ -213,7 +213,7 @@ class Core {
             array_shift($module);
         }
         $module = implode('', $module);
-        $module = str_replace('\\', Application::DS, $module);
+        $module = ltrim(str_replace('\\', Application::DS, $module),  Application::DS);
         return $module;
     }
 

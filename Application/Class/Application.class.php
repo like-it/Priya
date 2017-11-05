@@ -47,7 +47,7 @@ class Application extends Parser {
 //         set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->data('time.start', microtime(true));
         $this->data('priya.environment', Application::ENVIRONMENT);
-        $this->data('module', $this->module());
+        $this->data('module.name', $this->module());
         $this->data('dir.ds', Application::DS);
         $this->data('priya.dir.application',
             dirname(Application::DIR) .
@@ -85,8 +85,8 @@ class Application extends Parser {
                 Application::DS
             );
         }
-        if(empty($this->data('priya.dir.module'))){
-            $this->data('priya.dir.module',
+        if(empty($this->data('priya.module.dir'))){
+            $this->data('priya.module.dir',
                 dirname($this->data('priya.dir.application')) .
                 Application::DS .
                 Application::MODULE .
@@ -370,14 +370,14 @@ class Application extends Parser {
     public function page($request=''){
         $this->data('request', $request);
         $this->data('priya.dir.page', $this->data('priya.dir.root') . Application::PAGE . Application::DS);
-        $this->data('dir.module.page', $this->data('dir.module.root') . Application::PAGE . Application::DS);
+        $this->data('module.dir.page', $this->data('module.dir.root') . Application::PAGE . Application::DS);
 
         $result = new stdClass();
 
         $parser = new \Priya\Module\Parser();
         $parser->data($this->data());
         $file = new \Priya\Module\File();
-        $url = $this->data('dir.module.page') . 'Request.priya';
+        $url = $this->data('module.dir.page') . 'Request.priya';
         if(file_exists($url)){
             var_dump('parse this one');
         } else {
