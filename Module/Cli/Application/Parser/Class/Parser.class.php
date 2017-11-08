@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module\Cli\Application;
@@ -35,7 +35,7 @@ class Parser extends Cli {
     public function create($attribute=''){
         if(strtolower($attribute) == 'functionlist'){
             $url =
-                $this->data('dir.priya.module') .
+                $this->data('priya.dir.module') .
                 'Parser' . Application::DS .
                 'Function' . Application::DS
             ;
@@ -64,11 +64,12 @@ class Parser extends Cli {
                 if($node->type != 'file'){
                     continue;
                 }
-                $this->output(lcfirst(str_ireplace(array('control.', 'function.', 'modifier.', '.php'), '', $node->name)) . PHP_EOL);
+                $this->output('Combining: ' . lcfirst(str_ireplace(array('control.', 'function.', 'modifier.', '.php'), '', $node->name)) . PHP_EOL);
                 $tmp = $file->read($node->url);
                 $tmp = str_replace('<?php', '', $tmp);
                 $write .= $tmp;
             }
+            $this->output('In: ' . basename($target) . PHP_EOL);
             $file->write($target, $write);
         }
     }

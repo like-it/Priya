@@ -1,28 +1,26 @@
 {
-    "contentType": {
-        "html": "text\/html",
-        "css": "text\/css",
-        "pcss": "text\/css",
-        "js": "application\/javascript",
-        "json": "application\/json",
-        "ico": "image\/x-icon",
-        "png": "image\/png",
-        "jpg": "image\/jpeg",
-        "gif": "image\/gif",
-        "svg": "image\/svg+xml",
-        "woff": "application\/font-woff",
-        "ttf": "font\/ttf",
-        "wav": "audio\/wav",
-        "mp3": "audio\/mp3"
-    },
     "priya": {
         "environment": "production",
-        "comment" : "/*comment*/",
-        "special_comment" : "/**comment*/",
         "version": "{$priya.major|default:0}.{$priya.minor|default:0}.{$priya.patch|default:0}",
+        "contentType": {
+            "html": "text\/html",
+            "css": "text\/css",
+            "pcss": "text\/css",
+            "js": "application\/javascript",
+            "json": "application\/json",
+            "ico": "image\/x-icon",
+            "png": "image\/png",
+            "jpg": "image\/jpeg",
+            "gif": "image\/gif",
+            "svg": "image\/svg+xml",
+            "woff": "application\/font-woff",
+            "ttf": "font\/ttf",
+            "wav": "audio\/wav",
+            "mp3": "audio\/mp3"
+        },
         "major": 0,
-        "minor": 1,
-        "patch": 24,
-        "built": "2017-05-25 18:16:12"
+        "minor": 2,
+        "patch": 4,
+        "built": "2017-11-05 22:21:34"
     }
 }

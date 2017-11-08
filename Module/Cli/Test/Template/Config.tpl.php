@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-11-07
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-11-07
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  * @note
  *  - In Smarty bash coloring isn't working.
  */
@@ -18,7 +18,7 @@ use Priya\Module\Data;
 $parse = function(){
     $url = $this->parameter('url') ? $this->parameter('url') : $this->parameter(3);
     $cwd = getcwd();
-    chdir($this->data('dir.module.data') . 'Config' );
+    chdir($this->data('module.dir.data') . 'Config' );
     while (file_exists($url) === false){
         if(!empty($url)){
             $this->color(0,1);

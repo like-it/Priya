@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-01-2016
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-01-2016
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 
 use Priya\Application;
@@ -22,8 +22,11 @@ function smarty_function_require($params, $template)
     if(isset($vars['autoload'])){
         $result->data('autoload', $vars['autoload']);
     }
-    if(isset($vars['module'])){
-        $caller = $vars['module'];
+    if(
+        isset($vars['module']) &&
+        isset($vars['module']['name'])
+    ){
+        $caller = $vars['module']['name'];
     }
     $url = $result->locateTemplate($params['file'], 'tpl', $caller);
     if(!empty($url)){

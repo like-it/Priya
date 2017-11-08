@@ -9,10 +9,10 @@
 
 namespace Priya\Module;
 
-use Priya\Module\Parser\Core;
+use Priya\Module\Parser\Core as ParserCore;
 use Priya\Module\Parser\Variable;
 
-class Parser extends Core {
+class Parser extends ParserCore {
     const DIR = __DIR__;
     const LITERAL = 'literal';
     const FUNCTION_LIST = 'Function.List.php';

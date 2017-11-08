@@ -12,7 +12,6 @@ namespace Priya\Module;
 use stdClass;
 use Priya\Application;
 use Priya\Module\Core\Object;
-use Priya\Module\Core\Cli;
 
 class Core {
     use Core\Object;
@@ -214,7 +213,7 @@ class Core {
             array_shift($module);
         }
         $module = implode('', $module);
-        $module = str_replace('\\', Application::DS, $module);
+        $module = ltrim(str_replace('\\', Application::DS, $module),  Application::DS);
         return $module;
     }
 

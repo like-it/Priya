@@ -252,7 +252,7 @@ class Handler extends \Priya\Module\Core\Data{
         $tmp = explode('.', $request);
         $ext = strtolower(end($tmp));
 
-        $allowed_contentType = $this->data('contentType');
+        $allowed_contentType = $this->data('priya.contentType');
         if(isset($allowed_contentType->{$ext})){
             $contentType = $allowed_contentType->{$ext};
         }

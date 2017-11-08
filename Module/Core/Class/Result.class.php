@@ -26,27 +26,27 @@ class Result extends Parser {
 
     public function __construct($handler=null, $route=null, $data=null){
         parent::__construct($handler, $route, $data);
-        $this->data('module', $this->module());
+        $this->data('module.name', $this->module());
         $this->data('web.root', $this->handler()->web());
         if($this->data('web.root') !== false){
-            $namespace = explode('\\', $this->data('module'));
+            $namespace = explode('\\', $this->data('module.name'));
             $class = array_pop($namespace);
             $this->data('web.public', $this->data('web.root') . $this->data('public_html') . '/');
             if(empty($namespace)){
-                $this->data('web.module.root', $this->data('web.root') . $class . '/');
+                $this->data('module.web.root', $this->data('web.root') . $class . '/');
             } else {
-                $this->data('web.module.root', $this->data('web.root') . implode('/', $namespace) . '/');
+                $this->data('module.web.root', $this->data('web.root') . implode('/', $namespace) . '/');
             }
-            $this->data('web.module.public', $this->data('web.module.root') . $this->data('public_html') . '/');
-            $this->data('web.module.class', $this->data('web.module.root') . $class . '/');
+            $this->data('module.web.public', $this->data('module.web.root') . $this->data('public_html') . '/');
+            $this->data('module.web.class', $this->data('module.web.root') . $class . '/');
             $this->data('url', $this->handler()->url());
             $this->data('dir.public', $this->handler()->webRoot());
         } else {
             $this->data('delete', 'web');
         }
-        $dir_module = $this->data('dir.module');
+        $dir_module = $this->data('module.dir');
         if(empty($dir_module)){
-            $this->data('dir.module.root',
+            $this->data('module.dir.root',
                     dirname(dirname(Application::DIR)) .
                     Application::DS .
                     Application::MODULE .
@@ -54,14 +54,14 @@ class Result extends Parser {
                     $this->module() .
                     Application::DS
             );
-            $this->data('dir.module.data',
-                    $this->data('dir.module.root') .
+            $this->data('module.dir.data',
+                    $this->data('module.dir.root') .
                     Application::DATA .
                     Application::DS
             );
 
-            $this->data('dir.module.public',
-                    $this->data('dir.module.root') .
+            $this->data('module.dir.public',
+                    $this->data('module.dir.root') .
                     $this->data('public_html') .
                     Application::DS
             );
@@ -125,7 +125,13 @@ class Result extends Parser {
         $contentType = $this->request('contentType');
         $data = $this->data();
         $template_list = array();
-        if(empty($template) && isset($data->contentType) && isset($data->contentType->{$contentType}) && isset($data->contentType->{$contentType}->template)){
+        if(
+            empty($template) &&
+            isset($data) &&
+            isset($data->contentType) &&
+            isset($data->contentType->{$contentType}) &&
+            isset($data->contentType->{$contentType}->template)
+        ){
             $list = $data->contentType->{$contentType}->template;
             foreach($list as $template){
                 $url = $this->locateTemplate($template);
@@ -536,7 +542,7 @@ class Result extends Parser {
 
     public function application(){
         $autoload = new Autoload();
-        $autoload->addPrefix('Priya',  $this->data('dir.priya.application'));
+        $autoload->addPrefix('Priya',  $this->data('priya.dir.application'));
         $autoload->register();
         $autoload->environment(Application::ENVIRONMENT);
 
