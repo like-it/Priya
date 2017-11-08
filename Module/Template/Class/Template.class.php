@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module;
@@ -19,7 +19,7 @@ class Template extends Main {
         $this->read(__CLASS__);
 
         //$url = str_replace('/Data/', '/Template/', $this->request('url'));
-        $url = $this->data('dir.priya.public') . 'Template/' .basename($this->request('url'), '.json') . '.tpl';
+        $url = $this->data('priya.dir.public') . 'Template/' .basename($this->request('url'), '.json') . '.tpl';
 
         $file = new File();
         $data = Template::object_merge($this->data(), $this->request());

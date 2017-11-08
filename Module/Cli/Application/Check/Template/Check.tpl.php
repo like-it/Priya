@@ -11,4 +11,4 @@
 
 namespace Priya;
 
-echo 'Installing Priya...' . PHP_EOL;
+echo 'Checking installation directory: ' . $this->data('dir.root') . PHP_EOL;

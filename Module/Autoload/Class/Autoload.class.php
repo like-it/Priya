@@ -11,7 +11,6 @@
 namespace Priya\Module;
 
 use stdClass;
-use Priya\Application;
 
 class Autoload{
     const DIR = __DIR__;
@@ -25,6 +24,7 @@ class Autoload{
     private $expose;
     private $read;
     private $resource;
+
     protected $fileList;
 
     public $prefixList = array();
@@ -249,7 +249,6 @@ class Autoload{
                 $object->{$attribute} = $this->fileList[$item['baseName']];
             }
             echo json_encode($object, JSON_PRETTY_PRINT);
-            debug(debug_backtrace());
             if(ob_get_level() !== 0){
                 ob_flush();
             }

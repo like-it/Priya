@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module;
@@ -12,7 +12,6 @@ namespace Priya\Module;
 use stdClass;
 use Priya\Application;
 use Priya\Module\Core\Object;
-use Priya\Module\Core\Cli;
 
 class Core {
     use Core\Object;
@@ -70,6 +69,25 @@ class Core {
             die;
         }
         */
+    }
+
+    public static function sentence($sentence=''){
+        $sentence= explode('.', $sentence);
+        foreach ($sentence as $nr => $part){
+            $sentence[$nr] = ucfirst($part);
+        }
+        $sentence = implode('.', $sentence);
+        $sentence= explode('!', $sentence);
+        foreach ($sentence as $nr => $part){
+            $sentence[$nr] = ucfirst($part);
+        }
+        $sentence = implode('!', $sentence);
+        $sentence= explode('?', $sentence);
+        foreach ($sentence as $nr => $part){
+            $sentence[$nr] = ucfirst($part);
+        }
+        $sentence = implode('?', $sentence);
+        return $sentence;
     }
 
     public function handler($handler=null){
@@ -195,7 +213,7 @@ class Core {
             array_shift($module);
         }
         $module = implode('', $module);
-        $module = str_replace('\\', Application::DS, $module);
+        $module = ltrim(str_replace('\\', Application::DS, $module),  Application::DS);
         return $module;
     }
 

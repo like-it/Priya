@@ -15,6 +15,6 @@ class Install extends Cli {
     const DIR = __DIR__;
 
     public function run(){
-        return $this->result('cli');
+    	return $this->result('cli');
     }
 }

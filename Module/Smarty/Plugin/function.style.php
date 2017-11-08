@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-01-2016
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-01-2016
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 
 use Priya\Application;
@@ -20,7 +20,10 @@ function smarty_function_style($params, $template)
     if(isset($params['link'])){
         $link = $params['link'];
     }
-    if(isset($vars['module'])){
+    if(
+        isset($vars['module']) &&
+        isset($vars['module']['name'])
+    ){
         $caller = $vars['module'];
     }
     $url = explode('href="', $link, 2);

@@ -20,6 +20,8 @@ use Priya\Module\File\Dir;
 class Application extends Parser {
     const DS = DIRECTORY_SEPARATOR;
     const DIR = __DIR__;
+    const PRIYA = 'Priya';
+    const BIN = 'Bin';
     const ENVIRONMENT = 'development';
     const MODULE = 'Module';
     const TEMPLATE = 'Template';
@@ -33,6 +35,7 @@ class Application extends Parser {
     const TEMP = 'Temp';
     const CACHE = 'Cache';
     const PUBLIC_HTML = 'Public';
+    const HOST = 'Host';
     const CSS = 'Css';
     const JAVASCRIPT = 'Javascript';
     const CONFIG = 'Config.json';
@@ -46,19 +49,19 @@ class Application extends Parser {
 //         set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->data('time.start', microtime(true));
         $this->data('priya.environment', Application::ENVIRONMENT);
-        $this->data('module', $this->module());
+        $this->data('module.name', $this->module());
         $this->data('dir.ds', Application::DS);
-        $this->data('dir.priya.application',
+        $this->data('priya.dir.application',
             dirname(Application::DIR) .
             Application::DS
         );
         $this->data('dir.vendor',
-            dirname(dirname($this->data('dir.priya.application'))) .
+            dirname(dirname($this->data('priya.dir..application'))) .
             Application::DS
         );
         if(stristr($this->data('dir.vendor'), Application::VENDOR) === false){
             $this->data('dir.vendor',
-                dirname($this->data('dir.priya.application')) .
+                dirname($this->data('priya.dir..application')) .
                 Application::DS
             );
             $this->data('dir.root', $this->data('dir.vendor'));
@@ -78,30 +81,30 @@ class Application extends Parser {
         }
         $this->data(Application::object_merge($this->data(),$this->object($data)));
         $this->cli();
-        if(empty($this->data('dir.priya.root'))){
-            $this->data('dir.priya.root',
-                dirname($this->data('dir.priya.application')) .
+        if(empty($this->data('priya.dir.root'))){
+            $this->data('priya.dir.root',
+                dirname($this->data('priya.dir.application')) .
                 Application::DS
             );
         }
-        if(empty($this->data('dir.priya.module'))){
-            $this->data('dir.priya.module',
-                dirname($this->data('dir.priya.application')) .
+        if(empty($this->data('priya.dir.module'))){
+            $this->data('priya.dir.module',
+                dirname($this->data('priya.dir.application')) .
                 Application::DS .
                 Application::MODULE .
                 Application::DS
             );
         }
-        if(empty($this->data('dir.priya.data'))){
-            $this->data('dir.priya.data',
-                $this->data('dir.priya.application') .
+        if(empty($this->data('priya.dir.data'))){
+            $this->data('priya.dir.data',
+                $this->data('priya.dir.application') .
                 Application::DATA .
                 Application::DS
             );
         }
-        if(empty($this->data('dir.priya.backup'))){
-            $this->data('dir.priya.backup',
-                $this->data('dir.priya.data') .
+        if(empty($this->data('priya.dir.backup'))){
+            $this->data('priya.dir.backup',
+                $this->data('priya.dir.data') .
                 Application::BACKUP .
                 Application::DS
             );
@@ -113,23 +116,23 @@ class Application extends Parser {
                 Application::DS
            );
         }
-        if(empty($this->data('dir.priya.restore'))){
-            $this->data('dir.priya.restore',
-                $this->data('dir.priya.data') .
+        if(empty($this->data('priya.dir.restore'))){
+            $this->data('priya.dir.restore',
+                $this->data('priya.dir.data') .
                 Application::RESTORE .
                 Application::DS
            );
         }
-        if(empty($this->data('dir.priya.update'))){
-            $this->data('dir.priya.update',
-                $this->data('dir.priya.data') .
+        if(empty($this->data('priya.dir.update'))){
+            $this->data('priya.dir.update',
+                $this->data('priya.dir.data') .
                 Application::UPDATE .
                 Application::DS
             );
         }
-        if(empty($this->data('dir.priya.public'))){
-            $this->data('dir.priya.public',
-                $this->data('dir.priya.root') .
+        if(empty($this->data('priya.dir.public'))){
+            $this->data('priya.dir.public',
+                $this->data('priya.dir.root') .
                 Application::PUBLIC_HTML .
                 Application::DS
            );
@@ -143,11 +146,18 @@ class Application extends Parser {
             $this->data('public_html', Application::PUBLIC_HTML);
             $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);
         }
+        if(empty($this->data('dir.host'))){
+            $this->data('dir.host',
+                $this->data('dir.root') .
+                Application::HOST .
+                Application::DS
+            );
+        }
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
-        if($this->data('dir.priya.application')){
-            chdir($this->data('dir.priya.application'));
+        if($this->data('priya.dir.application')){
+            chdir($this->data('priya.dir.application'));
         }
         if(empty($autoload)){
             $autoload = new \Priya\Module\Autoload();
@@ -174,20 +184,16 @@ class Application extends Parser {
         $this->route()->create('Application.Help');
         $this->route()->create('Application.Error');
         $this->route()->create('Application.Route');
-        $this->route()->create('Application.Restore');
-        $this->route()->create('Application.Pull');
-        $this->route()->create('Application.Push');
-        $this->route()->create('Application.Build');
-        $this->route()->create('Application.Install');
-        $this->route()->create('Application.Update');
         $this->route()->create('Application.Parser');
-        $this->route()->create('Application.Cache.Clear');
+        $this->route()->create('Application.Cache');
+        $this->route()->create('Application.Check');
+        $this->route()->create('Application.Install');
         $this->route()->create('Test');
     }
 
     public function run(){
         $this->autoload()->environment($this->data('priya.environment'));
-        chdir($this->data('dir.priya.application'));
+        chdir($this->data('priya.dir.application'));
         $request = $this->request('request');
         if($request ===  $this->data('parser.request') && $request !== null){
             trigger_error('cannot route to SELF', E_USER_ERROR);
@@ -201,11 +207,34 @@ class Application extends Parser {
             $tmp = explode($this->data('prefix'), $url, 2);
             $url = implode('', $tmp);
         }
-        $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-        $allowed_contentType = $this->data('contentType');
+        $allowed_contentType = $this->data('priya.contentType');
         if(isset($allowed_contentType->{$ext})){
+            $host = $this->handler()->host(false);
+            if($host=== false){
+                $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+            } else{
+                $subdomain = $this->handler()->subDomain();
+                if($subdomain === false || $subdomain == 'www'){
+                    $url_tmp = $this->data('dir.host') . str_replace('www.', '', $host) . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    $dir =  $this->data('dir.host') . str_replace('www.', '', $host);
+                } else {
+                    $url_tmp = $this->data('dir.host') . $host . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    $dir = $this->data('dir.host') . $host ;
+                    if(!file_exists($dir)){
+                        $domain = $this->handler()->domain();
+                        $extension = $this->handler()->extension();
+                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                        $dir = $this->data('dir.host') . $domain . '.' . $extension;
+                    }
+                }
+                $url = $url_tmp;
+                if(!file_exists($dir)){
+                    $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                }
+            }
             $result = null;
             $contentType = $allowed_contentType->{$ext};
+
             if(file_exists($url) && strstr(strtolower($url), strtolower($this->data('public_html'))) !== false){
                 if(!headers_sent()){
                     header('Last-Modified: '. filemtime($url));
@@ -220,7 +249,8 @@ class Application extends Parser {
                     $parser = new Parser();
                     $file = new File();
                     $result = $parser->data('object')->compile($file->read($url), $data->data());
-                } elseif($ext == 'json'){
+                }
+                elseif($ext == 'json'){
                     $file = new File();
                     $result = $file->read($url);
                     $object = new stdClass();
@@ -228,9 +258,6 @@ class Application extends Parser {
                     $object = Application::object_merge($object, $this->object($result));
                     $result = $this->object($object, 'json');
                 } else {
-                    if($ext == 'js'){
-//                         sleep(rand(1, 10)); //testing async
-                    }
                     $file = new File();
                     $result = $file->read($url);
                 }
@@ -340,19 +367,19 @@ class Application extends Parser {
 
     public function page($request=''){
         $this->data('request', $request);
-        $this->data('dir.priya.page', $this->data('dir.priya.root') . Application::PAGE . Application::DS);
-        $this->data('dir.module.page', $this->data('dir.module.root') . Application::PAGE . Application::DS);
+        $this->data('priya.dir.page', $this->data('priya.dir.root') . Application::PAGE . Application::DS);
+        $this->data('module.dir.page', $this->data('module.dir.root') . Application::PAGE . Application::DS);
 
         $result = new stdClass();
 
         $parser = new \Priya\Module\Parser();
         $parser->data($this->data());
         $file = new \Priya\Module\File();
-        $url = $this->data('dir.module.page') . 'Request.priya';
+        $url = $this->data('module.dir.page') . 'Request.priya';
         if(file_exists($url)){
             var_dump('parse this one');
         } else {
-            $url = $this->data('dir.priya.page') . 'Request.priya';
+            $url = $this->data('priya.dir.page') . 'Request.priya';
             if(file_exists($url)){
                 $parser->data('input', $file->read($url));
                 $parser->data($parser->compile($parser->data(), $parser->data()));

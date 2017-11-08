@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module;
@@ -220,13 +220,13 @@ class Data extends Core {
             $data = new stdClass();
         }
         if(!empty($module)){
-            $this->object_set('module', $module, $data);
+            $this->object_set('module.name', $module, $data);
             $class = str_replace('\\', '-', strtolower($module));
             $this->object_set('class', $class, $data);
             $namespace = explode('\\', $module);
             array_pop($namespace);
             $namespace = implode(Application::DS, $namespace) . Application::DS;
-            $this->object_set('namespace', $namespace, $data);
+            $this->object_set('module.namespace', $namespace, $data);
         }
         if(!empty($read)){
             foreach($read as $attribute => $value){

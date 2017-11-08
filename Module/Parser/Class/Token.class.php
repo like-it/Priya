@@ -1062,6 +1062,9 @@ class Token extends Core {
             case 'T_ARRAY' :        //might needs its own type
             case 'T_IS' :             //might needs its own type
             case 'T_DEFAULT' :         //might needs its own type
+            case 'T_PUBLIC' :
+            case 'T_PROTECTED' :
+            case 'T_PRIVATE' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
