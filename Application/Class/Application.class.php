@@ -227,9 +227,10 @@ class Application extends Parser {
                         $dir = $this->data('dir.host') . $domain . '.' . $extension;
                     }
                 }
-                $url = $url_tmp;
                 if(!file_exists($dir)){
                     $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                } else {
+                    $url = $url_tmp;
                 }
             }
             $result = null;
