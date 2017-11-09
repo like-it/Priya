@@ -191,46 +191,10 @@ class Result extends Parser {
         $dir = dirname($url);
         $cwd = getcwd();
         chdir($dir);
-        $functions = spl_autoload_functions();
-        foreach($functions as $function) {
-            spl_autoload_unregister($function);
-        }
-        restore_error_handler();
-        restore_exception_handler();
 
-        $dir_vendor = dirname($dir_priya) . Application::DS;
-        $dir_smarty =
-            $dir_vendor .
-            'Smarty' .
-            Application::DS .
-            'libs' .
-            Application::DS
-        ;
-        //for compose dir_vendor/smarty/smarty ?
-        if(!file_exists($dir_smarty . 'Smarty.class.php')){
-            $dir_vendor = dirname($dir_vendor) . Application::DS;
-            $dir_smarty =
-            $dir_vendor .
-            'smarty' .
-            Application::DS .
-            'smarty' .
-            Application::DS .
-            'libs' .
-            Application::DS
-            ;
-            if(!file_exists($dir_smarty . 'Smarty.class.php')){
-                chdir($cwd);
-                $this->error('add', $this->parser('object')->random() . '.' .'smarty-not-found', true);
-                return false;
-            }
-        }
-        require_once $dir_smarty . 'Smarty.class.php';
         $smarty = new \Smarty();
+        \Smarty_Autoloader::register(true);
 
-        $func = spl_autoload_functions();
-        if(empty($func)){
-            \Smarty_Autoloader::register();
-        }
         $dir_template = '';
         $class = get_called_class();
         if($class::DIR){
@@ -380,13 +344,6 @@ class Result extends Parser {
             $result = $this->template($object);
         } else {
             $result = $this->template($fetch);
-        }
-        $func = spl_autoload_functions();
-        foreach($func as $function){
-            spl_autoload_unregister($function);
-        }
-        foreach($functions as $function) {
-            spl_autoload_register($function);
         }
         chdir($cwd);
         return $result;

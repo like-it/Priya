@@ -31,7 +31,6 @@ class Autoload{
     public $environment = 'production';
 
     public function register($method='load', $prepend=false){
-//         $this->environment('development');
         $functions = spl_autoload_functions();
         if(is_array($functions)){
             foreach($functions as $function){
