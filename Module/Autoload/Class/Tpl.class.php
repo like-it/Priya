@@ -18,6 +18,14 @@ class Tpl extends Autoload {
 
     private $seperator = false;
 
+    public function __destruct(){
+        if(!empty($this->read)){
+            $dir = dirname(Autoload::DIR) . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;
+            $url = $dir . Autoload::FILE;
+            $this->write($url, $this->read);
+        }
+    }
+
     public function register($method='tpl_load', $prepend=false){
         trigger_error('unable to register resulting data, no target specified.');
     }
