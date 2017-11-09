@@ -17,6 +17,8 @@ class Parser extends ParserCore {
     const LITERAL = 'literal';
     const FUNCTION_LIST = 'Function.List.php';
 
+    public $has_list = false;
+
     public function __construct($handler=null, $route=null, $data=null){
         if($data !== null){
             $this->handler($handler);

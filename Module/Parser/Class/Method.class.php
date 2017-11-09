@@ -7,8 +7,6 @@ use Priya\Module\Core\Object;
 class Method extends Core {
     const MAX = 1024;
 
-    private $has_list = false;
-
     public function __construct($data=null, $random=null){
         $this->data($data);
         $this->random($random);
@@ -412,13 +410,13 @@ class Method extends Core {
         );
         $url = __DIR__ . '/../Function/Function.List.php';
         if(
-            empty($this->has_list) &&
+            empty($parser->has_list) &&
             file_exists($url)
         ){
-            $this->has_list = true;
+            $parser->has_list = true;
             require_once $url;
         }
-        if($this->has_list !== true){
+        if($parser->has_list !== true){
             $url = __DIR__ . '/../Function/Function.' . $name . '.php';
             if(file_exists($url)){
                 require_once $url;

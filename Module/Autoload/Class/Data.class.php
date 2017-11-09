@@ -17,6 +17,14 @@ class Data extends Autoload {
 
     use \Priya\Module\Core\Object;
 
+    public function __destruct(){
+        if(!empty($this->read)){
+            $dir = dirname(Autoload::DIR) . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;
+            $url = $dir . Autoload::FILE;
+            $this->write($url, $this->read);
+        }
+    }
+
     public function register($method='data_load', $prepend=false){
         trigger_error('unable to register resulting data, no target specified.');
     }

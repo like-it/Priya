@@ -22,16 +22,14 @@ class Autoload{
     const EXT_TRAIT_PHP = 'trait.php';
 
     private $expose;
-    private $read;
-    private $resource;
 
+    protected $read;
     protected $fileList;
 
     public $prefixList = array();
     public $environment = 'production';
 
     public function register($method='load', $prepend=false){
-//         $this->environment('development');
         $functions = spl_autoload_functions();
         if(is_array($functions)){
             foreach($functions as $function){
@@ -120,8 +118,13 @@ class Autoload{
             $this->read = $this->read($url);
         }
         $data = array();
-        if(isset($this->read->autoload) && isset($this->read->autoload->{$item['load']})){
-            $data[] = $this->read->autoload->{$item['load']};
+        $caller = get_called_class();
+        if(
+            isset($this->read->autoload) &&
+            isset($this->read->autoload->{$caller}) &&
+            isset($this->read->autoload->{$caller}->{$item['load']})
+        ){
+            $data[] = $this->read->autoload->{$caller}->{$item['load']};
         }
         $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_CLASS_PHP;
         $data[] = $item['directory'] . $item['file'] . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR . $item['file'] . '.' . Autoload::EXT_PHP;
@@ -215,7 +218,6 @@ class Autoload{
                             array(
                                 Autoload::EXT_PHP,
                                 Autoload::EXT_TPL
-
                             )
                     ));
                     $item['baseName'] = explode(DIRECTORY_SEPARATOR, $item['baseName'], 2);
@@ -231,7 +233,8 @@ class Autoload{
                                 continue;
                             }
                             if(file_exists($file)){
-                                $this->write($url, $file, $load);
+                                $this->cache($file, $load);
+//                                 $this->write($url, $file, $load);
                                 return $file;
                             }
                         }
@@ -260,43 +263,57 @@ class Autoload{
     }
 
     public function __destruct(){
-        if(!empty($this->resource)){
-            fclose($this->resource);
+        if(!empty($this->read)){
+            $dir = dirname(Autoload::DIR) . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;
+            $url = $dir . Autoload::FILE;
+            $this->write($url, $this->read);
         }
     }
 
-    private function write($url='', $file='', $class=''){
+    private function cache($file='', $class=''){
         if(empty($this->read)){
+            $dir = dirname(Autoload::DIR) . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;
+            $url = $dir . Autoload::FILE;
             $this->read = $this->read($url);
         }
         if(empty($this->read->autoload)){
             $this->read->autoload = new stdClass();
         }
-        $this->read->autoload->{$class} = (string) $file;
+        $caller = get_called_class();
+        if(empty($this->read->autoload->{$caller})){
+            $this->read->autoload->{$caller}= new stdClass();
+        }
+        $this->read->autoload->{$caller}->{$class} = (string) $file;
+    }
 
-        $data = (string) json_encode($this->read, JSON_PRETTY_PRINT);
+    protected function write($url='', $data=''){
+        $data = (string) json_encode($data, JSON_PRETTY_PRINT);
+        if(empty($data)){
+            return false;
+        }
         $fwrite = 0;
-        if(empty($this->resource)){
+        if(empty($resource)){
             $dir = dirname($url);
             if(is_dir($dir) === false){
                 mkdir($dir, 0777, true);
             }
-            $this->resource = fopen($url, 'w');
+            $resource = fopen($url, 'w');
         }
-        if($this->resource === false){
-            return $this->resource;
+        if($resource === false){
+            return $resource;
         }
-        $lock = flock($this->resource, LOCK_EX);
-        fseek($this->resource, 0);
+        $lock = flock($resource, LOCK_EX);
+        fseek($resource, 0);
         for ($written = 0; $written < strlen($data); $written += $fwrite) {
-            $fwrite = fwrite($this->resource, substr($data, $written));
+            $fwrite = fwrite($resource, substr($data, $written));
             if ($fwrite === false) {
                 break;
             }
         }
-        if(!empty($this->resource)){
-            flock($this->resource, LOCK_UN);
+        if(!empty($resource)){
+            flock($resource, LOCK_UN);
         }
+        fclose($resource);
         if($written != strlen($data)){
             return false;
         } else {
