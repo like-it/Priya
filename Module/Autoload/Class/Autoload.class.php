@@ -214,7 +214,6 @@ class Autoload{
                             array(
                                 Autoload::EXT_PHP,
                                 Autoload::EXT_TPL
-
                             )
                     ));
                     $item['baseName'] = explode(DIRECTORY_SEPARATOR, $item['baseName'], 2);
