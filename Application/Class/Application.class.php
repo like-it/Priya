@@ -304,23 +304,19 @@ class Application extends Parser {
                     }
                 }
                 if(method_exists($controller, 'error')){
-                    /*
-                    $random = $this->parser('object')->random();
-                    if(!empty($random)){
-                        $error =  $controller->error();
-                        if(is_object($error)){
-                            foreach($error as $attribute => $value){
-                                $this->error($random . '.' . $attribute, $value);
-                            }
-                        }
-                    } else {
-                        $this->error($controller->error());
-                    }
-                    */
                     $this->error($controller->error());
                 }
             }
-        } else {
+        }
+        elseif(!empty($item->url)){
+            if(file_exists($item->url) && strstr(strtolower($item->url), strtolower($this->data('public_html'))) !== false){
+               $file = new File();
+               $result = $file->read($item->url);
+            } else {
+                //404
+            }
+        }
+        else {
             if($contentType == Handler::CONTENT_TYPE_CLI){
                 if($request == 'Application/Error/'){
                     trigger_error('cannot route to Application/Error/', E_USER_ERROR);

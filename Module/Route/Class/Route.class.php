@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module;
@@ -59,6 +59,11 @@ class Route extends \Priya\Module\Core\Parser{
             if(!isset($route->path)){
                 continue;
             }
+            if(isset($route->host)){
+                if($route->host != $this->handler()->host(false)){
+                    continue;
+                }
+            }
             $node = $this->parsePath($path, $route);
             if(empty($node)){
                 continue;
@@ -80,6 +85,33 @@ class Route extends \Priya\Module\Core\Parser{
                         continue; //skip based on wrong method
                     }
                 }
+            }
+            if(
+                isset($route->default) &&
+                isset($route->default->read)
+            ){
+                $read =
+                    $this->data('dir.host') .
+                    $this->handler()->host(false) .
+                    Application::DS .
+                    $this->data('public_html') .
+                    Application::DS .
+                    $route->default->read
+                ;
+                $object = new stdClass();
+                $object->url = $read;
+                if(isset($route->default->format)){
+                    $object->format = $route->default->format;
+                } else {
+                    $object->format = 'raw';
+                }
+                if(isset($route->default->language)){
+                    $object->language = $route->default->language;
+                }
+                if(isset($route->translate)){
+                    $object->translate = $route->translate;
+                }
+                return $this->item($object);
             }
             if(isset($route->default) && isset($route->default->controller)){
                 $controller = '\\' . trim(str_replace(array(':', '.'), array('\\','\\'), $route->default->controller), ':\\');

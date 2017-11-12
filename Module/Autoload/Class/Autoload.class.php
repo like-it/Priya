@@ -244,6 +244,7 @@ class Autoload{
         }
         if($this->environment() == 'development' || !empty($this->expose())){
             $object = new stdClass();
+            $object->load = $load;
             $attribute = 'Priya\Module\Exception\Error';
             if(!empty($this->expose())){
                 $attribute = $load;
@@ -251,6 +252,7 @@ class Autoload{
             if(isset($this->fileList[$item['baseName']])){
                 $object->{$attribute} = $this->fileList[$item['baseName']];
             }
+            debug(spl_autoload_functions());
             echo json_encode($object, JSON_PRETTY_PRINT);
             if(ob_get_level() !== 0){
                 ob_flush();
