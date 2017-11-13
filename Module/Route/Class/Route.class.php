@@ -32,10 +32,14 @@ class Route extends \Priya\Module\Core\Parser{
     }
 
     public function run($path=''){
-        return $this->parseRequest($path);
+        $route = $this->parseRequest($path);
+        if(empty($route)){
+            $route = $this->parseRequest($path, false);
+        }
+        return $route;
     }
 
-    public function parseRequest($path=''){
+    public function parseRequest($path='', $isHost=true){
         $handler = $this->handler();
         $data = $this->data();
         if(empty($path)){
@@ -59,10 +63,18 @@ class Route extends \Priya\Module\Core\Parser{
             if(!isset($route->path)){
                 continue;
             }
+            if($isHost === false){
+                if(isset($route->host)){
+                    continue;
+                }
+            }
             if(isset($route->host)){
                 if($route->host != $this->handler()->host(false)){
                     continue;
                 }
+            }
+            if($isHost && !isset($route->host)){
+                continue;
             }
             $node = $this->parsePath($path, $route);
             if(empty($node)){
