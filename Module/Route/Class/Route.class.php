@@ -36,6 +36,9 @@ class Route extends \Priya\Module\Core\Parser{
         if(empty($route)){
             $route = $this->parseRequest($path, false);
         }
+        if(empty($route)){
+            $this->error('route', true);
+        }
         return $route;
     }
 
@@ -134,7 +137,6 @@ class Route extends \Priya\Module\Core\Parser{
                 return $this->item($object);
             }
         }
-        $this->error('route', true);
     }
 
     private function parseRoute(){
