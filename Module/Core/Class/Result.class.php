@@ -118,10 +118,6 @@ class Result extends Parser {
     }
 
     public function createTemplate($template=''){
-        if($template != ''){
-            debug($template);
-            die;
-        }
         $contentType = $this->request('contentType');
         $data = $this->data();
         $template_list = array();
