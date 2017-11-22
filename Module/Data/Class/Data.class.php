@@ -220,20 +220,13 @@ class Data extends Core {
             $data = new stdClass();
         }
         if(!empty($module)){
-            if(empty($this->object_get('module.name', $data))){
-                $this->object_set('module.name', $module, $data);
-            }
-            if(empty($this->object_get('class', $data))){
-                $class = str_replace('\\', '-', strtolower($module));
-                $this->object_set('class', $class, $data);
-            }
-            if(empty($this->object_get('module.namespace', $data))){
-                $namespace = explode('\\', $module);
-                array_pop($namespace);
-                $namespace = implode(Application::DS, $namespace) . Application::DS;
-                $this->object_set('module.namespace', $namespace, $data);
-            }
-
+            $this->object_set('module.name', $module, $data);
+            $class = str_replace('\\', '-', strtolower($module));
+            $this->object_set('class', $class, $data);
+            $namespace = explode('\\', $module);
+            array_pop($namespace);
+            $namespace = implode(Application::DS, $namespace) . Application::DS;
+            $this->object_set('module.namespace', $namespace, $data);
         }
         if(!empty($read)){
             foreach($read as $attribute => $value){
