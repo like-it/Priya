@@ -21,7 +21,7 @@ class Data extends Core {
     public function __construct($handler=null, $route=null, $data=null){
         $this->data(Data::object_merge($this->data(), $handler));
     }
-
+    
     public function data($attribute=null, $value=null, $type=null){
         if($attribute !== null){
             if($attribute == 'set'){
@@ -154,8 +154,8 @@ class Data extends Core {
 
     public function read($url=''){
         $namespace = '';
-        if(empty($url)){
-            $url = get_called_class();
+        if(empty($url)){        	
+            $url = get_called_class();                        
         }
         if(file_exists($url)){
             $file = new File();
@@ -174,7 +174,7 @@ class Data extends Core {
             }
             return $this->data($data);
         } else {
-            $module = $url;
+            $module = $url;            
         }
         $autoload = $this->autoload();
         if(empty($autoload) || !$autoload instanceof \Priya\Module\Autoload\Data){
@@ -193,7 +193,7 @@ class Data extends Core {
             $data = new \Priya\Module\Autoload\Data();
             $class = get_called_class();
             if($class::DIR){
-                $dir = dirname($class::DIR) . Application::DS;// . 'Data' . Application::DS;
+                $dir = dirname($class::DIR) . Application::DS;
                 $data->addPrefix('none', $dir);
             }
             $data->addPrefix($namespace, $directory);
@@ -205,7 +205,6 @@ class Data extends Core {
             }
             $autoload = $this->autoload($data);
         }
-//         $autoload->environment('development');
         $url = $autoload->data_load($url);
         if($url !== false){
             $this->url($url);
@@ -218,16 +217,7 @@ class Data extends Core {
         $data = $this->data();
         if(empty($data)){
             $data = new stdClass();
-        }
-        if(!empty($module)){
-            $this->object_set('module.name', $module, $data);
-            $class = str_replace('\\', '-', strtolower($module));
-            $this->object_set('class', $class, $data);
-            $namespace = explode('\\', $module);
-            array_pop($namespace);
-            $namespace = implode(Application::DS, $namespace) . Application::DS;
-            $this->object_set('module.namespace', $namespace, $data);
-        }
+        }               
         if(!empty($read)){
             foreach($read as $attribute => $value){
                 $this->object_set($attribute, $value, $data);
