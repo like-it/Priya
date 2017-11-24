@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module\Core;
@@ -31,6 +31,17 @@ trait Object {
                 return array($input);
             } else {
                 trigger_error('unknown output in object');
+            }
+        }
+        if(is_null($input)){
+            if($output == 'object'){
+                return new stdClass();
+            }
+            elseif($output == 'array'){
+                return array();
+            }
+            elseif($output == 'json'){
+                return '{}';
             }
         }
         if(is_array($input) && $output == 'object'){
@@ -93,7 +104,7 @@ trait Object {
             }
         }
         if(stristr($output, 'json') !== false && stristr($output, 'data') !== false){
-            $data =str_replace('"', '&quot;',json_encode($input));
+            $data = str_replace('"', '&quot;',json_encode($input));
         }
         elseif(stristr($output, 'json') !== false && stristr($output, 'line') !== false){
             $data = json_encode($input);
@@ -282,7 +293,7 @@ trait Object {
                 }
             }
         } else {
-            unset($parent->{$key});	//unset $object won't delete it from the first object (parent) given
+            unset($parent->{$key});    //unset $object won't delete it from the first object (parent) given
             return true;
         }
     }
@@ -310,7 +321,7 @@ trait Object {
                     if(empty($attribute) && is_object($value)){
                         foreach($value as $value_key => $value_value){
                             if(isset($object->$key->$value_key)){
-// 								unset($object->$key->$value_key);   //so sort will happen, request will tak forever and apache2 crashes needs reboot apache2
+//                                 unset($object->$key->$value_key);   //so sort will happen, request will tak forever and apache2 crashes needs reboot apache2
                             }
                             $object->{$key}->{$value_key} = $value_value;
                         }
@@ -371,6 +382,12 @@ trait Object {
         foreach($objects as $nr => $object){
             if(is_array($object)){
                 foreach($object as $key => $value){
+                    if(is_object($main)){
+                        var_dump($main);
+                        var_dump($object);
+                        var_dump(debug_backtrace(true));
+                        die;
+                    }
                     if(!isset($main[$key])){
                         $main[$key] = $value;
                     } else {

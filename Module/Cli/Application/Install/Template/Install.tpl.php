@@ -12,3 +12,10 @@
 namespace Priya;
 
 echo 'Installing Priya...' . PHP_EOL;
+
+/**
+ * need to install memcached
+ * need to install php-memcached
+ * need to install pico2wave (but only when the module Speak is there)
+ * need to install sysstat (mpstat (system monitor)) 
+ */

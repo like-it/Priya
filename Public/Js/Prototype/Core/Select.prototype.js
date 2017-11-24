@@ -64,8 +64,13 @@ _('prototype').select = function(selector){
         else if(typeof selector['Priya'] == 'object'){
             return selector;
         } else {
+            console.log(object);
+            console.log(selector);
+            console.log(call);
             console.log('error, cannot attach ??? with priya.attach(object)');
-            return object.attach(call);
+            var object =  object.attach(call);
+            console.log(object);
+            return object;
         }
     }
 }

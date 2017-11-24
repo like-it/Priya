@@ -25,7 +25,7 @@ class Memory extends Data{
     private $keyList;
     private $serverList;
 
-    public function __construct($memory='', $id=null){
+    public function __construct($memory='', $id=null){    	
         if($id === null){
             $this->memory = new Memcached();
         } else {

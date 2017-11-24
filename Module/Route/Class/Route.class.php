@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module;
@@ -32,10 +32,17 @@ class Route extends \Priya\Module\Core\Parser{
     }
 
     public function run($path=''){
-        return $this->parseRequest($path);
+        $route = $this->parseRequest($path);
+        if(empty($route)){
+            $route = $this->parseRequest($path, false);
+        }
+        if(empty($route)){
+            $this->error('route', true);
+        }
+        return $route;
     }
 
-    public function parseRequest($path=''){
+    public function parseRequest($path='', $isHost=true){
         $handler = $this->handler();
         $data = $this->data();
         if(empty($path)){
@@ -57,6 +64,19 @@ class Route extends \Priya\Module\Core\Parser{
         $path = explode('/', trim($path, '/'));
         foreach($data as $name => $route){
             if(!isset($route->path)){
+                continue;
+            }
+            if($isHost === false){
+                if(isset($route->host)){
+                    continue;
+                }
+            }
+            if(isset($route->host)){
+                if($route->host != $this->handler()->host(false)){
+                    continue;
+                }
+            }
+            if($isHost && !isset($route->host)){
                 continue;
             }
             $node = $this->parsePath($path, $route);
@@ -81,6 +101,33 @@ class Route extends \Priya\Module\Core\Parser{
                     }
                 }
             }
+            if(
+                isset($route->default) &&
+                isset($route->default->read)
+            ){
+                $read =
+                    $this->data('dir.host') .
+                    $this->handler()->host(false) .
+                    Application::DS .
+                    $this->data('public_html') .
+                    Application::DS .
+                    $route->default->read
+                ;
+                $object = new stdClass();
+                $object->url = $read;
+                if(isset($route->default->format)){
+                    $object->format = $route->default->format;
+                } else {
+                    $object->format = 'raw';
+                }
+                if(isset($route->default->language)){
+                    $object->language = $route->default->language;
+                }
+                if(isset($route->translate)){
+                    $object->translate = $route->translate;
+                }
+                return $this->item($object);
+            }
             if(isset($route->default) && isset($route->default->controller)){
                 $controller = '\\' . trim(str_replace(array(':', '.'), array('\\','\\'), $route->default->controller), ':\\');
                 $tmp = explode('\\', $controller);
@@ -90,7 +137,6 @@ class Route extends \Priya\Module\Core\Parser{
                 return $this->item($object);
             }
         }
-        $this->error('route', true);
     }
 
     private function parseRoute(){

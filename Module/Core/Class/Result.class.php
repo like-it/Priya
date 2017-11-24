@@ -118,10 +118,6 @@ class Result extends Parser {
     }
 
     public function createTemplate($template=''){
-        if($template != ''){
-            debug($template);
-            die;
-        }
         $contentType = $this->request('contentType');
         $data = $this->data();
         $template_list = array();
@@ -191,6 +187,8 @@ class Result extends Parser {
         $dir = dirname($url);
         $cwd = getcwd();
         chdir($dir);
+
+        $functions = spl_autoload_functions();
 
         $smarty = new \Smarty();
         \Smarty_Autoloader::register(true);
@@ -284,8 +282,16 @@ class Result extends Parser {
             $smarty->assign('method', $method);
         }
         $smarty->assign('fetch', $url);
-        $fetch = trim($smarty->fetch($url));
 
+        foreach($functions as $autoload){
+            $function = array_pop($autoload);
+            $autoload = array_shift($autoload);
+            if(get_class($autoload) == 'Priya\Module\Autoload'){
+                spl_autoload_unregister(array($autoload, $function)); //disable priya autoload
+            }
+        }
+        $fetch = trim($smarty->fetch($url));
+        spl_autoload_register(array($autoload, $function)); //enable priya autoload
         set_exception_handler(array('Priya\Module\Core','handler_exception'));
         set_error_handler(array('Priya\Module\Core','handler_error'));
         if($contentType == Handler::CONTENT_TYPE_JSON){

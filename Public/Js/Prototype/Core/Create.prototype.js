@@ -1,4 +1,8 @@
 _('prototype').create = function (type, create){
+    if(typeof type.toLowerCase != 'function'){
+        console.log(type);
+        console.log(create);
+    }
     switch(type.toLowerCase()){
         case 'id':
             if(typeof create == 'undefined'){
