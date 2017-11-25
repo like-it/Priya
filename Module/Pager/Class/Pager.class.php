@@ -214,7 +214,11 @@ class Pager extends Data {
         }
         $recordLength = $this->recordLength();
         $recordCount = $this->recordCount();
-        return $this->pageAmount(intval(ceil($recordCount/$recordLength)));
+        $amount =  $this->pageAmount(intval(ceil($recordCount/$recordLength)));
+        if($amount < 1){
+            $amount = $this->pageAmount(1);
+        }
+        return $amount;
     }
 
     public function amount($amount=null){
@@ -228,7 +232,7 @@ class Pager extends Data {
         return $this->getPageAmount();
     }
 
-    private function setPageAmount($pageAmount=0){
+    private function setPageAmount($pageAmount=1){
         $this->pageAmount = $pageAmount;
     }
 
