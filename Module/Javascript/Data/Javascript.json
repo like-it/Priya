@@ -17,7 +17,8 @@
             "run" : "run",
             "select" : "select",
             "get" : "get",
-            "request" : "request"
+            "request" : "request",
+            "attach" : "attach"
         }
     }
 },
