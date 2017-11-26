@@ -1068,6 +1068,7 @@ class Token extends Core {
             case 'T_PUBLIC' :
             case 'T_PROTECTED' :
             case 'T_PRIVATE' :
+            case 'T_QUESTION_MARK' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
@@ -1179,11 +1180,6 @@ class Token extends Core {
     public static function remove_comment($string=''){
         $tokens = Token::all($string);
         foreach($tokens as $nr => $token){
-            if(!isset($token[2])){
-                var_dump($token);
-                var_Dump($string);
-                die;
-            }
             if($token[2] == 'T_COMMENT' && stristr($token[1], '//') === false){
                 $string = str_replace($token[1], '', $string);
             }
