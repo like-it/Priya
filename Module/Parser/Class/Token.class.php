@@ -94,6 +94,9 @@ class Token extends Core {
                     case ':' :
                         $tokens[$key][2] = 'T_COLON';
                     break;
+                    case '?' :
+                        $tokens[$key][2] = 'T_QUESTION_MARK';
+                    break;
                     case '$' :
                         $tokens[$key][2] = 'T_DOLLAR_SIGN';
                     break;
@@ -1176,6 +1179,11 @@ class Token extends Core {
     public static function remove_comment($string=''){
         $tokens = Token::all($string);
         foreach($tokens as $nr => $token){
+            if(!isset($token[2])){
+                var_dump($token);
+                var_Dump($string);
+                die;
+            }
             if($token[2] == 'T_COMMENT' && stristr($token[1], '//') === false){
                 $string = str_replace($token[1], '', $string);
             }
