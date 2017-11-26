@@ -94,6 +94,9 @@ class Token extends Core {
                     case ':' :
                         $tokens[$key][2] = 'T_COLON';
                     break;
+                    case '?' :
+                        $tokens[$key][2] = 'T_QUESTION_MARK';
+                    break;
                     case '$' :
                         $tokens[$key][2] = 'T_DOLLAR_SIGN';
                     break;
@@ -1065,6 +1068,7 @@ class Token extends Core {
             case 'T_PUBLIC' :
             case 'T_PROTECTED' :
             case 'T_PRIVATE' :
+            case 'T_QUESTION_MARK' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :

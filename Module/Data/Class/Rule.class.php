@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 namespace Priya\Module\Data;
@@ -218,6 +218,10 @@ class Rule extends Data {
                             }
                             $data  = $this->data($rule->attribute);
                             if(is_array($data) || is_object($data)){
+                                if(empty($data)){
+                                    $this->error('add', $rule->attribute, $rule->error);
+                                    $this->error('add', $rule->error, true);
+                                }
                                 foreach ($data as $key => $value){
                                     $found = false;
                                     foreach($compare as $nr => $node){
