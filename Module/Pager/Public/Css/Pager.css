@@ -27,6 +27,7 @@ Pager
     display: inline-block;
     margin-top: 20px;
 }
+
 .pager a {
     text-decoration: none;
 }
