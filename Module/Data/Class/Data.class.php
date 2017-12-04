@@ -210,7 +210,6 @@ class Data extends Core {
             $this->url($url);
         }
 
-
         $file = new File();
         $read = $file->read($url);
         $read = $this->object($read);
