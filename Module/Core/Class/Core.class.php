@@ -662,11 +662,7 @@ class Core {
                     }
                 }
             }
-        }
-        var_dump($rule);
-        var_dump($group);
-        var_dump($selector);
-        var_dump($this->data('permission'));
+        }        
         return false;
     }
 
