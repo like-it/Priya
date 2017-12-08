@@ -228,7 +228,11 @@ class Application extends Parser {
                     }
                 }
                 if(!file_exists($dir)){
+                    $url_tmp = $url;
                     $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    if(!file_exists($url)){
+                        $url = $this->data('dir.root') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url_tmp)));
+                    }
                 } else {
                     $url = $url_tmp;
                 }
