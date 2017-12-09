@@ -511,6 +511,10 @@ class Handler extends \Priya\Module\Core\Data{
         if($attribute == 'has'){
             return isset($_SESSION);
         }
+        elseif($attribute == 'close'){
+        	session_write_close();
+        	return;
+        }
         if(!isset($_SESSION)){
             session_start();
             $_SESSION['id'] = session_id();
