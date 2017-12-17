@@ -306,6 +306,7 @@ class Application extends Parser {
                 if(method_exists($controller, 'error')){
                     $this->error($controller->error());
                 }
+                $contentType = $handler->request('contentType'); //can change in the view
             }
         }
         elseif(!empty($item->url)){

@@ -248,13 +248,18 @@ class Handler extends \Priya\Module\Core\Data{
         if(empty($host)){
             $contentType = Handler::CONTENT_TYPE_CLI;
         }
-        $request = $this->request('request');
-        $tmp = explode('.', $request);
-        $ext = strtolower(end($tmp));
+        $ct = $this->request('contentType');
+        if($ct){
+            $contentType = $ct;
+        } else {
+            $request = $this->request('request');
+            $tmp = explode('.', $request);
+            $ext = strtolower(end($tmp));
 
-        $allowed_contentType = $this->data('priya.contentType');
-        if(isset($allowed_contentType->{$ext})){
-            $contentType = $allowed_contentType->{$ext};
+            $allowed_contentType = $this->data('priya.contentType');
+            if(isset($allowed_contentType->{$ext})){
+                $contentType = $allowed_contentType->{$ext};
+            }
         }
         $this->request('contentType',$contentType);
         return $this->contentType($contentType);
@@ -512,8 +517,8 @@ class Handler extends \Priya\Module\Core\Data{
             return isset($_SESSION);
         }
         elseif($attribute == 'close'){
-        	session_write_close();
-        	return;
+            session_write_close();
+            return;
         }
         if(!isset($_SESSION)){
             session_start();
