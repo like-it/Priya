@@ -204,6 +204,51 @@ class Route extends \Priya\Module\Core\Parser{
                 }
                 $counter++;
             }
+
+            if($this->handler()->method() == Handler::METHOD_GET){
+                $request = $this->handler()->request();
+                if(!empty($item)){
+                    foreach($attributeList as $attribute){
+                        unset($request->{$attribute});
+                    }
+                    unset($request->contentType);
+                    unset($request->request);
+                    unset($request->referer);
+                    if(is_object($request)){
+                        foreach($request as $add => $is){
+                            $is = $this->allowDot($is);
+                            $item->value .= '&' . $add . $is;
+
+                        }
+                    }
+                }
+            }
+            elseif($this->handler()->method() == Handler::METHOD_POST){
+                $request = $this->handler()->request();
+                if(!empty($item)){
+                    foreach($attributeList as $attribute){
+                        unset($request->{$attribute});
+                    }
+                    unset($request->contentType);
+                    unset($request->request);
+                    unset($request->referer);
+                    if(is_object($request)){
+                        $tmp = array();
+                        foreach($request as $add => $is){
+                            $is = $this->allowDot($is);
+                            $tmp[$add . $is] = $add;
+                        }
+                        foreach ($tmp as $add_is => $add){
+                            if(isset($_REQUEST[$add_is])){
+                                $item->value .= '&' . $add_is;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
             foreach($itemList as $request){
                 if(isset($request->name) && isset($request->value)){
                     $this->request($request->name, $request->value);
@@ -315,6 +360,18 @@ class Route extends \Priya\Module\Core\Parser{
             }
             return $path;
         }
+    }
+
+    public function allowDot($node=''){
+        $string = '';
+        if(is_object($node)){
+            foreach($node as $attribute => $value){
+                $string .= '.' . $attribute . $this->allowDot($value);
+            }
+        } else {
+            $string .= $node;
+        }
+        return $string;
     }
 }
 ?>
