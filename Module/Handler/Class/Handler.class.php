@@ -316,19 +316,6 @@ class Handler extends \Priya\Module\Core\Data{
             )
         ;
         if(empty($input) && !empty($_REQUEST)){
-            if(count($_REQUEST) > 1 && isset($_SERVER['QUERY_STRING'])){
-                //bugfound in parse_str | $_REQUEST
-                $_REQUEST = array();
-                $explode = explode('&', $_SERVER['QUERY_STRING']);
-                foreach ($explode as $nr => $part){
-                    $temp = explode('=', $part);
-                    if(isset($temp[1])){
-                        $_REQUEST[$temp[0]] = $temp[1];
-                    } else {
-                        $_REQUEST[$temp[0]] = '';
-                    }
-                }
-            }
             $input =
                 htmlspecialchars(
                     json_encode(
@@ -362,19 +349,6 @@ class Handler extends \Priya\Module\Core\Data{
                         $input->nodeList[] = $object;
                     }
                 }
-                if(count($_REQUEST) > 1 && isset($_SERVER['QUERY_STRING'])){
-                    //bugfound in parse_str | $_REQUEST
-                    $_REQUEST = array();
-                    $explode = explode('&', $_SERVER['QUERY_STRING']);
-                    foreach ($explode as $nr => $part){
-                        $temp = explode('=', $part);
-                        if(isset($temp[1])){
-                            $_REQUEST[$temp[0]] = $temp[1];
-                        } else {
-                            $_REQUEST[$temp[0]] = '';
-                        }
-                    }
-                }
                 $input->nodeList[] = $_REQUEST;
                 $input = json_encode($input);
             } else {
@@ -382,19 +356,6 @@ class Handler extends \Priya\Module\Core\Data{
                 $input->nodeList = $this->object($old->nodeList, 'array');
                 if(!is_array($input->nodeList)){
                     $input->nodeList = (array) $input->nodeList;
-                }
-                if(count($_REQUEST) > 1 && isset($_SERVER['QUERY_STRING'])){
-                    //bugfound in parse_str | $_REQUEST
-                    $_REQUEST = array();
-                    $explode = explode('&', $_SERVER['QUERY_STRING']);
-                    foreach ($explode as $nr => $part){
-                        $temp = explode('=', $part);
-                        if(isset($temp[1])){
-                            $_REQUEST[$temp[0]] = $temp[1];
-                        } else {
-                            $_REQUEST[$temp[0]] = '';
-                        }
-                    }
                 }
                 $input->nodeList[] = $_REQUEST;        //strange but works...
                 $input = json_encode($input);
