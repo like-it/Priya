@@ -1,10 +1,10 @@
 <?php
 /**
- * @author         Remco van der Velde
- * @since         2017-01-10
- * @version        1.0
+ * @author 		Remco van der Velde
+ * @since 		2017-01-10
+ * @version		1.0
  * @changeLog
- *     -    all
+ * 	-	all
  */
 
 namespace Priya\Module;
@@ -46,8 +46,6 @@ class Mail extends Data{
         $secure = $this->data('mail.secure');
         $username = $this->data('mail.username');
         $password = $this->data('mail.password');
-        $from = $this->data('mail.from.email');
-        $name = $this->data('mail.from.name');
         if(empty($host)){
             $this->error('host', true);
             return false;
@@ -80,13 +78,6 @@ class Mail extends Data{
         $this->mailer()->SMTPAuth = true;
         $this->mailer()->Username = $username;
         $this->mailer()->Password = $password;
-        if(!empty($from)){
-            if(empty($name)){
-                $name = $from;
-            }
-            $this->from($from, $name);
-            return false;
-        }
         return $this->getMailer();
     }
 
