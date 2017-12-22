@@ -315,12 +315,34 @@ class Handler extends \Priya\Module\Core\Data{
                 'UTF-8'
             )
         ;
-        if(empty($input) && !empty($_REQUEST)){
+        $request = $_REQUEST;
+        if(!empty($request) && !empty($_SERVER['QUERY_STRING'])){
+            $query = $_SERVER['QUERY_STRING'];
+            $temp = explode('&', $query);
+            $request = array();
+            foreach($temp as $nr => $value){
+                $explode = explode('=', $value, 2);
+                if(isset($explode[1])){
+                    $request[$explode[0]] = $explode[1];
+                } else {
+                    $request[$explode[0]] = '';
+                }
+            }
+        }
+        $previous = key($request);
+        foreach($request as $key => $value){
+            if(empty($value)){
+                $request[$previous] .= '&' . $key;
+            } else {
+                $previous = $key;
+            }
+        }
+        if(empty($input) && !empty($request)){
             $input =
                 htmlspecialchars(
                     json_encode(
                         array(
-                            'nodeList' => array(0 => $_REQUEST)
+                            'nodeList' => array(0 => $request)
                         )
                     ),
                     ENT_NOQUOTES,
@@ -328,7 +350,7 @@ class Handler extends \Priya\Module\Core\Data{
                 )
             ;
         }
-        elseif(!empty($input) && !empty($_REQUEST)){
+        elseif(!empty($input) && !empty($request)){
             $old = json_decode($input);
             if(!isset($old->nodeList)){
                 $input = new stdClass();
@@ -349,7 +371,7 @@ class Handler extends \Priya\Module\Core\Data{
                         $input->nodeList[] = $object;
                     }
                 }
-                $input->nodeList[] = $_REQUEST;
+                $input->nodeList[] = $request;
                 $input = json_encode($input);
             } else {
                 $input = $old;
@@ -357,11 +379,11 @@ class Handler extends \Priya\Module\Core\Data{
                 if(!is_array($input->nodeList)){
                     $input->nodeList = (array) $input->nodeList;
                 }
-                $input->nodeList[] = $_REQUEST;        //strange but works...
+                $input->nodeList[] = $request;        //strange but works...
                 $input = json_encode($input);
             }
         }
-        elseif(!empty($input) && empty($_REQUEST)){
+        elseif(!empty($input) && empty($request)){
             $old = json_decode($input);
             if(!isset($old->nodeList)){
                 $input = new stdClass();
