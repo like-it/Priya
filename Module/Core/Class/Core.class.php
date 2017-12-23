@@ -662,7 +662,7 @@ class Core {
                     }
                 }
             }
-        }        
+        }
         return false;
     }
 
@@ -694,5 +694,19 @@ class Core {
 
     public function debug($output='', $title=null, $isExport=false){
         debug($output, $title, $isExport);
+    }
+
+    public function class(){
+        $explode = explode('\\', get_called_class());
+        return end($explode);
+    }
+
+    public function namespace(){
+        $explode = explode('\\', get_called_class());
+        array_pop($explode);
+        if(empty($explode)){
+            return '';
+        }
+        return implode('\\', $explode);
     }
 }
