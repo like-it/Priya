@@ -580,9 +580,6 @@ class Token extends Core {
                         $item['invert'] = false;
                     }
                     $modifier = Token::modifier($parse);
-                    var_dump('2');
-                    var_dump($item);
-                    die;
                     $item['value'] = $variable->replace($item['value'], $modifier);
                     $item = Token::Exclamation($item);
                     if($item['type'] == Token::TYPE_VARIABLE){
@@ -614,9 +611,6 @@ class Token extends Core {
             } else {
                 $item['invert'] = false;
             }
-            var_dump('3');
-            var_dump($item);
-            die;
             $item['value'] = $variable->replace($item['value']);
             $item= Token::Exclamation($item);
             if($item['type'] == Token::TYPE_VARIABLE){

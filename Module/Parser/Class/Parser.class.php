@@ -19,6 +19,12 @@ class Parser extends ParserCore {
 
     public $has_list = false;
 
+    /**
+     *
+     * @param Priya\Module\Handler $handler
+     * @param Priya\Module\Route $route
+     * @param array/object $data
+     */
     public function __construct($handler=null, $route=null, $data=null){
         if($data !== null){
             $this->handler($handler);

@@ -21,7 +21,7 @@ class Data extends Core {
     public function __construct($handler=null, $route=null, $data=null){
         $this->data(Data::object_merge($this->data(), $handler));
     }
-    
+
     public function data($attribute=null, $value=null, $type=null){
         if($attribute !== null){
             if($attribute == 'set'){
@@ -154,8 +154,8 @@ class Data extends Core {
 
     public function read($url=''){
         $namespace = '';
-        if(empty($url)){        	
-            $url = get_called_class();                        
+        if(empty($url)){
+            $url = get_called_class();
         }
         if(file_exists($url)){
             $file = new File();
@@ -174,7 +174,7 @@ class Data extends Core {
             }
             return $this->data($data);
         } else {
-            $module = $url;            
+            $module = $url;
         }
         $autoload = $this->autoload();
         if(empty($autoload) || !$autoload instanceof \Priya\Module\Autoload\Data){
@@ -210,14 +210,13 @@ class Data extends Core {
             $this->url($url);
         }
 
-
         $file = new File();
         $read = $file->read($url);
         $read = $this->object($read);
         $data = $this->data();
         if(empty($data)){
             $data = new stdClass();
-        }               
+        }
         if(!empty($read)){
             foreach($read as $attribute => $value){
                 $this->object_set($attribute, $value, $data);
@@ -315,10 +314,11 @@ class Data extends Core {
             }
         }
         if(empty($useData)){
-            return $this->object($data, $output);
+            return $data; //$this->object($data, $output);
         } else {
             $this->data('delete', $list);
-            return $this->data($list, $this->object($data, $output));
+            return $this->data($list, $data);
+            //return $this->data($list, $this->object($data, $output));
         }
     }
 

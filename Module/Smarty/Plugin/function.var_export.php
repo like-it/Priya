@@ -1,5 +1,4 @@
 <?php
-use Priya\Module\Handler;
 
 /**
  * @author         Remco van der Velde

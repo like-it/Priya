@@ -106,6 +106,9 @@ class File {
     }
 
     public function removeExtension($filename='', $extension=array()){
+        if(!is_array($extension)){
+            $extension = array($extension);
+        }
         foreach($extension as $ext){
             $ext = '.' . ltrim($ext, '.');
             $filename = explode($ext, $filename, 2);

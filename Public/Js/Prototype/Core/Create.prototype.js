@@ -1,7 +1,10 @@
 _('prototype').create = function (type, create){
     if(typeof type.toLowerCase != 'function'){
+        console.log('no function toLowerCase______________________________________________');
         console.log(type);
         console.log(create);
+        console.log(_('prototype').create.caller);
+        return;
     }
     switch(type.toLowerCase()){
         case 'id':

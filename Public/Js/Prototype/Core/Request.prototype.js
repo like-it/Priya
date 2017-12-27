@@ -31,7 +31,11 @@ _('prototype').request = function (url, data, script){
             return;
         }
         if(empty(data)){
-            data = request.data();
+            if(!empty(request.tagName) && request.tagName == 'FORM'){
+                data = request.data('serialize');
+            } else {
+                data = request.data();
+            }
         }
         if(empty(data)){
             var type = 'GET';

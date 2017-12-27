@@ -16,11 +16,28 @@ _('prototype').html = function (html, where){
             return html;
         } else {
             if(where == 'outer'){
-                this.outerHTML = html;
-                return this.outerHTML;
+                if(this.is_nodeList()){
+                     var index;
+                     for(index=0; index < this.length; index++){
+                         this[index].outerHTML = html;
+                     }
+                     return html;
+                } else {
+                    this.outerHTML = html;
+                    return this.outerHTML;
+                }
+
             } else {
-                this.innerHTML = html;
-                return this.innerHTML;
+                if(this.is_nodeList()){
+                    var index;
+                    for(index=0; index < this.length; index++){
+                        this[index].innerHTML = html;
+                    }
+                    return html;
+               } else {
+                   this.innerHTML = html;
+                   return this.innerHTML;
+               }
             }
         }
     }
