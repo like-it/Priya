@@ -33,7 +33,7 @@ class Token extends Core {
     const TYPE_CONTROL = 'control';
 
     public static function all($token=''){
-        $tokens = token_get_all('<?php $variable=' . $token . ';');
+        $tokens = @token_get_all('<?php $variable=' . $token . ';');
         array_shift($tokens); //remove php tag
         array_shift($tokens); //remove $variable
         array_shift($tokens); //remove =
@@ -1171,11 +1171,20 @@ class Token extends Core {
         return null;
     }
 
-    public static function remove_comment($string=''){
+    public static function remove_comment($string='', $test=false){
         $tokens = Token::all($string);
+
         foreach($tokens as $nr => $token){
-            if($token[2] == 'T_COMMENT' && stristr($token[1], '//') === false){
-                $string = str_replace($token[1], '', $string);
+            if($token[2] == 'T_COMMENT'){
+                if(substr($token[1], 0, 2) == '//'){
+                    continue;
+                }
+                elseif(
+                    substr($token[1], 0, 2) == '/*' &&
+                    substr($token[1], -2, 2) == '*/'
+                ){
+                    $string = str_replace($token[1], '', $string);
+                }
             }
         }
         return $string;

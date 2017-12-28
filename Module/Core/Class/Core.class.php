@@ -180,6 +180,9 @@ class Core {
         if(!empty($cwd)){
             $this->cwd = $cwd;
         }
+        elseif(empty($this->cwd)){
+            $this->cwd = getcwd();
+        }
         return $this->cwd;
     }
 

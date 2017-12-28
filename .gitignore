@@ -5,6 +5,7 @@ org.*
 Application/Data/Custom.json
 Application/Data/Restore/
 Application/Data/Update/
+Application/Data/Pack/
 Module/Autoload/Data/*
 Module/Smarty/Data/*
 Module/Parser/Function/Function.List.php
