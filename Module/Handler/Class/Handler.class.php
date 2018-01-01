@@ -1009,4 +1009,15 @@ class Handler extends \Priya\Module\Core\Data{
         $value = implode('', $value);
         return $value;
     }
+
+    public function header($string='', $http_response_code=null, $replace=true){
+        if(empty($string)){
+            return;
+        }
+        if($http_response_code){
+            header($string, $replace, $http_response_code);
+        } else {
+            header($string, $replace);
+        }
+    }
 }

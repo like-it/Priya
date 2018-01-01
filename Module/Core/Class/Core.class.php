@@ -712,4 +712,12 @@ class Core {
         }
         return implode('\\', $explode);
     }
+
+    public function header($string='', $http_response_code=null, $replace=true){
+        $handler = $this->handler();
+        if(empty($handler)){
+            $this->handler(new Handler());
+        }
+        $this->handler()->header($string, $replace, $http_response_code);
+    }
 }
