@@ -74,12 +74,19 @@ class Parser extends ParserCore {
                 }
                 $this->random($random);
             }
+            $string = Parser\Literal::extra($string);
             $string = Parser\Newline::replace($string, $this->random());
+
+
 
             $tag = new Parser\Tag($string, $this->random());
             $list = $tag->find();
 
-            $data = $this->object($data);
+            if($data === null){
+                $data = $this->data();
+            } else {
+                $data = $this->object($data);
+            }
 
             $assign = new Parser\Assign($data, $this->random(), $this);
             $if = new Parser\Control_If($data, $this->random(), $this);
@@ -127,7 +134,6 @@ class Parser extends ParserCore {
                 $record = $variable->find($record, $keep);
 
                 $record['method']['tag'] = $key;
-//                 var_dump($record);
                 $record = $method->find($record, $variable, $this);
             }
             $string = $record['string'];

@@ -16,6 +16,36 @@ class Value extends Core {
         return $record;
     }
 
+    public static function type($record=array()){
+        if(!isset($record['value'])){
+            $record['value'] = null;
+        }
+        if(is_null($record['value'])){
+            $record['type'] = Token::TYPE_NULL;
+        }
+        elseif(is_string($record['value'])){
+            $record['type'] = Token::TYPE_STRING;
+        }
+        elseif(is_bool($record['value'])){
+            $record['type'] = Token::TYPE_BOOLEAN;
+        }
+        elseif(is_int($record['value'])){
+            $record['type'] = Token::TYPE_INT;
+        }
+        elseif(is_float($record['value'])){
+            $record['type'] = Token::TYPE_FLOAT;
+        }
+        elseif(is_array($record['value'])){
+            $record['type'] = Token::TYPE_ARRAY;
+        }
+        elseif(is_object($record['value'])){
+            $record['type'] = Token::TYPE_OBJECT;
+        } else {
+            debug('undefined type');
+        }
+        return $record;
+    }
+
     public static function format_json($record=array()){
         if($record['type'] == Token::TYPE_STRING && isset($record['value']) && substr($record['value'], 0, 1) == '\'' && substr($record['value'], -1, 1) == '\''){
             $record['value'] = substr($record['value'], 1, -1) ;

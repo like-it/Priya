@@ -259,147 +259,7 @@ class Method extends Core {
         return false;
     }
 
-    /*
-    public static function get($parse=array(), Variable $variable, $parser=null, $depth=0){
-        $has_string = false;
-        $is_method = false;
-        $requirement = false;
-        $parameter = array();
-        $result = array();
-        $list = array();
-        Method::remove_parenthese($parse, $variable, $parser);
-        foreach($parse as $record){
-            if(
-                $record['type'] == Token::TYPE_METHOD &&
-                isset($record['execute'])
-            ){
-                continue;
-            }
-            if(!isset($record['type'])){
-                debug($parse);
-                debug($record, 'type');
-                die;
-            }
-            if($record['type'] == Token::TYPE_WHITESPACE){
-                $list[] = $record;
-                continue;
-            }
-            if($record['type'] == Token::TYPE_OPERATOR){
-                $list[] = $record;
-                continue;
-            }
-            if($record['type'] == Token::TYPE_PARENTHESE){
-                $list[] = $record;
-                if($record['value'] == '('){
-                    $depth++;
-                    if($has_string === false){
-                        continue;
-                    }
-                } else {
-                    $depth--;
-                }
-            }
-
-            if(empty($result)){
-                $result = $record;
-                $result['method'] = '';
-                $result['value'] = '';
-            }
-            if($record['type'] == Token::TYPE_DOT){
-                $result['value'] .= $record['value'];
-                $list[] = $record;
-            }
-            if(
-                $record['type'] == Token::TYPE_STRING &&
-                $requirement === false
-            ){
-                $has_string = true;
-                $result['method'] .= $record['value'];
-                $result['value'] .= $record['value'];
-                $list[] = $record;
-                continue;
-            }
-            if(
-                $record['type'] == Token::TYPE_METHOD &&
-                $requirement === false
-            ){
-                $has_string = true;
-                $result['method'] .= $record['value'];
-                $result['value'] .= $record['value'];
-                $list[] = $record;
-                continue;
-            }
-            if(
-                $record['type'] == Token::TYPE_PARENTHESE &&
-                $record['value'] == '(' &&
-                $record['set']['depth'] == $depth + 1 &&
-                $has_string === true
-            ){
-                debug('yeah');
-                $requirement = true;
-                $result['value'] .= $record['value'];
-                $list[] = $record;
-                continue;
-            }
-            if(
-                $requirement === true &&
-                !(
-                    $record['type'] === Token::TYPE_PARENTHESE &&
-                    $record['value'] === ')' &&
-                    $record['set']['depth'] == $depth + 1
-                )
-            ){
-                $parameter[] = $record;
-                $list[] = $record;
-                if($record['type'] != Token::TYPE_DOT){
-                    $result['value'] .= $record['value'];
-                }
-                continue;
-            }
-            if(
-                $record['type'] == Token::TYPE_PARENTHESE &&
-                $record['value'] == ')' &&
-                $record['set']['depth'] == $depth + 1 &&
-                 $requirement === true
-              ){
-                $result['value'] .= $record['value'];
-                $list[] = $record;
-                $is_method = true;
-                break;
-            }
-            if(is_object($record['value'])){
-                return false;
-            }
-            $result['method'] .= $record['value'];
-            $list[] = $record;
-        }
-        debug($is_method, 'is_method');
-        debug($result, 'result');
-
-        if($is_method){
-            $result['type'] = Token::TYPE_METHOD;
-            $result['parameter'] = Parameter::get($parameter, $variable);
-//             $result['parameter'] = Token::method($result['parameter'], $variable, $parser, 1);
-            $count = substr_count($result['method'], '!');
-            if($count > 0){
-                $result['has_exclamation'] = true;
-            } else {
-                $result['has_exclamation'] = false;
-            }
-            if($count % 2 == 1){
-                $result['invert'] = true;
-            } else {
-                $result['invert'] = false;
-            }
-            $result['method'] = str_replace('!', '', $result['method']);
-            $result['parse_method'] = $list;
-            return $result;
-        }
-        return false;
-    }
-    */
-
-    public static function execute($function=array(), \Priya\Module\Parser $parser){
+    public static function execute($function=array(), Variable $variable, \Priya\Module\Parser $parser){
         $name = str_replace(
             array(
                 '..',
@@ -429,7 +289,12 @@ class Method extends Core {
             if(isset($function['parameter'])){
                 foreach ($function['parameter'] as $parameter){
                     if(isset($parameter['value']) || $parameter['value'] === null){
-                        $parameter['value'] = $parser->compile($parameter['value'], $parser->data());
+                        if($name == 'function_css'){
+                            $parser->test = true;
+                        }
+                        $parameter['value'] = $parser->compile($parameter['value'], $variable->data());
+                        $parameter = Value::type($parameter);
+
                         if($parameter['type'] == Token::TYPE_STRING && substr($parameter['value'], 0, 1) == '\'' && substr($parameter['value'], -1) == '\''){
                             $parameter['value'] = substr($parameter['value'], 1, -1);
                             $parameter['value'] = str_replace('\\\'', '\'', $parameter['value']);
@@ -438,7 +303,7 @@ class Method extends Core {
                     }
                 }
             }
-            $function = $name($function, $argument, $parser);
+            $function = $name($function, $argument, $parser, $variable->data());
             $function['value'] = $function['execute'];
 
             if($function['has_exclamation'] === true){

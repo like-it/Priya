@@ -288,15 +288,20 @@ class Route extends \Priya\Module\Core\Parser{
         }
         $found = false;
         $data = $this->data();
+//         var_dump($name);
+//         var_dump($data);
+//         die;
         foreach($data as $routeName => $route){
             if(!isset($route->path)){
                 continue;
             }
+//             var_dump($routeName);
             if(strtolower($name) == strtolower($routeName)){
                 $found = $route;
                 break;
             }
         }
+//         var_Dump($name);
         if(empty($found)){
 //             trigger_error('Route not found for ('. $name.')');
         } else {

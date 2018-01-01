@@ -337,6 +337,14 @@ class Handler extends \Priya\Module\Core\Data{
                 $previous = $key;
             }
         }
+        //dropzone extra form field
+        if(is_array($_REQUEST)){
+            foreach($_REQUEST as $key => $value){
+                if(!isset($request[$key]) && isset($value)){
+                    $request[$key] = $value;
+                }
+            }
+        }
         if(empty($input) && !empty($request)){
             $input =
                 htmlspecialchars(

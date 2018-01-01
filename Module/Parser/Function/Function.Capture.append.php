@@ -1,17 +1,17 @@
 <?php
 
 /**
- * @author 		Remco van der Velde
- * @since 		2017-04-20
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2017-04-20
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 use Priya\Module\Parser\Token;
 use Priya\Module\Parser\Newline;
 
-function function_capture_append($function=array(), $argumentList=array(), $parser=null){
+function function_capture_append($function=array(), $argumentList=array(), $parser=null, $data=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
@@ -22,6 +22,9 @@ function function_capture_append($function=array(), $argumentList=array(), $pars
     $value = str_replace('{capture.append', '{capture.append[' . $parser->random() . ']', $value);
     $explode = $parser->explode_single(array('{/capture}', '{capture.append'), $value, 2);
 
+    if($data === null){
+        $data = $parser->data();
+    }
     foreach($explode as $string){
         $temp = explode('[' . $parser->random() . '](', $string, 2);
         if(count($temp) == 2){
@@ -33,7 +36,7 @@ function function_capture_append($function=array(), $argumentList=array(), $pars
             if(empty($array) || !is_array($array)){
                 $array = array();
             }
-            $tmp[1] = $parser->compile($tmp[1], $parser->data());
+            $tmp[1] = $parser->compile($tmp[1], $data);
             $array[] = trim($tmp[1]);
             $parser->data($attribute, $array);
             $search = '{capture.append' . $string . '{/capture}';

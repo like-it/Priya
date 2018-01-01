@@ -10,5 +10,3 @@
  */
 
 namespace Priya;
-
-echo "\t" . 'Zipping...' . PHP_EOL;

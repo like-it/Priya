@@ -263,6 +263,11 @@ class Result extends Parser {
         } else {
             $smarty->assign('link', array());
         }
+        if(isset($data['contentType']) && isset($data['contentType'][$contentType]) && isset($data['contentType'][$contentType]['style'])){
+            $smarty->assign('style', $data['contentType'][$contentType]['style']);
+        } else {
+            $smarty->assign('style', array());
+        }
         if($contentType == Handler::CONTENT_TYPE_JSON){
             $target = $this->request('target');
             if(empty($target)){
@@ -317,6 +322,25 @@ class Result extends Parser {
                 $object->link = $link;
             } else {
                 $object->link = array();
+            }
+            if(isset($variable['style'])){
+                if(is_string($variable['style'])){
+                    $variable['style'] = (array) $variable['style'];
+                }
+                $style = array();
+                foreach($variable['style'] as $nr => $item){
+                    $tmp = explode('<sty', $item);
+                    foreach($tmp as $tmp_nr => $tmp_value){
+                        $tmp_value = trim($tmp_value);
+                        if(empty($tmp_value)){
+                            continue;
+                        }
+                        $style[] = '<sty' . $tmp_value;
+                    }
+                }
+                $object->style = $style;
+            } else {
+                $object->style = array();
             }
             if(isset($variable['script'])){
                 if(is_string($variable['script'])){

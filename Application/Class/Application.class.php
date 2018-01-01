@@ -357,7 +357,11 @@ class Application extends Parser {
                 $result = ob_get_contents();
                 ob_end_clean();
             }
-        } else {
+        }
+        elseif(is_array($result)){
+            var_dump($result);
+        }
+        else {
 //          404
         }
         chdir($this->cwd());  //for Parser

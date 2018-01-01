@@ -51,6 +51,4 @@ class Core extends \Priya\Module\Data {
     private function getRandom(){
         return $this->random;
     }
-
-
 }

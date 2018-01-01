@@ -1062,6 +1062,8 @@ class Token extends Core {
             case 'T_PUBLIC' :
             case 'T_PROTECTED' :
             case 'T_PRIVATE' :
+            case 'T_REQUIRE' :
+            case 'T_INCLUDE' :
             case 'T_QUESTION_MARK' :
                 return Token::TYPE_STRING;
             break;
@@ -1173,9 +1175,16 @@ class Token extends Core {
 
     public static function remove_comment($string='', $test=false){
         $tokens = Token::all($string);
-
         foreach($tokens as $nr => $token){
-            if($token[2] == 'T_COMMENT'){
+            if(
+                in_array(
+                    $token[2],
+                    array(
+                        'T_COMMENT',
+                        'T_DOC_COMMENT'
+                    )
+                )
+            ){
                 if(substr($token[1], 0, 2) == '//'){
                     continue;
                 }
@@ -1235,8 +1244,7 @@ class Token extends Core {
                 } else {
                     $method['string'] = $record['string'];
                 }
-                $method = Method::execute($method, $parser);
-
+                $method = Method::execute($method, $variable, $parser);
                 $method = Method::exclamation($record, $method, $parser);
                 $record = Method::remove_exclamation($record);
                 $method = Token::cast($method);
