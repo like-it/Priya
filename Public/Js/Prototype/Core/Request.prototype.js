@@ -10,6 +10,8 @@ _('prototype').request = function (url, data, script){
         core + 'Refresh.prototype.js',
         core + 'Debug.prototype.js',
     ], function(){
+        var offset = 0.001; //time in seconds for loading starts
+
         if(typeof url == 'object' && url !== null){
             data = url;
             console.log(url);
@@ -73,7 +75,26 @@ _('prototype').request = function (url, data, script){
                 //priya.collect.require.loaded++;
                 //priya.script(script);
             } else {
+                if(xhttp.readyState == 0){
+                    //UNSENT
+                }
+                else if (xhttp.readyState == 1){
+//                    OPENED
+                }
+                else if(xhttp.readyState == 2){
+//                    HEADERS_RECEIVED
+                }
+                if(xhttp.readyState == 3){
+//                  loading
+                    var start = priya.collection('request.microtime');
+                    time = microtime();
+                    if(time > (start + offset)){
+                        priya.loader();
+                    }
+
+                }
                 if (xhttp.readyState == 4 ){
+                    //status !- 200
                     console.log(xhttp);
                     //priya.collect.require.loaded = priya.collect.require.loaded ? priya.collect.require.loaded : 0;
                     //priya.collect.require.loaded++;
@@ -81,10 +102,13 @@ _('prototype').request = function (url, data, script){
             }
         };
         if(type == 'GET'){
+            priya.collection('request.microtime', microtime());
             xhttp.open("GET", url, true);
             xhttp.setRequestHeader("Content-Type", "application/json");
+
             xhttp.send();
         } else {
+            priya.collection('request.microtime', microtime());
             xhttp.open("POST", url, true);
             xhttp.setRequestHeader("Content-Type", "application/json");
             if (typeof JSON.decycle == "function") {
@@ -92,6 +116,7 @@ _('prototype').request = function (url, data, script){
             }
             var send = JSON.stringify(data);
             xhttp.send(send);
+
         }
     });
     /*

@@ -200,6 +200,7 @@ class Application extends Parser {
             trigger_error('cannot route to SELF', E_USER_ERROR);
         }
         $url = $this->handler()->url();
+        $etag = sha1($url);
         $tmp = explode('?', $url, 2);
         $url = reset($tmp);
         $tmp = explode('.', $url);
@@ -238,9 +239,28 @@ class Application extends Parser {
             $contentType = $allowed_contentType->{$ext};
 
             if(file_exists($url) && strstr(strtolower($url), strtolower($this->data('public_html'))) !== false){
+                $mtime = File::mtime($url);
+                /*
+                if(stristr($url, 'Tree.js')){
+
+                    var_dump(date('Y-m-d H:i:s', $mtime));
+                    if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])){
+                        var_dump(date('Y-m-d H:i:s, ', strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE'])));
+                    }
+                    die;
+                }
+                */
+                $this->handler()->since($mtime);
+
+                if(stristr($url, 'priya.prototype')){
+//                     var_dump($_SERVER);
+//                     die;
+                }
                 if(!headers_sent()){
-                    header('Last-Modified: '. filemtime($url));
-                    header('Content-Type: ' . $contentType);
+                    $this->header('Last-Modified: '. gmdate('D, d M Y H:i:s T', $mtime));
+                    $this->header('Content-Type: ' . $contentType);
+                    $this->header('ETag: ' . $etag . '-' . $mtime);
+                    $this->header('Cache-Control: public');
                 }
                 if($ext == 'pcss'){
                     $read = str_replace('/', Application::DS, $request);
@@ -270,7 +290,7 @@ class Application extends Parser {
             }
         }
         if(!headers_sent()){
-            header('Last-Modified: '. $this->request('lastModified'));
+            $this->header('Last-Modified: '. $this->request('last-modified'));
         }
         $item = $this->route()->run();
         $handler = $this->handler();

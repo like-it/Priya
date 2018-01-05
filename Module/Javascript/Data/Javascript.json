@@ -74,7 +74,7 @@
         "{$core}Rand{$extension}",
         "{$core}Refresh{$extension}",
         "{$core}Remove{$extension}",
-        "{$core}Request{$extension}",
+        "{$core}Request{$extension}?{$priya.revision | default : $priya.version}",
         "{$core}Round{$extension}",
         "{$core}Run{$extension}",
         "{$core}Script{$extension}",

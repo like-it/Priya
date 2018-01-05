@@ -19,6 +19,10 @@ class File {
         return str_replace('\\\/', DIRECTORY_SEPARATOR, rtrim($directory,'\\\/')) . DIRECTORY_SEPARATOR;
     }
 
+    public static function mtime($url=''){
+        return filemtime($url);
+    }
+
     public static function info(stdClass $node){
         $rev = strrev($node->name);
         $explode = explode('.', $rev, 2);

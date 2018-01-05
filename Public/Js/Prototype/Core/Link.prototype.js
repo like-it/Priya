@@ -10,20 +10,28 @@ priya.link = function (data, closure){
     if(this.isset(data.href)){
         priya.select('head').appendChild(data);
         priya.load++;
-        data.addEventListener('load', function(event){
+        data.addEventListener('loadend', function(event){
             priya.load--;
         }, false);
         if(closure){
-            data.addEventListener('load', function(event){
+            data.addEventListener('loadend', function(event){
+                console.log('loadend');
                 closure();
             }, false);
+            data.addEventListener('load', function(event){
+                console.log('load');
+            }, false);
             data.addEventListener('error', function(event){
-                closure();
+                console.log('error');
+            }, false);
+            data.addEventListener('progress', function(event){
+                console.log('progress');
             }, false);
         }
         return data;
     } else {
         if(!this.isset(data.link)){
+            console.log('no data link');
             return data;
         }
         var index;

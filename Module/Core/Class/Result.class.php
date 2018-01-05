@@ -21,6 +21,7 @@ use Priya\Module\Core\Parser;
 
 class Result extends Parser {
     const DIR = __DIR__;
+    const FILE = __FILE__;
 
     private $result;
 

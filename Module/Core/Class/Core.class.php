@@ -16,6 +16,8 @@ use Priya\Module\Core\Object;
 class Core {
     use Core\Object;
 
+    const FILE = __FILE__;
+
     private $cwd;
     private $mail;
     private $handler;
@@ -90,6 +92,9 @@ class Core {
         return $sentence;
     }
 
+    public static function mtime(){
+        return filemtime(get_called_class()::FILE);
+    }
     public function handler($handler=null){
         if($handler !== null){
             $this->setHandler($handler);
@@ -246,7 +251,7 @@ class Core {
             echo json_encode($output);
             die;
         } else {
-            header('Location: '.$url);
+            $this->header('Location: '.$url);
             die;
         }
     }
@@ -718,6 +723,6 @@ class Core {
         if(empty($handler)){
             $this->handler(new Handler());
         }
-        $this->handler()->header($string, $replace, $http_response_code);
+        $this->handler()->header($string, $http_response_code, $replace);
     }
 }

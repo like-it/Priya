@@ -1,16 +1,18 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 namespace Priya\Module;
 
 use Priya\Module\Core\Main;
 
 class Javascript extends Main {
+    const DIR = __DIR__;
+    const FILE = __FILE__;
 
     public function run(){
 //         $this->read(__CLASS__);
@@ -29,4 +31,5 @@ class Javascript extends Main {
         }
         return $read;
     }
+
 }

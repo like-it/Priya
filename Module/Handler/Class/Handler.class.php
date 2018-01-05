@@ -211,7 +211,7 @@ class Handler extends \Priya\Module\Core\Data{
     }
 
     public function lastModified(){
-        $this->request('lastModified: '. gmdate('D, d M Y H:i:s T'));
+        $this->request('last-modified', gmdate('D, d M Y H:i:s T'));
     }
 
     public function contentType($contentType=null){
@@ -1018,6 +1018,15 @@ class Handler extends \Priya\Module\Core\Data{
             header($string, $replace, $http_response_code);
         } else {
             header($string, $replace);
+        }
+    }
+
+    public function since($mtime=''){
+        if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])){
+            if(strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $mtime){
+                $this->header('HTTP/1.0 304 Not Modified');
+                exit;
+            }
         }
     }
 }
