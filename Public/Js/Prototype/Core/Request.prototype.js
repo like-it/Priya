@@ -10,7 +10,7 @@ _('prototype').request = function (url, data, script){
         core + 'Refresh.prototype.js',
         core + 'Debug.prototype.js',
     ], function(){
-        var offset = 0.001; //time in seconds for loading starts
+        var offset = 1.75; //time in seconds before loading starts
 
         if(typeof url == 'object' && url !== null){
             data = url;
@@ -71,6 +71,9 @@ _('prototype').request = function (url, data, script){
                 } else {
                     priya.debug(xhttp.responseText);
                 }
+                setTimeout(function(){
+                    priya.loader('remove');
+                }, 500);
                 //priya.collect.require.loaded = priya.collect.require.loaded ? priya.collect.require.loaded : 0;
                 //priya.collect.require.loaded++;
                 //priya.script(script);

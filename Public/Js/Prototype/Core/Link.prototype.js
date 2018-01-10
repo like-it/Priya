@@ -1,4 +1,4 @@
-priya.link = function (data, closure){
+ priya.link = function (data, closure){
     if(typeof data == 'undefined'){
         return;
     }
@@ -10,22 +10,16 @@ priya.link = function (data, closure){
     if(this.isset(data.href)){
         priya.select('head').appendChild(data);
         priya.load++;
-        data.addEventListener('loadend', function(event){
+        data.addEventListener('load', function(event){
             priya.load--;
         }, false);
         if(closure){
-            data.addEventListener('loadend', function(event){
-                console.log('loadend');
-                closure();
-            }, false);
             data.addEventListener('load', function(event){
-                console.log('load');
+                closure();
             }, false);
             data.addEventListener('error', function(event){
                 console.log('error');
-            }, false);
-            data.addEventListener('progress', function(event){
-                console.log('progress');
+                closure();
             }, false);
         }
         return data;
