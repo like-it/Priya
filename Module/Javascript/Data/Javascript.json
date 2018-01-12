@@ -84,7 +84,7 @@
         "{$core}Select{$extension}?{$query}",
         "{$core}Str.replace{$extension}?{$query}",
         "{$core}Str.stri{$extension}?{$query}",
-        "{$core}Style{$extension}?{$query}",
+        "{$core}Styler{$extension}?{$query}",
         "{$core}Trigger{$extension}?{$query}",
         "{$core}Trim{$extension}?{$query}",
         "{$core}Val{$extension}?{$query}"

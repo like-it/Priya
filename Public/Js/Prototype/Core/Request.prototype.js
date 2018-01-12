@@ -52,7 +52,7 @@ _('prototype').request = function (url, data, script){
             if(xhttp.responseText.substr(0, 1) == '{' && xhttp.responseText.substr(-1) == '}'){
                 var data = JSON.parse(xhttp.responseText);
                 priya.link(data);
-                priya.style(data);
+                priya.styler(data);
                 priya.script(data);
                 priya.content(data);
                 priya.refresh(data);

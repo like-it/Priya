@@ -1,4 +1,4 @@
-priya.style = function (data, closure){
+priya.styler = function (data, closure){
     if(typeof data == 'undefined'){
         return;
     }
