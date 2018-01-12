@@ -7,7 +7,7 @@ priya.style = function (data, closure){
             style : [data]
         };
     }
-    if(!this.isset(data.style)){
+    if(!isset(data.style)){
             return data;
     }
     var index;

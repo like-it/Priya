@@ -1024,7 +1024,9 @@ class Handler extends \Priya\Module\Core\Data{
     public function since($mtime=''){
         if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])){
             if(strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $mtime){
-                $this->header('HTTP/1.0 304 Not Modified');
+                $this->header('HTTP/1.1 304 Not Modified');
+                $this->header('Last-Modified: ' . gmdate('D, d M Y H:i:s T', $mtime));
+                $this->header('If-Modified-Since: ' . $_SERVER['HTTP_IF_MODIFIED_SINCE']);
                 exit;
             }
         }
