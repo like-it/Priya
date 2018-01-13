@@ -168,7 +168,10 @@ class Application extends Parser {
         $this->autoload($autoload);
         $this->autoload()->addPrefix('Vendor', $this->data('dir.vendor'));
 
-        $autoload = $this->data('autoload');
+        $autoload = $this->data('priya.autoload');
+        if(empty($autoload)){
+            $autoload = $this->data('autoload');
+        }
         if(is_object($autoload)){
             foreach($autoload as $prefix => $directory){
                 $this->autoload()->addPrefix($prefix, $directory);
