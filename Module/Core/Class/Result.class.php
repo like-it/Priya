@@ -407,7 +407,10 @@ class Result extends Parser {
             $dir = dirname($caller::DIR) . Application::DS . Application::TEMPLATE . Application::DS;
             $tpl->addPrefix('none', $dir, $extension);
         }
-        $autoload = $this->data('autoload');
+        $autoload = $this->data('priya.autoload');
+        if(empty($autoload)){
+            $autoload = $this->data('autoload');
+        }
         if(is_object($autoload) || is_array($autoload)){
             foreach($autoload as $prefix => $dir){
                 $tpl->addPrefix($prefix, $dir, $extension);
@@ -418,11 +421,6 @@ class Result extends Parser {
         $environment = $this->data('priya.environment');
         if(!empty($environment)){
             $tpl->environment($environment);
-        }
-        if($template ==    '{$module}'){
-            debug('found');
-            debug(debug_backtrace(true));
-            die;
         }
         $url = $tpl->tpl_load($template);
         if(empty($url)){

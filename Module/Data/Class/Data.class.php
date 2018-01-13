@@ -197,7 +197,10 @@ class Data extends Core {
                 $data->addPrefix('none', $dir);
             }
             $data->addPrefix($namespace, $directory);
-            $autoload = $this->data('autoload');
+            $autoload = $this->data('priya.autoload');
+            if(empty($autoload)){
+                $autoload = $this->data('autoload');
+            }
             if(is_object($autoload)){
                 foreach($autoload as $prefix => $directory){
                     $data->addPrefix($prefix, $directory);
