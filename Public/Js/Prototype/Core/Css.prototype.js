@@ -1,5 +1,5 @@
 priya.css = function(attribute, value){
-    if(empty(value)){
+    if(empty(value) && value !== 0 && value !== '0'){
         if(typeof this.style == 'undefined'){
             return '';
         }
