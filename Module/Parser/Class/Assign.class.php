@@ -180,12 +180,15 @@ class Assign extends Core {
         $assign = false;
         $parse = array();
         $count = 0;
-//         debug($tag, 'tag');
         $explode = explode('=', substr($tag, 1, -1), 2);
 
-        if(!empty($explode[0]) && substr($explode[0], 0, 1) == '$' && count($explode) == 2){
+        if(
+            !empty($explode[0]) &&
+            substr($explode[0], 0, 1) == '$' &&
+            stristr($explode[0], '|') === false &&
+            count($explode) == 2
+        ){
             $attribute = substr(rtrim($explode[0]), 1);
-//             debug($attribute, 'attribute');
             $value = trim($explode[1], ' ');
             if(
                 substr($attribute,-1) == '-' ||
@@ -223,6 +226,7 @@ class Assign extends Core {
             //an equation can be a variable, if it is undefined it will be + 0
 
             $parse = Token::parse($create);
+            var_dump($parse);
             $parse = Token::variable($parse, $variable, $attribute);
             $method = array();
             $method['parse'] = $parse;
