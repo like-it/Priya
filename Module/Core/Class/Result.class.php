@@ -483,7 +483,7 @@ class Result extends Parser {
 
     public function createPage($template=''){
         $contentType = $this->request('contentType');
-        $template_list = (array) $this->locateTemplate($template, 'tpl.priya');
+        $template_list = (array) $this->locateTemplate($template, 'tpl');
 
         $result = new stdClass();
         $file = new \Priya\Module\File();

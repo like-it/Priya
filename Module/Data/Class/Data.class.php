@@ -215,11 +215,14 @@ class Data extends Core {
 
         $file = new File();
         $read = $file->read($url);
-        $read = $this->object($read);
+        if($read !== false){
+            $read = $this->object($read);
+        }
         $data = $this->data();
         if(empty($data)){
             $data = new stdClass();
         }
+
         if(!empty($read)){
             foreach($read as $attribute => $value){
                 $this->object_set($attribute, $value, $data);

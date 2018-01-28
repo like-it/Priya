@@ -137,6 +137,13 @@ class Application extends Parser {
                 Application::DS
            );
         }
+        if(empty($this->data('dir.host'))){
+            $this->data('dir.host',
+                $this->data('dir.root') .
+                Application::HOST .
+                Application::DS
+            );
+        }
         $url = $this->data('dir.data') . Application::CONFIG;
         if(file_exists($url)){
             $this->read($url);
@@ -146,13 +153,7 @@ class Application extends Parser {
             $this->data('public_html', Application::PUBLIC_HTML);
             $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);
         }
-        if(empty($this->data('dir.host'))){
-            $this->data('dir.host',
-                $this->data('dir.root') .
-                Application::HOST .
-                Application::DS
-            );
-        }
+
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
@@ -220,8 +221,15 @@ class Application extends Parser {
             } else{
                 $subdomain = $this->handler()->subDomain();
                 if($subdomain === false || $subdomain == 'www'){
-                    $url_tmp = $this->data('dir.host') . str_replace('www.', '', $host) . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    $url_tmp = $this->data('dir.host') . str_replace('www.', '', $host) . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    //removed $this-data('public_html') from $url_tmp
                     $dir =  $this->data('dir.host') . str_replace('www.', '', $host);
+                    if(!file_exists($dir)){
+                        $domain = $this->handler()->domain();
+                        $extension = $this->handler()->extension();
+                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                        $dir = $this->data('dir.host') . $domain . '.' . $extension;
+                    }
                 } else {
                     $url_tmp = $this->data('dir.host') . $host . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
                     $dir = $this->data('dir.host') . $host ;

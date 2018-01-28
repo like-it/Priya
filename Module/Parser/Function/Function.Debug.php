@@ -19,6 +19,10 @@ function function_debug($function=array(), $argumentList=array(), $parser=null){
     if(is_null($is_export)){
         $is_export = false;
     }
-    $function['execute'] = debug($debug, $title, $is_export, 1);
+    if($debug == 'data'){
+        $debug = $parser->data();
+    }
+    debug($debug, $title, $is_export, 1);
+    $function['execute'] = '';
     return $function;
 }

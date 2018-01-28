@@ -72,8 +72,15 @@ class Route extends \Priya\Module\Core\Parser{
                 }
             }
             if(isset($route->host)){
-                if($route->host != $this->handler()->host(false)){
-                    continue;
+                $host = explode('.', $route->host);
+                array_pop($host);
+                $host[] = 'local';
+                $host = implode('.', $host);
+                $real_host = $this->handler()->host(false);
+                if($route->host != $real_host){
+                    if($host != $real_host){
+                        continue;
+                    }
                 }
             }
             if($isHost && !isset($route->host)){
@@ -115,12 +122,18 @@ class Route extends \Priya\Module\Core\Parser{
                 ;
                 $object = new stdClass();
                 $object->url = $read;
-                if(isset($route->default->format)){
+                if(isset($route->format)){
+                    $object->format = $route->format;
+                }
+                elseif(isset($route->default->format)){
                     $object->format = $route->default->format;
                 } else {
                     $object->format = 'raw';
                 }
-                if(isset($route->default->language)){
+                if(isset($route->language)){
+                    $object->language = $route->language;
+                }
+                elseif(isset($route->default->language)){
                     $object->language = $route->default->language;
                 }
                 if(isset($route->translate)){
@@ -128,7 +141,15 @@ class Route extends \Priya\Module\Core\Parser{
                 }
                 return $this->item($object);
             }
-            if(isset($route->default) && isset($route->default->controller)){
+            if(isset($route->controller)){
+                $controller = '\\' . trim(str_replace(array(':', '.'), array('\\','\\'), $route->controller), ':\\');
+                $tmp = explode('\\', $controller);
+                $node->route = $node->controller;
+                $node->function = array_pop($tmp);
+                $node->controller = implode('\\', $tmp);
+                return $this->item($node);
+            }
+            elseif(isset($route->default) && isset($route->default->controller)){
                 $controller = '\\' . trim(str_replace(array(':', '.'), array('\\','\\'), $route->default->controller), ':\\');
                 $tmp = explode('\\', $controller);
                 $object = new stdClass();

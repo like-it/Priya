@@ -253,7 +253,9 @@ class Autoload{
                 $object->{$attribute} = $this->fileList[$item['baseName']];
             }
             debug(debug_backtrace(true));
+            echo '<pre>';
             echo json_encode($object, JSON_PRETTY_PRINT);
+            echo '</pre>';
             if(ob_get_level() !== 0){
                 ob_flush();
             }
