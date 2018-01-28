@@ -147,7 +147,12 @@ class Assign extends Core {
         $string = Token::restore_return($record['string'], $random);
         $tag = Token::restore_return($record['assign']['tag'], $random);
         $explode = explode('=', substr($tag, 1, -1), 2);
-        if(!empty($explode[0]) && substr($explode[0], 0, 1) == '$' && count($explode) == 2){
+        if(
+            !empty($explode[0]) &&
+            substr($explode[0], 0, 1) == '$' &&
+            stristr($explode[0], '|') === false &&
+            count($explode) == 2
+        ){
             $anchor = '[' . $random . '][anchor]';
             $string = str_replace($tag, $anchor, $string);
             $explode = explode("\n", $string);

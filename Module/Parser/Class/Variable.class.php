@@ -182,11 +182,6 @@ class Variable extends Core {
         }
         $explode = explode($record['variable']['tag'], $record['string'], 2);
         $replace = $this->replace($attribute, $modifier, $keep);
-        if($attribute == '$web'){
-//             debug('found');
-//             debug($replace);
-//             die;
-        }
         if(is_object($replace)){
             if(
                 isset($replace->__tostring) &&

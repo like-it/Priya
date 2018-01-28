@@ -77,8 +77,6 @@ class Parser extends ParserCore {
             $string = Parser\Literal::extra($string);
             $string = Parser\Newline::replace($string, $this->random());
 
-
-
             $tag = new Parser\Tag($string, $this->random());
             $list = $tag->find();
 
@@ -122,7 +120,6 @@ class Parser extends ParserCore {
                 }
                 $if_counter++;
             }
-
             foreach($list as $value){
                 $key = key($value);
 
