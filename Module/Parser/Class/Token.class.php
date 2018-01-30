@@ -345,8 +345,6 @@ class Token extends Core {
                 $record['attribute'] = $attribute;
                 $record['original'] = $record['value'];
                 $record['token'] = $tokens;
-                debug($record, 'shouldnt be an object type?');
-                die;
                 $record['value'] = Token::object($record['value']);
                 if(
                     is_array($record['value']) ||
@@ -1224,10 +1222,7 @@ class Token extends Core {
                 return $record;
             }
         }
-//         debug($record, 'record');
         $method = Method::get($record['parse'], $variable, $parser);
-//         debug($method);
-//         die;
         while($method !== false){
             $attribute = false;
             if(!empty($method['parse_method']) && is_array($method['parse_method'])){

@@ -148,7 +148,6 @@ class Application extends Parser {
         if(file_exists($url)){
             $this->read($url);
         }
-
         if(empty($this->data('public_html'))){
             $this->data('public_html', Application::PUBLIC_HTML);
             $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);

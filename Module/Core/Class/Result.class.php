@@ -495,6 +495,12 @@ class Result extends Parser {
             if(file_exists($template) === false){
                 continue;
             }
+            $cwd = dirname($template) . Application::DS;
+            $explode = explode(Application::DS . Application::TEMPLATE, $cwd, 2);
+            if(count($explode) == 2){
+                $cwd = implode('', $explode);
+            }
+            $this->data('dir.current', $cwd);
             $this->data('input', $file->read($template));
             $this->data('output', $this->parser($this->data('input'), $this->data()));
             if($contentType == Handler::CONTENT_TYPE_JSON){

@@ -26,15 +26,30 @@ function function_require($function=array(), $argumentList=array(), $parser=null
     if($tmp){
         $data = $parser->object_merge($data, $tmp);
     }
-    if($file->extension($url) == 'json'){
-        $require = new Priya\Module\Parser($parser->handler(), $parser->route(), $data);
+    $read = '';
+    $exists = true;
+    if(file_exists($url) === false && substr($url, 0, 4) !== \Priya\Module\File::SCHEME_HTTP){
+        $exists = false;
+        trigger_error('File (' . $url . ') doesn\'t exists', E_USER_ERROR);
+    }
+    elseif(
+        $exists === true &&
+        $file->extension($url) == 'json'
+    ){
+        $require = new \Priya\Module\Parser($parser->handler(), $parser->route(), $data);
         $require->read($url);
         $read = '';
-    } else {
-        $require = new Priya\Module\Parser($parser->handler(), $parser->route(), $data);
-        $read = $require->compile($file->read($url));
     }
-    $parser->data('require.' . $parser->random(), $require->data());
+    elseif(
+        $exists === true
+    ) {
+        $read = $file->read($url);
+        $require = new \Priya\Module\Parser($parser->handler(), $parser->route());
+        $read = $require->compile($read, $data);
+    }
+    if($exists){
+        $parser->data('require.' . $parser->random(), $require->data());
+    }
     $function['execute'] = $read;
     return $function;
 }

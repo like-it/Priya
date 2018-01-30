@@ -50,7 +50,6 @@ _('prototype').debug = function (data){
                 }
                 collection = JSON.stringify(collection, null, 2);
                 node.html('<pre>' + collection + '</pre>');
-                console.log(node.html());
             });
             node.on('session', function(){
                 priya.select('.debug .tab-head li').removeClass('selected');

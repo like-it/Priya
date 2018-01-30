@@ -181,6 +181,7 @@ class Control_If extends Core {
             debug('unknown math in execute');
             debug($math, 'math');
             debug($record, 'record');
+            debug(debug_backtrace(true));
         }
         $record = Control_if::row($record, $random);
 

@@ -31,7 +31,12 @@ class Parser extends ParserCore {
             $this->route($route);
             $this->data(Parser::object_merge($this->data(), $data));
         } else {
-            $this->data(Parser::object_merge($this->data(), $handler));
+            if(!$handler instanceof \Priya\Module\Handler){
+                $this->data(Parser::object_merge($this->data(), $handler));
+            } else {
+                $this->handler($handler);
+                $this->route($route);
+            }
         }
         $this->data($this->compile($this->data(), $this->data()));
     }

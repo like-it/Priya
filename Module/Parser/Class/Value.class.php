@@ -5,12 +5,26 @@ namespace Priya\Module\Parser;
 class Value extends Core {
 
     public static function get($record=array()){
-        if($record['type'] == Token::TYPE_STRING && isset($record['value']) && substr($record['value'], 0, 1) == '\'' && substr($record['value'], -1, 1) == '\''){
+        if(
+            $record['type'] == Token::TYPE_STRING &&
+            isset($record['value']) &&
+            substr($record['value'], 0, 1) == '\'' &&
+            substr($record['value'], -1, 1) == '\''
+        ){
             $record['value'] = substr($record['value'], 1, -1);
             $record['value'] = str_replace('\\\'', '\'', $record['value']);
         }
-        elseif($record['type'] == Token::TYPE_STRING && isset($record['value']) && substr($record['value'], 0, 1) == '"' && substr($record['value'], -1, 1) == '"'){
+        elseif(
+            $record['type'] == Token::TYPE_STRING &&
+            isset($record['value']) &&
+            substr($record['value'], 0, 1) == '"' &&
+            substr($record['value'], -1, 1) == '"'
+        ){
             $record['value'] = substr($record['value'], 1, -1);
+            $record['value'] = str_replace('\r', "\r", $record['value']);
+            $record['value'] = str_replace('\n', "\n", $record['value']);
+            $record['value'] = str_replace('\s', "\s", $record['value']);
+            $record['value'] = str_replace('\t', "\t", $record['value']);
             $record['value'] = str_replace('\"', '"', $record['value']);
         }
         return $record;
