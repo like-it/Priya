@@ -289,6 +289,7 @@ trait Object {
                 if(isset($object->{$key})){
                     return $this->object_delete($attribute, $object->{$key}, $object, $key);
                 } else {
+                    unset($object->{$key}); //to delete nulls
                     return false;
                 }
             }
