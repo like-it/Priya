@@ -573,7 +573,8 @@ class Token extends Core {
                 }
                 if(
                     isset($depth) &&
-                    $record['set']['depth'] == $depth
+                    $record['set']['depth'] == $depth &&
+                    $record['value'] != ')'
                 ){
                     unset($parse[$nr]);
                 }

@@ -285,9 +285,6 @@ class Variable extends Core {
                         }
                         $output = Variable::value($output);
                         $output = Modifier::find($output, $modifier, $this, $this->parser());
-                        var_dump($output);
-//                         var_dump(debug_backtrace(true));
-//                         die;
                         $output = $this->parser()->compile($output, $this->parser()->data());
                         //parse comile again on output
                     }

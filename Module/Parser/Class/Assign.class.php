@@ -240,7 +240,6 @@ class Assign extends Core {
                 $this->data($attribute, $math);
                 return;
             } else {
-                var_dump($parse);
                 $item = array();
                 foreach ($parse as $nr => $record){
                     if(empty($record['type'])){
@@ -250,7 +249,6 @@ class Assign extends Core {
                         continue;
                     }
                     $record = Value::get($record);
-                    var_dump($record);
                     if(empty($item)){
                         $item = $record;
                         continue;
@@ -270,8 +268,6 @@ class Assign extends Core {
                     $this->data($attribute, null);
                     return;
                 }
-                var_dump($item);
-                var_dump($attribute);
                 switch($assign){
                     case '+=' :
                         $plus = $this->data($attribute) + 0;
