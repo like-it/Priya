@@ -143,6 +143,7 @@ class Operator extends Core {
                 $modifier = reset($operator['right_parse']);
                 if(is_string($modifier['value'])){
                     $operator = Modifier::execute($operator, $variable, $parser);
+                    var_dump($operator);
                     unset($operator['left']);
                     unset($operator['right']);
                     $operator['modified_is_executed'] = true;
@@ -177,6 +178,9 @@ class Operator extends Core {
     }
 
     public static function statement($statement=array(), Variable $variable, $parser=null){
+        var_dump($statement);
+        var_dump(debug_backtrace(true));
+        //variable is already a value in statement
         //add original
         $left = array();
         $right = array();
@@ -218,7 +222,7 @@ class Operator extends Core {
         $method = Token::method($method, $variable, $parser);
         $operator['right_parse'] = $method['parse'];
 
-        $is_modifier = 	Modifier::is($operator);
+        $is_modifier =     Modifier::is($operator);
 
         foreach($operator['left_parse']as $nr => $record){
             if($is_modifier === false){

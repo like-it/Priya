@@ -11,6 +11,7 @@ function modifier_default($value=null, $argumentList=array()){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
+    var_dump(debug_backtrace(true));
     if(empty($value) && count($argumentList) >= 1){
         return end($argumentList);
     }

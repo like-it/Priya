@@ -538,6 +538,8 @@ class Token extends Core {
                     $record['value'] = str_replace('$this.', '$' . $attribute . '.', $record['value']);
                 }
                 $modifier = Token::modifier($parse);
+
+                $original = $record['value'];
                 $record['value'] = $variable->replace($record['value'], $modifier);
                 if($record['exclamation_count'] % 2 == 1){
                     $record['invert'] = true;
@@ -547,11 +549,34 @@ class Token extends Core {
                 $record = Token::Exclamation($record);
                 if($record['type'] == Token::TYPE_VARIABLE){
                     $record['is_variable'] = true;
+                    $record['variable'] = $original;
                 }
                 $record['type'] = Variable::type($record['value']); //change to value::type...
                 $record = Token::cast($record);
-
                 $parse[$nr] = $record;
+            }
+            $previous = null;
+            $depth = null;
+            foreach ($parse as $nr => $record){
+                if($record['value'] == '{'){
+                    $previous = $nr;
+                }
+                if(
+                    isset($record['is_variable']) &&
+                    $record['is_variable'] === true
+                ){
+                    if(isset($previous)){
+                        unset($parse[$previous]);
+                    }
+                    $depth = $record['set']['depth'];
+                    continue;
+                }
+                if(
+                    isset($depth) &&
+                    $record['set']['depth'] == $depth
+                ){
+                    unset($parse[$nr]);
+                }
             }
             if($record['value'] == ')' && $record['set']['depth'] == 1){
                 continue;
@@ -578,10 +603,12 @@ class Token extends Core {
                         $item['invert'] = false;
                     }
                     $modifier = Token::modifier($parse);
+                    $original = $item['value'];
                     $item['value'] = $variable->replace($item['value'], $modifier);
                     $item = Token::Exclamation($item);
                     if($item['type'] == Token::TYPE_VARIABLE){
                         $item['is_variable'] = true;
+                        $item['variable'] = $original;
                     }
                     $item['type'] = Variable::type($item['value']); //change to value::type...
                     $item = Token::cast($item);
@@ -609,10 +636,12 @@ class Token extends Core {
             } else {
                 $item['invert'] = false;
             }
+            $original = $item['value'];
             $item['value'] = $variable->replace($item['value']);
             $item= Token::Exclamation($item);
             if($item['type'] == Token::TYPE_VARIABLE){
                 $item['is_variable'] = true;
+                $item['variable'] = $original;
             }
             $item['type'] = Variable::type($item['value']); //change to value::type...
             $item = Token::cast($item);
@@ -636,9 +665,16 @@ class Token extends Core {
         foreach($parse as $nr => $record){
             if($record['value'] == '|'){
                 $collect = true;
+                $depth = $record['set']['depth'];
+                continue;
             }
             if($collect === true){
-                $modifier .= $record['value'];
+                if($record['set']['depth'] >= $depth){
+                    if($depth > 0 && $record['set']['depth'] == 1 && $record['value'] == '}'){
+                        break;
+                    }
+                    $modifier .= $record['value'];
+                }
             }
         }
         return $modifier;
@@ -698,6 +734,7 @@ class Token extends Core {
                 break;
             }
         }
+//         var_dump($parse[0]);
         foreach($parse as $nr => $record){
             if($record['type'] == Token::TYPE_WHITESPACE){
                 unset($parse[$nr]);
@@ -1055,6 +1092,7 @@ class Token extends Core {
             case 'T_NS_SEPARATOR' :
             case 'T_DOUBLE_QUOTE' :
             case 'T_ARRAY' :        //might needs its own type
+            case 'T_CLASS' :
             case 'T_IS' :             //might needs its own type
             case 'T_DEFAULT' :         //might needs its own type
             case 'T_PUBLIC' :

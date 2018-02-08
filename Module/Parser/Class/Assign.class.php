@@ -240,6 +240,7 @@ class Assign extends Core {
                 $this->data($attribute, $math);
                 return;
             } else {
+                var_dump($parse);
                 $item = array();
                 foreach ($parse as $nr => $record){
                     if(empty($record['type'])){
@@ -249,6 +250,7 @@ class Assign extends Core {
                         continue;
                     }
                     $record = Value::get($record);
+                    var_dump($record);
                     if(empty($item)){
                         $item = $record;
                         continue;
@@ -256,10 +258,10 @@ class Assign extends Core {
                     if(!empty($item['type']) && $item['type'] != $record['type']){
                         $item['type'] = Token::TYPE_MIXED;
                     }
-                    if(!empty($item['value']) && isset($record['value']) && $item['type'] == Token::TYPE_STRING || $item['type'] == Token::TYPE_MIXED){
+                    if(isset($item['value']) && isset($record['value']) && $item['type'] == Token::TYPE_STRING || $item['type'] == Token::TYPE_MIXED){
                         $item['value'] .= $record['value'];
                     }
-                    elseif(!empty($item['value']) && !empty($record['value'])){
+                    elseif(isset($item['value']) && !empty($record['value'])){
                         debug($record, 'record, item already set');
                         debug($item, 'item already set');
                     }
@@ -268,6 +270,8 @@ class Assign extends Core {
                     $this->data($attribute, null);
                     return;
                 }
+                var_dump($item);
+                var_dump($attribute);
                 switch($assign){
                     case '+=' :
                         $plus = $this->data($attribute) + 0;
