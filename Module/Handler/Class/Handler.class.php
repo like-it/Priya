@@ -987,6 +987,8 @@ class Handler extends \Priya\Module\Core\Data{
         }
         elseif(isset($_SERVER['SERVER_NAME'])){
             $domain = $_SERVER['SERVER_NAME'];
+        } else {
+            $domain = '';
         }
         if($include_scheme) {
             $scheme = $this->scheme();
