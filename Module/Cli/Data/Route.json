@@ -1,5 +1,15 @@
 {
     "Cli\/Test\/Data\/Route": {
             "resource": "{$priya.dir.module}Cli\/Test\/Data\/Route.json"
+    },
+    "Cli\/Javascript\/Cli": {
+        "path": "javascript",
+        "controller": "Priya.Module.Cli.Javascript.run",
+        "format": "cli",
+        "language": "en" ,
+        "method": [
+            "CLI"
+        ],
+        "translate": false
     }
 }

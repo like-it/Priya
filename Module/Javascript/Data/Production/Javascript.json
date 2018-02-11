@@ -1,0 +1,32 @@
+{
+"@see" : "http://priya.software/Documentation/Javascript",
+"name" : "{$url|basename:'.json'}",
+"core" : "{$web.root|default:'/'}Priya/Module/Javascript/Public/Js/Bin/",
+"prototype" : "{$core|dir.name}",
+"extension" : ".js",
+"query" : "{$priya.version}",
+"collect" : {
+    "web" : "{object.merge($web,{prototype: $prototype, core: $core})}",
+    "version" : "{$priya.version}",
+    "expose" : {
+        "namespace" : "_",
+        "require" : "require",
+        "window" : {
+            "isset" : "isset",
+            "empty" : "empty",
+            "microtime" : "microtime",
+            "trim" : "trim",
+            "run" : "run",
+            "select" : "select",
+            "get" : "get",
+            "request" : "request",
+            "attach" : "attach"
+        }
+    }
+},
+"require" : {
+    "core" : [
+        "{$core}Core-0.2.15{$extension}?{$query}"
+    ]
+}
+}

@@ -54,10 +54,10 @@ class Method extends Core {
             elseif(is_string($method['value'])){
                 $record['string'] = implode($method['value'], $explode);
             }
-            elseif(is_object($method['value']) && isset($method['value']['__tostring'])){
-                $record['string'] = implode($method['value']['__tostring'], $explode);
+            elseif(is_object($method['value']) && isset($method['value']->__tostring)){
+                $record['string'] = implode($method['value']->__tostring, $explode);
             }
-            elseif(is_object($method['value']) && !isset($method['value']['__tostring'])){
+            elseif(is_object($method['value']) && !isset($method['value']->__tostring)){
                 $record['string'] = implode(Method::object($method['value'], 'json'), $explode);
             }
             elseif(is_array($method['value'])){

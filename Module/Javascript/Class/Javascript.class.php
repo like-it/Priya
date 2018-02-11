@@ -9,6 +9,7 @@
 namespace Priya\Module;
 
 use Priya\Module\Core\Main;
+use Priya\Application;
 
 class Javascript extends Main {
     const DIR = __DIR__;
@@ -20,8 +21,17 @@ class Javascript extends Main {
     }
 
     public function output(){
+        $url = $this->data('module.dir.data') .
+            ucfirst($this->data('priya.environment')) .
+            Application::DS .
+            basename(str_replace('\\', Application::DS, __CLASS__)) .
+            '.json';
+
         $data = new Data();
-        $read = $data->read(__CLASS__);
+        $read = $data->read($url);
+        if($read === false){
+            return $read;
+        }
         $parser = new Parser($this->data());
         foreach($read as $key => $value){
             $value = $parser->compile($value, $this->data());

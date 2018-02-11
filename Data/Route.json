@@ -24,5 +24,17 @@
             "POST"
         ],
         "translate": false
+    },
+      "Javascript-CLi": {
+        "path": "Javascript",
+        "default": {
+            "controller": "Priya.Module.Javascript.Cli.run",
+            "format": "html",
+            "language": "en"
+        },
+        "method": [
+            "CLI"
+        ],
+        "translate": false
     }
 }

@@ -245,7 +245,7 @@ class Handler extends \Priya\Module\Core\Data{
             $contentType = Handler::CONTENT_TYPE_CSS;
         }
         $host = $this->host();
-        if(empty($host)){
+        if(empty($host) || $host == 'http:///'){
             $contentType = Handler::CONTENT_TYPE_CLI;
         }
         $ct = $this->request('contentType');

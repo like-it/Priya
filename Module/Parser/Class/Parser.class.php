@@ -127,7 +127,6 @@ class Parser extends ParserCore {
             }
             foreach($list as $value){
                 $key = key($value);
-
                 $assign->find($key);
                 $record['assign']['tag'] = $key;
                 $record = Parser\Assign::row($record, $this->random());
