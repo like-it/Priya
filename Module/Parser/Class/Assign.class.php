@@ -155,6 +155,14 @@ class Assign extends Core {
         ){
             $rand = rand(1000, 9999) . '-' . rand(1000, 9999);
             $anchor = '[' . $random . '-' . $rand .  '][anchor]';
+            /**
+             * shouldnt it replace only 1 at a time?
+             *
+             *
+             * if so do a count & replace all items back
+             * the ifs below should have a break and restore the tags
+             * for the rest
+             */
             $string = str_replace($tag, $anchor, $string);
             $explode = explode("\n", $string);
             foreach($explode as $nr => $row){
