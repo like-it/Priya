@@ -153,17 +153,20 @@ class Assign extends Core {
             stristr($explode[0], '|') === false &&
             count($explode) == 2
         ){
-            $anchor = '[' . $random . '][anchor]';
+            $rand = rand(1000, 9999) . '-' . rand(1000, 9999);
+            $anchor = '[' . $random . '-' . $rand .  '][anchor]';
             $string = str_replace($tag, $anchor, $string);
             $explode = explode("\n", $string);
             foreach($explode as $nr => $row){
-                if(trim($row) == $anchor){
+                if($row == $anchor){
                     unset($explode[$nr]);
-                    break;
+                }
+                if(trim($row, ' ') == $anchor){
+                    unset($explode[$nr]);
                 }
                 $explode[$nr] = str_replace($anchor, '', $row, $count);
                 if($count > 0){
-                    break;
+                    //no break can occur multiple times...
                 }
             }
             $string = implode("\n", $explode);
