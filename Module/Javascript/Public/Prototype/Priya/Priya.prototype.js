@@ -24,6 +24,7 @@ var priya = function (url){
     this.hit = 0;
     this.collect.url = url;
     this.get(url + 'Priya/Javascript', function(url, data){
+        priya.collect.time = {};
         priya.collect.data = {};
         priya.collect.data.toLoad = 1;
         priya.collect.require.toLoad--;
@@ -47,9 +48,10 @@ var priya = function (url){
         if(data.require.core){
             require(data.require.core, function(){
                 priya.expose('window');
+                priya.collect.time.start = microtime(true);
                 if(data.require.file){
                     require(data.require.file, function(){
-                        priya.usleep(200);
+
                     });
                 }
             });

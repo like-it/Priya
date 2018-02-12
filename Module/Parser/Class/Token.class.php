@@ -1102,6 +1102,7 @@ class Token extends Core {
             case 'T_REQUIRE' :
             case 'T_INCLUDE' :
             case 'T_QUESTION_MARK' :
+            case 'T_ELLIPSIS' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :

@@ -82,7 +82,7 @@ _('prototype').request = function (url, data, script){
             if(xhttp.readyState == 3){
 //                  loading
                 var start = priya.collection('request.microtime');
-                time = microtime();
+                time = microtime(true);
                 if(time > (start + offset)){
                     priya.loader();
                 }
@@ -97,13 +97,13 @@ _('prototype').request = function (url, data, script){
         }
     };
     if(type == 'GET'){
-        priya.collection('request.microtime', microtime());
+        priya.collection('request.microtime', microtime(true));
         xhttp.open("GET", url, true);
         xhttp.setRequestHeader("Content-Type", "application/json");
 
         xhttp.send();
     } else {
-        priya.collection('request.microtime', microtime());
+        priya.collection('request.microtime', microtime(true));
         xhttp.open("POST", url, true);
         xhttp.setRequestHeader("Content-Type", "application/json");
         if (typeof JSON.decycle == "function") {

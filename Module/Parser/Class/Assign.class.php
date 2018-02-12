@@ -156,25 +156,18 @@ class Assign extends Core {
             $rand = rand(1000, 9999) . '-' . rand(1000, 9999);
             $anchor = '[' . $random . '-' . $rand .  '][anchor]';
             /**
-             * shouldnt it replace only 1 at a time?
+             * it should replace only 1 at a time...
              *
-             *
-             * if so do a count & replace all items back
-             * the ifs below should have a break and restore the tags
-             * for the rest
              */
-            $string = str_replace($tag, $anchor, $string);
+            $tmp = explode($tag, $string, 2);
+            if(count($tmp) == 2){
+                $string = implode($anchor, $tmp);
+            }
             $explode = explode("\n", $string);
             foreach($explode as $nr => $row){
-                if($row == $anchor){
-                    unset($explode[$nr]);
-                }
-                if(trim($row, ' ') == $anchor){
-                    unset($explode[$nr]);
-                }
-                $explode[$nr] = str_replace($anchor, '', $row, $count);
-                if($count > 0){
-                    //no break can occur multiple times...
+                $tmp = explode($anchor, $row, 2);
+                if(count($tmp) == 2){
+                    $explode[$nr] = implode('', $tmp);
                 }
             }
             $string = implode("\n", $explode);

@@ -319,6 +319,7 @@ class Method extends Core {
                 }
             }
         } else {
+            var_dump($function);
             trigger_error('function (' . $name . ') not exists', E_USER_ERROR);
             die;
         }
