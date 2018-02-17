@@ -144,7 +144,11 @@ class Assign extends Core {
             debug($record, 'record no string in row');
             return $record;
         }
-        $string = Token::restore_return($record['string'], $random);
+        if(is_string($record['string'])){
+            $string = Token::restore_return($record['string'], $random);
+        } else {
+            $string = $record['string'];
+        }
         $tag = Token::restore_return($record['assign']['tag'], $random);
         $explode = explode('=', substr($tag, 1, -1), 2);
         if(

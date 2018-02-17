@@ -180,6 +180,12 @@ class Variable extends Core {
         if(!isset($record['string'])){
             return $record;
         }
+        if(
+            is_object($record['string']) ||
+            is_array($record['string'])
+        ){
+            return $record;
+        }
         $explode = explode($record['variable']['tag'], $record['string'], 2);
         $replace = $this->replace($attribute, $modifier, $keep);
         if(is_object($replace)){

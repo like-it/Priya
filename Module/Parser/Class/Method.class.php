@@ -35,6 +35,12 @@ class Method extends Core {
         if(!isset($record['string'])){
             return $record;
         }
+        if(
+            is_object($record['string']) ||
+            is_array($record['string'])
+        ){
+            return $record;
+        }
         $explode = explode($record['method']['tag'], $record['string'], 2);
         if(empty($explode[0]) && empty($explode[1])){
             $record['string'] = $method['value'];
