@@ -327,8 +327,18 @@ class Application extends Parser {
             }
         }
         elseif(!empty($item->url)){
+            $parser = new \Priya\Module\Parser();
+            $item->url = $parser->compile($item->url, $this->data());
+
+
             if(file_exists($item->url) && strstr(strtolower($item->url), strtolower($this->data('public_html'))) !== false){
                $file = new File();
+               $ext = $file->extension($item->url);
+               if(empty($ext)){
+                    $ext = 'txt'; //to handle Licence file
+               }
+               $contentType = $allowed_contentType->{$ext};
+               $this->header('Content-Type: ' . $contentType);
                $result = $file->read($item->url);
             } else {
                 //404
