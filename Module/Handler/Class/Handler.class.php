@@ -42,6 +42,21 @@ class Handler extends \Priya\Module\Core\Data{
         $this->lastModified('create');
         $this->referer('create');
         $this->file('create');
+        $this->microtime('create');
+    }
+
+
+    public function microtime($attribute=null){
+           if($attribute == 'create'){
+                if(
+                    isset($_SERVER) &&
+                    isset($_SERVER['REQUEST_TIME_FLOAT'])
+                ){
+                    $this->request('time', $_SERVER['REQUEST_TIME_FLOAT']);
+                } else {
+                    $this->request('time', microtime(true));
+                }
+           }
     }
 
     public function request($attribute=null, $value=null){
