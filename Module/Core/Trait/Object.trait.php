@@ -10,6 +10,7 @@
 namespace Priya\Module\Core;
 
 use stdClass;
+use Exception;
 
 trait Object {
 
@@ -64,8 +65,7 @@ trait Object {
                     );
                     $json = json_decode($input);
                     if(json_last_error()){
-                        debug($input, 'input');
-                        trigger_error(json_last_error_msg(), E_USER_ERROR);
+                        new Exception(json_last_error_msg());
                     }
                     return $json;
                 }

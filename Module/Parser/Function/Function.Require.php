@@ -31,7 +31,7 @@ function function_require($function=array(), $argumentList=array(), $parser=null
     $exists = true;
     if(file_exists($url) === false && substr($url, 0, 4) !== \Priya\Module\File::SCHEME_HTTP){
         $exists = false;
-        trigger_error('File (' . $url . ') doesn\'t exists', E_USER_ERROR);
+        throw new Exception('File (' . $url . ') doesn\'t exists');
     }
     elseif(
         $exists === true &&

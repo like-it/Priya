@@ -178,8 +178,6 @@ class Operator extends Core {
     }
 
     public static function statement($statement=array(), Variable $variable, $parser=null){
-        var_dump($statement);
-        var_dump(debug_backtrace(true));
         //variable is already a value in statement
         //add original
         $left = array();
