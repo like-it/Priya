@@ -135,6 +135,19 @@ class Parser extends ParserCore {
                 $record = $variable->find($record, $keep);
 
                 $record['method']['tag'] = $key;
+
+                $record = $method->find($record, $variable, $this);
+            }
+            if(empty($list)){
+                $key = $record['string'];
+                $assign->find($key);
+                $record['assign']['tag'] = $key;
+                $record = Parser\Assign::row($record, $this->random());
+
+                $record['variable']['tag'] = $key;
+                $record = $variable->find($record, $keep);
+
+                $record['method']['tag'] = $key;
                 $record = $method->find($record, $variable, $this);
             }
             $string = $record['string'];

@@ -13,6 +13,12 @@ class Method extends Core {
     }
 
     public function find($record=array(), Variable $variable, \Priya\Module\Parser $parser){
+        if(
+            substr($record['method']['tag'], 0, 1) != '{' &&
+            substr($record['method']['tag'], -1, 1) != '}'
+        ){
+            return $record;
+        }
         $method = substr($record['method']['tag'], 1, -1);
         $parse = Token::parse($method);
         $record['parse'] = $parse;
@@ -142,6 +148,7 @@ class Method extends Core {
         $result = array();
         $parse_method = array();
         $method_has_name = false;
+
         foreach ($parse as $nr => $record){
 //
             if(
@@ -181,7 +188,8 @@ class Method extends Core {
                         debug($list, 'hebben we een probleem');
                     }
                     $result['set']['depth'] = $method_part['set']['depth'];
-                    $result['parameter']  = Parameter::get($parameter, $variable);
+//                     var_dump($parameter); //not is parameter but parse?
+                    $result['parameter'] = Parameter::get($parameter, $variable);
                     $result['parse_method'] = $parse_method; //all records of parse which is used to create the method
                     //maybe extend cast to all parse_method tokens
                     $possible_cast = reset($parse_method);
@@ -325,9 +333,8 @@ class Method extends Core {
                 }
             }
         } else {
-            var_dump($function);
-            trigger_error('function (' . $name . ') not exists', E_USER_ERROR);
-            die;
+            //methods not found silently return the method (might be js)
+            $function['value'] = $function['string'];
         }
         if(is_bool($function['value'])){
             if($function['value'] === true){

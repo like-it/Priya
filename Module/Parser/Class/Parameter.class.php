@@ -2,12 +2,17 @@
 
 namespace Priya\Module\Parser;
 
+Use Exception;
+
 class Parameter extends Core {
     const MAX_ARRAY = 1024;
     const MAX_OBJECT = 1024;
 
     public static function get($parse=array(), Variable $variable){
+        $original = $parse;
         $parse = Token::variable($parse, $variable);
+
+        //after variable, the string needs to get merged or object or array
         $count_array = 0;
         while(Parameter::has_array($parse)){
             $parse = Parameter::create_array($parse);
@@ -24,17 +29,76 @@ class Parameter extends Core {
             }
             $count_object++;
         }
-        $result = array();
+        $parameter_list = array();
+        $parameter_number = 0;
         foreach($parse as $nr => $record){
-            if(
-                $record['type'] == Token::TYPE_COMMA ||
-                $record['type'] == Token::TYPE_WHITESPACE
-            ){
+            if($record['type'] == Token::TYPE_COMMA){
+                $parameter_number++;
+                continue;
+            }
+            if($record['type'] == Token::TYPE_WHITESPACE){
                 continue;
             }
             $record = Value::get($record);
-            $record= Token::cast($record);
-            $result[] = $record;
+            $record = Token::cast($record);
+            $parameter_list[$parameter_number][] = $record;
+        }
+        $result = array();
+
+        /**
+         * multipart string / variable
+         */
+
+        foreach($parameter_list as $parameter){
+            if(isset($parameter[1])){ //we have a fast multiple check
+                $merge = array();
+                foreach($parameter as $part){
+                    if(
+                        $part['type'] == Token::TYPE_STRING &&
+                        $part['value'] == ''
+                    ){
+                        continue;
+                    }
+                    if(empty($merge)){
+                        $merge = $part;
+                        continue;
+                    }
+                    if($merge['type'] != $part['type']){
+                        $merge['type'] == Token::TYPE_MIXED;
+                    }
+                    if($merge['type'] == Token::TYPE_STRING){ //might also need TYPE_MIXED
+                        $merge['value'] .= $part['value'];
+                    }
+                    elseif(
+                        (
+                            $merge['type'] == Token::TYPE_INT ||
+                            $merge['type'] == Token::TYPE_FLOAT ||
+                            $merge['type'] == Token::TYPE_MIXED
+                        ) &&
+                            $part['type'] == Token::TYPE_STRING
+                    ){
+                        $merge['value'] .= $part['value'];
+                    }
+                    else {
+                        //int with boolean and string
+                        //float with boolean and string
+                        //int and boolean
+                        //boolean and string
+                        //boolean and string and boolean
+                        //operator and string
+                        throw new Exception(
+                            'Undefined state detected (' .
+                            $merge['type'] .
+                            '->' .
+                            $part['type'] .
+                            '), implementation undefined error...'
+                        );
+                    }
+                }
+                $result[] = $merge;
+            } else {
+                $result[] = $parameter[0];
+            }
         }
         return $result;
     }

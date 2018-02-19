@@ -156,6 +156,8 @@ class Route extends \Priya\Module\Core\Parser{
                 $object->function = array_pop($tmp);
                 $object->controller = implode('\\', $tmp);
                 return $this->item($object);
+            } else {
+                return $this->item($route);
             }
         }
     }

@@ -76,22 +76,75 @@ class Variable extends Core {
         }
     }
 
+    /**
+     *
+     * @param array $before (parse before variable definition
+     */
+    public static function exclamation($before=array()){
+        $count = 0;
+        if(empty($before)){
+            return $count;
+        }
+        krsort($before);
+
+        foreach($before as $nr => $record){
+            if($record['value'] == '{'){ //might need to add (
+                break;
+            }
+            if($record['type'] == Token::TYPE_EXCLAMATION){
+                $count++;
+            }
+        }
+        return $count;
+    }
+
     public static function fix($parse=array()){
         $result = array();
+        $depth = false;
         $is_variable = false;
+        $is_modifier = false;
         $has_variable = false;
         $collect = false;
+        $before = array();
+        $is_before = true;
+//         var_dump($parse);
         foreach($parse as $nr => $record){
+            if($record['type'] == Token::TYPE_EXCLAMATION){
+                if($is_before){
+                    $before[] = $record;
+                }
+                continue;
+            }
             if($record['type'] == Token::TYPE_VARIABLE){
+                $record['exclamation_count'] = Variable::exclamation($before);
+                if($record['exclamation_count'] > 0){
+                    $record['has_exclamation'] = true;
+                } else {
+                    $record['has_exclamation'] = false;
+                }
                 $has_variable = true;
                 $is_variable = $nr;
+                $is_before = false;
+                $before = array();
                 $result[$nr] = $record;
+                continue;
+            } elseif($is_before){
+                $before[] = $record;
+            }
+            if($is_modifier){
+                $result[$nr] = $record;
+                if($record['value'] == '}'){
+                    $is_modifier = false;
+                }
                 continue;
             }
             if($is_variable !== false){
                 if(substr($record['value'], 0, 1) == '.'){
                     $collect = true;
                 }
+            }
+            if($record['value'] == '|'){
+                $is_modifier = true;
             }
             if(
                 $collect === true &&
@@ -139,6 +192,12 @@ class Variable extends Core {
     }
 
     public function find($record=array(), $keep=false){
+        if(
+            substr($record['variable']['tag'], 0, 1) != '{' &&
+            substr($record['variable']['tag'], -1, 1) != '}'
+        ){
+            return $record;
+        }
         $attribute = substr($record['variable']['tag'], 1, -1);
         $tokens = Token::all($attribute);
         foreach($tokens as $nr => $token){
@@ -168,6 +227,8 @@ class Variable extends Core {
         $modifier_list = explode('|', $attribute);
         $attribute = trim(array_shift($modifier_list), ' ');
         if(!empty($modifier_list)){
+//             var_dump($attribute);
+//             var_dump($modifier_list);
             $modifier = Token::restore_return(implode('|', $modifier_list), $this->random());
         } else {
             $modifier = '';
@@ -290,9 +351,21 @@ class Variable extends Core {
                             return $output;
                         }
                         $output = Variable::value($output);
-                        $output = Modifier::find($output, $modifier, $this, $this->parser());
-                        $output = $this->parser()->compile($output, $this->parser()->data());
-                        //parse comile again on output
+                        if(!empty($modifier)){
+//                             var_dump($modifier);
+                            $output = Modifier::find($output, $modifier, $this, $this->parser());
+                        }
+                        if(
+                            is_null($output) ||
+                            is_bool($output) ||
+                            is_int($output) ||
+                            is_float($output)
+                        ){
+                            //no need to compile again
+                        } else {
+                            //parse comile again on output
+                            $output = $this->parser()->compile($output, $this->parser()->data());
+                        }
                     }
                 } else {
                     $output = $input;

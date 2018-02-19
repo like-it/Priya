@@ -46,16 +46,18 @@ class Literal extends Core {
      */
     public static function restore($value='', $random=''){
         $search = array(
-                '[' . $random .'][literal]',
-                '[' . $random .'][/literal]',
-                '[' . $random .'][curly_open]',
-                '[' . $random .'][curly_close]'
+                '[' . $random . '][literal]',
+                '[' . $random . '][/literal]',
+                '[' . $random . '][curly_open]',
+                '[' . $random . '][curly_close]',
+                '[' . $random . '][pipe]',
         );
         $replace = array(
                 Literal::OPEN,
                 Literal::CLOSE,
                 '{',
-                '}'
+                '}',
+                '|'
         );
         return str_replace($search, $replace, $value);
     }
@@ -71,9 +73,15 @@ class Literal extends Core {
         while($literal != ''){
             $literal = Literal::get($value);
             $search = Literal::OPEN . $literal . Literal::CLOSE;
-            $literal= str_replace(array('{', '}'), array(
+            $literal = str_replace(
+                array(
+                    '{',
+                    '}',
+                    '|',
+                ), array(
                     '[' . $random . '][curly_open]',
-                    '[' . $random . '][curly_close]'
+                    '[' . $random . '][curly_close]',
+                    '[' . $random . '][pipe]'
 
             ), $literal);
             $replace = '[' . $random . '][literal]' . $literal . '[' . $random .'][/literal]';

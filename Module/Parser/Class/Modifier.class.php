@@ -76,13 +76,17 @@ class Modifier extends Core {
      * -    multiple modifiers;
      */
     public static function find($value='', $modifier='', Variable $variable, $parser=null){
-        $parse = Token::parse($modifier);
-        /*
-        if(substr($modifier,-2,1) == 1){
-            var_dump($modifier);
-            var_dump($parse);
+        if(is_array($modifier)){
+            $string = array();
+            foreach($modifier as $nr =>  $part){
+                $string[$nr] = '';
+                foreach($part as $record){
+                    $string[$nr] .= $record['value'];
+                }
+            }
+            $modifier = implode(' | ', $string);
         }
-        */
+        $parse = Token::parse($modifier);
         $counter = 0;
         while($modifier = Modifier::get($parse)){
             if($modifier === false){
