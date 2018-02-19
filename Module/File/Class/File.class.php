@@ -100,6 +100,7 @@ class File {
     }
 
     public function extension($url=''){
+        $url = basename($url);
         $ext = explode('.', $url);
         if(count($ext)==1){
             $extension = '';
