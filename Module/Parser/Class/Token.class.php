@@ -569,7 +569,13 @@ class Token extends Core {
             if($record['type'] == Token::TYPE_VARIABLE){
                 $is_variable = true;
                 if($unset){
-                    unset($result[$unset]);
+                    if(is_array($unset)){
+                        foreach($unset as $part){
+                            unset($result[$part]);
+                        }
+                    } else {
+                        unset($result[$unset]);
+                    }
                     $unset = array();
                 }
                 if($attribute !== null){

@@ -77,13 +77,13 @@ class Literal extends Core {
                 array(
                     '{',
                     '}',
-                    '|',
-                ), array(
+                ),
+                array(
                     '[' . $random . '][curly_open]',
                     '[' . $random . '][curly_close]',
-                    '[' . $random . '][pipe]'
-
-            ), $literal);
+                ),
+                $literal
+            );
             $replace = '[' . $random . '][literal]' . $literal . '[' . $random .'][/literal]';
             $value = str_replace($search, $replace, $value);
         }

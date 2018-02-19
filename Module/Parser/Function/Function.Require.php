@@ -16,6 +16,7 @@ function function_require($function=array(), $argumentList=array(), $parser=null
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
+    $original = $data;
     $url = array_shift($argumentList);
     if($data === null){
         $data = $parser->data();
@@ -36,19 +37,33 @@ function function_require($function=array(), $argumentList=array(), $parser=null
         $exists === true &&
         $file->extension($url) == 'json'
     ){
+        $paser->read($url);
+        /*
         $require = new \Priya\Module\Parser($parser->handler(), $parser->route(), $data);
         $require->read($url);
+        */
         $read = '';
     }
     elseif(
         $exists === true
     ) {
         $read = $file->read($url);
-        $require = new \Priya\Module\Parser($parser->handler(), $parser->route());
+        if( \Priya\Module\Parser::is_empty($data)){
+            var_dump($url);
+            die;
+        }
+        $read = $parser->compile($read, $data);
+//         var_dump($data);
+//         var_dump($parser);
+//         var_dump($original);
+// why new parser if we have a parser available
+        /*
+        $require = new \Priya\Module\Parser($parser->handler(), $parser->route()); //data causes max nesting level
         $read = $require->compile($read, $data);
+        */
     }
     if($exists){
-        $parser->data('require.' . $parser->random(), $require->data());
+//         $parser->data('require.' . $parser->random(), $require->data());
     }
     $function['execute'] = $read;
     return $function;

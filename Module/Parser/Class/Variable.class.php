@@ -2,6 +2,8 @@
 
 namespace Priya\Module\Parser;
 
+use Exception;
+
 class Variable extends Core {
 
     private $parser;
@@ -78,7 +80,7 @@ class Variable extends Core {
 
     /**
      *
-     * @param array $before (parse before variable definition
+     * @param array $before (parse before variable definition)
      */
     public static function exclamation($before=array()){
         $count = 0;
@@ -352,7 +354,6 @@ class Variable extends Core {
                         }
                         $output = Variable::value($output);
                         if(!empty($modifier)){
-//                             var_dump($modifier);
                             $output = Modifier::find($output, $modifier, $this, $this->parser());
                         }
                         if(
@@ -363,7 +364,16 @@ class Variable extends Core {
                         ){
                             //no need to compile again
                         } else {
-                            //parse comile again on output
+                            //strange bug...
+                            if(
+                                Variable::is_empty($this->parser()->data()) === true &&
+                                Variable::is_empty($this->data()) === false
+                            ){
+                                //we could fix it now with $this->parser(data($this->data())
+                                //but better be on the right spot...
+
+                                throw new Exception('Parser data empty and variable data not (implementation error...)');
+                            }
                             $output = $this->parser()->compile($output, $this->parser()->data());
                         }
                     }

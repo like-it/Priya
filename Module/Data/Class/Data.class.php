@@ -22,6 +22,15 @@ class Data extends Core {
         $this->data(Data::object_merge($this->data(), $handler));
     }
 
+    public static function is_empty($data = array()){
+        $is_empty = true;
+        foreach($data as $key => $item){
+            $is_empty = false;
+            break;
+        }
+        return $is_empty;
+    }
+
     public function data($attribute=null, $value=null, $type=null){
         if($attribute !== null){
             if($attribute == 'set'){

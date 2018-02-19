@@ -71,6 +71,17 @@ class Modifier extends Core {
         return $parse;
     }
 
+    public static function pipe($parse=array(), $random=''){
+        $string = '';
+        foreach($parse as $nr => $record){
+            if($record['type'] == Token::TYPE_STRING){
+                $record['value'] = str_replace('|', '[' . $random . '][pipe]', $record['value']);
+            }
+            $string .= $record['value'];
+        }
+        return $string;
+    }
+
     /**
      * @todo
      * -    multiple modifiers;
@@ -79,12 +90,12 @@ class Modifier extends Core {
         if(is_array($modifier)){
             $string = array();
             foreach($modifier as $nr =>  $part){
-                $string[$nr] = '';
-                foreach($part as $record){
-                    $string[$nr] .= $record['value'];
-                }
+                $string[$nr] = Modifier::pipe($part, $parser->random());
             }
             $modifier = implode(' | ', $string);
+        } else {
+            $temp = Token::parse($modifier);
+            $modifier = Modifier::pipe($temp, $parser->random());
         }
         $parse = Token::parse($modifier);
         $counter = 0;
@@ -213,7 +224,7 @@ class Modifier extends Core {
         }
         $result = array();
         foreach ($argumentList as $argument){
-            $result[] = $argument;
+            $result[] = Literal::restore($argument, $variable->random());
         }
         return $result;
     }
@@ -245,12 +256,6 @@ class Modifier extends Core {
             $value .= $before['value'];
         }
         $argument = Modifier::argument($operator['right_parse'], $variable);
-
-//         var_dump(debug_backtrace(true));
-        var_dump($argument);
-        var_dump($operator);
-        var_dump($value);
-
         $operator['execute'] = $name($value, $argument, $parser);
         $operator['value'] = $operator['execute'];
         $part = reset($operator['right_parse']);

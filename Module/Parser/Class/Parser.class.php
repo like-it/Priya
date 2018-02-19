@@ -59,6 +59,31 @@ class Parser extends ParserCore {
         ){
             return $string;
         }
+        /*
+        if(
+            is_object($string) &&
+            is_object($data) &&
+            Parser::is_empty($string) &&
+            Parser::is_empty($data)
+        ){
+            return $string;
+        }
+        */
+        /*
+        $is_string = is_string($string);
+        if($is_string){
+            $test= Variable::value($string);
+            if(
+                is_null($test) ||
+                is_bool($test) ||
+                is_float($test) ||
+                is_int($test) ||
+                is_numeric($test)
+               ){
+                return $test;
+            }
+        }
+        */
         if (is_array($string)){
             foreach($string as $nr => $line){
                 $string[$nr] = $this->compile($line, $data, $keep);
