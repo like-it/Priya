@@ -20,6 +20,7 @@ class Method extends Core {
             return $record;
         }
         $method = substr($record['method']['tag'], 1, -1);
+        $method = Token::restore_return($method, $parser->random());
         $parse = Token::parse($method);
         $record['parse'] = $parse;
         //this has to find the first method in parse & return it!

@@ -11,7 +11,6 @@ class Parameter extends Core {
     public static function get($parse=array(), Variable $variable){
         $original = $parse;
         $parse = Token::variable($parse, $variable);
-
         //after variable, the string needs to get merged or object or array
         $count_array = 0;
         while(Parameter::has_array($parse)){
@@ -86,6 +85,8 @@ class Parameter extends Core {
                         //boolean and string
                         //boolean and string and boolean
                         //operator and string
+                        var_dump($merge);
+                        var_dump($parameter);
                         throw new Exception(
                             'Undefined state detected (' .
                             $merge['type'] .

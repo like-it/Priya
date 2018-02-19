@@ -2,8 +2,9 @@
 
 namespace Priya\Module\Parser;
 
-use Priya\Module\Core\Object;
 use stdClass;
+use Exception;
+use Priya\Module\Core\Object;
 
 class Token extends Core {
     const TYPE_NULL = 'null';
@@ -144,6 +145,31 @@ class Token extends Core {
             }
         }
         return $tokens;
+    }
+
+    public function unparse($parse=array()){
+        $string = '';
+        foreach($parse as $nr => $record){
+            if(is_array($record['value'])){
+                if(count($parse) == 1){
+                    $string = $record['value'];
+                } else {
+                    throw new Exception('Multiples for array found...');
+                }
+                continue;
+            }
+            elseif(is_object($record['value'])){
+                if(count($parse) == 1){
+                    $string = $record['value'];
+                } else {
+                    throw new Exception('Multiples for object found...');
+                }
+                continue;
+            }
+
+            $string .= $record['value'];
+        }
+        return $string;
     }
 
     public static function parse($value= ''){
