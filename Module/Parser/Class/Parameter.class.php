@@ -43,6 +43,39 @@ class Parameter extends Core {
             $parameter_list[$parameter_number][] = $record;
         }
         $result = array();
+        /**
+         * if is foreach...
+         */
+        $is_foreach = false;
+        foreach ($parameter_list as $nr => $parameter){
+            if(isset($parameter[1])){ //we have a fast multiple check
+                foreach($parameter as $part){
+                    if($part['type'] == Token::TYPE_AS){
+                        $is_foreach = true;
+                        break;
+                    }
+                }
+            }
+
+
+        }
+        if($is_foreach){
+            $result = array();
+            foreach($parameter_list as $nr => $parameter){
+                if(isset($parameter[1])){ //we have a fast multiple check
+                    foreach($parameter as $part_nr => $part){
+                        if($part['type'] == Token::TYPE_AS){
+//                             continue;
+                        }
+                        if($part['type'] == Token::TYPE_DOUBLE_ARROW){
+//                             continue;
+                        }
+                        $result[] = $part;
+                    }
+                }
+            }
+            return $result;
+        }
 
         /**
          * multipart string / variable

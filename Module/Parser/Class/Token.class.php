@@ -19,6 +19,8 @@ class Token extends Core {
     const TYPE_DOT = 'dot';
     const TYPE_COLON = 'colon';
     const TYPE_DOUBLE_COLON = 'double-colon';
+    const TYPE_DOUBLE_ARROW = 'double-arrow';
+    const TYPE_AS = 'as';
     const TYPE_SEMI_COLON = 'semi-colon';
     const TYPE_COMMA = 'comma';
     const TYPE_MIXED = 'mixed';
@@ -1061,6 +1063,7 @@ class Token extends Core {
             case 'T_COMMENT' :
             case 'T_FUNCTION' :
             case 'T_AT' :
+            case 'T_FOREACH' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
@@ -1143,6 +1146,12 @@ class Token extends Core {
             case Token::TYPE_BOOLEAN:
                 return $type;
             break;
+            case 'T_AS' :
+                return Token::TYPE_AS;
+            break;
+            case 'T_DOUBLE_ARROW' :
+                return Token::TYPE_DOUBLE_ARROW;
+            break;
             default :
                 var_dump($type);
                 debug($type, 'undefined type');
@@ -1222,6 +1231,10 @@ class Token extends Core {
             }
         }
         $method = Method::get($record['parse'], $variable, $parser);
+        if($method === false){
+//             var_dump($record);
+        }
+
         while($method !== false){
             $attribute = false;
             if(!empty($method['parse_method']) && is_array($method['parse_method'])){
