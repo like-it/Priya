@@ -327,7 +327,7 @@ class Application extends Parser {
             }
         }
         elseif(!empty($item->url)){
-            $parser = new \Priya\Module\Parser();
+            $parser = new \Priya\Module\Parser($this->handler(), $this->route(), $this->data());
             $item->url = $parser->compile($item->url, $this->data());
 
 

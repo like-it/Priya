@@ -3,6 +3,7 @@
 namespace Priya\Module\Parser;
 
 use Priya\Module\Core\Object;
+use Exception;
 
 class Method extends Core {
     const MAX = 1024;
@@ -25,6 +26,7 @@ class Method extends Core {
         $record['parse'] = $parse;
         //this has to find the first method in parse & return it!
         $is_method = false;
+
         $record = Token::method($record, $variable, $parser);
 
         //fix has_Exclamation
@@ -284,6 +286,7 @@ class Method extends Core {
             '',
             ucfirst($function['method'])
         );
+        $function_name = $name;
         $url = __DIR__ . '/../Function/Function.List.php';
         if(
             empty($parser->has_list) &&
@@ -333,9 +336,10 @@ class Method extends Core {
                     $function['value'] = (bool) $function['value'];
                 }
             }
+            $function['is_executed'] = true;
         } else {
-            //methods not found silently return the method (might be js)
-            $function['value'] = $function['string'];
+            $function['is_executed'] = false;
+            throw new Exception('Function "' . $function_name . '" not found');
         }
         if(is_bool($function['value'])){
             if($function['value'] === true){
@@ -344,7 +348,7 @@ class Method extends Core {
                 $function['value'] = 'false';
             }
         }
-        $function['is_executed'] = true;
+
         return $function;
     }
 

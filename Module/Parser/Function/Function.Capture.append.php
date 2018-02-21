@@ -20,48 +20,40 @@ function function_capture_append($function=array(), $argumentList=array(), $pars
     $value = str_ireplace('{capture.append', '{capture.append', $value);
     $value = str_ireplace('{/capture}', '{/capture}', $value);
     $value = str_replace('{capture.append', '{capture.append[' . $parser->random() . ']', $value);
-    $explode = $parser->explode_single(array('{/capture}', '{capture.append'), $value, 2);
 
+    $explode = explode('{capture.append', $value, 2);
+
+    $string = '';
+    if(isset($explode[1])){
+        $capture = explode('{/capture}', $explode[1], 2);
+        $string = $capture[0];
+    }
+
+    if(!isset($capture[1])){
+        throw new Exception('Missing {/capture} in {capture} tag');
+    }
     if($data === null){
         $data = $parser->data();
     }
-    foreach($explode as $string){
-        $temp = explode('[' . $parser->random() . '](', $string, 2);
-        if(count($temp) == 2){
-            $tmp = explode(')}', $temp[1], 2);
-            if(count($tmp) != 2){
-                continue;
-            }
-            $array = $parser->data($attribute);
-            if(empty($array) || !is_array($array)){
-                $array = array();
-            }
-            $tmp[1] = $parser->compile($tmp[1], $data);
-            $array[] = trim($tmp[1]);
-            $parser->data($attribute, $array);
-            $search = '{capture.append' . $string . '{/capture}';
-            $string_length = strlen($value);
-            $replace_length = str_replace($search, '', $value);
 
-            $key = '[' . $parser->random() . '][capture]';
-            $value = str_replace($search, $key, $value);
-            if(strlen($string_length) == $replace_length){
-                debug('str_replace not working');
-            } else {
-                $value = Token::restore_return($value, $parser->random());
-                $var = explode("\n", $value);
-                foreach($var as $nr => $var_value){
-                    if(trim($var_value) == $key){
-                        unset($var[$nr]);
-                        break;
-                    }
-                }
-                $value = implode("\n", $var);
-                $value= Newline::replace($value, $parser->random());
-            }
-            break;
+    $temp = explode('[' . $parser->random() . '](', $string, 2);
+    if(isset($temp[1])){
+        $tmp = explode(')}', $temp[1], 2);
+
+        $array = $parser->data($attribute);
+        if(empty($array) || !is_array($array)){
+            $array = array();
         }
+        $tmp[1] = $parser->compile($tmp[1], $data);
+        $array[] = trim($tmp[1]);
+        $parser->data($attribute, $array);
+
+        $search = '{capture.append' . $string . '{/capture}';
+
+        $value = str_replace($search, '', $value);
     }
+    $value = str_replace('{capture.append[' . $parser->random() . ']', '{capture.append', $value);
+
     $function['string'] = $value;
     $function['execute'] = '';
     return $function;

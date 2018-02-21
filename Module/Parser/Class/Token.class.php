@@ -1064,6 +1064,7 @@ class Token extends Core {
             case 'T_FUNCTION' :
             case 'T_AT' :
             case 'T_FOREACH' :
+            case 'T_FOR' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
@@ -1231,9 +1232,6 @@ class Token extends Core {
             }
         }
         $method = Method::get($record['parse'], $variable, $parser);
-        if($method === false){
-//             var_dump($record);
-        }
 
         while($method !== false){
             $attribute = false;

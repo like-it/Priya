@@ -371,7 +371,6 @@ class Variable extends Core {
                             ){
                                 //we could fix it now with $this->parser(data($this->data())
                                 //but better be on the right spot...
-
                                 throw new Exception('Parser data empty and variable data not (implementation error...)');
                             }
                             $output = $this->parser()->compile($output, $this->parser()->data());
