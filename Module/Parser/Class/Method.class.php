@@ -284,7 +284,7 @@ class Method extends Core {
                  '\\',
             ),
             '',
-            ucfirst($function['method'])
+            ucfirst(strtolower($function['method']))
         );
         $function_name = $name;
         $url = __DIR__ . '/../Function/Function.List.php';
@@ -307,9 +307,6 @@ class Method extends Core {
             if(isset($function['parameter'])){
                 foreach ($function['parameter'] as $parameter){
                     if(isset($parameter['value']) || $parameter['value'] === null){
-                        if($name == 'function_css'){
-                            $parser->test = true;
-                        }
                         $parameter['value'] = $parser->compile($parameter['value'], $variable->data());
                         $parameter = Value::type($parameter);
 
