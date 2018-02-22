@@ -109,6 +109,8 @@ class Parser extends ParserCore {
 
             $tag = new Parser\Tag($string, $this->random());
             $list = $tag->find();
+            $list = $tag->filter($list);
+
 
             if($data === null){
                 $data = $this->data();

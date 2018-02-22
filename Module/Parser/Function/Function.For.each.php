@@ -16,7 +16,6 @@ function function_for_each($function=array(), $argumentList=array(), $parser=nul
         $argumentList = (array) $argumentList;
     }
     $list = Control_Foreach::list($function, $parser);
-
     $key = Control_Foreach::key($function);
     $record = Control_Foreach::record($function);
 

@@ -6,9 +6,47 @@ namespace Priya\Module\Parser;
 
 class Tag extends Core {
 
+    const FILTER_CONTROL = array(
+        'capture.append' =>
+            array(
+                'capture',
+                'capture.append'
+        ),
+        'for.each' => array(
+            'for.each'
+        )
+        //might add if too...
+    );
+
     public function __construct($input=null, $random=null){
         $this->input($input);
         $this->random($random);
+    }
+
+    public function filter($list=array(), $attribute=array(), $value=array(), $action=null){
+        //add source line nr to list tag
+        $close_tags = array();
+        foreach($list as $nr => $value){
+            $tag = strtolower(key($value));
+            if(substr($tag, 1, 1) == '$'){
+                continue;
+            }
+            if(!empty($close_tags)){
+                if(in_array($tag, $close_tags)){
+                    $close_tags = array();
+                } else {
+                    unset($list[$nr]);
+                }
+            } else {
+                foreach(Tag::FILTER_CONTROL as $open_tag => $filter){
+                    $match = substr($tag, 1, strlen($open_tag));
+                    if($match == $open_tag){
+                        $close_tags = $filter;
+                    }
+                }
+            }
+        }
+        return $list;
     }
 
     public static function explode($input='', $depth=0){
