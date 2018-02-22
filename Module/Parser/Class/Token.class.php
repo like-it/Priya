@@ -1154,9 +1154,8 @@ class Token extends Core {
                 return Token::TYPE_DOUBLE_ARROW;
             break;
             default :
-                var_dump($type);
-                debug($type, 'undefined type');
-                debug(debug_backtrace());
+                //if production defaults to TYPE_STRING
+                throw new Exception('undefined type in token found: ' . $type);
         }
         return $type;
     }
