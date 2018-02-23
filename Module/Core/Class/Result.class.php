@@ -74,6 +74,17 @@ class Result extends Parser {
         $this->data('ignore', $ignore);
     }
 
+    public function exec($target='', $read=''){
+        if(empty($read)){
+            $read = get_called_class();
+        }
+        if(empty($target)){
+            $target = 'result.' . $this->request('contentType');
+        }
+        $this->read($read);
+        return $this->data($target); //(parsed in read)
+    }
+
     public function result($type=null, $result=''){
         if($type == 'template'){
             return $this->result($this->template('create', $result));
