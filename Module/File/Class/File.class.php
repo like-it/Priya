@@ -110,6 +110,14 @@ class File {
         return $extension;
     }
 
+    public function basename($url='', $extension=''){
+        $filename = basename($url);
+        $explode = explode('?', $filename, 2);
+        $filename = $explode[0];
+        $filename = basename($filename, $extension);
+        return $filename;
+    }
+
     public function removeExtension($filename='', $extension=array()){
         if(!is_array($extension)){
             $extension = array($extension);

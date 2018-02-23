@@ -1,0 +1,35 @@
+{
+    "@see": "http:\/\/documentation.priya.software\/Javascript\/Bootstrap",
+    "name": "Javascript",
+    "core": "Bin\/",
+    "prototype": "",
+    "extension": ".js",
+    "query": "0.2.15",
+    "collect": {
+        "web": {
+            "root": "\/",
+            "public": "\/Public\/"
+        },
+        "version": "0.2.15",
+        "expose": {
+            "namespace": "_",
+            "require": "require",
+            "window": {
+                "isset": "isset",
+                "empty": "empty",
+                "microtime": "microtime",
+                "trim": "trim",
+                "run": "run",
+                "select": "select",
+                "get": "get",
+                "request": "request",
+                "attach": "attach"
+            }
+        }
+    },
+    "require": {
+        "core": [
+            "Bin\/Core-0.2.15.js?0.2.15"
+        ]
+    }
+}
