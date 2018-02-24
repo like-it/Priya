@@ -71,7 +71,7 @@ class Cli extends Main {
         $count = count($core);
         $counter = 0;
         foreach($core as $read){
-            $location = dirname($this->data('dir.vendor')) . $read;
+            $location = dirname($this->data('module.dir.root')). Application::DS . 'Public' . Application::DS . 'Prototype' . Application::DS . 'Core' . Application::DS . $file->basename($read);
             $name = $file->basename($location, '.prototype.js');
 //             echo 'Module (' . $name . ')' . PHP_EOL;
             $module .= '/*' . "\n";

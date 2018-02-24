@@ -77,10 +77,28 @@ var priya;
     }
     var parent = this || {};
     parent.status = {};
-    var web = window.location.protocol + '//' + window.location.host + '/';
+    var url = window.location.protocol + '//' + window.location.host + '/';
 
-    var node = include('Bin/Priya.prototype.js');
+    var scripts = document.getElementsByTagName('script');
+    var index;
+    var src = '';
+    for(index=0; index < scripts.length; index++){
+        var script = scripts[index];
+        if(script.src.toLowerCase().indexOf('priya') !== -1){
+            var src = script.src;
+            break;
+        }
+    }
+    src = src.split('/');
+    src.pop();
+    src = src.join('/') + '/';
+    bin = src + 'Bin/';
+    var node = include(bin + '/Priya.prototype.js');
     node.addEventListener('load', function(event){
-        priya = new priya(web);
+        priya = new priya({
+            "url" : url,
+            "bin" : bin,
+            "priya" : src
+        });
     }, false);
 })();

@@ -6,10 +6,6 @@
     "extension": ".js",
     "query": "0.2.15",
     "collect": {
-        "web": {
-            "root": "\/",
-            "public": "\/Public\/"
-        },
         "version": "0.2.15",
         "expose": {
             "namespace": "_",

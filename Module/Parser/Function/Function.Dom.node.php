@@ -16,6 +16,10 @@ function function_dom_node($function=array(), $argumentList=array(), $parser=nul
     }
     $node =  array_shift($argumentList);
 
+    if(empty($node)){
+        $function['execute'] = '';
+        return $function;
+    }
     $module = new Priya\Module\Data();
     $module->data('node', $node);
     $module->data('attribute', clone $node);

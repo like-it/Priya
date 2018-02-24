@@ -17,14 +17,18 @@
  *  -    all
  */
 
-var priya = function (url){
+var priya = function (collection){
     this.version = '0.2.15';
     this.collect = {};
     this.parent = this;
     this.load = 0;
     this.hit = 0;
-    this.collect.url = url;
-    this.get('Bin/Bootstrap.json?' + this.version, function(url, data){
+    this.collect.url = collection.url;
+    this.collect.web = {};
+    this.collect.web.root = collection.url;
+    this.collect.web.bin = collection.bin;
+    this.collect.web.priya = collection.priya;
+    this.get(this.collect.web.bin + 'Bootstrap.json?' + this.version, function(url, data){
         priya.collect.data = {};
         priya.collect.data.toLoad = 1;
         priya.collect.require.toLoad--;
@@ -46,7 +50,8 @@ var priya = function (url){
         priya.collect.data.file.push(url);
 
         if(data.require.core){
-            require(data.require.core, function(){
+            console.log(priya.collect);
+            require(priya.collect.web.priya + data.require.core, function(){
                 priya.expose('window');
                 if(data.require.file){
                     require(data.require.file, function(){
