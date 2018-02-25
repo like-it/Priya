@@ -94,7 +94,7 @@ class Dir {
                 $file->url = $url . $entry;
                 if(is_dir($file->url)){
                     $file->url .= DIRECTORY_SEPARATOR;
-                    $file->type = \Priya\Module\File\Dir::TYPE;
+                    $file->type = Dir::TYPE;
                 }
                 if($this->ignore('find', $file->url)){
                     continue;

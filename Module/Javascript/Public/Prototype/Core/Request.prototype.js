@@ -6,9 +6,6 @@ _('prototype').request = function (url, data, script){
 
     if(typeof url == 'object' && url !== null){
         data = url;
-        console.log(url);
-        console.log(typeof null);
-        console.log(typeof url);
         url = '';
         if (typeof data.altKey != "undefined") {//event
             priya.debug('event');
@@ -91,8 +88,6 @@ _('prototype').request = function (url, data, script){
             if (xhttp.readyState == 4 ){
                 //status !- 200
                 console.log(xhttp);
-                //priya.collect.require.loaded = priya.collect.require.loaded ? priya.collect.require.loaded : 0;
-                //priya.collect.require.loaded++;
             }
         }
     };
@@ -113,17 +108,6 @@ _('prototype').request = function (url, data, script){
         xhttp.send(send);
 
     }
-    /*
-     * requires:
-     * - data
-     * - empty
-     * link
-     * script,
-     * content
-     * refresh
-     * exception
-     * debug
-     */
 }
 
 priya.request = _('prototype').request;

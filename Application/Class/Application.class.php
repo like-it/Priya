@@ -253,9 +253,10 @@ class Application extends Parser {
                 $this->handler()->since($mtime);
 
                 if(!headers_sent()){
-                    $this->header('Last-Modified: '. gmdate('D, d M Y H:i:s T', $mtime));
+                    $gm = gmdate('D, d M Y H:i:s T', $mtime);
+                    $this->header('Last-Modified: '. $gm);
                     $this->header('Content-Type: ' . $contentType);
-                    $this->header('ETag: ' . $etag . '-' . gmdate('D, d M Y H:i:s T', $mtime));
+                    $this->header('ETag: ' . $etag . '-' . $gm);
                     $this->header('Cache-Control: public');
                 }
                 if($ext == 'pcss'){
@@ -391,45 +392,6 @@ class Application extends Parser {
 //          404
         }
         chdir($this->cwd());  //for Parser
-        return $result;
-    }
-
-    public function page($request=''){
-        $this->data('request', $request);
-        $this->data('priya.dir.page', $this->data('priya.dir.root') . Application::PAGE . Application::DS);
-        $this->data('module.dir.page', $this->data('module.dir.root') . Application::PAGE . Application::DS);
-
-        $result = new stdClass();
-
-        $parser = new \Priya\Module\Parser();
-        $parser->data($this->data());
-        $file = new \Priya\Module\File();
-        $url = $this->data('module.dir.page') . 'Request.priya';
-        if(file_exists($url)){
-            var_dump('parse this one');
-        } else {
-            $url = $this->data('priya.dir.page') . 'Request.priya';
-            if(file_exists($url)){
-                $parser->data('input', $file->read($url));
-                $parser->data($parser->compile($parser->data(), $parser->data()));
-
-                var_dump($parser->data());
-
-                var_Dump($parser->data('script'));
-                die;
-
-                $result->script[] = $parser->data('input');
-
-                if($this->data('request.contentType') == Handler::CONTENT_TYPE_JSON){
-                    $result = $this->object($result, 'json');
-                } else {
-
-                }
-
-            } else {
-                var_dump('parse not found');
-            }
-        }
         return $result;
     }
 

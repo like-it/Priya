@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-10-19
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-10-19
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 namespace Priya\Module\Core;
 
@@ -37,7 +37,6 @@ class Cli extends Result {
         if(!empty($color) || ($color === 0 || $color ==  '0')){
             if($color == 'reset'){
                 echo "\e[0m";
-//                 echo "\007";
             } else {
                 echo "\e[38;5;" . intval($color) . 'm';
             }
@@ -66,9 +65,6 @@ class Cli extends Result {
         ob_flush();
         if($url=='input'){
             readline_completion_function(array($this, 'complete'));
-//             $this->color('reset');
-//             var_dump('reset');
-            //add history as array in this.data('history')
             $input = rtrim(readline($text), ' ');
         }
         elseif($url=='input-hidden'){
@@ -119,7 +115,6 @@ class Cli extends Result {
         if(empty($text)){
             echo '/';
         }
-//         var_dump($text);
     }
 
 }

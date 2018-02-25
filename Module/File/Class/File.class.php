@@ -39,7 +39,7 @@ class File {
         return $node;
     }
 
-    public static function chown($url='', $owner=null, $group=null){
+    public static function chown($url='', $owner=null, $group=null, $recursive=false){
         if($owner === null){
             $owner = 'root:root';
         }
@@ -52,7 +52,11 @@ class File {
                 $group = $explode[1];
             }
         }
-        exec('chown ' . $owner . ':' . $group . ' ' . $url, $output);
+        if($recursive){
+            exec('chown ' . $owner . ':' . $group . ' -R ' . $url, $output);
+        } else {
+            exec('chown ' . $owner . ':' . $group . ' ' . $url, $output);
+        }
     }
 
     public function write($url='', $data=''){

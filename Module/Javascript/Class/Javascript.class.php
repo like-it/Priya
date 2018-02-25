@@ -16,7 +16,6 @@ class Javascript extends Main {
     const FILE = __FILE__;
 
     public function run(){
-//         $this->read(__CLASS__);
         return $this->output();
     }
 

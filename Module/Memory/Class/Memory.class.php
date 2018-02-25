@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 namespace Priya\Module;
 
@@ -25,7 +25,7 @@ class Memory extends Data{
     private $keyList;
     private $serverList;
 
-    public function __construct($memory='', $id=null){    	
+    public function __construct($memory='', $id=null){
         if($id === null){
             $this->memory = new Memcached();
         } else {
@@ -66,8 +66,6 @@ class Memory extends Data{
     }
 
     public function restart(){
-//         exec('service memcached stop');
-//         exec('service memcached start');
         exec('service memcached restart');
     }
 

@@ -10,6 +10,7 @@
 namespace Priya\Module;
 
 use stdClass;
+use Exception;
 use Priya\Application;
 
 class Data extends Core {
@@ -114,7 +115,7 @@ class Data extends Core {
                         return $this->decodeUrl($attribute);
                     break;
                     default:
-                        trigger_error('unknown attribute (' . $url . ') in url');
+                        throw new Exception('unknown attribute (' . $url . ') in url');
                 }
             } else {
                 $this->setUrl($url);
@@ -329,11 +330,10 @@ class Data extends Core {
             }
         }
         if(empty($useData)){
-            return $data; //$this->object($data, $output);
+            return $data;
         } else {
             $this->data('delete', $list);
             return $this->data($list, $data);
-            //return $this->data($list, $this->object($data, $output));
         }
     }
 

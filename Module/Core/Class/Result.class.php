@@ -501,7 +501,6 @@ class Result extends Parser {
         $this->data('request', $this->request());
         $this->data('session', $this->session());
 
-
         foreach($template_list as $template){
             if(file_exists($template) === false){
                 continue;

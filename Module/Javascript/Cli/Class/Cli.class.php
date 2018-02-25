@@ -24,20 +24,13 @@ class Cli extends Main {
         if($this->parameter('create')){
             $this->createScript();
         }
-
     }
 
     public function createScript(){
-
-//         $root = dirname($this->data('module.dir.root')) . Application::DS . $this->data('public_html') . Application::DS . 'Js' . Application::DS . 'Priya.js';
-//         $priya = dirname($this->data('module.dir.root')) . Application::DS . $this->data('public_html') . Application::DS . 'Prototype' . Application::DS . 'Priya' . Application::DS . 'Priya.prototype.js';
         echo 'Reading Bootstrap.json...' . PHP_EOL;
         $url = dirname($this->data('module.dir.root')) . Application::DS  . 'Data' . Application::DS . 'Development' . Application::DS . 'Javascript.json';
         $this->read($url);
 
-//         $dir = new Dir();
-//         $url = dirname($this->data('module.dir.root')) . Application::DS . $this->data('public_html') . Application::DS . 'Prototype' . Application::DS . 'Core' . Application::DS ;
-//         $dir->read($url);
         $core = $this->data('require.core');
 
         $file = new File();
@@ -73,7 +66,6 @@ class Cli extends Main {
         foreach($core as $read){
             $location = dirname($this->data('module.dir.root')). Application::DS . 'Public' . Application::DS . 'Prototype' . Application::DS . 'Core' . Application::DS . $file->basename($read);
             $name = $file->basename($location, '.prototype.js');
-//             echo 'Module (' . $name . ')' . PHP_EOL;
             $module .= '/*' . "\n";
             $module .= ' * @name: ' . $name . "\n";
             $module .= ' * @url: ' . $location . "\n";

@@ -18,7 +18,6 @@ class Template extends Main {
     public function run(){
         $this->read(__CLASS__);
 
-        //$url = str_replace('/Data/', '/Template/', $this->request('url'));
         $url = $this->data('priya.dir.public') . 'Template/' .basename($this->request('url'), '.json') . '.tpl';
 
         $file = new File();

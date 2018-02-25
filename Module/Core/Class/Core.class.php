@@ -444,8 +444,6 @@ class Core {
             }
             elseif(is_array($this->error)) {
                 $this->error[$attribute] = $value;
-            } else {
-                var_dump('setError create object and set object');
             }
         }
     }

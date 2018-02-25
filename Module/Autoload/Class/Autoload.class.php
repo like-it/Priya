@@ -21,7 +21,7 @@ class Autoload{
     const EXT_CLASS_PHP = 'class.php';
     const EXT_TRAIT_PHP = 'trait.php';
 
-    private $expose;
+    protected $expose;
 
     protected $read;
     protected $fileList;

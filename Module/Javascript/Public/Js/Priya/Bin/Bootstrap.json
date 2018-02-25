@@ -25,7 +25,7 @@
     },
     "require": {
         "core": [
-            "Bin\/Core-0.2.15.js?0.2.15"
+            "Bin\/Core-0.2.15.min.js?0.2.15"
         ]
     }
 }

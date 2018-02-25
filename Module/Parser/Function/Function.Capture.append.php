@@ -8,9 +8,6 @@
  *     -    all
  */
 
-use Priya\Module\Parser\Token;
-use Priya\Module\Parser\Newline;
-
 function function_capture_append($function=array(), $argumentList=array(), $parser=null, $data=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;

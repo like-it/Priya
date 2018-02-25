@@ -10,6 +10,7 @@
 namespace Priya\Module;
 
 use stdClass;
+use Exception;
 use Priya\Application;
 
 class Route extends \Priya\Module\Core\Parser{
@@ -311,22 +312,17 @@ class Route extends \Priya\Module\Core\Parser{
         }
         $found = false;
         $data = $this->data();
-//         var_dump($name);
-//         var_dump($data);
-//         die;
         foreach($data as $routeName => $route){
             if(!isset($route->path)){
                 continue;
             }
-//             var_dump($routeName);
             if(strtolower($name) == strtolower($routeName)){
                 $found = $route;
                 break;
             }
         }
-//         var_Dump($name);
         if(empty($found)){
-//             trigger_error('Route not found for ('. $name.')');
+//             throw new Exception('Route not found for (' . $name .')');
         } else {
             $route_path = explode('/', trim($route->path, '/'));
             foreach($route_path as $part_nr => $part){

@@ -10,6 +10,7 @@
 namespace Priya\Module\Data;
 
 use stdClass;
+use Exception;
 use Priya\Module\Data;
 
 class Rule extends Data {
@@ -82,16 +83,16 @@ class Rule extends Data {
         $ruleList = $this->ruleList();
         foreach($ruleList as $nr => $rule){
             if(!isset($rule->attribute)){
-                trigger_error('attribute not defined in rule');
+                throw new Exception('attribute not defined in rule');
             }
             if(!isset($rule->type)){
-                trigger_error('type not defined in rule');
+                throw new Exception('type not defined in rule');
             }
             if(!isset($rule->rule)){
-                trigger_error('rule not defined in rule');
+                throw new Exception('rule not defined in rule');
             }
             if(!isset($rule->error)){
-                trigger_error('error not defined in rule');
+                throw new Exception('error not defined in rule');
             }
             switch($rule->type){
                 case 'string':
@@ -151,7 +152,7 @@ class Rule extends Data {
                                 }
                             break;
                             default:
-                                trigger_error('rule not defined in rule');
+                                throw new Exception('rule not defined in rule');
                             break;
                         }
                     } else {
@@ -201,7 +202,7 @@ class Rule extends Data {
                                         }
                                     break;
                                     default:
-                                        trigger_error('rule not defined in strlen');
+                                        throw new Exception('rule not defined in strlen');
                                     break;
                                 }
                             break;
@@ -295,15 +296,14 @@ class Rule extends Data {
                                     }
                                 break;
                                 default:
-                                    trigger_error($rule);
-                                    trigger_error('rule not defined in array count');
+                                    throw new Exception('rule not defined in array count');
                                 break;
                             }
                         }
                     }
                 break;
                 default:
-                    trigger_error('unknown rule->type in rule');
+                    throw new Exception('unknown rule->type in rule');
                 break;
             }
         }
