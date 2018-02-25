@@ -8,5 +8,5 @@
  */
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'Autoload.php';
 
-$app = new Priya\Application(autoload());
+$app = new Priya\Application($autoload);
 echo $app->run();

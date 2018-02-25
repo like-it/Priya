@@ -10,7 +10,7 @@
 namespace Priya\Module;
 
 use stdClass;
-use Exception;
+// use Exception;
 use Priya\Application;
 
 class Route extends \Priya\Module\Core\Parser{

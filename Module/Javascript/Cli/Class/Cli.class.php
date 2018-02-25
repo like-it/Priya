@@ -12,7 +12,6 @@ use Priya\Module\Core\Main;
 use Priya\Application;
 use Priya\Module\File\Dir;
 use Priya\Module\File;
-use Priya\Module\Parser;
 use Priya\Module\Data;
 use Priya\Module\File\Zip;
 

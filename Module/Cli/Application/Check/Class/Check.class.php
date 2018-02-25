@@ -14,7 +14,6 @@ use Priya\Module\Data;
 use Priya\Application;
 use Priya\Module\File;
 use Priya\Module\File\Dir;
-use Priya\Module\Parser;
 
 class Check extends Cli {
     const DIR = __DIR__;

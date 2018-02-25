@@ -34,8 +34,6 @@ class Parser extends Cli {
 
     public function create($attribute=''){
         if(strtolower($attribute) == 'functionlist'){
-            $this->output('Error: need to extract the use and make them single...' . PHP_EOL);
-//             return;
             $url =
                 $this->data('priya.dir.module') .
                 'Parser' . Application::DS .

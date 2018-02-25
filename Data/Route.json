@@ -1,11 +1,9 @@
 {
     "Indent": {
         "path": "Priya/Module/Indent/Public/Css/Indent.css",
-        "default": {
-            "controller": "Priya.Module.Indent.css",
-            "format": "html",
-            "language": "en"
-        },
+        "controller": "Priya.Module.Indent.css",
+        "format": "html",
+        "language": "en",
         "method": [
             "GET",
             "POST"
@@ -14,11 +12,9 @@
     },
     "Javascript": {
         "path": "Priya/Javascript",
-        "default": {
-            "controller": "Priya.Module.Javascript.run",
-            "format": "html",
-            "language": "en"
-        },
+        "controller": "Priya.Module.Javascript.run",
+        "format": "html",
+        "language": "en",
         "method": [
             "GET",
             "POST"
@@ -27,11 +23,19 @@
     },
       "Javascript-CLi": {
         "path": "Javascript",
-        "default": {
-            "controller": "Priya.Module.Javascript.Cli.run",
-            "format": "html",
-            "language": "en"
-        },
+        "controller": "Priya.Module.Javascript.Cli.run",
+        "format": "html",
+        "language": "en",
+        "method": [
+            "CLI"
+        ],
+        "translate": false
+    },
+    "Memory-CLi": {
+        "path": "Memory",
+        "controller": "Priya.Module.Memory.Cli.run",
+        "format": "html",
+        "language": "en",
         "method": [
             "CLI"
         ],

@@ -9,7 +9,6 @@
  */
 
 use Priya\Module\Parser\Control_Foreach;
-use Priya\Module\Parser\Control_If;
 
 function function_for_each($function=array(), $argumentList=array(), $parser=null, $data=null){
     if(!is_array($argumentList)){
