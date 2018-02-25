@@ -11,7 +11,6 @@ namespace Priya\Module\Core;
 
 use stdClass;
 use Exception;
-use Exception;
 
 trait Object {
 
