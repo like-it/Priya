@@ -147,6 +147,9 @@ class Parser extends ParserCore {
                 $record = $if->statement($record, $this);
                 $list = $tag->find($record['string']);
                 if($if_counter >= $if::MAX){
+                    debug($key);
+                    debug($record);
+                    debug(debug_backtrace(true));
                     debug('max reached in if::has');
                     break;
                 }

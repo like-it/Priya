@@ -39,11 +39,16 @@ class Memory {
     }
 
     public static function write(Memcached $dma, $key='', $value='', $expiration=0){
+        $result = array();
+        $result['key'] = $key;
+        $result['value'] = $value;
+        $result['expiration'] = $expiration;
         if(is_array($key)){
-            return $dma->setMulti($key, $value);
+            $result['set'] = $dma->setMulti($key, $value);
         } else{
-            return $dma->set($key, $value, $expiration);
+            $result['set'] = $dma->set($key, $value, $expiration);
         }
+        return $result;
     }
 
     public static function delete(Memcached $dma, $key='', $time=0){
