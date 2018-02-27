@@ -35,6 +35,7 @@ class Memory {
     }
 
     public static function read(Memcached $dma, $key=''){
+        return false;
         return $dma->get($key);
     }
 

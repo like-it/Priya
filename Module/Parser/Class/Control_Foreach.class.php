@@ -121,7 +121,8 @@ class Control_Foreach extends Core {
 
     public static function finalize($value='', $function=array()){
         $search = '{for.each(' . $value . '{/for.each}';
-        return str_replace($search, $function['execute'], $function['string']);
+        $explode = explode($search, $function['string'], 2);
+        return implode($function['execute'], $explode);
     }
 
     public static function find($string='', $list=array(), $key=null, $record=null, $parser=null){

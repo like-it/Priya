@@ -2,8 +2,6 @@
 
 namespace Priya\Module\Parser;
 
-//use Priya\Module\Parse\Data;
-
 class Newline extends Core {
 
     public static function replace($input='',  $random=''){

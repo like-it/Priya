@@ -2,8 +2,6 @@
 
 namespace Priya\Module\Parser;
 
-//use Priya\Module\Parse\Data;
-
 class Tag extends Core {
 
     const FILTER_CONTROL = array(
@@ -15,7 +13,7 @@ class Tag extends Core {
         'for.each' => array(
             'for.each'
         )
-        //might add if too...
+        //might add if too... (in the future, new version)
     );
 
     public function __construct($input=null, $random=null){

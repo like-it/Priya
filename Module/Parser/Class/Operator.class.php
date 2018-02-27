@@ -90,7 +90,6 @@ class Operator extends Core {
         ){
             $operator['execute'] = $operator['left'] . $operator['operator'] . $operator['right'];
         }
-//         debug($operator, 'execute');
         //add % & ** >= <=
         $original = $operator['value'];
         switch($operator['value']){
@@ -167,11 +166,11 @@ class Operator extends Core {
                 $operator['value'] = $operator['left'] || $operator['right'];
             break;
             default :
-                debug('undefined operator (' .  $operator['value'] . ') in execute');
+                throw new Exception('Operator::execute:Undefined operator (' . $operator['value'] . ') in execute');
             break;
         }
         if(!isset($operator['value'])){
-            debug($operator, 'no value');
+            throw new Exception('Operator::execute:No value');
         }
         $operator['type'] = Variable::type($operator['value']);
         return $operator;
@@ -245,9 +244,7 @@ class Operator extends Core {
             $operator['right_parse'][$nr] = $record;
         }
         if(!isset($operator['value']) && empty($operator['right_parse'])){
-            debug($operator, 'wrong compare');
-            debug($statement, 'what is in statement');
-            die;
+            throw new Exception('Operator::statement:Wrong compare');
         }
         if($operator['value'] == '&&' || $operator['value'] == '||'){
             $right_statement = $statement;
@@ -259,7 +256,7 @@ class Operator extends Core {
                     $right_statement = Operator::statement($right_statement, $variable, $parser);
                     $right_statement_count++;
                     if($right_statement_count >= Operator::MAX){
-                        debug('$right_statement_count >= Operator::MAX');
+                        throw new Exception('Operator::statement:$right_statement_count >= Operator::MAX');;
                         break;
                     }
                 }

@@ -109,7 +109,6 @@ class Variable extends Core {
         $collect = false;
         $before = array();
         $is_before = true;
-//         var_dump($parse);
         foreach($parse as $nr => $record){
             if($record['type'] == Token::TYPE_EXCLAMATION){
                 if($is_before){
@@ -229,8 +228,6 @@ class Variable extends Core {
         $modifier_list = explode('|', $attribute);
         $attribute = trim(array_shift($modifier_list), ' ');
         if(!empty($modifier_list)){
-//             var_dump($attribute);
-//             var_dump($modifier_list);
             $modifier = Token::restore_return(implode('|', $modifier_list), $this->random());
         } else {
             $modifier = '';
@@ -380,69 +377,7 @@ class Variable extends Core {
                     $output = $input;
                 }
             } else {
-                foreach ($list as $nr => $subList){
-                    foreach ($subList as $search => $empty){
-                        if(substr($search, 1, 1) != '$'){
-                            $output = $input;
-                            continue;
-                        }
-                        $attribute = substr($search, 2, -1);
-                        debug($attribute);
-                        $value = $this->data($attribute);
-                        $value = Variable::value($value);
-                        $type = Variable::type($value);
-                        debug($value, 'val2ue'); //set this->Data(attribute,value);
-                        debug($attribute, 'attri2bute');
-                        debug($input, 'inp2ut');
-                        if($output != null){
-                            $output_type = Variable::type($output);
-                        }
-                        if($output === null){
-                            if(in_array($type, array(
-                                    Token::TYPE_ARRAY,
-                                    Token::TYPE_OBJECT
-                            ))){
-                                $output = $value;
-                            } else {
-                                $output = str_replace($search, $value, $input);
-                                $output = Variable::value($output);
-                                $type = Variable::type($value);
-                            }
-                            //make list?
-                            $record['attribute'] = $attribute;
-                            $record['search'] = $search;
-                            $record['value'] = $value;
-                            $record['type'] = $type;
-                        } else {
-                            if($type == Token::TYPE_OBJECT && $output_type == Token::TYPE_OBJECT){
-                                $output = Variable::object_merge($output, $value);
-                                continue;
-                            }
-                            elseif($type == Token::TYPE_ARRAY && $output_type == Token::TYPE_ARRAY){
-                                $output = array_merge($output, $value);
-                                continue;
-                            }
-                            if($output_type == Token::TYPE_OBJECT && $type == Token::TYPE_NULL){
-                                continue; //add false too ?
-                            }
-                            if($output_type == Token::TYPE_ARRAY && $type == Token::TYPE_NULL){
-                                continue; //add false too ?
-                            }
-                            if(in_array($output_type, array(
-                                    Token::TYPE_ARRAY,
-                                    Token::TYPE_OBJECT
-                            ))){
-                                continue; //preserve arrays and objects
-                            }
-                            if(empty($is_set)){
-                                $output = $input;
-                                $is_set = true;
-                                $output = str_replace($record['search'], $record['value'], $output);
-                            }
-                            $output = str_replace($search, $value, $output);
-                        }
-                    }
-                }
+                throw new Exception('Variable::replace:list is not empty (have tags)');
             }
             return $output;
         }

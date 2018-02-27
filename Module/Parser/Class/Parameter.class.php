@@ -11,7 +11,6 @@ class Parameter extends Core {
     public static function get($parse=array(), Variable $variable){
         $original = $parse;
         $parse = Token::variable($parse, $variable);
-        //after variable, the string needs to get merged or object or array
         $count_array = 0;
         while(Parameter::has_array($parse)){
             $parse = Parameter::create_array($parse);
@@ -56,8 +55,6 @@ class Parameter extends Core {
                     }
                 }
             }
-
-
         }
         if($is_foreach){
             $result = array();
@@ -65,10 +62,10 @@ class Parameter extends Core {
                 if(isset($parameter[1])){ //we have a fast multiple check
                     foreach($parameter as $part_nr => $part){
                         if($part['type'] == Token::TYPE_AS){
-//                             continue;
+                            continue;
                         }
                         if($part['type'] == Token::TYPE_DOUBLE_ARROW){
-//                             continue;
+                            continue;
                         }
                         $result[] = $part;
                     }
@@ -118,10 +115,8 @@ class Parameter extends Core {
                         //boolean and string
                         //boolean and string and boolean
                         //operator and string
-                        var_dump($merge);
-                        var_dump($parameter);
                         throw new Exception(
-                            'Undefined state detected (' .
+                            'Parameter::get:Undefined state detected (' .
                             $merge['type'] .
                             '->' .
                             $part['type'] .

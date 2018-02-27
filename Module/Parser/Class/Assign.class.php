@@ -3,6 +3,7 @@
 namespace Priya\Module\Parser;
 
 use Priya\Module\Core\Object;
+use Exception;
 
 class Assign extends Core {
 
@@ -58,7 +59,6 @@ class Assign extends Core {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -104,7 +104,6 @@ class Assign extends Core {
                 unset($parse[$nr]);
             }
         }
-        debug($parse, 'replace_set');
         return $parse;
     }
 
@@ -141,7 +140,7 @@ class Assign extends Core {
 
     public static function row($record=array(), $random=''){
         if(!isset($record['string'])){
-            debug($record, 'record no string in row');
+            throw new Exception('Assign:record no string in row');
             return $record;
         }
         if(is_string($record['string'])){
@@ -268,8 +267,7 @@ class Assign extends Core {
                         $item['value'] .= $record['value'];
                     }
                     elseif(isset($item['value']) && !empty($record['value'])){
-                        debug($record, 'record, item already set');
-                        debug($item, 'item already set');
+                        throw new Exception('Assign:find: record & item set AND NOT TYPE_MIXED OR TYPE_STRING ');
                     }
                 }
                 if(!isset($item['value'])){
@@ -338,7 +336,8 @@ class Assign extends Core {
             return $result;
         }
         $string = trim($string, '\'"');
-        $pattern = '/\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/';
+//         $pattern = '/\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/';
+        $pattern = '/\{.*\}/';
         preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
         if(count($matches) == 1){
             $result = null;
@@ -387,8 +386,7 @@ class Assign extends Core {
             }
         } else {
             if($has === true){
-                var_dump('HERE IT IS....');
-                var_dump($string);
+
             }
             if(is_numeric($string)){
                 $pos = strpos($string,'0');
@@ -410,84 +408,4 @@ class Assign extends Core {
         return $result;
     }
 
-    private function ternary($explode='', $attribute, $value=''){
-        if($explode == Ternary::SHORT){
-            $short = explode( $explode, $value, 2);
-            if(count($short) == 2){
-                $start = rtrim($short[0], ' ');
-                $end = ltrim($short[1], ' ');
-
-                $statement = $this->statement($start, $this->statement($end));
-                $statement['result'] = $this->variable($statement['result']);
-
-                //$statement['result'] = $this->variable($this->statement($start, $this->statement($end)));
-                $this->data('set', $attribute, $statement['result']);
-                return true;
-
-            }
-        }
-        elseif ($explode == Ternary::QUESTION){
-            $start = explode($explode, $value, 2);
-            foreach($start as $key => $value){
-                $start[$key] = trim($value, ' ');
-            }
-            $end = explode(Ternary::COLON, $value, 2);
-            foreach($end as $key => $value){
-                $end[$key] = trim($value, ' ');
-            }
-            if(count($start) == 2 && count($end) == 2){
-                if(substr($start[1], 0, 1) == ':'){
-                    $start = $start[0];
-                    //add operator support
-                    if(substr($start, 0, 1) == '$'){
-                        $search = substr($start, 1);
-                        $replace = $this->data($search);
-                        if(!$replace){
-                            $replace = $end[1];
-                        }
-                        $this->data('set', $attribute, $replace);
-                        return true;
-                    }
-                } else {
-                    $original = $value;
-                    $statement = $this->statement($start[0], $this->statement($end[1]), $end[0], $end[1]);
-                    $statement['result'] = $this->variable($statement['result']);
-
-
-                    var_dump($statement);
-                    /*
-                    $pattern = '/(\S+)(\s+)(\S+)(\s+)(\S+)/';
-                    preg_match_all($pattern, $start[0], $matches, PREG_SET_ORDER);
-                    if(count($matches) == 1){
-                        $statement['left'] = trim($matches[0][1], '\'"');
-                        $statement['operator'] = $matches[0][3];
-                        $statement['right'] = trim($matches[0][5], '\'"');
-                        $statement['true'] = trim($end[0], '\'"');
-                        $statement['false'] = trim($end[1], '\'"');
-
-                        $statement['left'] = $this->variable($statement['left']);
-                        $statement['right'] = $this->variable($statement['right']);
-                        $statement['true'] = $this->variable($statement['true']);
-                        $statement['false'] = $this->variable($statement['false']);
-
-                        $statement = Control_If::statement($statement);
-
-                        if(!empty($statement['output'])){
-                            var_dump($statement['true']);
-                            $this->data('set', $attribute, $statement['true']);
-                        } else {
-                            var_dump($statement['true']);
-                            $this->data('set', $attribute, $statement['false']);
-                        }
-                        return true;
-                    } else {
-                        //no comparison
-                        //maybe a pattern without spaces
-                    }
-                    */
-                }
-            }
-
-        }
-    }
 }

@@ -85,6 +85,11 @@ class Control_If extends Core {
         $inner = '';
         foreach($explode as $nr => $part){
             $count = substr_count($part, '{/if}');
+            if($count >= 1 && $nr == 0){
+                $temp = explode('{/if}', $part, 2);
+                $inner .= $temp[0];
+                break;
+            }
             $close_count += $count;
 
             if($open_count == $close_count){
@@ -157,29 +162,6 @@ class Control_If extends Core {
         return $result;
     }
 
-    public static function row($record=array(), $random=''){
-        $string = Token::restore_return($record['string'], $random);
-        var_dump($record);
-        $statement = Token::restore_return($record['if']['value'], $random);
-        $if = Token::restore_return($record['if']['string'], $random);
-        $anchor = '[' . $random . '][anchor]';
-        $string = str_replace($statement, $anchor . $if, $string);
-        $explode = explode("\n", $string);
-        foreach($explode as $nr => $row){
-            if(trim($row) == $anchor){
-                unset($explode[$nr]);
-                break;
-            }
-            $explode[$nr] = str_replace($anchor, '', $row, $count);
-            if($count > 0){
-                break;
-            }
-        }
-        $string = implode("\n", $explode);
-        $record['string'] = Newline::replace($string, $random);
-        return $record;
-    }
-
     public static function execute($record=array(), $math=null, $random=''){
         $record['if']['result'] = $math;
         if($math === true){
@@ -188,6 +170,8 @@ class Control_If extends Core {
                 isset($record['if']['true'])
             ){
                 $record['if']['string'] = $record['if']['true'];
+            } elseif(isset($record['if'])){
+                $record['if']['string'] = '';
             } else {
                 throw new Exception('Unknown record format...');
             }
@@ -198,6 +182,9 @@ class Control_If extends Core {
                 isset($record['if']['false'])
             ){
                 $record['if']['string'] = $record['if']['false'];
+            }
+            elseif(isset($record['if'])){
+                $record['if']['string'] = '';
             } else {
                 throw new Exception('Unknown record format...');
             }
@@ -222,11 +209,8 @@ class Control_If extends Core {
         $create = Token::restore_return($record['if']['statement'], $this->random());
         $create = str_replace('{if ', '', substr($create, 0, -1));
         $variable = new Variable($this->data(), $this->random(), $parser);
-        // an equation can be a variable, if it is undefined it will be + 0
-        // an equeation can have functions.
         $parse = Token::parse($create);
         $parse = Token::variable($parse, $variable);
-        //method before create_equation ?
 
         $method = array();
         $method['parse'] = $parse;

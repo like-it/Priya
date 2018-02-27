@@ -2,6 +2,8 @@
 
 namespace Priya\Module\Parser;
 
+use Exception;
+
 class Value extends Core {
 
     public static function get($record=array()){
@@ -55,7 +57,7 @@ class Value extends Core {
         elseif(is_object($record['value'])){
             $record['type'] = Token::TYPE_OBJECT;
         } else {
-            debug('undefined type');
+            throw new Exception('Value::type:Unknown type');
         }
         return $record;
     }

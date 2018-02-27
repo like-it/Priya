@@ -11,6 +11,7 @@ namespace Priya\Module;
 
 use Priya\Module\Parser\Core as ParserCore;
 use Priya\Module\Parser\Variable;
+use Exception;
 
 class Parser extends ParserCore {
     const DIR = __DIR__;
@@ -59,31 +60,6 @@ class Parser extends ParserCore {
         ){
             return $string;
         }
-        /*
-        if(
-            is_object($string) &&
-            is_object($data) &&
-            Parser::is_empty($string) &&
-            Parser::is_empty($data)
-        ){
-            return $string;
-        }
-        */
-        /*
-        $is_string = is_string($string);
-        if($is_string){
-            $test= Variable::value($string);
-            if(
-                is_null($test) ||
-                is_bool($test) ||
-                is_float($test) ||
-                is_int($test) ||
-                is_numeric($test)
-               ){
-                return $test;
-            }
-        }
-        */
         if (is_array($string)){
             foreach($string as $nr => $line){
                 $string[$nr] = $this->compile($line, $data, $keep);
@@ -147,10 +123,7 @@ class Parser extends ParserCore {
                 $record = $if->statement($record, $this);
                 $list = $tag->find($record['string']);
                 if($if_counter >= $if::MAX){
-                    debug($key);
-                    debug($record);
-                    debug(debug_backtrace(true));
-                    debug('max reached in if::has');
+                    throw new Exception('Parser::compile:$if_counter>=$if::MAX');
                     break;
                 }
                 $if_counter++;
@@ -189,12 +162,6 @@ class Parser extends ParserCore {
                 $string = Parser\Token::remove_comment($string);
                 return $string;
             } else {
-                /**
-                 * do we need to parse the object ?
-                 * - variables
-                 * - methods
-                 * - literal
-                 */
                 return $string;
             }
         }

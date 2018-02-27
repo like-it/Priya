@@ -187,9 +187,6 @@ class Method extends Core {
                         $result['invert'] = false;
                     }
                     $result['method'] = str_replace('!', '', $result['method']);
-                    if($result['method'] == ''){
-                        debug($list, 'hebben we een probleem');
-                    }
                     $result['set']['depth'] = $method_part['set']['depth'];
 //                     var_dump($parameter); //not is parameter but parse?
                     $result['parameter'] = Parameter::get($parameter, $variable);
@@ -263,7 +260,6 @@ class Method extends Core {
                     )
                 )
             ){
-//                 debug($list, 'remove exclamation before (');
                 $possible_method = true;
                 $list[$nr] = $record;
                 $parse_method[$nr] = $record;
@@ -294,6 +290,13 @@ class Method extends Core {
         ){
             $parser->has_list = true;
             require_once $url;
+            $name_tmp = 'function_' . str_replace('.', '_', strtolower($name));
+            if(!function_exists($name_tmp)){    //add in_array $name_tmp for speed...
+                $url = __DIR__ . '/../Function/Function.' . $name . '.php';
+                if(file_exists($url)){
+                    require_once $url;
+                }
+            }
         }
         if($parser->has_list !== true){
             $url = __DIR__ . '/../Function/Function.' . $name . '.php';
@@ -336,7 +339,7 @@ class Method extends Core {
             $function['is_executed'] = true;
         } else {
             $function['is_executed'] = false;
-            throw new Exception('Function "' . $function_name . '" not found');
+            throw new Exception('Method::execute:Function "' . $function_name . '" not found');
         }
         if(is_bool($function['value'])){
             if($function['value'] === true){
@@ -345,7 +348,6 @@ class Method extends Core {
                 $function['value'] = 'false';
             }
         }
-
         return $function;
     }
 
