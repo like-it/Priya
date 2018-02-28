@@ -12,24 +12,27 @@ namespace Priya\Module;
 use stdClass;
 // use Exception;
 use Priya\Application;
+use Priya\Module\Core\Parser;
 
-class Route extends \Priya\Module\Core\Parser{
+class Route extends Parser{
     const DIR = __DIR__;
 
     private $item;
 
-    public function __construct(Handler $handler, $data=''){
+    public function __construct(Handler $handler, $data='', $read=true){
         $this->handler($handler);
         $this->data($data);
 
-        $data = new Data();
-        $read = $data->read($this->data('dir.data') . Application::ROUTE);
-        if(empty($read)){
-            $this->error('read', true);
-        } else {
-            $this->data($read);
+        if($read){
+            $data = new Data();
+            $read = $data->read($this->data('dir.data') . Application::ROUTE);
+            if(empty($read)){
+                $this->error('read', true);
+            } else {
+                $this->data($read);
+            }
+            $this->parseRoute();
         }
-        $this->parseRoute();
     }
 
     public function run($path=''){

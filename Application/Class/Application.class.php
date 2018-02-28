@@ -16,6 +16,7 @@ use Priya\Module\Core\Parser;
 use Priya\Module\Core\Data;
 use Priya\Module\Core\Object;
 use Priya\Module\File\Dir;
+use Priya\Module\File\Cache;
 
 class Application extends Parser {
     const DS = DIRECTORY_SEPARATOR;
@@ -42,45 +43,60 @@ class Application extends Parser {
     const CUSTOM = 'Custom.json';
     const ROUTE = 'Route.json';
     const CREDENTIAL = 'Credential.json';
+    const URL = 'Application';
 
     public function __construct($autoload=null, $data=null){
         $this->cwd(getcwd());
 //         set_exception_handler(array('Priya\Module\Core','handler_exception'));
 //         set_error_handler(array('Priya\Module\Core','handler_error'));
-        $this->data('time.start', microtime(true));
-        $this->data('priya.environment', Application::ENVIRONMENT);
-        $this->data('module.name', $this->module());
-        $this->data('dir.ds', Application::DS);
-        $this->data('priya.dir.application',
-            dirname(Application::DIR) .
-            Application::DS
-        );
-        $this->data('dir.vendor',
-            dirname(dirname($this->data('priya.dir.application'))) .
-            Application::DS
-        );
-        if(stristr($this->data('dir.vendor'), Application::VENDOR) === false){
-            $this->data('dir.vendor',
-                dirname($this->data('priya.dir.application')) .
-                Application::DS
-            );
-            $this->data('dir.root', $this->data('dir.vendor'));
-        } else {
-            $this->data('dir.root',
-                dirname($this->data('dir.vendor')) .
-                Application::DS
-            );
+        $this->init();
+        $url = $this->data('priya.dir.application') .
+            Application::DATA .
+            Application::DS .
+            Cache::CACHE .
+            Application::DS .
+            Cache::MINUTE .
+            Application::DS .
+            Application::URL
+        ;
+        $cache = $this->cache($url);
+        if($cache){
+            $this->cli();
+            $this->handler(new Module\Handler($this->data()));
+            if($this->data('priya.dir.application')){
+                chdir($this->data('priya.dir.application'));
+            }
+            $this->autoload($autoload);
+            $this->router();
+            return;
         }
         $url = dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG;
-        if(file_exists($url)){
-            $this->read($url);
-        }
+        $this->read($url);
         $url = dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM;
-        if(file_exists($url)){
-            $this->read($url);
-        }
+        $this->read($url);
         $this->data(Application::object_merge($this->data(),$this->object($data)));
         $this->cli();
+        $this->dir();
+        $url = $this->data('dir.data') . Application::CONFIG;
+        if(file_exists($url)){
+            $this->read($url);
+        }
+        if(empty($this->data('public_html'))){
+            $this->data('public_html', Application::PUBLIC_HTML);
+            $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);
+        }
+
+        $this->handler(new Module\Handler($this->data()));
+        $this->data('web.root', $this->handler()->web());
+
+        if($this->data('priya.dir.application')){
+            chdir($this->data('priya.dir.application'));
+        }
+        $this->autoload($autoload);
+        $this->router();
+    }
+
+    private function dir(){
         if(empty($this->data('priya.dir.root'))){
             $this->data('priya.dir.root',
                 dirname($this->data('priya.dir.application')) .
@@ -114,14 +130,14 @@ class Application extends Parser {
                 $this->data('dir.root') .
                 Application::DATA .
                 Application::DS
-           );
+            );
         }
         if(empty($this->data('priya.dir.restore'))){
             $this->data('priya.dir.restore',
                 $this->data('priya.dir.data') .
                 Application::RESTORE .
                 Application::DS
-           );
+            );
         }
         if(empty($this->data('priya.dir.update'))){
             $this->data('priya.dir.update',
@@ -135,7 +151,7 @@ class Application extends Parser {
                 $this->data('priya.dir.root') .
                 Application::PUBLIC_HTML .
                 Application::DS
-           );
+            );
         }
         if(empty($this->data('dir.host'))){
             $this->data('dir.host',
@@ -144,59 +160,182 @@ class Application extends Parser {
                 Application::DS
             );
         }
-        $url = $this->data('dir.data') . Application::CONFIG;
-        if(file_exists($url)){
-            $this->read($url);
+    }
+
+    private function init(){
+        $this->data('time.start', microtime(true));
+        $this->data('priya.environment', Application::ENVIRONMENT);
+        $this->data('module.name', $this->module());
+        $this->data('dir.ds', Application::DS);
+        $this->data('priya.dir.application',
+            dirname(Application::DIR) .
+            Application::DS
+        );
+        $this->data('dir.vendor',
+            dirname(dirname($this->data('priya.dir.application'))) .
+            Application::DS
+        );
+        if(stristr($this->data('dir.vendor'), Application::VENDOR) === false){
+            $this->data('dir.vendor',
+                dirname($this->data('priya.dir.application')) .
+                Application::DS
+            );
+            $this->data('dir.root', $this->data('dir.vendor'));
+        } else {
+            $this->data('dir.root',
+                dirname($this->data('dir.vendor')) .
+                Application::DS
+            );
         }
-        if(empty($this->data('public_html'))){
-            $this->data('public_html', Application::PUBLIC_HTML);
-            $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . Application::DS);
+    }
+
+    private function router($url=''){
+        if(empty($url)){
+            $url = $this->data('priya.dir.application') .
+                Application::DATA .
+                Application::DS .
+                Cache::CACHE .
+                Application::DS .
+                Cache::MINUTE .
+                Application::DS .
+                Application::ROUTE
+            ;
+        }
+        $cache = $this->cache($url, 'route');
+
+        if($cache){
+            $this->route(new Module\Route(
+                $this->handler(),
+                Module\Core::object($cache, 'object'),
+                false
+            ));
+        } else {
+            $this->route(new Module\Route(
+                $this->handler(),
+                clone $this->data()
+            ));
+            $this->route()->create('Application.Version');
+            $this->route()->create('Application.Locate');
+            $this->route()->create('Application.Config');
+            $this->route()->create('Application.Help');
+            $this->route()->create('Application.Error');
+            $this->route()->create('Application.Route');
+            $this->route()->create('Application.Parser');
+            $this->route()->create('Application.Cache');
+            $this->route()->create('Application.Check');
+            $this->route()->create('Application.Install');
+            $this->route()->create('Application.Zip');
+            $this->route()->create('Test');
         }
 
-        $this->handler(new Module\Handler($this->data()));
-        $this->data('web.root', $this->handler()->web());
-
-        if($this->data('priya.dir.application')){
-            chdir($this->data('priya.dir.application'));
+        if(empty($url)){
+            $url = $this->data('priya.dir.application') .
+                Application::DATA .
+                Application::DS .
+                Cache::CACHE .
+                Application::DS .
+                Cache::MINUTE .
+                Application::DS .
+                Application::ROUTE
+            ;
         }
+        $this->write($url,'route');
+    }
+
+    /**
+     * only begin & end...
+     * {@inheritDoc}
+     * @see \Priya\Module\Core\Parser::read()
+     */
+    public function read($url=''){
+        if(file_exists($url) === false){
+            return false;
+        }
+        $mtime = filemtime($url);
+        $url_cache = $url . '?mtime=' . $mtime;
+        $cache = Cache::read($url_cache);
+        if(!$cache){
+            $read = parent::read($url);
+            $data = new Data();
+            $data->data($read);
+            $data->data('time.cache', $data->data('time.start'));
+            $data->data('delete', 'time.start');
+//             Cache::write($url_cache, $data->data());
+            return $read;
+        }
+        $this->data($cache);
+        return $cache;
+    }
+
+    public function write($url='', $type='data'){
+        switch ($type){
+            case 'route' :
+                $url = $url . '?' . date('YmdHi', $this->route()->data('time.cache')); //every minute;
+                Cache::write($url, $this->route()->data());
+            break;
+            default:
+                $data = new Data();
+                $data->data($this->data());
+                $data->data('time.cache', $data->data('time.start'));
+                $url = $url . '?' . date('YmdHi', $data->data('time.cache')); //every minute;
+                $data->data('delete','time.start');
+                Cache::write($url, $data->data());
+        }
+
+    }
+
+    public function cache($url='', $type='data'){
+        $url = $url . '?' . date('YmdHi'); //every minute;
+        $cache = Cache::read($url);
+        switch($type){
+            case 'data':
+                $this->data(Module\Core::object($cache, 'object'));
+                break;
+        }
+        return $cache;
+    }
+
+    public function autoload($autoload=''){
         if(empty($autoload)){
             $autoload = new \Priya\Module\Autoload();
             $autoload->addPrefix('Priya',  dirname(Application::DIR) . Application::DS);
             $autoload->register();
         }
         $autoload->environment($this->data('priya.environment'));
-        $this->autoload($autoload);
-        $this->autoload()->addPrefix('Vendor', $this->data('dir.vendor'));
+        parent::autoload($autoload);
+        parent::autoload()->addPrefix('Vendor', $this->data('dir.vendor'));
 
         $autoload = $this->data('priya.autoload');
         if(empty($autoload)){
             $autoload = $this->data('autoload');
         }
+        //how to name below...
         if(is_object($autoload)){
             foreach($autoload as $prefix => $directory){
-                $this->autoload()->addPrefix($prefix, $directory);
+                parent::autoload()->addPrefix($prefix, $directory);
             }
         }
-        $this->route(new Module\Route(
-            $this->handler(),
-            clone $this->data()
-        ));
-        $this->route()->create('Application.Version');
-        $this->route()->create('Application.Locate');
-        $this->route()->create('Application.Config');
-        $this->route()->create('Application.Help');
-        $this->route()->create('Application.Error');
-        $this->route()->create('Application.Route');
-        $this->route()->create('Application.Parser');
-        $this->route()->create('Application.Cache');
-        $this->route()->create('Application.Check');
-        $this->route()->create('Application.Install');
-        $this->route()->create('Application.Zip');
-        $this->route()->create('Test');
     }
 
-    public function run(){
-        $this->autoload()->environment($this->data('priya.environment'));
+    public function run($url=''){
+        if(empty($url)){
+            $url = $this->data('priya.dir.application') .
+                Application::DATA .
+                Application::DS .
+                Cache::CACHE .
+                Application::DS .
+                Cache::MINUTE .
+                Application::DS .
+                Application::URL
+            ;
+        }
+        //want to write to cache here...
+        $this->write($url);
+        parent::autoload()->environment($this->data('priya.environment'));
+        if(!$this->data('priya.dir.application')){
+            var_dump($this->data());
+            die;
+        }
         chdir($this->data('priya.dir.application'));
         $request = $this->request('request');
         if($request ===  $this->data('parser.request') && $request !== null){

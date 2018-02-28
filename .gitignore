@@ -2,6 +2,7 @@
 .project
 .settings
 org.*
+Application/Data/Cache/*
 Application/Data/Custom.json
 Application/Data/Pack/
 Module/Autoload/Data/*
