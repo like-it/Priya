@@ -148,6 +148,8 @@ class Route extends \Priya\Module\Core\Parser{
                 $node->route = $node->controller;
                 $node->function = array_pop($tmp);
                 $node->controller = implode('\\', $tmp);
+                $node->name = $name;
+                $node->request = $this->request();
                 return $this->item($node);
             }
             elseif(isset($route->default) && isset($route->default->controller)){
@@ -156,8 +158,12 @@ class Route extends \Priya\Module\Core\Parser{
                 $object = new stdClass();
                 $object->function = array_pop($tmp);
                 $object->controller = implode('\\', $tmp);
+                $object->name = $name;
+                $object->request = $this->request();
                 return $this->item($object);
             } else {
+                $route->name = $name;
+                $route->request = $this->request();
                 return $this->item($route);
             }
         }
