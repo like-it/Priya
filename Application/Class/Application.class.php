@@ -56,12 +56,12 @@ class Application extends Parser {
             Application::DS
         );
         $this->data('dir.vendor',
-            dirname(dirname($this->data('priya.dir..application'))) .
+            dirname(dirname($this->data('priya.dir.application'))) .
             Application::DS
         );
         if(stristr($this->data('dir.vendor'), Application::VENDOR) === false){
             $this->data('dir.vendor',
-                dirname($this->data('priya.dir..application')) .
+                dirname($this->data('priya.dir.application')) .
                 Application::DS
             );
             $this->data('dir.root', $this->data('dir.vendor'));
