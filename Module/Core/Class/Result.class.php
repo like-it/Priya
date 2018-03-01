@@ -95,7 +95,6 @@ class Result extends Parser {
                 $this->write($target, $read, $page);
                 return $page;
             } else {
-                //add cache write for every minute
                 $data = $this->data($target); //(parsed in read)
                 $this->write($target, $read, $data);
                 return $data;
