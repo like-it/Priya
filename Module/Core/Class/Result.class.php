@@ -84,6 +84,9 @@ class Result extends Parser {
         }
         $cache = $this->cache($target, $read);
         if($cache){
+            if(is_array($cache)){
+                return Result::object($cache, 'object');
+            }
             return $cache;
         } else {
             $this->read($read);
@@ -93,7 +96,9 @@ class Result extends Parser {
                 return $page;
             } else {
                 //add cache write for every minute
-                return $this->data($target); //(parsed in read)
+                $data = $this->data($target); //(parsed in read)
+                $this->write($target, $read, $data);
+                return $data;
             }
         }
     }
@@ -116,8 +121,8 @@ class Result extends Parser {
         return Cache::read($url);
     }
 
-    public function write($target='', $read='', $page=''){
-        $dir = dirname($read::DIR)  .
+    public function write($target='', $class='', $data=''){
+        $dir = dirname($class::DIR)  .
         Application::DS .
         Application::DATA .
         Application::DS .
@@ -134,7 +139,7 @@ class Result extends Parser {
         if(file_exists($url)){
             return true;
         }
-        return Cache::write($url, $page);
+        return Cache::write($url, $data);
     }
 
     public function result($type=null, $result=''){
