@@ -1,157 +1,72 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 namespace Priya\Module;
 
 use Memcached;
-use stdClass;
+use Exception;
 
-class Memory extends Data{
+class Memory {
     const DEFAULT_HOST = '127.0.0.1';
-    const DEFAULT_PORT = 11211;
+    const DEFAULT_PORT = 11211; //public memcache server, secure memcache server is on a different port...
     const DEFAULT_WEIGHT = 1;
+    const DEFAULT_TYPE = 'Memcached';
 
     const NOT_FOUND = 16;
     const TIMEOUT = 32;
 
-    private $id;
-    private $memory;
-    private $nodeList;
-    private $keyList;
-    private $serverList;
-
-    public function __construct($memory='', $id=null){    	
-        if($id === null){
-            $this->memory = new Memcached();
-        } else {
-            $this->id = $id;
-            $this->memory = new Memcached($id);
-        }
-        if(is_object($memory)){
-            $server = $this->createServer($memory);
-            $this->memory->addserver(
-                $server->host,
-                $server->port,
-                $server->weight
-            );
-        }
-        if(is_array($memory)){
-            foreach ($memory as $server){
-                $server = $this->createServer($server);
-                $this->memory->addserver(
-                   $server->host,
-                   $server->port,
-                   $server->weight
-                );
-            }
-        }
+    public static function server(Memcached $dma, $server=array()){
+        $server = array_merge($server, array(
+            'host' => Memory::DEFAULT_HOST,
+            'port' => Memory::DEFAULT_PORT,
+            'weight' => Memory::DEFAULT_WEIGHT
+        ));
+        $dma->addServer(
+            $server['host'],
+            $server['port'],
+            $server['weight']
+        );
+        return $dma;
     }
 
-    public function __destruct(){
-        if($this->id === null){
-            $this->stop();
-        }
-        $this->stop();
+    public static function read(Memcached $dma, $key=''){
+        return false;
+        return $dma->get($key);
     }
 
-    public function result($result='code'){
-        if($result == 'code'){
-            return $this->memory->getResultCode();
-        }
-    }
-
-    public function restart(){
-//         exec('service memcached stop');
-//         exec('service memcached start');
-        exec('service memcached restart');
-    }
-
-    private function createServer($server=''){
-        $object = new stdClass();
-        $object->host = Memory::DEFAULT_HOST;
-        $object->port = Memory::DEFAULT_PORT;
-        $object->weight = Memory::DEFAULT_WEIGHT;
-        $object = Memory::object_merge($object, $server);
-        return $object;
-    }
-
-    public function write($key='', $value='', $expiration=0){
+    public static function write(Memcached $dma, $key='', $value='', $expiration=0){
+        $result = array();
+        $result['key'] = $key;
+        $result['value'] = $value;
+        $result['expiration'] = $expiration;
         if(is_array($key)){
-            return $this->memory->setMulti($key, $value);
+            $result['set'] = $dma->setMulti($key, $value);
         } else{
-            return $this->memory->set($key, $value, $expiration);
+            $result['set'] = $dma->set($key, $value, $expiration);
         }
+        return $result;
     }
 
-    public function read($key=''){
-        return $this->memory->get($key);
-    }
-
-    public function delete($key='', $time=0){
+    public static function delete(Memcached $dma, $key='', $time=0){
         if(is_array($key)){
-            return $this->memory->deleteMulti($key, $time);
+            return $dma->deleteMulti($key, $time);
         } else {
-            return $this->memory->delete($key, $time);
+            return $dma->delete($key, $time);
         }
     }
 
-    public function touch($key='', $expiration=0){
-        return $this->memory->touch($key, $expiration);
+    public static function touch(Memcached $dma, $key='', $expiration=0){
+        return $dma->touch($key, $expiration);
     }
 
-    public function keyList(){
-        $this->keyList = $this->memory->getAllKeys();
-        return $this->keyList;
+    public static function dma($type='Memcached'){
+        return  new Memcached();
     }
 
-    public function nodeList($attribute=''){
-        $keys = $this->memory->getAllKeys();
-        if($attribute == 'delete'){
-            return $this->delete($keys);
-        }
-        if(!empty($attribute) && is_array($attribute)){
-            $write = $this->write($attribute);
-            if(!empty($write)){
-                return $this->nodeList();
-            }
-            return false;
-        }
-        else {
-            $this->memory->getDelayed($keys);
-            $this->nodeList = $cache->fetchAll();
-            return $this->nodeList;
-        }
-    }
 
-    public function serverList(){
-        $this->serverList = $this->memory->getServerList();
-    }
-
-    public function statistic(){
-        return $this->memory->getStats();
-    }
-
-    public function version(){
-        return $this->memory->version();
-    }
-
-    public function stop(){
-        return $this->memory->quit();
-    }
-
-    public function option($option=null, $value=null){
-        if($option === null){
-            return;
-        }
-        if($value === null){
-            $this->memory->getOption($option);
-        } else {
-            $this->memory->setOption($option, $value);
-        }
-    }
 }

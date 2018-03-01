@@ -6,6 +6,8 @@
  * @version        1.0
  * @changeLog
  *     -    all
+ *
+ * @todo file read into variable
  */
 
 function function_file_read($function=array(), $argumentList=array(), $parser=null){

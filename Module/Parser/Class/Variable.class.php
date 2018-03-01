@@ -2,6 +2,8 @@
 
 namespace Priya\Module\Parser;
 
+use Exception;
+
 class Variable extends Core {
 
     private $parser;
@@ -76,22 +78,74 @@ class Variable extends Core {
         }
     }
 
+    /**
+     *
+     * @param array $before (parse before variable definition)
+     */
+    public static function exclamation($before=array()){
+        $count = 0;
+        if(empty($before)){
+            return $count;
+        }
+        krsort($before);
+
+        foreach($before as $nr => $record){
+            if($record['value'] == '{'){ //might need to add (
+                break;
+            }
+            if($record['type'] == Token::TYPE_EXCLAMATION){
+                $count++;
+            }
+        }
+        return $count;
+    }
+
     public static function fix($parse=array()){
         $result = array();
+        $depth = false;
         $is_variable = false;
+        $is_modifier = false;
         $has_variable = false;
         $collect = false;
+        $before = array();
+        $is_before = true;
         foreach($parse as $nr => $record){
+            if($record['type'] == Token::TYPE_EXCLAMATION){
+                if($is_before){
+                    $before[] = $record;
+                }
+                continue;
+            }
             if($record['type'] == Token::TYPE_VARIABLE){
+                $record['exclamation_count'] = Variable::exclamation($before);
+                if($record['exclamation_count'] > 0){
+                    $record['has_exclamation'] = true;
+                } else {
+                    $record['has_exclamation'] = false;
+                }
                 $has_variable = true;
                 $is_variable = $nr;
+                $is_before = false;
+                $before = array();
                 $result[$nr] = $record;
+                continue;
+            } elseif($is_before){
+                $before[] = $record;
+            }
+            if($is_modifier){
+                $result[$nr] = $record;
+                if($record['value'] == '}'){
+                    $is_modifier = false;
+                }
                 continue;
             }
             if($is_variable !== false){
                 if(substr($record['value'], 0, 1) == '.'){
                     $collect = true;
                 }
+            }
+            if($record['value'] == '|'){
+                $is_modifier = true;
             }
             if(
                 $collect === true &&
@@ -139,6 +193,12 @@ class Variable extends Core {
     }
 
     public function find($record=array(), $keep=false){
+        if(
+            substr($record['variable']['tag'], 0, 1) != '{' &&
+            substr($record['variable']['tag'], -1, 1) != '}'
+        ){
+            return $record;
+        }
         $attribute = substr($record['variable']['tag'], 1, -1);
         $tokens = Token::all($attribute);
         foreach($tokens as $nr => $token){
@@ -180,13 +240,14 @@ class Variable extends Core {
         if(!isset($record['string'])){
             return $record;
         }
+        if(
+            is_object($record['string']) ||
+            is_array($record['string'])
+        ){
+            return $record;
+        }
         $explode = explode($record['variable']['tag'], $record['string'], 2);
         $replace = $this->replace($attribute, $modifier, $keep);
-        if($attribute == '$web'){
-//             debug('found');
-//             debug($replace);
-//             die;
-        }
         if(is_object($replace)){
             if(
                 isset($replace->__tostring) &&
@@ -289,79 +350,34 @@ class Variable extends Core {
                             return $output;
                         }
                         $output = Variable::value($output);
-                        $output = Modifier::find($output, $modifier, $this, $this->parser());
-//                         var_dump($output);
-//                         die;
-                        $output = $this->parser()->compile($output, $this->parser()->data());
-                        //parse comile again on output
+                        if(!empty($modifier)){
+                            $output = Modifier::find($output, $modifier, $this, $this->parser());
+                        }
+                        if(
+                            is_null($output) ||
+                            is_bool($output) ||
+                            is_int($output) ||
+                            is_float($output)
+                        ){
+                            //no need to compile again
+                        } else {
+                            //strange bug...
+                            if(
+                                Variable::is_empty($this->parser()->data()) === true &&
+                                Variable::is_empty($this->data()) === false
+                            ){
+                                //we could fix it now with $this->parser(data($this->data())
+                                //but better be on the right spot...
+                                throw new Exception('Parser data empty and variable data not (implementation error...)');
+                            }
+                            $output = $this->parser()->compile($output, $this->parser()->data());
+                        }
                     }
                 } else {
                     $output = $input;
                 }
             } else {
-                foreach ($list as $nr => $subList){
-                    foreach ($subList as $search => $empty){
-                        if(substr($search, 1, 1) != '$'){
-                            $output = $input;
-                            continue;
-                        }
-                        $attribute = substr($search, 2, -1);
-                        debug($attribute);
-                        $value = $this->data($attribute);
-                        $value = Variable::value($value);
-                        $type = Variable::type($value);
-                        debug($value, 'val2ue'); //set this->Data(attribute,value);
-                        debug($attribute, 'attri2bute');
-                        debug($input, 'inp2ut');
-                        if($output != null){
-                            $output_type = Variable::type($output);
-                        }
-                        if($output === null){
-                            if(in_array($type, array(
-                                    Token::TYPE_ARRAY,
-                                    Token::TYPE_OBJECT
-                            ))){
-                                $output = $value;
-                            } else {
-                                $output = str_replace($search, $value, $input);
-                                $output = Variable::value($output);
-                                $type = Variable::type($value);
-                            }
-                            //make list?
-                            $record['attribute'] = $attribute;
-                            $record['search'] = $search;
-                            $record['value'] = $value;
-                            $record['type'] = $type;
-                        } else {
-                            if($type == Token::TYPE_OBJECT && $output_type == Token::TYPE_OBJECT){
-                                $output = Variable::object_merge($output, $value);
-                                continue;
-                            }
-                            elseif($type == Token::TYPE_ARRAY && $output_type == Token::TYPE_ARRAY){
-                                $output = array_merge($output, $value);
-                                continue;
-                            }
-                            if($output_type == Token::TYPE_OBJECT && $type == Token::TYPE_NULL){
-                                continue; //add false too ?
-                            }
-                            if($output_type == Token::TYPE_ARRAY && $type == Token::TYPE_NULL){
-                                continue; //add false too ?
-                            }
-                            if(in_array($output_type, array(
-                                    Token::TYPE_ARRAY,
-                                    Token::TYPE_OBJECT
-                            ))){
-                                continue; //preserve arrays and objects
-                            }
-                            if(empty($is_set)){
-                                $output = $input;
-                                $is_set = true;
-                                $output = str_replace($record['search'], $record['value'], $output);
-                            }
-                            $output = str_replace($search, $value, $output);
-                        }
-                    }
-                }
+                throw new Exception('Variable::replace:list is not empty (have tags)');
             }
             return $output;
         }

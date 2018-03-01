@@ -12,6 +12,12 @@ function function_memory_usage($function=array(), $argumentList=array(), $parser
     $usage = memory_get_peak_usage(true);
     $format = array_shift($argumentList);
     switch (strtoupper($format)){
+        case 'PB' :
+            $function['execute'] = round($usage/1024/1024/1024/1024/1024, 2) . ' PB';
+            break;
+        case 'TB' :
+            $function['execute'] = round($usage/1024/1024/1024/1024, 2) . ' TB';
+            break;
         case 'GB' :
             $function['execute'] = round($usage/1024/1024/1024, 2) . ' GB';
            break;

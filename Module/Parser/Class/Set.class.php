@@ -69,11 +69,7 @@ class Set extends Core {
                             $record['value'] = (bool) $record['value'];
                         }
                     }
-
-
-
                     $parse[$nr] = $record;
-                    die;
                 }
             }
 
@@ -145,7 +141,6 @@ class Set extends Core {
             if(!isset($record['set'])){
                 $record['set'] = array();
             }
-//             $record['set']['statement'] = $statement;
             $set[$nr] = $record;
         }
         return $set;

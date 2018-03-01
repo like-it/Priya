@@ -3,6 +3,7 @@
         "environment": "production",
         "version": "{$priya.major|default:0}.{$priya.minor|default:0}.{$priya.patch|default:0}",
         "contentType": {
+            "txt" : "text\/plain",
             "html": "text\/html",
             "css": "text\/css",
             "pcss": "text\/css",
@@ -19,8 +20,8 @@
             "mp3": "audio\/mp3"
         },
         "major": 0,
-        "minor": 2,
-        "patch": 9,
-        "built": "2017-12-28 00:04:36"
+        "minor": 3,
+        "patch": 0,
+        "built": "2018-03-01 01:57:59"
     }
 }

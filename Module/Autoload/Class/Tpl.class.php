@@ -50,6 +50,12 @@ class Tpl extends Autoload {
         }
         $data = array();
 
+        if($item['prefix'] != 'none'){
+            $prefix = str_replace('\\',Application::DS, $item['prefix']);
+            if(strpos($item['load'], $prefix) === false){
+                return $data;
+            }
+        }
         $directory = explode(Application::DS, $item['file']);
         if(count($directory) == 1){
             if(stristr($item['file'], $item['extension']) !== false){
@@ -99,7 +105,6 @@ class Tpl extends Autoload {
         }
 
         $this->fileList[$item['baseName']][] = $data;
-//         var_dump($data);
         return $data;
     }
 }

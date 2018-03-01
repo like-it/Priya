@@ -18,9 +18,11 @@ use Priya\Module\Autoload\Tpl;
 use Priya\Module\File;
 use Priya\Module\File\Dir;
 use Priya\Module\Core\Parser;
+use Priya\Module\File\Cache;
 
 class Result extends Parser {
     const DIR = __DIR__;
+    const FILE = __FILE__;
 
     private $result;
 
@@ -71,6 +73,72 @@ class Result extends Parser {
         $ignore[] = 'contentType';
 //         $ignore[] = 'autoload';
         $this->data('ignore', $ignore);
+    }
+
+    public function exec($target='', $read=''){
+        if(empty($read)){
+            $read = get_called_class();
+        }
+        if(empty($target)){
+            $target = 'result.' . $this->request('contentType');
+        }
+        $cache = $this->cache($target, $read);
+        if($cache){
+            if(is_array($cache)){
+                return Result::object($cache, 'object');
+            }
+            return $cache;
+        } else {
+            $this->read($read);
+            if($target == 'page'){
+                $page =  $this->result($target);
+                $this->write($target, $read, $page);
+                return $page;
+            } else {
+                $data = $this->data($target); //(parsed in read)
+                $this->write($target, $read, $data);
+                return $data;
+            }
+        }
+    }
+
+    public function cache($target='', $read=''){
+        $dir = dirname($read::DIR)  .
+        Application::DS .
+        Application::DATA .
+        Application::DS .
+        Cache::CACHE .
+        Application::DS .
+        Cache::MINUTE .
+        Application::DS
+        ;
+        if(!is_dir($dir)){
+            Dir::create($dir, Dir::CHMOD);
+        }
+        $url = $dir . $target;
+        $url = $url . '?' . date('YmdHi'); //every minute;
+        return Cache::read($url);
+    }
+
+    public function write($target='', $class='', $data=''){
+        $dir = dirname($class::DIR)  .
+        Application::DS .
+        Application::DATA .
+        Application::DS .
+        Cache::CACHE .
+        Application::DS .
+        Cache::MINUTE .
+        Application::DS
+        ;
+        if(!is_dir($dir)){
+            Dir::create($dir, Dir::CHMOD);
+        }
+        $url = $dir . $target;
+        $url = $url . '?' . date('YmdHi', $this->data('time.cache')); //every minute;
+        if(file_exists($url)){
+            return true;
+        }
+        return Cache::write($url, $data);
     }
 
     public function result($type=null, $result=''){
@@ -263,6 +331,11 @@ class Result extends Parser {
         } else {
             $smarty->assign('link', array());
         }
+        if(isset($data['contentType']) && isset($data['contentType'][$contentType]) && isset($data['contentType'][$contentType]['style'])){
+            $smarty->assign('style', $data['contentType'][$contentType]['style']);
+        } else {
+            $smarty->assign('style', array());
+        }
         if($contentType == Handler::CONTENT_TYPE_JSON){
             $target = $this->request('target');
             if(empty($target)){
@@ -317,6 +390,25 @@ class Result extends Parser {
                 $object->link = $link;
             } else {
                 $object->link = array();
+            }
+            if(isset($variable['style'])){
+                if(is_string($variable['style'])){
+                    $variable['style'] = (array) $variable['style'];
+                }
+                $style = array();
+                foreach($variable['style'] as $nr => $item){
+                    $tmp = explode('<sty', $item);
+                    foreach($tmp as $tmp_nr => $tmp_value){
+                        $tmp_value = trim($tmp_value);
+                        if(empty($tmp_value)){
+                            continue;
+                        }
+                        $style[] = '<sty' . $tmp_value;
+                    }
+                }
+                $object->style = $style;
+            } else {
+                $object->style = array();
             }
             if(isset($variable['script'])){
                 if(is_string($variable['script'])){
@@ -382,7 +474,10 @@ class Result extends Parser {
             $dir = dirname($caller::DIR) . Application::DS . Application::TEMPLATE . Application::DS;
             $tpl->addPrefix('none', $dir, $extension);
         }
-        $autoload = $this->data('autoload');
+        $autoload = $this->data('priya.autoload');
+        if(empty($autoload)){
+            $autoload = $this->data('autoload');
+        }
         if(is_object($autoload) || is_array($autoload)){
             foreach($autoload as $prefix => $dir){
                 $tpl->addPrefix($prefix, $dir, $extension);
@@ -393,11 +488,6 @@ class Result extends Parser {
         $environment = $this->data('priya.environment');
         if(!empty($environment)){
             $tpl->environment($environment);
-        }
-        if($template ==    '{$module}'){
-            debug('found');
-            debug(debug_backtrace(true));
-            die;
         }
         $url = $tpl->tpl_load($template);
         if(empty($url)){
@@ -460,18 +550,23 @@ class Result extends Parser {
 
     public function createPage($template=''){
         $contentType = $this->request('contentType');
-        $template_list = (array) $this->locateTemplate($template, 'tpl.priya');
+        $template_list = (array) $this->locateTemplate($template, 'tpl');
 
         $result = new stdClass();
         $file = new \Priya\Module\File();
         $this->data('request', $this->request());
         $this->data('session', $this->session());
 
-
         foreach($template_list as $template){
             if(file_exists($template) === false){
                 continue;
             }
+            $cwd = dirname($template) . Application::DS;
+            $explode = explode(Application::DS . Application::TEMPLATE, $cwd, 2);
+            if(count($explode) == 2){
+                $cwd = implode('', $explode);
+            }
+            $this->data('dir.current', $cwd);
             $this->data('input', $file->read($template));
             $this->data('output', $this->parser($this->data('input'), $this->data()));
             if($contentType == Handler::CONTENT_TYPE_JSON){

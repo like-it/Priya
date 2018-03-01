@@ -19,6 +19,10 @@ class File {
         return str_replace('\\\/', DIRECTORY_SEPARATOR, rtrim($directory,'\\\/')) . DIRECTORY_SEPARATOR;
     }
 
+    public static function mtime($url=''){
+        return filemtime($url);
+    }
+
     public static function info(stdClass $node){
         $rev = strrev($node->name);
         $explode = explode('.', $rev, 2);
@@ -35,7 +39,7 @@ class File {
         return $node;
     }
 
-    public static function chown($url='', $owner=null, $group=null){
+    public static function chown($url='', $owner=null, $group=null, $recursive=false){
         if($owner === null){
             $owner = 'root:root';
         }
@@ -48,7 +52,11 @@ class File {
                 $group = $explode[1];
             }
         }
-        exec('chown ' . $owner . ':' . $group . ' ' . $url, $output);
+        if($recursive){
+            exec('chown ' . $owner . ':' . $group . ' -R ' . $url, $output);
+        } else {
+            exec('chown ' . $owner . ':' . $group . ' ' . $url, $output);
+        }
     }
 
     public function write($url='', $data=''){
@@ -96,6 +104,7 @@ class File {
     }
 
     public function extension($url=''){
+        $url = basename($url);
         $ext = explode('.', $url);
         if(count($ext)==1){
             $extension = '';
@@ -103,6 +112,14 @@ class File {
             $extension = array_pop($ext);
         }
         return $extension;
+    }
+
+    public function basename($url='', $extension=''){
+        $filename = basename($url);
+        $explode = explode('?', $filename, 2);
+        $filename = $explode[0];
+        $filename = basename($filename, $extension);
+        return $filename;
     }
 
     public function removeExtension($filename='', $extension=array()){

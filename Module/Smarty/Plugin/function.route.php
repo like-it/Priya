@@ -2,11 +2,11 @@
 use Priya\Module\Handler;
 
 /**
- * @author 		Remco van der Velde
- * @since 		19-01-2016
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-01-2016
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 
 function smarty_function_route($params, $template)
@@ -40,7 +40,7 @@ function smarty_function_route($params, $template)
             }
         }
         if(empty($found)){
-            trigger_error('Route not found for ('. $name.')', E_USER_ERROR);
+            throw new Exception('Route not found for ('. $name.')');
         } else {
             $route_path = explode('/', trim($route['path'], '/'));
             foreach($route_path as $part_nr => $part){

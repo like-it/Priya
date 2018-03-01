@@ -90,7 +90,6 @@ class Operator extends Core {
         ){
             $operator['execute'] = $operator['left'] . $operator['operator'] . $operator['right'];
         }
-//         debug($operator, 'execute');
         //add % & ** >= <=
         $original = $operator['value'];
         switch($operator['value']){
@@ -143,6 +142,7 @@ class Operator extends Core {
                 $modifier = reset($operator['right_parse']);
                 if(is_string($modifier['value'])){
                     $operator = Modifier::execute($operator, $variable, $parser);
+                    var_dump($operator);
                     unset($operator['left']);
                     unset($operator['right']);
                     $operator['modified_is_executed'] = true;
@@ -166,17 +166,18 @@ class Operator extends Core {
                 $operator['value'] = $operator['left'] || $operator['right'];
             break;
             default :
-                debug('undefined operator (' .  $operator['value'] . ') in execute');
+                throw new Exception('Operator::execute:Undefined operator (' . $operator['value'] . ') in execute');
             break;
         }
         if(!isset($operator['value'])){
-            debug($operator, 'no value');
+            throw new Exception('Operator::execute:No value');
         }
         $operator['type'] = Variable::type($operator['value']);
         return $operator;
     }
 
     public static function statement($statement=array(), Variable $variable, $parser=null){
+        //variable is already a value in statement
         //add original
         $left = array();
         $right = array();
@@ -218,7 +219,7 @@ class Operator extends Core {
         $method = Token::method($method, $variable, $parser);
         $operator['right_parse'] = $method['parse'];
 
-        $is_modifier = 	Modifier::is($operator);
+        $is_modifier =     Modifier::is($operator);
 
         foreach($operator['left_parse']as $nr => $record){
             if($is_modifier === false){
@@ -243,9 +244,7 @@ class Operator extends Core {
             $operator['right_parse'][$nr] = $record;
         }
         if(!isset($operator['value']) && empty($operator['right_parse'])){
-            debug($operator, 'wrong compare');
-            debug($statement, 'what is in statement');
-            die;
+            throw new Exception('Operator::statement:Wrong compare');
         }
         if($operator['value'] == '&&' || $operator['value'] == '||'){
             $right_statement = $statement;
@@ -257,7 +256,7 @@ class Operator extends Core {
                     $right_statement = Operator::statement($right_statement, $variable, $parser);
                     $right_statement_count++;
                     if($right_statement_count >= Operator::MAX){
-                        debug('$right_statement_count >= Operator::MAX');
+                        throw new Exception('Operator::statement:$right_statement_count >= Operator::MAX');;
                         break;
                     }
                 }

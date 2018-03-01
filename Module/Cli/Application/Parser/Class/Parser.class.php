@@ -57,18 +57,35 @@ class Parser extends Cli {
             $write[] = 'Copyright (c) 2015-' . date('Y') . ' Remco van der Velde';
             $write[] = 'Generated File (do not modify) (built: ' . date('Y-m-d H:i:s') . ')';
             $write[] = '*/';
+            $write[] = '';
 
-            $write = implode(PHP_EOL, $write);
+            $write = implode("\n", $write);
+
+            $combination = '';
 
             foreach($read as $node){
-                if($node->type != 'file'){
+                if($node->type != File::TYPE){
                     continue;
                 }
                 $this->output('Combining: ' . lcfirst(str_ireplace(array('control.', 'function.', 'modifier.', '.php'), '', $node->name)) . PHP_EOL);
                 $tmp = $file->read($node->url);
                 $tmp = str_replace('<?php', '', $tmp);
-                $write .= $tmp;
+                $explode = explode("\n", $tmp);
+                $match = 'use';
+                foreach($explode as $nr => $record){
+                    $class = trim($record, " \t");
+                    if(substr($class, 0, 3) == $match){
+                        $use[$class] = $nr;
+                        unset($explode[$nr]);
+                    }
+                }
+                $tmp = implode("\n", $explode);
+                $combination .= $tmp;
             }
+            foreach ($use as $class => $nr){
+                $write .= $class . "\n";
+            }
+            $write .= $combination;
             $this->output('In: ' . basename($target) . PHP_EOL);
             $file->write($target, $write);
         }

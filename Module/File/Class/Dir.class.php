@@ -13,6 +13,7 @@ use stdClass;
 
 class Dir {
     const CHMOD = 0740;
+    const TYPE = 'Dir';
 
     private $node;
 
@@ -93,7 +94,7 @@ class Dir {
                 $file->url = $url . $entry;
                 if(is_dir($file->url)){
                     $file->url .= DIRECTORY_SEPARATOR;
-                    $file->type = 'dir';
+                    $file->type = Dir::TYPE;
                 }
                 if($this->ignore('find', $file->url)){
                     continue;
@@ -111,7 +112,7 @@ class Dir {
                         }
                     }
                 } else {
-                    $file->type = 'file';
+                    $file->type = \Priya\Module\File::TYPE;
                 }
                 if(is_link($entry)){
                     $file->link = true;

@@ -3,6 +3,7 @@
 namespace Priya\Module\Parser;
 
 use Priya\Module\Core\Object;
+use Exception;
 
 class Assign extends Core {
 
@@ -58,7 +59,6 @@ class Assign extends Core {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -104,7 +104,6 @@ class Assign extends Core {
                 unset($parse[$nr]);
             }
         }
-        debug($parse, 'replace_set');
         return $parse;
     }
 
@@ -141,24 +140,37 @@ class Assign extends Core {
 
     public static function row($record=array(), $random=''){
         if(!isset($record['string'])){
-            debug($record, 'record no string in row');
+            throw new Exception('Assign:record no string in row');
             return $record;
         }
-        $string = Token::restore_return($record['string'], $random);
+        if(is_string($record['string'])){
+            $string = Token::restore_return($record['string'], $random);
+        } else {
+            $string = $record['string'];
+        }
         $tag = Token::restore_return($record['assign']['tag'], $random);
         $explode = explode('=', substr($tag, 1, -1), 2);
-        if(!empty($explode[0]) && substr($explode[0], 0, 1) == '$' && count($explode) == 2){
-            $anchor = '[' . $random . '][anchor]';
-            $string = str_replace($tag, $anchor, $string);
+        if(
+            !empty($explode[0]) &&
+            substr($explode[0], 0, 1) == '$' &&
+            stristr($explode[0], '|') === false &&
+            count($explode) == 2
+        ){
+            $rand = rand(1000, 9999) . '-' . rand(1000, 9999);
+            $anchor = '[' . $random . '-' . $rand .  '][anchor]';
+            /**
+             * it should replace only 1 at a time...
+             *
+             */
+            $tmp = explode($tag, $string, 2);
+            if(count($tmp) == 2){
+                $string = implode($anchor, $tmp);
+            }
             $explode = explode("\n", $string);
             foreach($explode as $nr => $row){
-                if(trim($row) == $anchor){
-                    unset($explode[$nr]);
-                    break;
-                }
-                $explode[$nr] = str_replace($anchor, '', $row, $count);
-                if($count > 0){
-                    break;
+                $tmp = explode($anchor, $row, 2);
+                if(count($tmp) == 2){
+                    $explode[$nr] = implode('', $tmp);
                 }
             }
             $string = implode("\n", $explode);
@@ -180,12 +192,15 @@ class Assign extends Core {
         $assign = false;
         $parse = array();
         $count = 0;
-//         debug($tag, 'tag');
         $explode = explode('=', substr($tag, 1, -1), 2);
 
-        if(!empty($explode[0]) && substr($explode[0], 0, 1) == '$' && count($explode) == 2){
+        if(
+            !empty($explode[0]) &&
+            substr($explode[0], 0, 1) == '$' &&
+            stristr($explode[0], '|') === false &&
+            count($explode) == 2
+        ){
             $attribute = substr(rtrim($explode[0]), 1);
-//             debug($attribute, 'attribute');
             $value = trim($explode[1], ' ');
             if(
                 substr($attribute,-1) == '-' ||
@@ -200,7 +215,7 @@ class Assign extends Core {
             //before create_object assign variable needed
             $create = Token::restore_return($value, $this->random());
             $original = $create;
-            $variable = new Variable($this->data(), $this->random());
+            $variable = new Variable($this->data(), $this->random(), $this->parser());
             $create = Token::all($create);
             $object = Token::create_object($create, $attribute, $variable, $this->parser());
             if(!empty($object)){
@@ -212,16 +227,15 @@ class Assign extends Core {
             }
             $array = Token::create_array($create, $variable);
             if(!empty($array)){
-                $variable = new Variable($this->data(), $this->random());
+                $variable = new Variable($this->data(), $this->random(), $this->parser());
                 $array['value'] = $variable->replace($array['value']);
                 //is variable data changed?
                 $array = Token::cast($array);
                 $this->data($attribute, $array['value']);
                 return;
             }
-            $variable = new Variable($this->data(), $this->random());
+            $variable = new Variable($this->data(), $this->random(), $this->parser());
             //an equation can be a variable, if it is undefined it will be + 0
-
             $parse = Token::parse($create);
             $parse = Token::variable($parse, $variable, $attribute);
             $method = array();
@@ -249,16 +263,17 @@ class Assign extends Core {
                     if(!empty($item['type']) && $item['type'] != $record['type']){
                         $item['type'] = Token::TYPE_MIXED;
                     }
-                    if(!empty($item['value']) && isset($record['value']) && $item['type'] == Token::TYPE_STRING || $item['type'] == Token::TYPE_MIXED){
+                    if(isset($item['value']) && isset($record['value']) && $item['type'] == Token::TYPE_STRING || $item['type'] == Token::TYPE_MIXED){
                         $item['value'] .= $record['value'];
                     }
-                    elseif(!empty($item['value']) && !empty($record['value'])){
-                        debug($record, 'record, item already set');
-                        debug($item, 'item already set');
+                    elseif(isset($item['value']) && !empty($record['value'])){
+                        throw new Exception('Assign:find: record & item set AND NOT TYPE_MIXED OR TYPE_STRING ');
                     }
                 }
                 if(!isset($item['value'])){
-                    $this->data($attribute, null);
+                    //cant use date with value null to set so...
+                    $this->object_delete($attribute, $this->data()); //for sorting an object
+                    $this->object_set($attribute, null, $this->data());
                     return;
                 }
                 switch($assign){
@@ -321,7 +336,8 @@ class Assign extends Core {
             return $result;
         }
         $string = trim($string, '\'"');
-        $pattern = '/\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/';
+//         $pattern = '/\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/';
+        $pattern = '/\{.*\}/';
         preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
         if(count($matches) == 1){
             $result = null;
@@ -370,8 +386,7 @@ class Assign extends Core {
             }
         } else {
             if($has === true){
-                var_dump('HERE IT IS....');
-                var_dump($string);
+
             }
             if(is_numeric($string)){
                 $pos = strpos($string,'0');
@@ -393,84 +408,4 @@ class Assign extends Core {
         return $result;
     }
 
-    private function ternary($explode='', $attribute, $value=''){
-        if($explode == Ternary::SHORT){
-            $short = explode( $explode, $value, 2);
-            if(count($short) == 2){
-                $start = rtrim($short[0], ' ');
-                $end = ltrim($short[1], ' ');
-
-                $statement = $this->statement($start, $this->statement($end));
-                $statement['result'] = $this->variable($statement['result']);
-
-                //$statement['result'] = $this->variable($this->statement($start, $this->statement($end)));
-                $this->data('set', $attribute, $statement['result']);
-                return true;
-
-            }
-        }
-        elseif ($explode == Ternary::QUESTION){
-            $start = explode($explode, $value, 2);
-            foreach($start as $key => $value){
-                $start[$key] = trim($value, ' ');
-            }
-            $end = explode(Ternary::COLON, $value, 2);
-            foreach($end as $key => $value){
-                $end[$key] = trim($value, ' ');
-            }
-            if(count($start) == 2 && count($end) == 2){
-                if(substr($start[1], 0, 1) == ':'){
-                    $start = $start[0];
-                    //add operator support
-                    if(substr($start, 0, 1) == '$'){
-                        $search = substr($start, 1);
-                        $replace = $this->data($search);
-                        if(!$replace){
-                            $replace = $end[1];
-                        }
-                        $this->data('set', $attribute, $replace);
-                        return true;
-                    }
-                } else {
-                    $original = $value;
-                    $statement = $this->statement($start[0], $this->statement($end[1]), $end[0], $end[1]);
-                    $statement['result'] = $this->variable($statement['result']);
-
-
-                    var_dump($statement);
-                    /*
-                    $pattern = '/(\S+)(\s+)(\S+)(\s+)(\S+)/';
-                    preg_match_all($pattern, $start[0], $matches, PREG_SET_ORDER);
-                    if(count($matches) == 1){
-                        $statement['left'] = trim($matches[0][1], '\'"');
-                        $statement['operator'] = $matches[0][3];
-                        $statement['right'] = trim($matches[0][5], '\'"');
-                        $statement['true'] = trim($end[0], '\'"');
-                        $statement['false'] = trim($end[1], '\'"');
-
-                        $statement['left'] = $this->variable($statement['left']);
-                        $statement['right'] = $this->variable($statement['right']);
-                        $statement['true'] = $this->variable($statement['true']);
-                        $statement['false'] = $this->variable($statement['false']);
-
-                        $statement = Control_If::statement($statement);
-
-                        if(!empty($statement['output'])){
-                            var_dump($statement['true']);
-                            $this->data('set', $attribute, $statement['true']);
-                        } else {
-                            var_dump($statement['true']);
-                            $this->data('set', $attribute, $statement['false']);
-                        }
-                        return true;
-                    } else {
-                        //no comparison
-                        //maybe a pattern without spaces
-                    }
-                    */
-                }
-            }
-
-        }
-    }
 }

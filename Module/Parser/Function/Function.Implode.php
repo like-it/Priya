@@ -19,7 +19,11 @@ function function_implode($function=array(), $argumentList=array(), $parser=null
         $glue = array_shift($argumentList);
         $pieces = array_shift($argumentList);
     }
-    $function['execute'] = implode($glue, $pieces);
+    if($pieces === null){
+        $function['execute'] = ''; //implode returns a string...
+    } else {
+        $function['execute'] = implode($glue, $pieces);
+    }
     return $function;
 
 }

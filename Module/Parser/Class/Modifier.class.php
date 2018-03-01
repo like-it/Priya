@@ -71,11 +71,32 @@ class Modifier extends Core {
         return $parse;
     }
 
+    public static function pipe($parse=array(), $random=''){
+        $string = '';
+        foreach($parse as $nr => $record){
+            if($record['type'] == Token::TYPE_STRING){
+                $record['value'] = str_replace('|', '[' . $random . '][pipe]', $record['value']);
+            }
+            $string .= $record['value'];
+        }
+        return $string;
+    }
+
     /**
      * @todo
-     * -	multiple modifiers;
+     * -    multiple modifiers;
      */
     public static function find($value='', $modifier='', Variable $variable, $parser=null){
+        if(is_array($modifier)){
+            $string = array();
+            foreach($modifier as $nr =>  $part){
+                $string[$nr] = Modifier::pipe($part, $parser->random());
+            }
+            $modifier = implode(' | ', $string);
+        } else {
+            $temp = Token::parse($modifier);
+            $modifier = Modifier::pipe($temp, $parser->random());
+        }
         $parse = Token::parse($modifier);
         $counter = 0;
         while($modifier = Modifier::get($parse)){
@@ -83,6 +104,7 @@ class Modifier extends Core {
                 return $value;
             }
             $argument = Modifier::argument($parse, $variable);
+
             $name = str_replace(
                 array(
                     '..',
@@ -122,6 +144,7 @@ class Modifier extends Core {
         $collect = false;
         $key = 0;
         $is_modifier = false;
+        $depth = null;
         foreach($parse as $nr => $record){
             if($record['type'] == Token::TYPE_WHITESPACE){
                 continue;
@@ -150,6 +173,7 @@ class Modifier extends Core {
                 }
                 $collect = true;
                 $is_array = false;
+                $depth = $record['set']['depth'];
                 continue;
             }
             if(
@@ -169,6 +193,9 @@ class Modifier extends Core {
                 continue;
             }
             if($collect === true){
+                if($record['value'] == '}' && $record['set']['depth'] == $depth){
+                    break;
+                }
                 if(
                     $is_array === true &&
                     $record['type'] != Token::TYPE_COMMA
@@ -195,7 +222,11 @@ class Modifier extends Core {
                 }
             }
         }
-        return $argumentList;
+        $result = array();
+        foreach ($argumentList as $argument){
+            $result[] = Literal::restore($argument, $variable->random());
+        }
+        return $result;
     }
 
     public static function execute($operator=array(), Variable $variable, $parser=null){
@@ -217,9 +248,14 @@ class Modifier extends Core {
         } else {
             trigger_error('Modifier (' . $name .') not found (' . $url . ')', E_USER_ERROR);
         }
-        $before = reset($operator['left_parse']);
+        $value = '';
+        foreach ($operator['left_parse'] as $before){
+            if($before['value'] == '{'){
+                break;
+            }
+            $value .= $before['value'];
+        }
         $argument = Modifier::argument($operator['right_parse'], $variable);
-        $value = $before['value'];
         $operator['execute'] = $name($value, $argument, $parser);
         $operator['value'] = $operator['execute'];
         $part = reset($operator['right_parse']);

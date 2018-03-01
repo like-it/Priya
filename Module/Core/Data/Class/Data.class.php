@@ -34,8 +34,6 @@ class Data extends Core {
         $object_data = $this->get_object_data();
         if($object_data === null){
             $this->set_object_data(new \Priya\Module\Data());
-//             $this->get_object_data()->route($this->route());
-//             $this->get_object_data()->handler($this->handler());
         }
         return $this->get_object_data();
     }

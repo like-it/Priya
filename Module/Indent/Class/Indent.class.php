@@ -17,7 +17,7 @@ class Indent extends Main {
     const FILE = 'Indent.css';
 
     public function css(){
-        header('Content-Type: ' . $this->data('priya.contentType.css'));
+        $this->header('Content-Type: ' . $this->data('priya.contentType.css'));
         $this->read(__CLASS__);
         $result =  $this->result('template');
 

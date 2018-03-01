@@ -10,6 +10,7 @@
 namespace Priya\Module;
 
 use stdClass;
+use Exception;
 use Priya\Application;
 
 class Data extends Core {
@@ -20,6 +21,15 @@ class Data extends Core {
 
     public function __construct($handler=null, $route=null, $data=null){
         $this->data(Data::object_merge($this->data(), $handler));
+    }
+
+    public static function is_empty($data = array()){
+        $is_empty = true;
+        foreach($data as $key => $item){
+            $is_empty = false;
+            break;
+        }
+        return $is_empty;
     }
 
     public function data($attribute=null, $value=null, $type=null){
@@ -105,7 +115,7 @@ class Data extends Core {
                         return $this->decodeUrl($attribute);
                     break;
                     default:
-                        trigger_error('unknown attribute (' . $url . ') in url');
+                        throw new Exception('unknown attribute (' . $url . ') in url');
                 }
             } else {
                 $this->setUrl($url);
@@ -197,7 +207,10 @@ class Data extends Core {
                 $data->addPrefix('none', $dir);
             }
             $data->addPrefix($namespace, $directory);
-            $autoload = $this->data('autoload');
+            $autoload = $this->data('priya.autoload');
+            if(empty($autoload)){
+                $autoload = $this->data('autoload');
+            }
             if(is_object($autoload)){
                 foreach($autoload as $prefix => $directory){
                     $data->addPrefix($prefix, $directory);
@@ -212,11 +225,14 @@ class Data extends Core {
 
         $file = new File();
         $read = $file->read($url);
-        $read = $this->object($read);
+        if($read !== false){
+            $read = $this->object($read);
+        }
         $data = $this->data();
         if(empty($data)){
             $data = new stdClass();
         }
+
         if(!empty($read)){
             foreach($read as $attribute => $value){
                 $this->object_set($attribute, $value, $data);
@@ -314,11 +330,10 @@ class Data extends Core {
             }
         }
         if(empty($useData)){
-            return $data; //$this->object($data, $output);
+            return $data;
         } else {
             $this->data('delete', $list);
             return $this->data($list, $data);
-            //return $this->data($list, $this->object($data, $output));
         }
     }
 

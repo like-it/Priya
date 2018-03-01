@@ -35,6 +35,9 @@ class Version extends Cli {
             if($parameter == '--update'){
                 continue;
             }
+            elseif($parameter == 'update'){
+                continue;
+            }
             $version = $parameter;
         }
         if(empty($version)){

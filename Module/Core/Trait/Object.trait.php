@@ -10,6 +10,7 @@
 namespace Priya\Module\Core;
 
 use stdClass;
+use Exception;
 
 trait Object {
 
@@ -30,7 +31,7 @@ trait Object {
             elseif($output == 'array') {
                 return array($input);
             } else {
-                trigger_error('unknown output in object');
+                throw new Exception('unknown output in object');
             }
         }
         if(is_null($input)){
@@ -64,8 +65,7 @@ trait Object {
                     );
                     $json = json_decode($input);
                     if(json_last_error()){
-                        debug($input, 'input');
-                        trigger_error(json_last_error_msg(), E_USER_ERROR);
+                        new Exception(json_last_error_msg());
                     }
                     return $json;
                 }
@@ -83,8 +83,7 @@ trait Object {
                     );
                     $json = json_decode($input);
                     if(json_last_error()){
-                        debug($input, 'input');
-                        trigger_error(json_last_error_msg(), E_USER_ERROR);
+                        throw new Exception(json_last_error_msg());
                     }
                     return $json;
                 }
@@ -124,7 +123,7 @@ trait Object {
         elseif($output=='array'){
             return json_decode($data,true);
         } else {
-            trigger_error('unknown output in object');
+            throw new Exception('unknown output in object');
         }
     }
 
@@ -289,6 +288,7 @@ trait Object {
                 if(isset($object->{$key})){
                     return $this->object_delete($attribute, $object->{$key}, $object, $key);
                 } else {
+                    unset($object->{$key}); //to delete nulls
                     return false;
                 }
             }
@@ -383,10 +383,7 @@ trait Object {
             if(is_array($object)){
                 foreach($object as $key => $value){
                     if(is_object($main)){
-                        var_dump($main);
-                        var_dump($object);
-                        var_dump(debug_backtrace(true));
-                        die;
+                        throw new Exception('cannot merge an array with an object');
                     }
                     if(!isset($main[$key])){
                         $main[$key] = $value;

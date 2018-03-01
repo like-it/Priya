@@ -11,6 +11,7 @@ namespace Priya\Module;
 
 use stdClass;
 use Priya\Application;
+use Priya\Module\Core\Object;
 
 class Handler extends \Priya\Module\Core\Data{
     const CONTENT_TYPE_CSS = 'text/css';
@@ -42,6 +43,32 @@ class Handler extends \Priya\Module\Core\Data{
         $this->lastModified('create');
         $this->referer('create');
         $this->file('create');
+        $this->microtime('create');
+        $this->key('create');
+    }
+
+    public function key($attribute=null){
+        if($attribute == 'create'){
+            $request = $this->request();
+            unset($request->{'last-modified'});
+            unset($request->time);
+            $key = sha1(Core::object($request, 'json'));
+            $this->request('key', $key);
+        }
+    }
+
+
+    public function microtime($attribute=null){
+           if($attribute == 'create'){
+                if(
+                    isset($_SERVER) &&
+                    isset($_SERVER['REQUEST_TIME_FLOAT'])
+                ){
+                    $this->request('time', $_SERVER['REQUEST_TIME_FLOAT']);
+                } else {
+                    $this->request('time', microtime(true));
+                }
+           }
     }
 
     public function request($attribute=null, $value=null){
@@ -211,7 +238,7 @@ class Handler extends \Priya\Module\Core\Data{
     }
 
     public function lastModified(){
-        $this->request('lastModified: '. gmdate('D, d M Y H:i:s T'));
+        $this->request('last-modified', gmdate('D, d M Y H:i:s T'));
     }
 
     public function contentType($contentType=null){
@@ -245,7 +272,7 @@ class Handler extends \Priya\Module\Core\Data{
             $contentType = Handler::CONTENT_TYPE_CSS;
         }
         $host = $this->host();
-        if(empty($host)){
+        if(empty($host) || $host == 'http:///'){
             $contentType = Handler::CONTENT_TYPE_CLI;
         }
         $ct = $this->request('contentType');
@@ -335,6 +362,14 @@ class Handler extends \Priya\Module\Core\Data{
                 $request[$previous] .= '&' . $key;
             } else {
                 $previous = $key;
+            }
+        }
+        //dropzone extra form field
+        if(is_array($_REQUEST)){
+            foreach($_REQUEST as $key => $value){
+                if(!isset($request[$key]) && isset($value)){
+                    $request[$key] = $value;
+                }
             }
         }
         if(empty($input) && !empty($request)){
@@ -979,6 +1014,8 @@ class Handler extends \Priya\Module\Core\Data{
         }
         elseif(isset($_SERVER['SERVER_NAME'])){
             $domain = $_SERVER['SERVER_NAME'];
+        } else {
+            $domain = '';
         }
         if($include_scheme) {
             $scheme = $this->scheme();
@@ -1000,5 +1037,27 @@ class Handler extends \Priya\Module\Core\Data{
         $value = explode($host, $value, 2);
         $value = implode('', $value);
         return $value;
+    }
+
+    public function header($string='', $http_response_code=null, $replace=true){
+        if(empty($string)){
+            return;
+        }
+        if($http_response_code){
+            header($string, $replace, $http_response_code);
+        } else {
+            header($string, $replace);
+        }
+    }
+
+    public function since($mtime=''){
+        if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])){
+            if(strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $mtime){
+                $this->header('HTTP/1.1 304 Not Modified');
+                $this->header('Last-Modified: ' . gmdate('D, d M Y H:i:s T', $mtime));
+                $this->header('If-Modified-Since: ' . $_SERVER['HTTP_IF_MODIFIED_SINCE']);
+                exit;
+            }
+        }
     }
 }

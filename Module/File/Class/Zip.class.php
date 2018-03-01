@@ -1,16 +1,17 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 namespace Priya\Module\File;
 
 use stdClass;
 use zipArchive;
 use Priya\Module\File;
+use Priya\Application;
 
 class Zip {
 
@@ -86,8 +87,79 @@ class Zip {
         return $result;
     }
 
-    public function pack($archive='', $source=''){
-        //source can be a filelist created by dir (flat)
-        //use a tmp directory to copy see restore
+    public function pack($read, $target){
+        $this->request('date', date('Y-m-d' . ' ' . 'His'));
+        $location = $this->data('priya.dir.data') . 'Pack' . Application::DS . $this->request('date') . Application::DS;
+
+        $url = $location . rand(1000, 9999) . Application::DS;
+
+        while(file_exists($url)){
+            $url = $location . rand(1000, 9999) . Application::DS;
+        }
+        if(!file_exists($url)){
+            mkdir($url, Dir::CHMOD, true);
+        }
+        var_dump($url);
+        die;
+        if(!is_dir($url)){
+            return;
+        }
+        foreach($read as $file){
+            $src = $file->url;
+            $src = explode($source, $src, 2);
+            $file->target = $location . $src[1];
+
+            if($file->type == File::TYPE){
+                copy($file->url, $file->target);
+            } else {
+                mkdir($file->target, Dir::CHMOD, true);
+            }
+        }
+        $this->create($target, $url, $read);
+        chmod($target, File::CHMOD);
+
+        $dir = new Dir();
+        $dir->delete($url);
+    }
+
+    public function create($target='', $location='', $read=array()){
+        $dirname = dirname($target);
+        if(!is_dir($dirname)){
+            mkdir($dirname, Dir::CHMOD, true);
+        }
+        if(!is_dir($dirname)){
+            return;
+        }
+        $zip = new ZipArchive();
+        $res = $zip->open($target, ZipArchive::CREATE);
+
+        $count = count($read);
+        if($count == 0){
+            return;
+        }
+        $counter = 0;
+        $mod = $count / 100;
+        if($mod < 1){
+            $mod = 1;
+        }
+        foreach($read as $node){
+            $counter++;
+            $skip = false;
+            if($node->url == $target){
+                $skip = true;
+            }
+            if($node->target == $target){
+                $skip = true;
+            }
+            if($node->type != File::TYPE){
+                $skip = true;
+            }
+            if(empty($skip)){
+                $loc = explode($location, $node->target, 2);
+                $loc = implode('', $loc);
+                $zip->addFile($node->target, $loc);
+            }
+        }
+        $zip->close();
     }
 }

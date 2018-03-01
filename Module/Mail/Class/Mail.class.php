@@ -237,7 +237,7 @@ class Mail extends Data{
         return $this->mailer()->Body = $body;
     }
 
-    public function altBody($altBody=''){
-        return $this->mailer()->AltBody = $altBody;
+    public function alternative($alternative=''){
+        return $this->mailer()->AltBody = $alternative;
     }
 }

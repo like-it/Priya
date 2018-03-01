@@ -16,7 +16,7 @@ function function_str_sub_compare($function=array(), $argumentList=array(), $par
     $string2 = array_shift($argumentList);
     $offset = array_shift($argumentList);
     $length = array_shift($argumentList);
-    $case_insensitivity= array_shift($argumentList);
+    $case_insensitivity = array_shift($argumentList);
     if($length !== null && empty($case_insensitivity)){
         $case_insensitivity = false;
     }

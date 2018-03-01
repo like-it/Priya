@@ -17,6 +17,7 @@ Pager
     border-bottom: 1px solid rgba(231, 229, 225, 0.3);
     color: #ffffff;
     text-align: center;
+    overflow: hidden;
 }
 
 .pager .item.save{

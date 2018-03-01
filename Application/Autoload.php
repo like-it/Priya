@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-07-2015
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-07-2015
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  */
 
 $start =
@@ -27,4 +27,3 @@ require_once $debug;
 $autoload = new \Priya\Module\Autoload();
 $autoload->addPrefix('Priya',  dirname(__DIR__) . DIRECTORY_SEPARATOR);
 $autoload->register();
-$autoload->environment(Priya\Application::ENVIRONMENT);

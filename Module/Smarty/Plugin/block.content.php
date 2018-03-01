@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		19-01-2016
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         19-01-2016
+ * @version        1.0
  * @changeLog
- *  -	all
+ *  -    all
  */
 
 function smarty_block_content($params, $content, $template, &$repeat)
@@ -35,7 +35,7 @@ function smarty_block_content($params, $content, $template, &$repeat)
                 $replace = (array) $_val;
             break;
             default:
-                trigger_error("content_block: unknown attribute '$_key'");
+                throw  new Exception("content_block: unknown attribute '$_key'");
         }
     }
     if($trim == 'html' || $trim == 'html-line' || $trim == 'svg' || $trim == 'canvas-svg'){
