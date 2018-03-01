@@ -18,6 +18,7 @@ use Priya\Module\Autoload\Tpl;
 use Priya\Module\File;
 use Priya\Module\File\Dir;
 use Priya\Module\Core\Parser;
+use Priya\Module\File\Cache;
 
 class Result extends Parser {
     const DIR = __DIR__;
@@ -81,8 +82,59 @@ class Result extends Parser {
         if(empty($target)){
             $target = 'result.' . $this->request('contentType');
         }
-        $this->read($read);
-        return $this->data($target); //(parsed in read)
+        $cache = $this->cache($target, $read);
+        if($cache){
+            return $cache;
+        } else {
+            $this->read($read);
+            if($target == 'page'){
+                $page =  $this->result($target);
+                $this->write($target, $read, $page);
+                return $page;
+            } else {
+                //add cache write for every minute
+                return $this->data($target); //(parsed in read)
+            }
+        }
+    }
+
+    public function cache($target='', $read=''){
+        $dir = dirname($read::DIR)  .
+        Application::DS .
+        Application::DATA .
+        Application::DS .
+        Cache::CACHE .
+        Application::DS .
+        Cache::MINUTE .
+        Application::DS
+        ;
+        if(!is_dir($dir)){
+            Dir::create($dir, Dir::CHMOD);
+        }
+        $url = $dir . $target;
+        $url = $url . '?' . date('YmdHi'); //every minute;
+        return Cache::read($url);
+    }
+
+    public function write($target='', $read='', $page=''){
+        $dir = dirname($read::DIR)  .
+        Application::DS .
+        Application::DATA .
+        Application::DS .
+        Cache::CACHE .
+        Application::DS .
+        Cache::MINUTE .
+        Application::DS
+        ;
+        if(!is_dir($dir)){
+            Dir::create($dir, Dir::CHMOD);
+        }
+        $url = $dir . $target;
+        $url = $url . '?' . date('YmdHi', $this->data('time.cache')); //every minute;
+        if(file_exists($url)){
+            return true;
+        }
+        return Cache::write($url, $page);
     }
 
     public function result($type=null, $result=''){

@@ -11,6 +11,7 @@ namespace Priya\Module;
 
 use stdClass;
 use Priya\Application;
+use Priya\Module\Core\Object;
 
 class Handler extends \Priya\Module\Core\Data{
     const CONTENT_TYPE_CSS = 'text/css';
@@ -43,6 +44,17 @@ class Handler extends \Priya\Module\Core\Data{
         $this->referer('create');
         $this->file('create');
         $this->microtime('create');
+        $this->key('create');
+    }
+
+    public function key($attribute=null){
+        if($attribute == 'create'){
+            $request = $this->request();
+            unset($request->{'last-modified'});
+            unset($request->time);
+            $key = sha1(Core::object($request, 'json'));
+            $this->request('key', $key);
+        }
     }
 
 
