@@ -227,18 +227,6 @@ class Application extends Parser {
             $this->route()->create('Application.Zip');
             $this->route()->create('Test');
         }
-
-        if(empty($url)){
-            $url = $this->data('priya.dir.application') .
-                Application::DATA .
-                Application::DS .
-                Cache::CACHE .
-                Application::DS .
-                Cache::MINUTE .
-                Application::DS .
-                Application::ROUTE
-            ;
-        }
         $this->write($url,'route');
     }
 

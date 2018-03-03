@@ -92,11 +92,15 @@ class Result extends Parser {
             $this->read($read);
             if($target == 'page'){
                 $page =  $this->result($target);
-                $this->write($target, $read, $page);
+                if(!$this->session('has')){
+                    $this->write($target, $read, $page);
+                }
                 return $page;
             } else {
                 $data = $this->data($target); //(parsed in read)
-                $this->write($target, $read, $data);
+                if(!$this->session('has')){
+                    $this->write($target, $read, $data);
+                }
                 return $data;
             }
         }
