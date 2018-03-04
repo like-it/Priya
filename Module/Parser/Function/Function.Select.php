@@ -24,9 +24,10 @@ function function_select($function=array(), $argumentList=array(), $parser=null)
         $result = $parser->data($select);
     }
     if($url){
-        $data = new Data();
-        $data->read($url);
-        $result = $data->data($select);
+        $result = $parser->read($url);
+//         $data = new Data();
+//         $data->read($url);
+//         $result = $data->data($select);
     }
     $function['execute'] = $result;
     return $function;
