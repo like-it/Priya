@@ -370,7 +370,8 @@ class Variable extends Core {
                                 //but better be on the right spot...
                                 throw new Exception('Parser data empty and variable data not (implementation error...)');
                             }
-                            $output = $this->parser()->compile($output, $this->parser()->data());
+                            //not using compile anymore here, removes {literal} even without root
+//                             $output = $this->parser()->compile($output, $this->parser()->data(), false, false);
                         }
                     }
                 } else {
