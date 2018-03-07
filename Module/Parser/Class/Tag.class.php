@@ -16,12 +16,7 @@ class Tag extends Core {
         //might add if too... (in the future, new version)
     );
 
-    public function __construct($input=null, $random=null){
-        $this->input($input);
-        $this->random($random);
-    }
-
-    public function filter($list=array(), $attribute=array(), $value=array(), $action=null){
+    public static function control($list=array()){
         //add source line nr to list tag
         $close_tags = array();
         foreach($list as $nr => $value){
@@ -86,13 +81,7 @@ class Tag extends Core {
         return $list;
     }
 
-    public function find($input=null){
-        if($input === null){
-            $input = $this->input();
-        } else {
-            $this->input($input);
-        }
-        $input = Literal::replace($input, $this->random());
+    public static function find($input=null){
         $explode = Tag::explode($input);
 //         $pattern = '/\$([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/';
         $pattern = '/\{.*\}/';
@@ -104,6 +93,6 @@ class Tag extends Core {
                 $tagged[][$match] = '';
             }
         }
-        return $this->output($tagged);
+        return $tagged;
     }
 }
