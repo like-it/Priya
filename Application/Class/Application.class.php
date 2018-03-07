@@ -455,9 +455,9 @@ class Application extends Parser {
             }
         }
         elseif(!empty($item->url)){
+            $this->data('request', $item->request);
             $parser = new \Priya\Module\Parser($this->handler(), $this->route(), $this->data());
             $item->url = $parser->compile($item->url, $this->data());
-
 
             if(file_exists($item->url) && strstr(strtolower($item->url), strtolower($this->data('public_html'))) !== false){
                $file = new File();
@@ -466,6 +466,7 @@ class Application extends Parser {
                     $ext = 'txt'; //to handle Licence file
                }
                $contentType = $allowed_contentType->{$ext};
+
                $this->header('Content-Type: ' . $contentType);
                $result = $file->read($item->url);
             } else {
@@ -514,6 +515,7 @@ class Application extends Parser {
         }
         elseif(is_array($result)){
             var_dump($result);
+            die;
         }
         else {
 //          404

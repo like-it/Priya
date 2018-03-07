@@ -152,6 +152,11 @@ class Route extends Parser{
                 $node->function = array_pop($tmp);
                 $node->controller = implode('\\', $tmp);
                 $node->name = $name;
+                if(isset($node->request) && is_object($node->request)){
+                    foreach($node->request as $attribute => $value){
+                        $this->request($attribute, $value);
+                    }
+                }
                 $node->request = $this->request();
                 return $this->item($node);
             }
@@ -166,6 +171,11 @@ class Route extends Parser{
                 return $this->item($object);
             } else {
                 $route->name = $name;
+                if(isset($node->request) && is_object($node->request)){
+                    foreach($node->request as $attribute => $value){
+                        $this->request($attribute, $value);
+                    }
+                }
                 $route->request = $this->request();
                 return $this->item($route);
             }
