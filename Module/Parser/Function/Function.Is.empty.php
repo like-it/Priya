@@ -12,10 +12,14 @@ function function_is_empty($function=array(), $argumentList=array(), $parser=nul
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    foreach($argumentList as $argument){
-        $function['execute']  = empty($argument);
-        if($function['execute'] === false){
-            return $function;
+    if(empty($argumentList)){
+        $function['execute'] = true;
+    } else {
+        foreach($argumentList as $argument){
+            $function['execute']  = empty($argument);
+            if($function['execute'] === false){
+                return $function;
+            }
         }
     }
     return $function;
