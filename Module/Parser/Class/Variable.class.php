@@ -346,6 +346,7 @@ class Variable extends Core {
                         $output = $input;
                     } else {
                         $output = $this->data($attribute);
+//                         var_dump($output);
                         if($output === null && $keep === true){
                             return $output;
                         }
@@ -371,7 +372,7 @@ class Variable extends Core {
                                 throw new Exception('Parser data empty and variable data not (implementation error...)');
                             }
                             //not using compile anymore here, removes {literal} even without root
-//                             $output = $this->parser()->compile($output, $this->parser()->data(), false, false);
+                            $output = $this->parser()->compile($output, $this->parser()->data(), false, false);
                         }
                     }
                 } else {

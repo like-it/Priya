@@ -283,7 +283,7 @@ trait Object {
         if(is_array($attributeList)){
             $attributeList = $this->object_horizontal($attributeList);
         }
-        if(!empty($attributeList)){
+        if(!empty($attributeList) && is_object($attributeList)){
             foreach($attributeList as $key => $attribute){
                 if(isset($object->{$key})){
                     return $this->object_delete($attribute, $object->{$key}, $object, $key);

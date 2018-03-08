@@ -271,7 +271,7 @@ class Assign extends Core {
                     }
                 }
                 if(!isset($item['value'])){
-                    //cant use date with value null to set so...
+                    //cant use data with value null to set so...
                     $this->object_delete($attribute, $this->data()); //for sorting an object
                     $this->object_set($attribute, null, $this->data());
                     return;

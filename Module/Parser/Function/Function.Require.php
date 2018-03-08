@@ -1,5 +1,8 @@
 <?php
 
+use Priya\Module\Parser\Literal;
+use Priya\Module\Parser\Token;
+
 /**
  * @author          Remco van der Velde
  * @since           2017-04-20
@@ -44,7 +47,26 @@ function function_require($function=array(), $argumentList=array(), $parser=null
         $exists === true
     ) {
         $read = $file->read($url);
-        $read = $parser->compile($read, $data);
+        /*
+        $read = Literal::extra($read);
+        $read = Newline::replace($read, $parser->random());
+        $read = Literal::replace($read, $parser->random());
+        */
+        $read = $parser->compile($read, $data, false, false);
+        $read = str_replace(
+                array('{literal}', '{/literal}'),
+                array('[literal][rand:' .  $parser->random() .']{literal}', '[/literal][rand:' .  $parser->random() .']{/literal}'),
+                $read
+                );
+//         $read = Literal::remove($read);
+        $read= Token::remove_comment($read);
+        /*
+        $read = str_replace(
+            array('[literal][rand:' .  $parser->random() .']', '[/literal][rand:' .  $parser->random() .']'),
+            array('{literal}', '{/literal}'),
+            $read
+        );
+        */
     }
     $function['execute'] = $read;
     return $function;

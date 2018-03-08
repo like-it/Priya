@@ -28,6 +28,18 @@ class Literal extends Core {
      * @return string
      */
     public static function remove($value=''){
+        if(is_array($value)){
+            foreach($value as $key => $value_value){
+                $value[$key] = Literal::remove($value_value);
+            }
+            return $value;
+        }
+        elseif(is_object($value)){
+            foreach($value as $key => $value_value){
+                $value->{$key} = Literal::remove($value_value);
+            }
+            return $value;
+        }
         return str_replace(
             array(
                 Literal::OPEN,
@@ -50,14 +62,12 @@ class Literal extends Core {
                 '[' . $random . '][/literal]',
                 '[' . $random . '][curly_open]',
                 '[' . $random . '][curly_close]',
-                '[' . $random . '][pipe]',
         );
         $replace = array(
                 Literal::OPEN,
                 Literal::CLOSE,
                 '{',
                 '}',
-                '|'
         );
         return str_replace($search, $replace, $value);
     }

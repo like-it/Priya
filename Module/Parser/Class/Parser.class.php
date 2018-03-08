@@ -11,6 +11,14 @@ namespace Priya\Module;
 
 use Priya\Module\Parser\Core as ParserCore;
 use Priya\Module\Parser\Variable;
+use Priya\Module\Parser\Newline;
+use Priya\Module\Parser\Literal;
+use Priya\Module\Parser\Tag;
+use Priya\Module\Parser\Random;
+use Priya\Module\Parser\Assign;
+use Priya\Module\Parser\Method;
+use Priya\Module\Parser\Control_If;
+use Priya\Module\Parser\Token;
 use Exception;
 
 class Parser extends ParserCore {
@@ -45,8 +53,10 @@ class Parser extends ParserCore {
     public function read($url=''){
         $read = parent::read($url);
         if(!empty($read)){
-            return $this->data($this->compile($this->data(), $this->data()));
+            $read = $this->data($this->compile($this->data(), $this->data(), false, false));
         }
+        //might need to add comment...
+        $read = $this->data(Literal::remove($this->data()));
         return $read;
     }
 
@@ -74,18 +84,18 @@ class Parser extends ParserCore {
         } else {
             $random = $this->random();
             if(empty($random)){
-                $random = Parser\Random::create();
+                $random = Random::create();
                 while(stristr($string, $random) !== false){
-                    $random = Parser\Random::create();
+                    $random = Random::create();
                 }
                 $this->random($random);
             }
-            $string = Parser\Literal::extra($string);
-            $string = Parser\Newline::replace($string, $this->random());
-            $string= Parser\Literal::replace($string, $this->random());
+            $string = Literal::extra($string);
+            $string = Newline::replace($string, $this->random());
+            $string= Literal::replace($string, $this->random());
 
-            $list = Parser\Tag::find($string);
-            $list = Parser\Tag::control($list);
+            $list = Tag::find($string);
+            $list = Tag::control($list);
 
             if($data === null){
                 $data = $this->data();
@@ -93,10 +103,10 @@ class Parser extends ParserCore {
                 $data = $this->object($data);
             }
 
-            $assign = new Parser\Assign($data, $this->random(), $this);
-            $if = new Parser\Control_If($data, $this->random(), $this);
-            $variable = new Parser\Variable($data, $this->random(), $this);
-            $method = new Parser\Method($data, $this->random());
+            $assign = new Assign($data, $this->random(), $this);
+            $if = new Control_If($data, $this->random(), $this);
+            $variable = new Variable($data, $this->random(), $this);
+            $method = new Method($data, $this->random());
             $if_counter = 0;
 
             $record = array();
@@ -110,7 +120,7 @@ class Parser extends ParserCore {
                     }
                     $assign->find($key);
                     $record['assign']['tag'] = $key;
-                    $record = Parser\Assign::row($record, $this->random());
+                    $record = Assign::row($record, $this->random());
 
                     $record['variable']['tag'] = $key;
                     $record = $variable->find($record, $keep);
@@ -120,7 +130,7 @@ class Parser extends ParserCore {
                 }
                 $record = $if::create($list, $record['string'], $this->random());
                 $record = $if->statement($record, $this);
-                $list = Parser\Tag::find($record['string']);
+                $list = Tag::find($record['string']);
                 if($if_counter >= $if::MAX){
                     throw new Exception('Parser::compile:$if_counter>=$if::MAX');
                     break;
@@ -131,7 +141,7 @@ class Parser extends ParserCore {
                 $key = key($value);
                 $assign->find($key);
                 $record['assign']['tag'] = $key;
-                $record = Parser\Assign::row($record, $this->random());
+                $record = Assign::row($record, $this->random());
 
                 $record['variable']['tag'] = $key;
                 $record = $variable->find($record, $keep);
@@ -143,7 +153,7 @@ class Parser extends ParserCore {
                 $key = $record['string'];
                 $assign->find($key);
                 $record['assign']['tag'] = $key;
-                $record = Parser\Assign::row($record, $this->random());
+                $record = Assign::row($record, $this->random());
 
                 $record['variable']['tag'] = $key;
                 $record = $variable->find($record, $keep);
@@ -155,12 +165,17 @@ class Parser extends ParserCore {
 
             if(is_string($string)){
 //                 echo $string;
-                $string = Parser\Token::restore_return($string, $this->random());
-                $string = Parser\Literal::restore($string, $this->random());
+                $string = Token::restore_return($string, $this->random());
+                $string = Literal::restore($string, $this->random());
+                $string = str_replace(
+                    array('[literal][rand:' .  $this->random() .']{literal}', '[/literal][rand:' .  $this->random() .']{/literal}'),
+                    array('{literal}', '{/literal}'),
+                    $string
+                );
                 //only root should remove
                 if($root){
-                    $string = Parser\Literal::remove($string);
-                    $string = Parser\Token::remove_comment($string);
+                    $string = Literal::remove($string);
+                    $string = Token::remove_comment($string);
                 }
                 return $string;
             } else {
