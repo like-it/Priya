@@ -53,7 +53,7 @@ class Parser extends ParserCore {
     public function read($url=''){
         $read = parent::read($url);
         if(!empty($read)){
-            $read = $this->data($this->compile($this->data(), $this->data(), false, false));
+            $read = $this->data($this->compile($this->data(), $this->data(), false, true));
         }
         //might need to add comment...
         $read = $this->data(Literal::remove($this->data()));

@@ -78,46 +78,46 @@ class Control_If extends Core {
         return $false;
     }
 
-    public static function inner($raw=''){
-        $explode = explode('{if', $raw);
-        $open_count = count($explode);
-        $close_count = 0;
-        $inner = '';
-        foreach($explode as $nr => $part){
-            $count = substr_count($part, '{/if}');
-            if($count >= 1 && $nr == 0){
-                $temp = explode('{/if}', $part, 2);
-                $inner .= $temp[0];
+    public static function depth($raw=''){
+        $depth = 0;
+        $new_depth = 0;
+        $explode = explode('{', $raw);
+        $result = array();
+        foreach($explode as $nr => $row){
+            if(substr($row, 0, 2) == 'if'){
+                $depth++;
+                $record['depth'] = $depth;
+            }
+            elseif(substr($row, 0, 3) == '/if'){
+                $record['depth'] = $depth;
+                $depth--;
+            }
+            elseif(substr($row, 0, 4) == 'else'){
+                $record['depth'] = $depth;
+            } else {
+                $record['depth'] = $depth;
+            }
+            $record['string'] = empty($nr) ? $row : '{' . $row;
+
+            $result[] = $record;
+        }
+        $list = array();
+        foreach($result as $record){
+            if(
+                substr($record['string'], 0, 4) == '{/if' &&
+                $record['depth'] == 0
+            ){
                 break;
             }
-            $close_count += $count;
-
-            if($open_count == $close_count){
-                if($count > 1){
-                    $temp = explode('{/if}', $part);
-                    foreach($temp as $nr => $value){
-                        if($count == ($nr + 1)){
-                            $inner .= $value;
-                            break;
-                        } else {
-                            $inner .= '{if' . $value . '{/if}';
-                        }
-                    }
-                } else {
-                    $temp = explode('{/if}', $part, 2);
-                    $inner .= '{if' . $temp[0];
-                }
-            } elseif($nr > 0) {
-                $inner .= '{if' . $part;
-            } else {
-                $inner .= $part;
-            }
+            $list[] = $record;
         }
-        return $inner;
+        return $list;
     }
 
+    /*
     public static function depth($inner=''){
         $depth = 0;
+        $new_depth = 0;
         $explode = explode('{', $inner);
         $result = array();
         foreach($explode as $nr => $row){
@@ -134,12 +134,26 @@ class Control_If extends Core {
             } else {
                 $record['depth'] = $depth;
             }
+            if(substr($row,0, 2) == 'if'){
+                $new_depth++;
+                $record['new_depth'] = $new_depth;
+            }
+            if(substr($row,0, 4) == 'else'){
+//                 $record['new_depth'] = $depth;
+//                 $depth--;
+            }
+            if(substr($row,0, 3) == '/if'){
+                $record['new_depth'] = $new_depth;
+                $new_depth--;
+            }
+            $record['new_depth'] = $new_depth;
             $record['string'] = empty($nr) ? $row : '{' . $row;
 
             $result[] = $record;
         }
        return $result;
     }
+    */
 
     public static function create($list=array(), $string='', $random=''){
         $result = array();
@@ -147,8 +161,7 @@ class Control_If extends Core {
         $if = Control_If::get($list);
         $explode = explode($if, $string, 2);
         $inner_raw = $explode[1];
-        $inner = Control_If::inner($inner_raw);
-        $depth = Control_If::depth($inner);
+        $depth = Control_If::depth($inner_raw);
         $true = Control_If::true($depth);
         $false = Control_If::false($depth);
         if($false === false){
