@@ -297,7 +297,6 @@ class Assign extends Core {
                 return;
             }
         }
-        return;
     }
 
     private function variable($string='', $type=null){
