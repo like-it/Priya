@@ -334,6 +334,9 @@ class Token extends Core {
                     }
                 }
                 $result['value'] = $parser->compile($result['value'], $parser->data(), true);
+                if(!is_object($result['value'])){
+                    return array();
+                }
                 return $result;
                 break;
             }
@@ -1221,6 +1224,10 @@ class Token extends Core {
         $counter = 0;
         $has_method = false;
         $list = array();
+        if(!isset($record['string'])){
+            //create_object
+            //create_array
+        }
         foreach($record['parse'] as $parse){
             if(
                 isset($parse['is_executed']) &&
