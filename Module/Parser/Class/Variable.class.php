@@ -3,6 +3,7 @@
 namespace Priya\Module\Parser;
 
 use Exception;
+use Priya\Module\Parser\Tag;
 
 class Variable extends Core {
 
@@ -336,8 +337,7 @@ class Variable extends Core {
             return $input;
         } else {
             //remove if statements
-            $tag = new Tag($input);
-            $list = $tag->find();
+            $list = Tag::find($input);
             $output = null;
             $output_type = Token::TYPE_NULL;
             $is_set = false;
@@ -374,7 +374,10 @@ class Variable extends Core {
                                 throw new Exception('Parser data empty and variable data not (implementation error...)');
                             }
                             //add tag find, if no tag no compile
-                            $output = $this->parser()->compile($output, $this->parser()->data(), false, false);
+                            $list = Tag::find($output);
+                            if(!empty($list)){
+                                $output = $this->parser()->compile($output, $this->parser()->data(), false, false);
+                            }
                         }
                     }
                 } else {

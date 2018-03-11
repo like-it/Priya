@@ -27,10 +27,9 @@ $parse = function(){
         }
         $url = $this->read('input', 'Please provide the parser file: ');
     }
-    $parser = new Parser($this->data());
-    $parser->route($this->route());
+    $parser = new Parser($this->handler(), $this->route(), $this->data());
     $read = $parser->read($url);
-    $output = new Parser();
+    $output = new Parser($this->handler(), $this->route());
     $output->data('input', $parser->data('test'));
     $data = new Data();
     $data->read($url);

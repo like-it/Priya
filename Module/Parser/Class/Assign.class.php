@@ -276,6 +276,11 @@ class Assign extends Core {
                     $this->object_set($attribute, null, $this->data());
                     return;
                 }
+                if(is_string($item['value'])){
+                    $item['value'] = Literal::extra($item['value']);
+                    $item['value'] = Newline::replace($item['value'], $this->parser()->random());
+                    $item['value'] = Literal::replace($item['value'], $this->parser()->random());
+                }
                 switch($assign){
                     case '+=' :
                         $plus = $this->data($attribute) + 0;
@@ -404,6 +409,7 @@ class Assign extends Core {
                 $result = $string;
             }
         }
+        debug($result);
         return $result;
     }
 

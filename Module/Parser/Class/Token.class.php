@@ -1210,13 +1210,24 @@ class Token extends Core {
     }
 
     public static function restore_return($value='', $random=''){
-        $search = array();
-        $search[] = '[' . $random . '][return]';
-        $search[] = '[' . $random . '][newline]';
-        $replace = array();
-        $replace[] = "\r";
-        $replace[] = "\n";
-        $value = str_replace($search, $replace, $value);
+        if(is_array($value)){
+            foreach($value as $key => $val){
+                $value[$key] = Token::restore_return($val, $random);
+            }
+        }
+        elseif(is_object($value)){
+            foreach($value as $key => $val){
+                $value->{$key} = Token::restore_return($val, $random);
+            }
+        } else {
+            $search = array();
+            $search[] = '[' . $random . '][return]';
+            $search[] = '[' . $random . '][newline]';
+            $replace = array();
+            $replace[] = "\r";
+            $replace[] = "\n";
+            $value = str_replace($search, $replace, $value);
+        }
         return $value;
     }
 
@@ -1256,6 +1267,8 @@ class Token extends Core {
                 } else {
                     $method['string'] = $record['string'];
                 }
+//                 debug($method, __LINE__ . '::' . __FILE__);
+                //parse method['parameter'] first...
                 $method = Method::execute($method, $variable, $parser);
                 $method = Method::exclamation($record, $method, $parser);
                 $record = Method::remove_exclamation($record);

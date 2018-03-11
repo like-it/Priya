@@ -417,6 +417,7 @@ class Application extends Parser {
             $this->header('Last-Modified: '. $this->request('last-modified'));
         }
         $item = $this->route()->run();
+        $this->cli();
         $handler = $this->handler();
         $contentType = $handler->request('contentType');
         $result = '';
@@ -528,33 +529,17 @@ class Application extends Parser {
         $request = $this->request('data');
         if(!empty($request)){
             if(is_array($request) || is_object($request)){
-                $key = false;
-                $value = null;
                 foreach($request as $attribute){
-                    if(!empty($key)){
-                        $value = $attribute;
-                    }
                     $attribute = explode('=', $attribute, 2);
-                    if(count($attribute) == 2){
-                        switch($attribute[0]){
-                            case 'dir.data':
-                                $key = $attribute[0];
-                                $value = $attribute[1];
-                            break;
-                        }
-                    } else {
-                        switch($attribute[0]){
-                            case 'dir.data':
-                                $key = $attribute[0];
-                                continue;
-                            break;
-                        }
-                    }
+                    if(isset($attribute[1])){
+                        $key = $attribute[0];
+                        $value = $attribute[1];
 
-                    if(!empty($key) && isset($value)){
-                        $this->data($key, $value);
-                        unset($key);
-                        unset($value);
+                        if(!empty($key) && isset($value)){
+                            $this->request($key, $value);
+                            unset($key);
+                            unset($value);
+                        }
                     }
                 }
             }

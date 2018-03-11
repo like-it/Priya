@@ -41,6 +41,7 @@ class Method extends Core {
         } else {
             return $record;
         }
+//         debug($record, __LINE__ . '::' . __FILE__);
         if(!isset($record['string'])){
             return $record;
         }
@@ -282,6 +283,7 @@ class Method extends Core {
             '',
             ucfirst(strtolower($function['method']))
         );
+//         debug($function, __LINE__ . '::' . __FILE__);
         $function_name = $name;
         $url = __DIR__ . '/../Function/Function.List.php';
         if(
@@ -308,7 +310,7 @@ class Method extends Core {
         if(function_exists($name)){
             $argument = array();
             if(isset($function['parameter'])){
-                foreach ($function['parameter'] as $parameter){
+                foreach ($function['parameter'] as $nr => $parameter){
                     if(isset($parameter['value']) || $parameter['value'] === null){
                         $parameter['value'] = $parser->compile($parameter['value'], $variable->data());
                         $parameter = Value::type($parameter);
@@ -318,9 +320,11 @@ class Method extends Core {
                             $parameter['value'] = str_replace('\\\'', '\'', $parameter['value']);
                         }
                         $argument[] = $parameter['value'];
+                        $function['parameter'][$nr] = $parameter;
                     }
                 }
             }
+
             $function = $name($function, $argument, $parser, $variable->data());
             $function['value'] = $function['execute'];
 

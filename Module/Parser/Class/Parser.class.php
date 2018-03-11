@@ -50,13 +50,28 @@ class Parser extends ParserCore {
         $this->data($this->compile($this->data(), $this->data()));
     }
 
+    /**
+     * can only read .json files...
+     * {@inheritDoc}
+     * @see \Priya\Module\Data::read()
+     */
     public function read($url=''){
-        $read = parent::read($url);
-        if(!empty($read)){
-            $read = $this->data($this->compile($this->data(), $this->data(), false, true));
+        $file = new File();
+        $ext = $file->extension($url);
+        if($ext == '' || $ext == Autoload::EXT_JSON){
+            $read = parent::read($url);
+            if(!empty($read)){
+                $read = $this->data($this->compile($this->data(), $this->data(), false, false));
+            }
+            //might need to add comment...
+            $read = $this->data(Literal::remove($this->data()));
+            $read = $this->data(Literal::remove($this->data()));
+        } else {
+            $read = $file->read($url);
+            $read = $this->compile($read, $this->data(), false, false);
+            $read = Token::remove_comment($read);
+//             debug($read, __LINE__ . '::' . __FILE__);
         }
-        //might need to add comment...
-        $read = $this->data(Literal::remove($this->data()));
         return $read;
     }
 
@@ -73,12 +88,32 @@ class Parser extends ParserCore {
         if (is_array($string)){
             foreach($string as $nr => $line){
                 $string[$nr] = $this->compile($line, $data, $keep, false);
+                if(is_string($string[$nr])){
+//                     $string[$nr] = Literal::extra($string[$nr]);
+//                     $string[$nr] = Newline::replace($string[$nr], $this->random());
+//                     $string[$nr]= Literal::replace($string[$nr], $this->random());
+                }
             }
             return $string;
         }
         elseif(is_object($string)){
             foreach ($string as $key => $value){
+                //add key compile
                 $string->{$key} = $this->compile($value, $data, $keep, false);
+                if(is_string($string->{$key})){
+//                     $string->{$key} = Literal::extra($string->{$key});
+//                     $string->{$key} = Newline::replace($string->{$key}, $this->random());
+//                     $string->{$key} = Literal::replace($string->{$key}, $this->random());
+                }
+                if($key == 'page'){
+//                     debug($value);
+//                     debug(debug_backtrace(true));
+//                     die;
+//                     var_dump($data);
+//                     echo $value;
+
+//                     die;
+                }
             }
             return $string;
         } else {
@@ -92,10 +127,15 @@ class Parser extends ParserCore {
             }
             $string = Literal::extra($string);
             $string = Newline::replace($string, $this->random());
-            $string= Literal::replace($string, $this->random());
+            $string = Literal::replace($string, $this->random());
 
             $list = Tag::find($string);
-            $list = Tag::control($list);
+            /**
+             * invalid for capture.append
+             *
+             * dont know for for.each (it removes the content)
+             */
+//             $list = Tag::control($list);
 
             if($data === null){
                 $data = $this->data();
@@ -162,10 +202,9 @@ class Parser extends ParserCore {
                 $record = $method->find($record, $variable, $this);
             }
             $string = $record['string'];
-
+            $string = Token::restore_return($string, $this->random());
             if(is_string($string)){
 //                 echo $string;
-                $string = Token::restore_return($string, $this->random());
                 $string = Literal::restore($string, $this->random());
                 $string = str_replace(
                     array('[literal][rand:' .  $this->random() .']{literal}', '[/literal][rand:' .  $this->random() .']{/literal}'),

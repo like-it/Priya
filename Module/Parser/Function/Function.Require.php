@@ -1,7 +1,10 @@
 <?php
 
 use Priya\Module\Parser\Literal;
+use Priya\Module\Parser\Newline;
 use Priya\Module\Parser\Token;
+
+use Priya\Module\Parser;
 
 /**
  * @author          Remco van der Velde
@@ -32,9 +35,12 @@ function function_require($function=array(), $argumentList=array(), $parser=null
     }
     $read = '';
     $exists = true;
-    if(file_exists($url) === false && substr($url, 0, 4) !== \Priya\Module\File::SCHEME_HTTP){
+    if(
+        substr($url, 0, 4) !== \Priya\Module\File::SCHEME_HTTP &&
+        file_exists($url) === false
+    ){
         $exists = false;
-        throw new Exception('File (' . $url . ') doesn\'t exists');
+//         throw new Exception('File (' . $url . ') doesn\'t exists');
     }
     elseif(
         $exists === true &&
@@ -46,13 +52,29 @@ function function_require($function=array(), $argumentList=array(), $parser=null
     elseif(
         $exists === true
     ) {
-        $read = $file->read($url);
+        if(is_dir($url)){
+            throw new Exception('File (' . $url . ') is a directory...');
+        }
+//         debug($url, __LINE__ . '::' . __FILE__);
+
+        $parser->data('compile', true);
+        $read = $parser->read($url);
+
+//         $compiler = new Parser($parser->handler(), $parser->route(), $parser->data());
+//         $compiler->data('compile', true);
+//         $read = $compiler->read($url);
+
+
+
+//         $read = $parser->read($url);
+
+//         debug($read, __LINE__ . '::' . __FILE__);
         /*
         $read = Literal::extra($read);
         $read = Newline::replace($read, $parser->random());
         $read = Literal::replace($read, $parser->random());
-        */
-        $read = $parser->compile($read, $data, false, false);
+        /*
+        $read = $parser->compile($read, $parser->data(), false, false);
         $read = str_replace(
                 array('{literal}', '{/literal}'),
                 array('[literal][rand:' .  $parser->random() .']{literal}', '[/literal][rand:' .  $parser->random() .']{/literal}'),
@@ -60,6 +82,10 @@ function function_require($function=array(), $argumentList=array(), $parser=null
                 );
 //         $read = Literal::remove($read);
         $read= Token::remove_comment($read);
+        $read = Literal::extra($read);
+        $read = Newline::replace($read, $parser->random());
+        $read = Literal::replace($read, $parser->random());
+        */
         /*
         $read = str_replace(
             array('[literal][rand:' .  $parser->random() .']', '[/literal][rand:' .  $parser->random() .']'),
@@ -67,6 +93,8 @@ function function_require($function=array(), $argumentList=array(), $parser=null
             $read
         );
         */
+//         var_dump($url);
+//         var_dump($read);
     }
     $function['execute'] = $read;
     return $function;

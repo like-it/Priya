@@ -82,10 +82,14 @@ class Tag extends Core {
     }
 
     public static function find($input=null){
+        $tagged = array();
+        if(!is_string($input)){
+            return $tagged;
+        }
         $explode = Tag::explode($input);
 //         $pattern = '/\$([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/';
         $pattern = '/\{.*\}/';
-        $tagged = array();
+
         foreach($explode as $key => $value){
             preg_match_all($pattern, $value, $matches, PREG_SET_ORDER);
             if(!empty($matches)){

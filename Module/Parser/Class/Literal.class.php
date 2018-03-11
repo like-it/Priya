@@ -12,6 +12,9 @@ class Literal extends Core {
      * @return string
      */
     public static function get($value=''){
+        if(!is_string($value)){
+            return '';
+        }
         $explode = explode(Literal::OPEN, $value, 2);
         if(count($explode) == 2){
             $temp = explode(Literal::CLOSE, $explode[1], 2);

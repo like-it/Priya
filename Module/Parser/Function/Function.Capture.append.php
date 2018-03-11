@@ -13,16 +13,23 @@ function function_capture_append($function=array(), $argumentList=array(), $pars
         $argumentList = (array) $argumentList;
     }
     $attribute = trim(array_shift($argumentList), '"\'');
+
     $value = $function['string'];
     $value = str_ireplace('{capture.append', '{capture.append', $value);
     $value = str_ireplace('{/capture}', '{/capture}', $value);
+    $value = str_ireplace('{/capture.append}', '{/capture.append}', $value);
     $value = str_replace('{capture.append', '{capture.append[' . $parser->random() . ']', $value);
 
     $explode = explode('{capture.append', $value, 2);
 
     $string = '';
+    $is_append = false;
     if(isset($explode[1])){
         $capture = explode('{/capture}', $explode[1], 2);
+        if(!isset($capture[1])){
+            $capture = explode('{/capture.append}', $explode[1], 2);
+            $is_append = true;
+        }
         $string = $capture[0];
     }
 
@@ -42,10 +49,15 @@ function function_capture_append($function=array(), $argumentList=array(), $pars
             $array = array();
         }
         $tmp[1] = $parser->compile($tmp[1], $data);
+//         debug($tmp[1], __LINE__ . '::' . __FILE__);
         $array[] = trim($tmp[1]);
-        $parser->data($attribute, $array);
 
-        $search = '{capture.append' . $string . '{/capture}';
+        $parser->data($attribute, $array);
+        if($is_append){
+            $search = '{capture.append' . $string . '{/capture.append}';
+        } else {
+            $search = '{capture.append' . $string . '{/capture}';
+        }
 
         $value = str_replace($search, '', $value);
     }
