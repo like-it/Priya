@@ -291,6 +291,9 @@ class Variable extends Core {
         } else {
             $record['string'] = implode($item['replace'], $explode);
         }
+        $record['string'] = Literal::extra($record['string']);
+        $record['string'] = Newline::replace($record['string'], $this->parser()->random());
+        $record['string'] = Literal::replace($record['string'], $this->parser()->random());
 
         unset($record['cast']);
         unset($record['is_cast']);
@@ -346,7 +349,6 @@ class Variable extends Core {
                         $output = $input;
                     } else {
                         $output = $this->data($attribute);
-//                         var_dump($output);
                         if($output === null && $keep === true){
                             return $output;
                         }
@@ -371,7 +373,7 @@ class Variable extends Core {
                                 //but better be on the right spot...
                                 throw new Exception('Parser data empty and variable data not (implementation error...)');
                             }
-                            //not using compile anymore here, removes {literal} even without root
+                            //add tag find, if no tag no compile
                             $output = $this->parser()->compile($output, $this->parser()->data(), false, false);
                         }
                     }
