@@ -7,9 +7,14 @@
 {capture.append('footer')}
     {require("{$module.dir.root}Template/Footer.tpl")}
 {/capture}
-{capture.append('missing')}
+{capture('missing')}
     {require("{$module.dir.root}Template/Footer.tpl")}
-{/capture.append}
+{/capture}
+
+{capture.prepend('loader')}
+    {require("{$module.dir.root}Template/Footer.tpl")}
+{/capture}
+
 {$head = require("{$module.dir.root}Template/Head.tpl")}
 
 {$head} <a href="{route('priya-software-main')}">Home</a>
