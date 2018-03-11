@@ -50,7 +50,7 @@ function function_capture_append($function=array(), $argumentList=array(), $pars
         }
         $tmp[1] = $parser->compile($tmp[1], $data);
 //         debug($tmp[1], __LINE__ . '::' . __FILE__);
-        $array[] = trim($tmp[1]);
+        $array[] = $tmp[1];
 
         $parser->data($attribute, $array);
         if($is_append){
