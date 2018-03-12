@@ -60,12 +60,14 @@ class Parser extends ParserCore {
         $ext = $file->extension($url);
         if($ext == '' || $ext == Autoload::EXT_JSON){
             $read = parent::read($url);
+//             var_dump($url);
+//             var_dump($read);
             if(!empty($read)){
                 $read = $this->data($this->compile($this->data(), $this->data(), false, false));
             }
             //might need to add comment...
             $read = $this->data(Literal::remove($this->data()));
-            $read = $this->data(Literal::remove($this->data()));
+//             $read = $this->data(Literal::remove($this->data()));
         } else {
             $read = $file->read($url);
             $read = $this->compile($read, $this->data(), false, false);

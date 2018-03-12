@@ -108,28 +108,41 @@ class Literal extends Core {
      * @param string $value
      */
     public static function extra($value=''){
-        $search = array(
-            '{' . "\n",
-            '{' . "\r",
-            '{' . "\r\n",
-            '{' . ' ',
-            '{}',
-            "\n" . '}',
-            "\r" . '}',
-            "\r\n" . '}',
-            ' ' . '}',
-        );
-        $replace = array(
-            Literal::OPEN . '{' . Literal::CLOSE . "\n",
-            Literal::OPEN . '{' . Literal::CLOSE . "\r",
-            Literal::OPEN . '{' . Literal::CLOSE . "\r\n",
-            Literal::OPEN . '{' . Literal::CLOSE . ' ',
-            Literal::OPEN .'{}' . Literal::CLOSE,
-            "\n" . Literal::OPEN . '}'. Literal::CLOSE,
-            "\r" . Literal::OPEN . '}'. Literal::CLOSE,
-            "\r\n" . Literal::OPEN . '}'. Literal::CLOSE,
-            ' ' . Literal::OPEN .'}'. Literal::CLOSE,
-        );
-        return str_replace($search, $replace, $value);
+        if(is_object($value)){
+            foreach ($value as $key => $val){
+                $value->{$key} = Literal::extra($val);
+            }
+            return $value;
+        }
+        elseif(is_array($value)){
+            foreach ($value as $key => $val){
+                $value[$key] = Literal::extra($val);
+            }
+            return $value;
+        } else {
+            $search = array(
+                    '{' . "\n",
+                    '{' . "\r",
+                    '{' . "\r\n",
+                    '{' . ' ',
+                    '{}',
+                    "\n" . '}',
+                    "\r" . '}',
+                    "\r\n" . '}',
+                    ' ' . '}',
+            );
+            $replace = array(
+                    Literal::OPEN . '{' . Literal::CLOSE . "\n",
+                    Literal::OPEN . '{' . Literal::CLOSE . "\r",
+                    Literal::OPEN . '{' . Literal::CLOSE . "\r\n",
+                    Literal::OPEN . '{' . Literal::CLOSE . ' ',
+                    Literal::OPEN .'{}' . Literal::CLOSE,
+                    "\n" . Literal::OPEN . '}'. Literal::CLOSE,
+                    "\r" . Literal::OPEN . '}'. Literal::CLOSE,
+                    "\r\n" . Literal::OPEN . '}'. Literal::CLOSE,
+                    ' ' . Literal::OPEN .'}'. Literal::CLOSE,
+            );
+            return str_replace($search, $replace, $value);
+        }
     }
 }

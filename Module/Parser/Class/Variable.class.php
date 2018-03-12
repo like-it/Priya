@@ -291,11 +291,10 @@ class Variable extends Core {
             $record['string'] = $item['replace'];
         } else {
             $record['string'] = implode($item['replace'], $explode);
+            $record['string'] = Literal::extra($record['string']);
+            $record['string'] = Newline::replace($record['string'], $this->parser()->random());
+            $record['string'] = Literal::replace($record['string'], $this->parser()->random());
         }
-        $record['string'] = Literal::extra($record['string']);
-        $record['string'] = Newline::replace($record['string'], $this->parser()->random());
-        $record['string'] = Literal::replace($record['string'], $this->parser()->random());
-
         unset($record['cast']);
         unset($record['is_cast']);
         if($record['string'] == 'null'){

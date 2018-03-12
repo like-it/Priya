@@ -24,7 +24,17 @@ function function_select($function=array(), $argumentList=array(), $parser=null)
         $result = $parser->data($select);
     }
     if($url){
-        $result = $parser->read($url);
+        if(file_exists($url) === false){
+            throw new Exception('File not exists (' . $url . ')');
+        }
+        $data = new Data();
+        $data->read($url);
+
+        $data->data($parser->compile($data->data(), $parser->data(), false, true));
+        $result = $data->data($select);
+
+//         $result = $parser->read($url);
+//         var_dump($result);
 //         $data = new Data();
 //         $data->read($url);
 //         $result = $data->data($select);
