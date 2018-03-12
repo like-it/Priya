@@ -1054,6 +1054,7 @@ class Token extends Core {
             case 'T_DOUBLE_QUOTE' :
             case 'T_ARRAY' :        //might needs its own type
             case 'T_CLASS' :
+            case 'T_NAMESPACE' :
             case 'T_IS' :             //might needs its own type
             case 'T_DEFAULT' :         //might needs its own type
             case 'T_PUBLIC' :

@@ -88,11 +88,6 @@ class Parser extends ParserCore {
         if (is_array($string)){
             foreach($string as $nr => $line){
                 $string[$nr] = $this->compile($line, $data, $keep, false);
-                if(is_string($string[$nr])){
-//                     $string[$nr] = Literal::extra($string[$nr]);
-//                     $string[$nr] = Newline::replace($string[$nr], $this->random());
-//                     $string[$nr]= Literal::replace($string[$nr], $this->random());
-                }
             }
             return $string;
         }
@@ -100,20 +95,6 @@ class Parser extends ParserCore {
             foreach ($string as $key => $value){
                 //add key compile
                 $string->{$key} = $this->compile($value, $data, $keep, false);
-                if(is_string($string->{$key})){
-//                     $string->{$key} = Literal::extra($string->{$key});
-//                     $string->{$key} = Newline::replace($string->{$key}, $this->random());
-//                     $string->{$key} = Literal::replace($string->{$key}, $this->random());
-                }
-                if($key == 'page'){
-//                     debug($value);
-//                     debug(debug_backtrace(true));
-//                     die;
-//                     var_dump($data);
-//                     echo $value;
-
-//                     die;
-                }
             }
             return $string;
         } else {
