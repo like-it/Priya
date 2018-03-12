@@ -29,15 +29,8 @@ function function_select($function=array(), $argumentList=array(), $parser=null)
         }
         $data = new Data();
         $data->read($url);
-
-        $data->data($parser->compile($data->data(), $parser->data(), false, true));
+        $data->data($parser->compile($data->data(), $parser->data(), true, true));
         $result = $data->data($select);
-
-//         $result = $parser->read($url);
-//         var_dump($result);
-//         $data = new Data();
-//         $data->read($url);
-//         $result = $data->data($select);
     }
     $function['execute'] = $result;
     return $function;
