@@ -7,29 +7,6 @@ use Exception;
 
 class Assign extends Core {
 
-    private $parser;
-
-    public function __construct($data=null, $random=null, $parser=null){
-        $this->data($data);
-        $this->random($random);
-        $this->parser($parser);
-    }
-
-    public function parser($parser=null){
-        if($parser !== null){
-            $this->setParser($parser);
-        }
-        return $this->getParser();
-    }
-
-    private function setParser($parser=''){
-        $this->parser= $parser;
-    }
-
-    private function getParser(){
-        return $this->parser;
-    }
-
     public static function is_variable($record=array()){
         if(isset($record['type']) && $record['type'] == Token::TYPE_VARIABLE){
             return true;
@@ -179,12 +156,7 @@ class Assign extends Core {
         return $record;
     }
 
-    public function find($input=null){
-        if($input === null){
-            $input = $this->input();
-        } else {
-            $this->input($input);
-        }
+    public static function find($input=null, $parser=null){
         if(empty($input)){
             return;
         }
@@ -213,38 +185,35 @@ class Assign extends Core {
                 $attribute = rtrim($attribute,' ');
             }
             //before create_object assign variable needed
-            $create = Token::restore_return($value, $this->random());
+            $create = Token::restore_return($value, $parser->random());
             $original = $create;
-            $variable = new Variable($this->data(), $this->random(), $this->parser());
             $create = Token::all($create);
-            $object = Token::create_object($create, $attribute, $variable, $this->parser());
+            $object = Token::create_object($create, $attribute, $parser);
             if(!empty($object)){
-                $object['value'] = $variable->replace($object['value']);
+                $object['value'] = Variable::replace($object['value'], '', false, $parser);
                 //is variable data changed?
                 $object = Token::cast($object);
                 $this->data($attribute, $object['value']);
                 return;
             }
-            $array = Token::create_array($create, $variable);
+            $array = Token::create_array($create, $parser);
             if(!empty($array)){
-                $variable = new Variable($this->data(), $this->random(), $this->parser());
-                $array['value'] = $variable->replace($array['value']);
+                $array['value'] = Variable::replace($array['value'], '', false, $parser);
                 //is variable data changed?
                 $array = Token::cast($array);
                 $this->data($attribute, $array['value']);
                 return;
             }
-            $variable = new Variable($this->data(), $this->random(), $this->parser());
             //an equation can be a variable, if it is undefined it will be + 0
             $parse = Token::parse($create);
-            $parse = Token::variable($parse, $variable, $attribute);
+            $parse = Token::variable($parse, $attribute, $parser);
             $method = array();
             $method['parse'] = $parse;
-            $method = Token::method($method, $variable, $this->parser());
+            $method = Token::method($method, $parser);
             $parse = $method['parse'];
-            $math = Token::create_equation($parse, $variable, $this->parser());
+            $math = Token::create_equation($parse, $parser);
             if($math !== null){
-                $this->data($attribute, $math);
+                $parser->data($attribute, $math);
                 return;
             } else {
                 $item = array();
@@ -272,145 +241,36 @@ class Assign extends Core {
                 }
                 if(!isset($item['value'])){
                     //cant use data with value null to set so...
-                    $this->object_delete($attribute, $this->data()); //for sorting an object
-                    $this->object_set($attribute, null, $this->data());
+                    $parser->object_delete($attribute, $parser->data()); //for sorting an object
+                    $parser->object_set($attribute, null, $parser->data());
                     return;
                 }
                 if(is_string($item['value'])){
                     $item['value'] = Literal::extra($item['value']);
-                    $item['value'] = Newline::replace($item['value'], $this->parser()->random());
-                    $item['value'] = Literal::replace($item['value'], $this->parser()->random());
+                    $item['value'] = Newline::replace($item['value'], $parser->random());
+                    $item['value'] = Literal::replace($item['value'], $parser->random());
                 }
                 switch($assign){
                     case '+=' :
-                        $plus = $this->data($attribute) + 0;
-                        $this->data($attribute, $plus += $item['value']);
+                        $plus = $parser->data($attribute) + 0;
+                        $parser->data($attribute, $plus += $item['value']);
                     break;
                     case '-=' :
-                        $min = $this->data($attribute) + 0;
-                        $this->data($attribute, $min -= $item['value']);
+                        $min = $parser->data($attribute) + 0;
+                        $parser->data($attribute, $min -= $item['value']);
                     break;
                     case '.=' :
-                        $add = $this->data($attribute);
-                        $this->data($attribute, $add .= $item['value']);
+                        $add = $parser->data($attribute);
+                        $parser->data($attribute, $add .= $item['value']);
                     break;
                     default :
                         $item = Token::cast($item);
-                        $this->data($attribute, $item['value']);
+                        $parser->data($attribute, $item['value']);
                     break;
                 }
                 return;
             }
         }
-    }
-
-    private function variable($string='', $type=null){
-        $has = false;
-        $result = null;
-        if($string == 'has' && $type !== null){
-            $has = true;
-            $string = $type;
-        }
-        if(
-            is_bool($string) ||
-            $string== 'true' ||
-            $string== 'false' ||
-            is_null($string) ||
-            $string== 'null' ||
-            is_numeric($string) ||
-            is_array($string) ||
-            is_object($string)
-        ){
-            if(is_numeric($string)){
-                $pos = strpos($string,'0');
-                if($pos === 0 && is_numeric(substr($string, 1, 1))){
-                } else {
-                    $result = $string+ 0;
-                }
-            }
-            elseif(is_bool($string) || $string== 'true' || $string== 'false') {
-                $result= (bool) $string;
-            }
-            elseif(is_null($string) || $string== 'null'){
-                $result= null;
-            }
-            if($has === true){
-                return !false; //this means not true but needed for statement default trigger
-            }
-            return $result;
-        }
-        $string = trim($string, '\'"');
-//         $pattern = '/\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/';
-        $pattern = '/\{.*\}/';
-        preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
-        if(count($matches) == 1){
-            $result = null;
-            foreach ($matches[0] as $key => $search){
-                $replace = $this->data(substr($search, 1));
-                $is_variable = !(bool) str_replace($search, '', $string);
-
-                if(is_null($replace) && $has === true){
-                    return false;
-                } elseif($has === true){
-                    return true;
-                }
-                if(
-                    (
-                        is_bool($replace) ||
-                        $replace== 'true' ||
-                        $replace== 'false' ||
-                        is_null($replace) ||
-                        $replace== 'null' ||
-                        is_numeric($replace) ||
-                        is_array($replace) ||
-                        is_object($replace)
-                    ) &&
-                    $result === null &&
-                    $is_variable === true
-                ){
-                    if(is_numeric($replace)){
-                        $pos = strpos($replace,'0');
-                        if($pos === 0 && is_numeric(substr($replace, 1, 1))){
-                        } else {
-                            $result = $replace + 0;
-                        }
-                    }
-                    elseif(is_bool($replace) || $replace== 'true' || $replace== 'false') {
-                        $result= (bool) $value;
-                    }
-                    elseif(is_null($replace) || $replace== 'null'){
-                        $result= null;
-                    } else {
-                        $result = $replace;
-                    }
-                    break;
-                } else {
-                    $result = str_replace($search, $replace, $string);
-                }
-            }
-        } else {
-            if($has === true){
-
-            }
-            if(is_numeric($string)){
-                $pos = strpos($string,'0');
-                if($pos === 0 && is_numeric(substr($string, 1, 1))){
-                } else {
-                    $result = $string+ 0;
-                }
-            }
-            elseif(is_bool($string) || $string== 'true' || $string== 'false') {
-                $result= (bool) $string;
-            }
-            elseif(is_null($string) || $string== 'null'){
-                $result= null;
-            }
-            else {
-                $result = $string;
-            }
-        }
-        debug($result);
-        return $result;
     }
 
 }

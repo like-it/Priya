@@ -7,29 +7,6 @@ use Priya\Module\Parser\Tag;
 
 class Variable extends Core {
 
-    private $parser;
-
-    public function __construct($data=null, $random=null, $parser=null){
-        $this->data($data);
-        $this->random($random);
-        $this->parser($parser);
-    }
-
-    public function parser($parser=null){
-        if($parser !== null){
-            $this->setParser($parser);
-        }
-        return $this->getParser();
-    }
-
-    private function setParser($parser=''){
-        $this->parser= $parser;
-    }
-
-    private function getParser(){
-        return $this->parser;
-    }
-
     public static function type($mixed=null){
         if(is_int($mixed)){
             return Token::TYPE_INT;
@@ -118,6 +95,10 @@ class Variable extends Core {
                 continue;
             }
             if($record['type'] == Token::TYPE_VARIABLE){
+//                 $debug = debug_backtrace(true);
+//                 var_dump($debug[0]);
+//                 var_dump($debug[0]['args']);
+                //for.each in parse
                 $record['exclamation_count'] = Variable::exclamation($before);
                 if($record['exclamation_count'] > 0){
                     $record['has_exclamation'] = true;
@@ -193,7 +174,7 @@ class Variable extends Core {
         return $result;
     }
 
-    public function find($record=array(), $keep=false){
+    public static function find($record=array(), $keep=false, $parser=null){
         if(
             substr($record['variable']['tag'], 0, 1) != '{' &&
             substr($record['variable']['tag'], -1, 1) != '}'
@@ -229,7 +210,7 @@ class Variable extends Core {
         $modifier_list = explode('|', $attribute);
         $attribute = trim(array_shift($modifier_list), ' ');
         if(!empty($modifier_list)){
-            $modifier = Token::restore_return(implode('|', $modifier_list), $this->random());
+            $modifier = Token::restore_return(implode('|', $modifier_list), $parser->random());
         } else {
             $modifier = '';
         }
@@ -248,7 +229,7 @@ class Variable extends Core {
             return $record;
         }
         $explode = explode($record['variable']['tag'], $record['string'], 2);
-        $replace = $this->replace($attribute, $modifier, $keep);
+        $replace = Variable::replace($attribute, $modifier, $keep, $parser);
         if(is_object($replace)){
             if(
                 isset($replace->__tostring) &&
@@ -292,8 +273,8 @@ class Variable extends Core {
         } else {
             $record['string'] = implode($item['replace'], $explode);
             $record['string'] = Literal::extra($record['string']);
-            $record['string'] = Newline::replace($record['string'], $this->parser()->random());
-            $record['string'] = Literal::replace($record['string'], $this->parser()->random());
+            $record['string'] = Newline::replace($record['string'], $parser->random());
+            $record['string'] = Literal::replace($record['string'], $parser->random());
         }
         unset($record['cast']);
         unset($record['is_cast']);
@@ -309,7 +290,7 @@ class Variable extends Core {
         return $record;
     }
 
-    public function replace($input=null, $modifier='', $keep=false){
+    public static function replace($input=null, $modifier='', $keep=false, $parser=null){
         $original = $input;
         if(
             (
@@ -325,13 +306,13 @@ class Variable extends Core {
         }
         if (is_array($input)){
             foreach($input as $nr => $value){
-                $input[$nr] = $this->replace($value, $modifier);
+                $input[$nr] = $this->replace($value, $modifier, $keep);
             }
             return $input;
         }
         elseif(is_object($input)){
             foreach ($input as $key => $value){
-                $input->{$key} = $this->replace($value, $modifier);
+                $input->{$key} = $this->replace($value, $modifier, $keep);
             }
             return $input;
         } else {
@@ -347,13 +328,13 @@ class Variable extends Core {
                     if($attribute === false){
                         $output = $input;
                     } else {
-                        $output = $this->data($attribute);
+                        $output = $parser->data($attribute);
                         if($output === null && $keep === true){
                             return $output;
                         }
                         $output = Variable::value($output);
                         if(!empty($modifier)){
-                            $output = Modifier::find($output, $modifier, $this, $this->parser());
+                            $output = Modifier::find($output, $modifier, $parser);
                         }
                         if(
                             is_null($output) ||
@@ -364,18 +345,45 @@ class Variable extends Core {
                             //no need to compile again
                         } else {
                             //strange bug...
-                            if(
-                                Variable::is_empty($this->parser()->data()) === true &&
-                                Variable::is_empty($this->data()) === false
-                            ){
-                                //we could fix it now with $this->parser(data($this->data())
-                                //but better be on the right spot...
-                                throw new Exception('Parser data empty and variable data not (implementation error...)');
-                            }
                             //add tag find, if no tag no compile
                             $list = Tag::find($output);
+//                             var_dump($attribute);
+//                             var_Dump($output);
                             if(!empty($list)){
-                                $output = $this->parser()->compile($output, $this->parser()->data(), false, false);
+                                if(isset($list[0]['{for.each($menu as $nr => $record)}'])){
+                                    $parser->data('chimp', true);
+                                }
+                                if($parser->data('priya.parser.loop')){
+                                    if(isset($list[0]['{for.each($menu as $nr => $record)}'])){
+//                                         echo $input;
+//                                         echo $output;
+                                        $parser->data('priya.parser.loop3', 'init');
+                                        var_dump('found 4');
+//                                         die;
+                                    }
+//                                     var_dump($this->parser()->data());
+
+                                    if(is_string($output)){
+//                                         echo $input;
+//                                         echo '<hr>';
+//                                         echo $output;
+                                    }
+//                                     var_Dump($this->parser()->data('priya.parser'));
+//                                     var_dump('found 3');
+//                                     $debug = debug_backtrace(true);
+//                                     var_dump($debug[0]);
+//                                     var_dump($debug[0]['args']);
+                                }
+//                                 var_dump($list);
+//                                 var_dump($this->parser()->Data());
+//                                 var_dump($data);
+                                $output = $parser->compile($output, $parser->data(), false, false);
+                                if(is_string($output)){
+                                    if(isset($list[0]['{$menu.20.name}'])){
+                                        $parser->data('parser.double.menu', true);
+                                    }
+//                                     echo $output;
+                                }
                             }
                         }
                     }

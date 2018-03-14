@@ -79,7 +79,7 @@ class Operator extends Core {
         );
     }
 
-    public static function execute($operator=array(), Variable $variable, $parser=null){
+    public static function execute($operator=array(), $parser=null){
         if(!isset($operator['type']) || $operator['type'] != 'operator'){
             return $operator;
         }
@@ -145,7 +145,7 @@ class Operator extends Core {
             case '|' :
                 $modifier = reset($operator['right_parse']);
                 if(is_string($modifier['value'])){
-                    $operator = Modifier::execute($operator, $variable, $parser);
+                    $operator = Modifier::execute($operator, $parser);
                     unset($operator['left']);
                     unset($operator['right']);
                     $operator['modified_is_executed'] = true;
@@ -179,7 +179,7 @@ class Operator extends Core {
         return $operator;
     }
 
-    public static function statement($statement=array(), Variable $variable, $parser=null){
+    public static function statement($statement=array(), $parser=null){
         //variable is already a value in statement
         //add original
         $left = array();
@@ -214,12 +214,12 @@ class Operator extends Core {
         $operator['left_parse'] = $left;
         $method = array();
         $method['parse'] = $left;
-        $method = Token::method($method, $variable, $parser);
+        $method = Token::method($method, $parser);
         $operator['left_parse'] = $method['parse'];
 
         $method = array();
         $method['parse'] = $right;
-        $method = Token::method($method, $variable, $parser);
+        $method = Token::method($method, $parser);
         $operator['right_parse'] = $method['parse'];
 
         $is_modifier = Modifier::is($operator);
@@ -253,10 +253,10 @@ class Operator extends Core {
             $right_statement = $statement;
             array_unshift($right_statement, $operator['right_parse'][0]);
             if(count($right_statement) > 1){
-                $right_statement = Operator::statement($right_statement, $variable, $parser);
+                $right_statement = Operator::statement($right_statement, $parser);
                 $right_statement_count = 0;
                 while(count($right_statement) > 1 && $right_statement[0]['value'] === true){
-                    $right_statement = Operator::statement($right_statement, $variable, $parser);
+                    $right_statement = Operator::statement($right_statement, $parser);
                     $right_statement_count++;
                     if($right_statement_count >= Operator::MAX){
                         throw new Exception('Operator::statement:$right_statement_count >= Operator::MAX');;
@@ -268,7 +268,7 @@ class Operator extends Core {
             $operator['right'] = $right_statement[0]['value'];
             $statement = array();
         }
-        $operator = Operator::execute($operator, $variable, $parser);
+        $operator = Operator::execute($operator, $parser);
         array_unshift($statement, $operator);
         return $statement;
     }

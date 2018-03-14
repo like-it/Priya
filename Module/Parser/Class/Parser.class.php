@@ -113,6 +113,7 @@ class Parser extends ParserCore {
             $string = Literal::replace($string, $this->random());
 
             $list = Tag::find($string);
+
             /**
              * invalid for capture.append
              *
@@ -126,35 +127,33 @@ class Parser extends ParserCore {
                 $data = $this->object($data);
             }
 
-            $assign = new Assign($data, $this->random(), $this);
+//             $assign = new Assign($data, $this->random(), $this);
             $if = new Control_If($data, $this->random(), $this);
-            $variable = new Variable($data, $this->random(), $this);
-            $method = new Method($data, $this->random());
             $if_counter = 0;
 
             $record = array();
             $record['string'] = $string;
 
-            while($if::has($list)){
+            while(Control_If::has($list)){
                 foreach($list as $value){
                     $key = key($value);
                     if(substr($key, 0, 3) == '{if'){
                         break;
                     }
-                    $assign->find($key);
+                    Assign::find($key, $this);
                     $record['assign']['tag'] = $key;
                     $record = Assign::row($record, $this->random());
 
                     $record['variable']['tag'] = $key;
-                    $record = $variable->find($record, $keep);
+                    $record = Variable::find($record, $keep, $this);
 
                     $record['method']['tag'] = $key;
-                    $record = $method->find($record, $variable, $this);
+                    $record = Method::find($record, $this);
                 }
-                $record = $if::create($list, $record['string'], $this->random());
-                $record = $if->statement($record, $this);
+                $record = Control_If::create($list, $record['string'], $this->random());
+                $record = Control_If::statement($record, $this);
                 $list = Tag::find($record['string']);
-                if($if_counter >= $if::MAX){
+                if($if_counter >= Control_If::MAX){
                     throw new Exception('Parser::compile:$if_counter>=$if::MAX');
                     break;
                 }
@@ -162,27 +161,28 @@ class Parser extends ParserCore {
             }
             foreach($list as $value){
                 $key = key($value);
-                $assign->find($key);
+                Assign::find($key, $this);
                 $record['assign']['tag'] = $key;
                 $record = Assign::row($record, $this->random());
 
                 $record['variable']['tag'] = $key;
-                $record = $variable->find($record, $keep);
+                $record = Variable::find($record, $keep, $this);
 
                 $record['method']['tag'] = $key;
-                $record = $method->find($record, $variable, $this);
+                $record = method::find($record, $this);
             }
             if(empty($list)){
                 $key = $record['string'];
-                $assign->find($key);
+                Assign::find($key, $this);
+//                 var_dump($this->data());
                 $record['assign']['tag'] = $key;
                 $record = Assign::row($record, $this->random());
 
                 $record['variable']['tag'] = $key;
-                $record = $variable->find($record, $keep);
+                $record = Variable::find($record, $keep, $this);
 
                 $record['method']['tag'] = $key;
-                $record = $method->find($record, $variable, $this);
+                $record = method::find($record, $this);
             }
             $string = $record['string'];
             $string = Token::restore_return($string, $this->random());
@@ -198,9 +198,13 @@ class Parser extends ParserCore {
                 if($root){
                     $string = Literal::remove($string);
                     $string = Token::remove_comment($string);
+//                     echo $string;
                 }
+//                 var_dump($root);
+//                 var_dump($string);
                 return $string;
             } else {
+//                 var_Dump($string);
                 return $string;
             }
         }

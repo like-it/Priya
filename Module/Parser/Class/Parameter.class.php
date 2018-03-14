@@ -8,9 +8,12 @@ class Parameter extends Core {
     const MAX_ARRAY = 1024;
     const MAX_OBJECT = 1024;
 
-    public static function get($parse=array(), Variable $variable){
+    public static function get($parse=array(), $parser=null){
+//         $debug = debug_backtrace(true);
+//         var_dump($debug[0]);
+//         var_dump($debug[0]['args']);
         $original = $parse;
-        $parse = Token::variable($parse, $variable);
+        $parse = Token::variable($parse, '',$parser);
         $count_array = 0;
         while(Parameter::has_array($parse)){
             $parse = Parameter::create_array($parse);

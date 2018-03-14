@@ -10,7 +10,7 @@ use Priya\Application;
  *     -    all
  */
 
-function function_dir_cwd($function=array(), $argumentList=array(), $parser=null){
+function function_dir_set($function=array(), $argumentList=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
@@ -18,6 +18,6 @@ function function_dir_cwd($function=array(), $argumentList=array(), $parser=null
     if(is_dir($dir)){
         chdir($dir);
     }
-    $function['execute'] = getcwd() . Application::DS;
+    $function['execute'] = '';
     return $function;
 }

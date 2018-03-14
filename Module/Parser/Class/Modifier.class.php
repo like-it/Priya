@@ -86,7 +86,7 @@ class Modifier extends Core {
      * @todo
      * -    multiple modifiers;
      */
-    public static function find($value='', $modifier='', Variable $variable, $parser=null){
+    public static function find($value='', $modifier='', $parser=null){
         if(is_array($modifier)){
             $string = array();
             foreach($modifier as $nr =>  $part){
@@ -103,7 +103,7 @@ class Modifier extends Core {
             if($modifier === false){
                 return $value;
             }
-            $argument = Modifier::argument($parse, $variable);
+            $argument = Modifier::argument($parse, $parser);
 
             $name = str_replace(
                 array(
@@ -139,7 +139,7 @@ class Modifier extends Core {
         return $value;
     }
 
-    public static function argument($parse=array(), Variable $variable){
+    public static function argument($parse=array(), $parser=null){
         $argumentList = array();
         $collect = false;
         $key = 0;
@@ -217,19 +217,19 @@ class Modifier extends Core {
                     continue;
                 } else {
                     $argumentList[$key] = Variable::value(
-                        $variable->data($attribute)
+                        $parser->data($attribute)
                     );
                 }
             }
         }
         $result = array();
         foreach ($argumentList as $argument){
-            $result[] = Literal::restore($argument, $variable->random());
+            $result[] = Literal::restore($argument, $parser->random());
         }
         return $result;
     }
 
-    public static function execute($operator=array(), Variable $variable, $parser=null){
+    public static function execute($operator=array(), $parser=null){
         $modifier = Modifier::get($operator['right_parse']);
         $name = str_replace(
             array(
@@ -255,7 +255,7 @@ class Modifier extends Core {
             }
             $value .= $before['value'];
         }
-        $argument = Modifier::argument($operator['right_parse'], $variable);
+        $argument = Modifier::argument($operator['right_parse'], $parser);
         $operator['execute'] = $name($value, $argument, $parser);
         $operator['value'] = $operator['execute'];
         $part = reset($operator['right_parse']);

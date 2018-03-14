@@ -43,7 +43,7 @@ function function_require($function=array(), $argumentList=array(), $parser=null
         if($file->extension($url) == 'js'){
             echo '<script>console.error("File: ' . $url . ' doesn\'t exists");</script>';
         } else {
-//         throw new Exception('File (' . $url . ') doesn\'t exists');
+            throw new Exception('File (' . $url . ') doesn\'t exists');
         }
     }
     elseif(

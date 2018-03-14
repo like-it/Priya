@@ -7,29 +7,6 @@ use Exception;
 class Control_If extends Core {
     const MAX = 1024;
 
-    private $parser;
-
-    public function __construct($data=null, $random=null, $parser=null){
-        $this->data($data);
-        $this->random($random);
-        $this->parser($parser);
-    }
-
-    public function parser($parser=null){
-        if($parser !== null){
-            $this->setParser($parser);
-        }
-        return $this->getParser();
-    }
-
-    private function setParser($parser=''){
-        $this->parser= $parser;
-    }
-
-    private function getParser(){
-        return $this->parser;
-    }
-
     public static function has($list=array()){
         return (bool) Control_If::get($list);
     }
@@ -218,19 +195,18 @@ class Control_If extends Core {
         return $record;
     }
 
-    public function statement($record=array(), $parser=null){
-        $create = Token::restore_return($record['if']['statement'], $this->random());
+    public static function statement($record=array(), $parser=null){
+        $create = Token::restore_return($record['if']['statement'], $parser->random());
         $create = str_replace('{if ', '', substr($create, 0, -1));
-        $variable = new Variable($this->data(), $this->random(), $parser);
         $parse = Token::parse($create);
-        $parse = Token::variable($parse, $variable);
+        $parse = Token::variable($parse, '', $parser);
 
         $method = array();
         $method['parse'] = $parse;
-        $method = Token::method($method, $variable, $this->parser());
+        $method = Token::method($method, $parser);
         $parse = $method['parse'];
-        $math = Token::create_equation($parse, $variable, $parser);
-        $record = Control_If::execute($record, $math, $this->random());
+        $math = Token::create_equation($parse, $parser);
+        $record = Control_If::execute($record, $math, $parser->random());
         $record = Control_If::replace($record);
         return $record;
     }
