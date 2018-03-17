@@ -50,11 +50,6 @@ class Parser extends ParserCore {
         $this->data($this->compile($this->data(), $this->data()));
     }
 
-    /**
-     * can only read .json files...
-     * {@inheritDoc}
-     * @see \Priya\Module\Data::read()
-     */
     public function read($url=''){
         $file = new File();
         $ext = $file->extension($url);
