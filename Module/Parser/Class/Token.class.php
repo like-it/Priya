@@ -1266,13 +1266,7 @@ class Token extends Core {
                 } else {
                     $method['string'] = $record['string'];
                 }
-//                 debug($method, __LINE__ . '::' . __FILE__);
-                //parse method['parameter'] first...
-                if(get_class($parser) != 'Priya\Module\Parser'){
-                    var_dump(get_class($parser));
-                    var_dump(debug_backtrace(true));
-                    die;
-                }
+//                     echo __LINE__ . '::' . __FILE__ . PHP_EOL . '<br>';
                 $method = Method::execute($method, $parser);
                 $method = Method::exclamation($record, $method, $parser);
                 $record = Method::remove_exclamation($record);
