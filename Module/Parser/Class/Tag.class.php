@@ -86,10 +86,10 @@ class Tag extends Core {
         if(!is_string($input)){
             return $tagged;
         }
+//         echo __LINE__ . '::' . __FILE__ . $input;
         $explode = Tag::explode($input);
 //         $pattern = '/\$([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/';
         $pattern = '/\{.*\}/';
-
         foreach($explode as $key => $value){
             preg_match_all($pattern, $value, $matches, PREG_SET_ORDER);
             if(!empty($matches)){
