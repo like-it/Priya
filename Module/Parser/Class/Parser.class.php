@@ -60,14 +60,11 @@ class Parser extends ParserCore {
         $ext = $file->extension($url);
         if($ext == '' || $ext == Autoload::EXT_JSON){
             $read = parent::read($url);
-//             var_dump($url);
-//             var_dump($read);
             if(!empty($read)){
                 $read = $this->data($this->compile($this->data(), $this->data(), false, false));
             }
             //might need to add comment...
             $read = $this->data(Literal::remove($this->data()));
-//             $read = $this->data(Literal::remove($this->data()));
         } else {
             $read = $file->read($url);
             $read = $this->compile($read, $this->data(), false, false);
@@ -78,6 +75,7 @@ class Parser extends ParserCore {
     }
 
     public function compile($string, $data=null, $keep=false, $root=true){
+//         $this->input($string);
         if(
             is_null($string) ||
             is_bool($string) ||
@@ -121,14 +119,9 @@ class Parser extends ParserCore {
              */
 //             $list = Tag::control($list);
 
-            if($data === null){
-                $data = $this->data();
-            } else {
-                $data = $this->object($data);
+            if($data !== null){
+                $this->data($data);
             }
-
-//             $assign = new Assign($data, $this->random(), $this);
-            $if = new Control_If($data, $this->random(), $this);
             $if_counter = 0;
 
             $record = array();
@@ -154,7 +147,7 @@ class Parser extends ParserCore {
                 $record = Control_If::statement($record, $this);
                 $list = Tag::find($record['string']);
                 if($if_counter >= Control_If::MAX){
-                    throw new Exception('Parser::compile:$if_counter>=$if::MAX');
+                    throw new Exception('Parser::compile:$if_counter>=Control_If::MAX');
                     break;
                 }
                 $if_counter++;
@@ -174,7 +167,6 @@ class Parser extends ParserCore {
             if(empty($list)){
                 $key = $record['string'];
                 Assign::find($key, $this);
-//                 var_dump($this->data());
                 $record['assign']['tag'] = $key;
                 $record = Assign::row($record, $this->random());
 
@@ -187,7 +179,6 @@ class Parser extends ParserCore {
             $string = $record['string'];
             $string = Token::restore_return($string, $this->random());
             if(is_string($string)){
-//                 echo $string;
                 $string = Literal::restore($string, $this->random());
                 $string = str_replace(
                     array('[literal][rand:' .  $this->random() .']{literal}', '[/literal][rand:' .  $this->random() .']{/literal}'),
@@ -198,13 +189,9 @@ class Parser extends ParserCore {
                 if($root){
                     $string = Literal::remove($string);
                     $string = Token::remove_comment($string);
-//                     echo $string;
                 }
-//                 var_dump($root);
-//                 var_dump($string);
                 return $string;
             } else {
-//                 var_Dump($string);
                 return $string;
             }
         }
