@@ -100,9 +100,40 @@ class Control_Foreach extends Core {
         return $string;
     }
 
+    public static function literal($value='', $parser=null){
+        $search = array(
+            '[' . $parser->random() . '][literal]',
+            '[' . $parser->random() . '][/literal]',
+            '[' . $parser->random(). '][curly_open]',
+            '[' . $parser->random(). '][curly_close]',
+        );
+        $replace = array(
+            '[literal][for.each:' .  $parser->random() .']',
+            '[/literal][for.each:' .  $parser->random() .']',
+            '[curly_open][for.each:' .  $parser->random() .']',
+            '[curly_close][for.each:' .  $parser->random() .']'
+        );
+        return str_replace($search, $replace, $value);
+    }
+
+    public static function replace($value='', $parser=null){
+        $search = array(
+                '[literal][for.each:' .  $parser->random() .']',
+                '[/literal][for.each:' .  $parser->random() .']',
+                '[curly_open][for.each:' .  $parser->random() .']',
+                '[curly_close][for.each:' .  $parser->random() .']'
+        );
+        $replace = array(
+                '[' . $parser->random() . '][literal]',
+                '[' . $parser->random() . '][/literal]',
+                '[' . $parser->random(). '][curly_open]',
+                '[' . $parser->random(). '][curly_close]',
+        );
+        return str_replace($search, $replace, $value);
+    }
+
     public static function content($value=''){
         $explode = explode('{for.each(', $value, 2);
-
         $string = '';
         if(isset($explode[1])){
             $foreach = explode('}hcae.rof/{', strrev($explode[1]), 2);
@@ -110,7 +141,7 @@ class Control_Foreach extends Core {
             if(isset($foreach[1])){
                 $foreach[1] = strrev($foreach[1]);
             } else {
-                throw new Exception('Missing {/for.each} in {for.each} tag');
+                throw new Exception('Control_Foreach::content:Missing {/for.each} in {for.each} tag');
             }
             $string = $foreach[1]; //not 0 (reverse)
             return $string;
@@ -122,6 +153,9 @@ class Control_Foreach extends Core {
     public static function finalize($value='', $function=array()){
         $search = '{for.each(' . $value . '{/for.each}';
         $explode = explode($search, $function['string'], 2);
+        if(!isset($explode[1])){
+            throw new Exception('Control_Foreach::finalize:Cannot finalize for.each, cannot find origin');
+        }
         return implode($function['execute'], $explode);
     }
 
