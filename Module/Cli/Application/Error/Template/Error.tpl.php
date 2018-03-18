@@ -1,10 +1,10 @@
 <?php
 /**
- * @author 		Remco van der Velde
- * @since 		2016-11-07
- * @version		1.0
+ * @author         Remco van der Velde
+ * @since         2016-11-07
+ * @version        1.0
  * @changeLog
- * 	-	all
+ *     -    all
  * @note
  *  - In Smarty bash coloring isn't working.
  */
@@ -23,9 +23,14 @@ switch ($this->request('id')){
         break;
     default:
         $route = $this->request('route') ? $this->request('route') : $this->request('request');
-        echo "\033[31m[error]\033[0m Route not found for request (". $route . ")" . PHP_EOL;
-        echo  PHP_EOL;
-        echo "\tOptions:" . PHP_EOL;
-        echo "\t - php " . getcwd() . Application::DS . "Priya.php route --list        (this will show available routes)" . PHP_EOL;
+        $color = 16;
+        $background = 9;
+        $this->color($color, $background);
+        $this->output('  ERROR  ');
+        $this->color('reset');
+        $this->output(' Route not found for request (' . $route . ')' . PHP_EOL);
+        $this->output(PHP_EOL);
+        $this->output("\tOptions:" . PHP_EOL);
+        $this->output("\t - priya route --list        (this will show available routes)" . PHP_EOL);
         break;
 }

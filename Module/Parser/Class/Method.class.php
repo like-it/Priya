@@ -323,7 +323,9 @@ class Method extends Core {
                     }
                 }
             }
-
+// echo '<hr><hr>';
+// echo $function['string'];
+// echo '<hr><hr>';
             $function = $name($function, $argument, $parser, $parser->data());
             $function['value'] = $function['execute'];
 

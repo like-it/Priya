@@ -16,14 +16,26 @@ function function_for_each($function=array(), $argumentList=array(), $parser=nul
     }
     $list = Control_Foreach::list($function, $parser);
     $key = Control_Foreach::key($function);
-//     echo __LINE__ . '::' . __FILE__ . $function['parameter'][0]['variable'] . ' ' . $key . ' (exec)<br>' . PHP_EOL;
     $record = Control_Foreach::record($function);
     $value = Control_Foreach::lower($function['string']);
+//     echo __LINE__ . '::' . __FILE__ . $value;
     $value = Control_Foreach::get($value);
 
+//     echo __LINE__ . '::' . __FILE__ . $value;
     $string = Control_Foreach::content($value);
     $string = Control_Foreach::literal($string, $parser);
-    if($string === false){
+
+    if($parser->data('priya.debug') === true){
+//         var_Dump($string);
+        //wrong position...
+//         die;
+    }
+
+    if($string == ''){
+        //can be caused by multiple foreaches with the same arguments...
+        $function['execute'] = '';
+    }
+    elseif($string === false){
         $function['execute'] = '';
     } else {
         $function['execute'] = Control_Foreach::find($string, $list, $key, $record, $parser);

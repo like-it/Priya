@@ -133,17 +133,25 @@ class Control_Foreach extends Core {
     }
 
     public static function content($value=''){
-        $explode = explode('{for.each(', $value, 2);
+        $explode = explode('{for.each(', $value, 3); //yes 3
         $string = '';
         if(isset($explode[1])){
+            if(isset($explode[2])){
+                //we found multiple foreaches in the value, we only need the first one
+                //these for.eaches should not be nested
+            }
             $foreach = explode('}hcae.rof/{', strrev($explode[1]), 2);
             $foreach[0] = strrev($foreach[0]);
             if(isset($foreach[1])){
                 $foreach[1] = strrev($foreach[1]);
+                $string = $foreach[1]; //not 0 (reverse)
             } else {
+//                 echo '<hr><hr>';
+//                 echo $value;
+                $string = $foreach[0]; //for duplicate for.eaches...
                 throw new Exception('Control_Foreach::content:Missing {/for.each} in {for.each} tag');
             }
-            $string = $foreach[1]; //not 0 (reverse)
+
             return $string;
         } else {
             return false;
@@ -154,6 +162,12 @@ class Control_Foreach extends Core {
         $search = '{for.each(' . $value . '{/for.each}';
         $explode = explode($search, $function['string'], 2);
         if(!isset($explode[1])){
+//             echo __LINE__ . '::' . __FILE__ . ':' . $search;
+//             echo '<hr>';
+//             echo $function['string'];
+//             var_Dump(debug_backtrace(true));
+            var_dump($function);
+            die;
             throw new Exception('Control_Foreach::finalize:Cannot finalize for.each, cannot find origin');
         }
         return implode($function['execute'], $explode);
@@ -161,6 +175,11 @@ class Control_Foreach extends Core {
 
     public static function find($string='', $list=array(), $key=null, $record=null, $parser=null){
         $tmp = explode(')}',$string, 2);
+        if(!isset($tmp[1])){
+            var_dump($string);
+            var_dump(debug_backtrace(true));
+            die;
+        }
         //might add randomizer to be in scope of the foreach only...
         $internal = '';
 

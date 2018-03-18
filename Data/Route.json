@@ -40,5 +40,15 @@
             "CLI"
         ],
         "translate": false
+    },
+    "Boot-CLi": {
+        "path": "Boot",
+        "controller": "Priya.Module.Boot.Cli.run",
+        "format": "html",
+        "language": "en",
+        "method": [
+            "CLI"
+        ],
+        "translate": false
     }
 }
