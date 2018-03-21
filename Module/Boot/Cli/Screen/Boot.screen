@@ -8,9 +8,9 @@
 {$z = $x}
 
 {terminal.start()}
-{terminal.grid(0, 0, 'auto', 'auto', 9, 4)}
-{terminal.screen.goto(1, 1)}
-{terminal.write.line('this is a test')}
+{terminal.grid(0, 0, 'auto', 'auto', 10, 5)}
+{terminal.screen.goto(0, 0)}
+{terminal.write.line("Welcome to Priya version {$priya.version}")}
 {terminal.screen()}
 {terminal.screen.goto(10, 10)}
 {$command = terminal.read.line('Boot: ')}

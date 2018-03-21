@@ -101,21 +101,6 @@ class Cli extends Result {
             $result .= "\e[48;5;" . intval($background) . 'm';
         }
         return $result;
-        /*
-        switch($color){
-            case 'red':
-                echo "\033[31m";
-            break;
-            case 'green':
-                echo "\033[32m";
-            break;
-            case 'test':
-                echo "\e[38;5;82mHello \e[38;5;198mWorld";
-            case 'end':
-                echo "\033[0m";
-            break;
-        }
-        */
     }
 
     public function read($url='', $text='', $read=''){

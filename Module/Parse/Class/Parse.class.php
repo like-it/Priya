@@ -1,23 +1,21 @@
 <?php
 /**
- * @author                 Remco van der Velde
+ * @author                Remco van der Velde
  * @since                 2018-03-19
- * @version                2.0
+ * @version               2.0
  * @changeLog
  *     -    detoken parse
+ * @todo
+ *     -    if function
+ *     -    foreach function
+ *     -    while function
+ *     -    switch function
+ *     -    sets, from inside to outside
+ *     -    operators
  */
 
 namespace Priya\Module;
 
-// use Priya\Module\Parser\Variable;
-// use Priya\Module\Parser\Newline;
-// use Priya\Module\Parser\Literal;
-// use Priya\Module\Parser\Tag;
-// use Priya\Module\Parser\Random;
-// use Priya\Module\Parser\Assign;
-// use Priya\Module\Parser\Method;
-// use Priya\Module\Parser\Control_If;
-// use Priya\Module\Parser\Token;
 use Exception;
 use Priya\Module\Parse\Tag;
 use Priya\Module\Parse\Assign;
@@ -105,7 +103,7 @@ class Parse extends Data {
                 $key_type = gettype($key);
                 //add key compile
                 if($key_type == Parse::TYPE_STRING){
-                    //keep the key value otherways it might overwrite
+                    //keep the key value otherways it might be overwritten
                     $string->{Parse::token($key, $data, true, $parser)} = Parse::token($value, $data, $keep, $parser);
                 } else {
                     $string->{$key} = Parse::token($value, $data, $keep, $parser);
