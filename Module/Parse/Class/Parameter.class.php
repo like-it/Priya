@@ -9,27 +9,29 @@ use Exception;
 class Parameter extends Core {
 
     public static function find($string='', $parser=null){
-       $explode = explode(')}', $string, 2);
-       //explode[0]
-       $method = token_get_all('<?php $method=method(' . $explode[0] . ');');
+       $parameters = array();
+       $explode = explode('})', strrev($string), 2);
+       if(!isset($explode[1])){
+            return $parameters;
+       }       
+       $method = token_get_all('<?php $method=method(' . strrev($explode[1]) . ');');
        $collect = false;
        $counter = 0;
        $set_depth = 0;
-       $parameters = array();
+       
        foreach ($method as $nr => $parameter){
             if($parameter == '(' || isset($parameter[1]) && $parameter[1] == '('){
                 $set_depth++;
                 if($set_depth == 1){
                     $collect = true;
-                }
-                continue;
+                    continue;
+                }                
             }
             if($parameter == ')' || isset($parameter[1]) && $parameter[1] == ')'){
                 if($set_depth == 1){
                     $collect = false;
                 }
-                $set_depth--;
-                continue;
+                $set_depth--;                
             }
             if($collect){
                 if($parameter == ',' || isset($parameter[1]) && $parameter[1] == ','){
@@ -74,7 +76,7 @@ class Parameter extends Core {
                     elseif($test == 'null'){
                         $parameters[$nr] = null;
                     }
-                    elseif(substr($test, 0, 1) == '$'){
+                    elseif(substr($parameter, 0, 1) == '$'){
                         $parameter = substr($parameter, 1);
                         $parameters[$nr] = $parser->data($parameter);
                     }
