@@ -7,23 +7,10 @@
 {$z = $x}
 {$z = $x}
 
-{$grid = terminal.grid(0, 0, 'auto', 'auto', 9, 4)}
-{$grid = array.merge($grid, terminal.grid(0, 2, 80, 50, 9, 7))}
-{terminal.screen($grid)}
-
-
+{terminal.start()}
+{terminal.grid(0, 0, 'auto', 'auto', 9, 4)}
+{terminal.screen.goto(1, 1)}
+{terminal.write.line('this is a test')}
+{terminal.screen()}
+{terminal.screen.goto(10, 10)}
 {$command = terminal.readline('Boot: ')}
-
-{literal}
-{$block.width = 80}
-{$block.x = terminal.width() - $block.width}
-{$block.height = terminal.height() - 3}
-{$block.y = 1}
-{$block.content = 'test'}
-{$block.color = 2}
-{$block.background = 11}
-
-{terminal.block($block)}
-{/literal}
-
-Priya: {$command}

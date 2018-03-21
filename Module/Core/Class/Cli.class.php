@@ -121,8 +121,15 @@ class Cli extends Result {
     public function read($url='', $text='', $read=''){
         ob_flush();
         if($url=='input'){
-            readline_completion_function(array($this, 'complete'));
-            $input = rtrim(readline($text), ' ');
+            echo $text;
+            ob_flush();
+//             system('stty -echo');
+            $input = trim(fgets(STDIN));
+//             system('stty echo');
+            echo PHP_EOL;
+
+//             readline_completion_function(array($this, 'complete'));
+//             $input = rtrim(readline($text), ' ');
         }
         elseif($url=='input-hidden'){
             echo $text;
@@ -145,7 +152,7 @@ class Cli extends Result {
                 $this->color($color, $background);
             }
             echo $text;
-            $this->tput('reset');
+//             $this->tput('reset');
             ob_flush();
         } else {
             return parent::write($url);
@@ -216,12 +223,14 @@ class Cli extends Result {
     }
 
     public function screen($grid=array(), $timeout=null){
-        $this->tput('clear');
-        $this->tput('home');
         $content = array();
         if(!is_array($grid)){
             return;
         }
+
+        $this->output($this->tput('clear'));
+        $this->output($this->tput('home'));
+
         foreach($grid as $y => $list_y){
             $row = '';
             foreach($list_y as $x => $pointer){
@@ -229,8 +238,10 @@ class Cli extends Result {
             }
             $content[] = $row;
         }
-        $this->output(implode(PHP_EOL, $content));
+        $this->output(implode('', $content));
         $this->output($this->tput('reset'));
+//         $this-
+        $this->output($this->tput('home'));
 //         $this->tput('position', array(0, ($this->tput('height') - 1)));
 //         $this->input('Priya: ');
     }

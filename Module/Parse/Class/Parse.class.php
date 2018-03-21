@@ -51,10 +51,6 @@ class Parse extends Data {
             $read = $file->read($url);
             $this->data('priya.module.parser.document.url', $url);
             $read = $this->compile($read, $this->data(), false);
-            var_dump($read);
-            var_dump($this->data());
-            die;
-
             //             debug($read, __LINE__ . '::' . __FILE__);
         }
         return $read;
@@ -122,9 +118,9 @@ class Parse extends Data {
             $tags = Tag::find($string, $parser);
             $string = $string;
             foreach($tags as $nr => $tag){
-                $string = Assign::find($tag, $string, $parser);
-                $string = Variable::find($tag, $string, $keep, $parser);
                 $string = Method::find($tag, $string, $parser);
+                $string = Variable::find($tag, $string, $keep, $parser);
+                $string = Assign::find($tag, $string, $parser);
             }
             return $string;
             //first tags, rows + cols

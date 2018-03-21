@@ -6,6 +6,23 @@ use Priya\Module\Core;
 use Exception;
 
 class Tag extends Core {
+    const ATTRIBUTE = 'attribute';
+    const LINE = 'line';
+    const COLUMN = 'column';
+    const EXECUTE = 'execute';
+    const PARAMETER = 'parameter';
+
+    const ATTRIBUTE_EXECUTE = 'execute';
+    const ATTRIBUTE_METHOD = 'method';
+    const ATTRIBUTE_PARAMETER = 'parameter';
+    const ATTRIBUTE_STRING = 'string';
+    const ATTRIBUTE_TAG = 'tag';
+    const ATTRIBUTE_CAST = 'cast';
+    const ATTRIBUTE_EXCLAMATION = 'exclamation';
+    const ATTRIBUTE_FUNCTION = 'function';
+    const ATTRIBUTE_NAME = 'name';
+    const ATTRIBUTE_ASSIGN = 'assign';
+    const ATTRIBUTE_VALUE = 'value';
 
     public static function find($input=null, $parser=null){
         $tagged = array();
@@ -21,16 +38,16 @@ class Tag extends Core {
             foreach ($matches as $occurence => $set){
                 foreach ($set as $nr => $record){
                     $explode = explode($record[0], $page, 2);
-                    $row = strlen($explode[0]) - strlen(str_replace("\n", '', $explode[0])) + 1;
+                    $line = strlen($explode[0]) - strlen(str_replace("\n", '', $explode[0])) + 1;
                     if(isset($explode[1])){
                         $page = $explode[0] . str_repeat(' ', strlen($record[0])) . $explode[1];
                     } else {
                         $page = $explode[0] . str_repeat(' ', strlen($record[0]));
                     }
                     $explode = explode("\n", strrev($explode[0]), 2);
-                    $col = strlen($explode[0]) +1;
+                    $column = strlen($explode[0]) +1;
                     $node = array();
-                    $node['tag'] = $record[0];
+                    $node[Tag::ATTRIBUTE_TAG] = $record[0];
 
                     //below should not be neccesary, otherways the '"}}"' get replaced too
                     /*
@@ -40,8 +57,8 @@ class Tag extends Core {
                         $record[0]
                     );
                     */
-                    $node['line'] = $row;
-                    $node['column'] = $col;
+                    $node[Tag::LINE] = $line;
+                    $node[Tag::COLUMN] = $column;
                     $tagged[] = $node;
                     $counter++;
                 }

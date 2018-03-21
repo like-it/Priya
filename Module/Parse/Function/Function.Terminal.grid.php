@@ -52,5 +52,8 @@ function function_terminal_grid($tag=array(), $parser=null){
     }
     $grid = $cli->grid($x, $y, $width, $height, $color, $background);
     $tag['execute'] = $grid;
+    if($parser->data('priya.module.terminal.start') === true){
+        $parser->data('priya.module.terminal.grid', $grid);
+    }
     return $tag;
 }

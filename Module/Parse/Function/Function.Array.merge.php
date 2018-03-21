@@ -8,18 +8,17 @@
  *     -    all
  */
 
+use Priya\Module\Parse\Tag;
+
 function function_array_merge($tag=array(), $parser=null){
-    $argumentList = $tag['parameter'];
-    var_dump($argumentList);
-    die;
+    $argumentList = $tag[Tag::PARAMETER];
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $reference = array_shift($argumentList);
-    $selector = substr($reference, 2, -1);
-    $array = $parser->data($selector);
-    $result = next($array);
-    $parser->data($selector, $array);
-    $function['execute'] = $result;
-    return $function;
+    $result = array_shift($argumentList);
+    foreach($argumentList as $argument){
+        $result = array_merge($result, $argument);
+    }
+    $tag[Tag::EXECUTE] = $result;
+    return $tag;
 }

@@ -10,10 +10,10 @@ class Assign extends Core {
 
     public static function remove($tag=array(), $attribute='', $parser=null){
         $method = '=';
-        $explode = explode($method, $tag['tag'], 2);
+        $explode = explode($method, $tag[Tag::ATTRIBUTE_TAG], 2);
 
         if(!isset($explode[1])){
-            $tag[$attribute] = $tag['tag'];
+            $tag[$attribute] = $tag[Tag::ATTRIBUTE_TAG];
         } else {
             $tag[$attribute] = rtrim($explode[1], ' ');
         }
@@ -22,10 +22,10 @@ class Assign extends Core {
 
     public static function select($tag=array(), $parser=null){
         $method = '=';
-        $explode = explode($method, $tag['tag'], 2);
+        $explode = explode($method, $tag[Tag::ATTRIBUTE_TAG], 2);
 
-        $tag['attribute'] = null;
-        $tag['assign'] = null;
+        $tag[Tag::ATTRIBUTE] = null;
+        $tag[Tag::ATTRIBUTE_ASSIGN] = null;
 
         if(!isset($explode[1])){
             return $tag;
@@ -57,14 +57,14 @@ class Assign extends Core {
         ){
             $method = $check . $method;
         }
-        $tag['attribute'] = rtrim($variable[1], '+-.!*/ ');
-        $tag['assign'] = $method;
+        $tag[Tag::ATTRIBUTE] = rtrim($variable[1], '+-.!*/ ');
+        $tag[Tag::ATTRIBUTE_ASSIGN] = $method;
         return $tag;
     }
 
     public static function find($tag=array(), $string='', $parser=null){
         $method = '=';
-        $explode = explode($method, $tag['tag'], 2);
+        $explode = explode($method, $tag[Tag::ATTRIBUTE_TAG], 2);
 
         if(!isset($explode[1])){
             return $string;
@@ -98,88 +98,89 @@ class Assign extends Core {
         ){
             $method = $check . $method;
         }
-        $tag['assign'] = $method;
-        $tag['attribute'] = rtrim($variable[1], ' +-.!');
-        $tag['value'] = rtrim($explode[1]);
-        $tag['value'] = ltrim($tag['value'], ' ');
+        $tag[Tag::ATTRIBUTE_ASSIGN] = $method;
+        $tag[Tag::ATTRIBUTE] = rtrim($variable[1], ' +-.!');
+        $tag[Tag::ATTRIBUTE_VALUE] = trim($explode[1], ' ');
 
-        if(substr($tag['value'], 0, 1) == '$'){
-            $tag['value'] = '{' . $tag['value'];
+        if(substr($tag[Tag::ATTRIBUTE_VALUE], 0, 1) == '$'){
+            $tag[Tag::ATTRIBUTE_VALUE] = '{' . $tag[Tag::ATTRIBUTE_VALUE];
         }
-        elseif(substr($tag['value'], 0, 2) == '{$'){
+        elseif(substr($tag[Tag::ATTRIBUTE_VALUE], 0, 2) == '{$'){
             //needs to keep the }
         }
         else {
-            $tag['value'] = rtrim($explode[1], '}');//not allowed
+            if(substr($tag[Tag::ATTRIBUTE_VALUE], -1) == '}'){
+                $tag[Tag::ATTRIBUTE_VALUE] = substr($tag[Tag::ATTRIBUTE_VALUE], 0, -1);
+            }
         }
-        $tag['value'] = Parse::token($tag['value'], $parser->data(), false, $parser);
-        $tag = Assign::execute($tag, 'value', $parser);
-        $temp = explode($tag['tag'], $string, 2);
+        $tag[Tag::ATTRIBUTE_VALUE] = Parse::token($tag[Tag::ATTRIBUTE_VALUE], $parser->data(), false, $parser);
+        $tag = Assign::execute($tag, Tag::ATTRIBUTE_VALUE, $parser);
+        $temp = explode($tag[Tag::ATTRIBUTE_TAG], $string, 2);
         $string = implode('', $temp);
         return $string;
     }
 
     public static function execute($tag=array(), $attribute='', $parser=null){
-    	if(
-    		!empty($tag['attribute']) &&
-    		!empty($tag['assign'])
-    	){
-    		if(!isset($tag[$attribute])){
-    			$tag[$attribute] = null;
-    		}
-    		$left = Cast::translate($parser->data($tag['attribute']));
-    		$right = Cast::translate($tag[$attribute]);
-    		$type = gettype($tag[$attribute]);
+        if(
+            !empty($tag[Tag::ATTRIBUTE]) &&
+            !empty($tag[Tag::ATTRIBUTE_ASSIGN])
+        ){
+            if(!isset($tag[$attribute])){
+                $tag[$attribute] = null;
+            }
+            $left = Cast::translate($parser->data($tag[Tag::ATTRIBUTE]));
+            $right = Cast::translate($tag[$attribute]);
+            $type = gettype($tag[$attribute]);
 
-    		if($type == Parse::TYPE_ARRAY){
-    			switch($tag['assign']){
-    				case '+' :
-    					$parser->data($tag['attribute'], $left + $right);
-    				break;
-    				default :
-    					$parser->data($tag['attribute'], $right);
-    				break;
-    			}
-    		}
-    		elseif($type == Parse::TYPE_OBJECT){
-    			switch($tag['assign']){
-    				case '+' :
-    					$left = $parser->data($tag['attribute']);
-    					$parser->data($tag['attribute'], $left + $right);
-    				break;
-    				default :
-    					$parser->data($tag['attribute'], $right);
-    				break;
-    			}
-    		} else {
-    			switch($tag['assign']){
-    				case '.=' :
-    					$parser->data($tag['attribute'], $left .= $right);
-    				break;
-    				case '+=' :
-    					$parser->data($tag['attribute'], $left += $right);
-    				break;
-    				case '-=' :
-    					$parser->data($tag['attribute'], $left -= $right);
-    				break;
-    				case '*=' :
-    					$parser->data($tag['attribute'], $left * $right);
-    				break;
-    				case '/=' :
-    					if(empty($right)){
-    						throw new Exception('Cannot divide to zero on line: ' . $tag['line'] . ' column: ' . $tag['column'] . ' in ' . $parser->data('priya.module.parser.document.url'));
-    					}
-    					$parser->data($tag['attribute'], $left / $right);
-    				break;
-    				case '+' :
-    					$parser->data($tag['attribute'], $left + $right);
-    				break;
-    				default :
-    					$parser->data($tag['attribute'], $right);
-    				break;
-    			}
-    		}
-    	}
-    	return $tag;
+            if($type == Parse::TYPE_ARRAY){
+                switch($tag[Tag::ATTRIBUTE_ASSIGN]){
+                    case '+' :
+                        $parser->data($tag[Tag::ATTRIBUTE], $left + $right);
+                    break;
+                    default :
+                        $parser->data($tag[Tag::ATTRIBUTE], $right);
+                    break;
+                }
+            }
+            elseif($type == Parse::TYPE_OBJECT){
+                switch($tag[Tag::ATTRIBUTE_ASSIGN]){
+                    case '+' :
+                        $left = $parser->data($tag['attribute']);
+                        $parser->data($tag[Tag::ATTRIBUTE], $left + $right);
+                    break;
+                    default :
+                        $parser->data($tag[Tag::ATTRIBUTE], $right);
+                    break;
+                }
+            } else {
+                switch($tag[Tag::ATTRIBUTE_ASSIGN]){
+                    case '.=' :
+                        $parser->data($tag[Tag::ATTRIBUTE], $left .= $right);
+                    break;
+                    case '+=' :
+                        $parser->data($tag[Tag::ATTRIBUTE], $left += $right);
+                    break;
+                    case '-=' :
+                        $parser->data($tag[Tag::ATTRIBUTE], $left -= $right);
+                    break;
+                    case '*=' :
+                        $parser->data($tag[Tag::ATTRIBUTE], $left * $right);
+                    break;
+                    case '/=' :
+                        if(empty($right)){
+                            throw new Exception('Cannot divide to zero on line: ' . $tag['line'] . ' column: ' . $tag['column'] . ' in ' . $parser->data('priya.module.parser.document.url'));
+                        }
+                        $parser->data($tag[Tag::ATTRIBUTE], $left / $right);
+                    break;
+                    case '+' :
+                        $parser->data($tag[Tag::ATTRIBUTE], $left + $right);
+                    break;
+                    default :
+                        $parser->data($tag[Tag::ATTRIBUTE], $right);
+                    break;
+                }
+            }
+        }
+        return $tag;
     }
 }

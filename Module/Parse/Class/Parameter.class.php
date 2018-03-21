@@ -10,31 +10,34 @@ class Parameter extends Core {
 
     public static function find($string='', $parser=null){
        $parameters = array();
-       $explode = explode('})', strrev($string), 2);
-       if(!isset($explode[1])){
-            return $parameters;
-       }       
-       $method = token_get_all('<?php $method=method(' . strrev($explode[1]) . ');');
+       $method = token_get_all('<?php $method=method(' . $string . ');');
        $collect = false;
        $counter = 0;
        $set_depth = 0;
-       
+
        foreach ($method as $nr => $parameter){
             if($parameter == '(' || isset($parameter[1]) && $parameter[1] == '('){
                 $set_depth++;
                 if($set_depth == 1){
                     $collect = true;
                     continue;
-                }                
+                }
             }
             if($parameter == ')' || isset($parameter[1]) && $parameter[1] == ')'){
                 if($set_depth == 1){
                     $collect = false;
                 }
-                $set_depth--;                
+                $set_depth--;
             }
             if($collect){
-                if($parameter == ',' || isset($parameter[1]) && $parameter[1] == ','){
+                if(
+                    $set_depth == 1 &&
+                    (
+                        $parameter == ',' ||
+                        isset($parameter[1]) &&
+                        $parameter[1] == ','
+                    )
+                ){
                     $counter++;
                     continue;
                 }
@@ -67,13 +70,13 @@ class Parameter extends Core {
                 }
                 elseif($type == Parse::TYPE_STRING){
                     $test = strtolower($parameter);
-                    if($test == 'true'){
+                    if($test == Cast::TRANSLATE_TRUE){
                         $parameters[$nr] = true;
                     }
-                    elseif($test == 'false'){
-                        $parameters[$nr] = true;
+                    elseif($test == Cast::TRANSLATE_FALSE){
+                        $parameters[$nr] = false;
                     }
-                    elseif($test == 'null'){
+                    elseif($test == Cast::TRANSLATE_NULL){
                         $parameters[$nr] = null;
                     }
                     elseif(substr($parameter, 0, 1) == '$'){
@@ -84,5 +87,20 @@ class Parameter extends Core {
             }
        }
        return $parameters;
+    }
+
+    public static function execute($tag=array(), $attribute='', $parser=null){
+        foreach($tag[Tag::ATTRIBUTE_PARAMETER] as $nr => $parameter){
+            if(Method::is($parameter, $parser)){
+                $parse = '{' . trim($parameter, '{}') . '}';
+                $parse  = Parse::token($parse, $parser->data(), false, $parser);
+                $tag[Tag::ATTRIBUTE_PARAMETER][$nr] = $parse;
+            }
+            elseif(Variable::is($parameter, $parser)){
+                var_dump($tag);
+                throw new Exception('Please implement variable in parameter...');
+            }
+        }
+        return $tag;
     }
 }

@@ -16,6 +16,9 @@ function function_terminal_screen($tag=array(), $parser=null){
         $argumentList = (array) $argumentList;
     }
     $grid = array_shift($argumentList);
+    if(empty($grid) && $parser->data('priya.module.terminal.start') === true){
+        $grid = $parser->data('priya.module.terminal.grid');
+    }
     $timeout = array_shift($argumentList);
     $cli = new Cli($parser->handler(), $parser->route(), $parser->data());
     $tag['execute'] = $cli->screen($grid, $timeout);

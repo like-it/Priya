@@ -3,6 +3,7 @@
 namespace Priya\Module\Parse;
 
 use Priya\Module\Core;
+use Priya\Module\Parse;
 use Exception;
 
 class Cast extends Core {
@@ -14,6 +15,10 @@ class Cast extends Core {
     const TYPE_STRING = 'string';
     const TYPE_ARRAY = 'array';
     const TYPE_OBJECT = 'object';
+
+    const TRANSLATE_TRUE = 'true';
+    const TRANSLATE_FALSE = 'false';
+    const TRANSLATE_NULL = 'null';
 
     const LIST = array(
         Cast::TYPE_BOOL,
@@ -27,23 +32,23 @@ class Cast extends Core {
     );
 
     public static function translate($string=''){
-    	$type = getType($string);
-    	if($type == Parse::TYPE_STRING){
-    		$test = strtolower($string);
-    		if($test == 'true'){
-    			return true;
-    		}
-    		elseif($test == 'false'){
-    			return false;
-    		}
-    		elseif($test == 'null'){
-    			return null;
-    		}
-    		elseif(is_numeric($string)){
-    			return $string += 0;
-    		}
-    	}
-    	return $string;
+        $type = getType($string);
+        if($type == Parse::TYPE_STRING){
+            $test = strtolower($string);
+            if($test == Cast::TRANSLATE_TRUE){
+                return true;
+            }
+            elseif($test == Cast::TRANSLATE_FALSE){
+                return false;
+            }
+            elseif($test == Cast::TRANSLATE_NULL){
+                return null;
+            }
+            elseif(is_numeric($string)){
+                return $string += 0;
+            }
+        }
+        return $string;
     }
 
     public static function find($tag='', $attribute='', $parser=null){
@@ -66,38 +71,39 @@ class Cast extends Core {
                 }
             }
         }
-        $tag['cast'] = krsort($cast);
+        krsort($cast);
+        $tag[Tag::ATTRIBUTE_CAST] = $cast;
        return $tag;
     }
 
     public static function execute($tag=array(), $attribute='', $parser=null){
-        if(empty($tag['cast'])){
+        if(empty($tag[Tag::ATTRIBUTE_CAST])){
             return $tag;
         }
         if(!isset($tag[$attribute])){
-        	$tag[$attribute] = null;
+            $tag[$attribute] = null;
         }
-        foreach($tag['cast'] as $cast){
+        foreach($tag[Tag::ATTRIBUTE_CAST] as $cast){
             switch($cast){
                 case Cast::TYPE_INT:
                 case Cast::TYPE_INTEGER:
-                	$tag[$attribute] = (int) $tag[$attribute];
+                    $tag[$attribute] = (int) $tag[$attribute];
                 break;
                 case Cast::TYPE_FLOAT:
-                	$tag[$attribute] = (float) $tag[$attribute];
+                    $tag[$attribute] = (float) $tag[$attribute];
                     break;
                 case Cast::TYPE_BOOL:
                 case Cast::TYPE_BOOLEAN:
-                	$tag[$attribute] = (bool) $tag[$attribute];
+                    $tag[$attribute] = (bool) $tag[$attribute];
                     break;
                 case Cast::TYPE_STRING:
-                	$tag[$attribute] = (string) $tag[$attribute];
+                    $tag[$attribute] = (string) $tag[$attribute];
                     break;
                 case Cast::TYPE_ARRAY:
-                	$tag[$attribute] = (array) $tag[$attribute];
+                    $tag[$attribute] = (array) $tag[$attribute];
                     break;
                 case Cast::TYPE_OBJECT:
-                	$tag[$attribute] = (object) $tag[$attribute];
+                    $tag[$attribute] = (object) $tag[$attribute];
                     break;
             }
         }

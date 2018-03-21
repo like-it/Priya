@@ -44,4 +44,8 @@ class Variable extends Core {
         return $string;
     }
 
+    public static function is($string='', $parser=null){
+        return false;
+    }
+
 }

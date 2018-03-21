@@ -1062,6 +1062,7 @@ class Token extends Core {
             case 'T_FOREACH' :
             case 'T_FOR' :
             case 'T_ELSE' :
+            case 'T_PLUS_EQUAL' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
