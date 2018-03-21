@@ -38,7 +38,7 @@ class Parameter extends Core {
                     $counter++;
                     continue;
                 }
-                if(isset($parameter[1]) || (isset($parameter[1]) && $parameter[1] == 0)){
+                if(isset($parameter[1])){
                     $parameters[$counter][] = $parameter[1];
                 } else {
                     $parameters[$counter][] = $parameter;
