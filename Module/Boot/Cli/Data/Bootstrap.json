@@ -50,5 +50,14 @@
             "title" : "Debootstrap: Checking end installation...",
             "execute" : "debootstrap install"
         }
+    },
+    "content" : {
+        "type" : "text/html; charset=UTF-8",
+        "body" : "{require('{$module.dir.root}Screen/Body.screen')}"
+    },
+    "page": "{require('{$module.dir.root}Screen/Boot.screen')}",
+    "terminal" : "{require('{$module.dir.root}Screen/Main.screen')}",
+    "result" : {
+        "application/tput" : "{$terminal}"
     }
 }

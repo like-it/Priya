@@ -10,13 +10,23 @@ namespace Priya\Module\Boot;
 
 use Priya\Module\Core\Cli as Core_Cli;
 use Exception;
+use Priya\Module\Parse;
 
 class Cli extends Core_Cli {
     const DIR = __DIR__;
     const FILE = __FILE__;
 
     public function run(){
+        $this->output($this->tput('reset'));
+
+        $parse = new Parse($this->handler(), $this->route(), $this->data());
+//         $parse->data('priya.parser.dir.function');
+        $template = $parse->read($this->data('module.dir.data') . '../Screen/Boot.screen');
+//         $parse->read($this->data('module.dir.data') . 'Bootstrap.json');
+
+
         $this->read($this->data('module.dir.data') . 'Bootstrap.json');
+//         $term = $this->parser('object')->read('Boot.screen');
         $this->queue($this->data('queue'));
         sleep(5);
 //         var_dump($this->data());
@@ -37,6 +47,16 @@ class Cli extends Core_Cli {
         if($length == 0){
             return;
         }
+        //result
+//         system('clear');
+        $this->tput('clear');
+        $this->tput('home');
+        $this->output($this->data('result.application/tput'));
+        //result
+        die;
+        $this->input('Priya:');
+
+
         $color = 16;
         $background = 10;
         system('clear');

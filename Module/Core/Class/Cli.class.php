@@ -45,11 +45,11 @@ class Cli extends Result {
             break;
             case 'color' :
                 $color = isset($arguments[0]) ? (int) $arguments[0] : 9; //9 = default
-                $tput = 'setaf' . $color;
+                $tput = 'setaf ' . $color;
             break;
             case 'background' :
-                $color = isset($arguments[0]) ? (int) $arguments[0] : 9; //9 = default
-                $tput = 'setab' . $color;
+                $color = isset($arguments[0]) ? (int) $arguments[0] : 0; //9 = default
+                $tput = 'setab ' . $color;
                 break;
             case 'cursor.up' :
             case 'up' :
@@ -78,6 +78,7 @@ class Cli extends Result {
                 $tput = 'cols';
             break;
             case 'default':
+            case 'reset':
                 $tput  = 'sgr0';
             break;
         }
@@ -88,17 +89,18 @@ class Cli extends Result {
     }
 
     public function color($color='', $background=''){
-        ob_flush();
+        $result = '';
         if(!empty($color) || ($color === 0 || $color ==  '0')){
-            if($color == 'reset'){
-                echo "\e[0m";
+            if($color == 'reset' || $color == 'default'){
+                $result .= "\e[0m";
             } else {
-                echo "\e[38;5;" . intval($color) . 'm';
+                $result .= "\e[38;5;" . intval($color) . 'm';
             }
         }
         if(!empty($background) || $background=== (0 || '0')){
-            echo "\e[48;5;" . intval($background) . 'm';
+            $result .= "\e[48;5;" . intval($background) . 'm';
         }
+        return $result;
         /*
         switch($color){
             case 'red':
@@ -143,7 +145,7 @@ class Cli extends Result {
                 $this->color($color, $background);
             }
             echo $text;
-            $this->color('reset');
+            $this->tput('reset');
             ob_flush();
         } else {
             return parent::write($url);
@@ -156,6 +158,81 @@ class Cli extends Result {
         } else {
             return $this->read('input-hidden', $text, $timout);
         }
+    }
+
+    public function grid($start_x=null, $start_y=null, $width=null, $height=null, $color=9, $background=0){
+        $grid = array();
+        if($height === null || $height == 'auto'){
+            $height =
+            null !== $this->data('priya.terminal.screen.grid.height') ?
+            $this->data('priya.terminal.screen.grid.height') :
+            $this->tput('height')
+            ;
+        }
+        if($width === null || $width == 'auto'){
+            $width =
+            null !== $this->data('priya.terminal.screen.grid.width') ?
+            $this->data('priya.terminal.screen.grid.width') :
+            $this->tput('width')
+            ;
+        }
+        if(empty($start_y) && ($start_y !== 0 || $start_y !== '0')){
+            $start_y =
+                null !== $this->data('priya.terminal.screen.grid.y') ?
+                $this->data('priya.terminal.screen.grid.y') :
+                0
+            ;
+        }
+        if(empty($start_x) && ($start_x!== 0 || $start_x !== '0')){
+            $start_x =
+                null !== $this->data('priya.terminal.screen.grid.x') ?
+                $this->data('priya.terminal.screen.grid.x') :
+                0
+            ;
+        }
+        if(!is_numeric($start_y)){
+            $start_y += 0;
+        }
+        if(!is_numeric($start_x)){
+            $start_x += 0;
+        }
+        if(!is_numeric($height)){
+            var_dump('found');
+            var_Dump($height);
+            die;
+        }
+        for($y=$start_y; $y < ($height + $start_y); $y++){
+            for($x=$start_x; $x < ($width + $start_x); $x++){
+                $char = ' ';
+                $grid[$y][$x]['x'] = $x;
+                $grid[$y][$x]['y'] = $y;
+                $grid[$y][$x]['color'] = $color;
+                $grid[$y][$x]['background'] = $background;
+                $grid[$y][$x]['char'] = $char;
+            }
+        }
+        $this->data('priya.terminal.screen.grid.content', $grid);
+        return $grid;
+    }
+
+    public function screen($grid=array(), $timeout=null){
+        $this->tput('clear');
+        $this->tput('home');
+        $content = array();
+        if(!is_array($grid)){
+            return;
+        }
+        foreach($grid as $y => $list_y){
+            $row = '';
+            foreach($list_y as $x => $pointer){
+                $row .= $this->color($pointer['color'], $pointer['background']) . $pointer['char'];
+            }
+            $content[] = $row;
+        }
+        $this->output(implode(PHP_EOL, $content));
+        $this->output($this->tput('reset'));
+//         $this->tput('position', array(0, ($this->tput('height') - 1)));
+//         $this->input('Priya: ');
     }
 
     public function output($text='', $class=''){

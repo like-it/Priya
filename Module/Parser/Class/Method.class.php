@@ -189,6 +189,7 @@ class Method extends Core {
                     $result['set']['depth'] = $method_part['set']['depth'];
 //                     var_dump($parameter); //not is parameter but parse?
                     $result['parameter'] = Parameter::get($parameter, $parser);
+//                     var_dump($result['parameter']);
                     $result['parse_method'] = $parse_method; //all records of parse which is used to create the method
                     //maybe extend cast to all parse_method tokens
                     $possible_cast = reset($parse_method);

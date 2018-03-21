@@ -1,0 +1,31 @@
+{$x= 80}
+{$y = 50}
+{$x += 1}
+
+{$cherry = $x}
+
+{$z = $x}
+{$z = $x}
+
+{$grid = terminal.grid(0, 0, "auto", 'auto', 9, 3)}
+{debug($grid)}
+{$grid = terminal.grid(0, 0, 'auto', 'auto', 9, 3)}
+{$grid = terminal.grid(0, 2, 80, 50, 9, 7)}
+{terminal.screen($grid)}
+
+
+{$command = terminal.readline('Boot: ')}
+
+{literal}
+{$block.width = 80}
+{$block.x = terminal.width() - $block.width}
+{$block.height = terminal.height() - 3}
+{$block.y = 1}
+{$block.content = 'test'}
+{$block.color = 2}
+{$block.background = 11}
+
+{terminal.block($block)}
+{/literal}
+
+Priya: {$command}

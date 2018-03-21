@@ -80,7 +80,7 @@ class Parameter extends Core {
         /**
          * multipart string / variable
          */
-
+        $is_result = false;
         foreach($parameter_list as $parameter){
             if(isset($parameter[1])){ //we have a fast multiple check
                 $merge = array();
@@ -110,14 +110,15 @@ class Parameter extends Core {
                             $part['type'] == Token::TYPE_STRING
                     ){
                         $merge['value'] .= $part['value'];
-                    }
-                    else {
+                    } else {
                         //int with boolean and string
                         //float with boolean and string
                         //int and boolean
                         //boolean and string
                         //boolean and string and boolean
                         //operator and string
+//                         var_dump($merge['type']);
+//                         var_dump($parameter);
                         throw new Exception(
                             'Parameter::get:Undefined state detected (' .
                             $merge['type'] .
