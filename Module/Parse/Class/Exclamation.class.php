@@ -6,7 +6,6 @@ use Priya\Module\Core;
 
 class Exclamation extends Core {
 
-
     public static function find($tag='', $attribute='', $parser=null){
         if(strpos($tag[$attribute], '!') === false){
             $tag['exclamation'] = 0;
