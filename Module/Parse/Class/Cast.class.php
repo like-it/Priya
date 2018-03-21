@@ -70,34 +70,36 @@ class Cast extends Core {
        return $tag;
     }
 
-    public static function execute($tag=array(), $parser=null){
+    public static function execute($tag=array(), $attribute='', $parser=null){
         if(empty($tag['cast'])){
             return $tag;
+        }
+        if(!isset($tag[$attribute])){
+        	$tag[$attribute] = null;
         }
         foreach($tag['cast'] as $cast){
             switch($cast){
                 case Cast::TYPE_INT:
                 case Cast::TYPE_INTEGER:
-                    $tag['execute'] = (int) $tag['execute'];
+                	$tag[$attribute] = (int) $tag[$attribute];
                 break;
                 case Cast::TYPE_FLOAT:
-                    $tag['execute'] = (float) $tag['execute'];
+                	$tag[$attribute] = (float) $tag[$attribute];
                     break;
                 case Cast::TYPE_BOOL:
                 case Cast::TYPE_BOOLEAN:
-                    $tag['execute'] = (bool) $tag['execute'];
+                	$tag[$attribute] = (bool) $tag[$attribute];
                     break;
                 case Cast::TYPE_STRING:
-                    $tag['execute'] = (string) $tag['execute'];
+                	$tag[$attribute] = (string) $tag[$attribute];
                     break;
                 case Cast::TYPE_ARRAY:
-                    $tag['execute'] = (array) $tag['execute'];
+                	$tag[$attribute] = (array) $tag[$attribute];
                     break;
                 case Cast::TYPE_OBJECT:
-                    $tag['execute'] = (object) $tag['execute'];
+                	$tag[$attribute] = (object) $tag[$attribute];
                     break;
             }
-
         }
         return $tag;
     }
