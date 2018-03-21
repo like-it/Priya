@@ -13,9 +13,6 @@ class Tag extends Core {
             throw new Exception('Tag::find:Input should be string...');
             return $tagged;
         }
-//         echo __LINE__ . '::' . __FILE__ . $input;
-//         $explode = Tag::explode($input);
-//         $pattern = '/\$([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/';
         $pattern = '/\{.*\}/';
         $page = $input;
         $counter = 0;
@@ -33,11 +30,16 @@ class Tag extends Core {
                     $explode = explode("\n", strrev($explode[0]), 2);
                     $col = strlen($explode[0]) +1;
                     $node = array();
+                    $node['tag'] = $record[0];
+
+                    //below should not be neccesary, otherways the '"}}"' get replaced too
+                    /*
                     $node['tag'] = str_replace(
                         array('}}'),
                         array('}'),
                         $record[0]
                     );
+                    */
                     $node['line'] = $row;
                     $node['column'] = $col;
                     $tagged[] = $node;

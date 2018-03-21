@@ -3,7 +3,6 @@
 namespace Priya\Module\Parse;
 
 use Priya\Module\Core;
-use Exception;
 
 class Exclamation extends Core {
 

@@ -26,6 +26,26 @@ class Cast extends Core {
         Cast::TYPE_OBJECT
     );
 
+    public static function translate($string=''){
+    	$type = getType($string);
+    	if($type == Parse::TYPE_STRING){
+    		$test = strtolower($string);
+    		if($test == 'true'){
+    			return true;
+    		}
+    		elseif($test == 'false'){
+    			return false;
+    		}
+    		elseif($test == 'null'){
+    			return null;
+    		}
+    		elseif(is_numeric($string)){
+    			return $string += 0;
+    		}
+    	}
+    	return $string;
+    }
+
     public static function find($tag='', $attribute='', $parser=null){
         if(strpos($tag[$attribute], '(') === false){
             return $tag;
@@ -46,7 +66,7 @@ class Cast extends Core {
                 }
             }
         }
-        $tag['cast']  = $cast;
+        $tag['cast'] = krsort($cast);
        return $tag;
     }
 
@@ -54,7 +74,6 @@ class Cast extends Core {
         if(empty($tag['cast'])){
             return $tag;
         }
-        krsort($tag['cast']);
         foreach($tag['cast'] as $cast){
             switch($cast){
                 case Cast::TYPE_INT:

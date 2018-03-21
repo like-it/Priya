@@ -9,11 +9,10 @@
 namespace Priya\Module;
 
 use Memcached;
-use Exception;
 
 class Memory {
     const DEFAULT_HOST = '127.0.0.1';
-    const DEFAULT_PORT = 11211; //public memcache server, secure memcache server is on a different port...
+    const DEFAULT_PORT = 11211;
     const DEFAULT_WEIGHT = 1;
     const DEFAULT_TYPE = 'Memcached';
 
@@ -35,7 +34,6 @@ class Memory {
     }
 
     public static function read(Memcached $dma, $key=''){
-        return false;
         return $dma->get($key);
     }
 
@@ -65,7 +63,7 @@ class Memory {
     }
 
     public static function dma($type='Memcached'){
-        return  new Memcached();
+        return new Memcached();
     }
 
 

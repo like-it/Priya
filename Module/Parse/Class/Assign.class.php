@@ -8,28 +8,6 @@ use Exception;
 
 class Assign extends Core {
 
-    public static function cast($string=''){
-        $type = getType($string);
-        if($type == Parse::TYPE_STRING){
-            $test = strtolower($string);
-        
-            if($test == 'true'){
-                return true;
-            }
-            elseif($test == 'false'){
-                return false;
-            }
-            elseif($test == 'null'){
-                return null;
-            }
-            elseif(is_numeric($string)){
-                return $string += 0;
-            }
-        }
-        return $string;
-
-    }
-
     public static function remove($tag=array(), $attribute='', $parser=null){
         $method = '=';
         $explode = explode($method, $tag['tag'], 2);
@@ -45,6 +23,9 @@ class Assign extends Core {
     public static function select($tag=array(), $parser=null){
         $method = '=';
         $explode = explode($method, $tag['tag'], 2);
+
+        $tag['attribute'] = null;
+        $tag['assign'] = null;
 
         if(!isset($explode[1])){
             return $tag;
@@ -76,7 +57,7 @@ class Assign extends Core {
         ){
             $method = $check . $method;
         }
-        $tag['attribute'] = rtrim($variable[1], ' +-.!');
+        $tag['attribute'] = rtrim($variable[1], '+-.!*/ ');
         $tag['assign'] = $method;
         return $tag;
     }
@@ -109,7 +90,7 @@ class Assign extends Core {
                     '+',
                     '-',
                     '.',
-                    '!', //extend to multiple
+                    '!',
                     '*',
                     '/',
                 )
@@ -133,31 +114,37 @@ class Assign extends Core {
         }
         $tag['value'] = Parse::token($tag['value'], $parser->data(), false, $parser);
 
+        $left = Cast::translate($parser->data($tag['attribute']));
+        $right = Cast::translate($tag['value']);
+
         switch($tag['assign']){
             case '+=' :
-                $plus = $parser->data($tag['attribute']) + 0;
-                $parser->data($tag['attribute'], $plus += $tag['value']);
-                break;
+                $parser->data($tag['attribute'], $left += $right);
+            break;
             case '-=' :
-                $min = $parser->data($tag['attribute']) + 0;
-                $parser->data($tag['attribute'], $min -= $tag['value']);
-                break;
+                $parser->data($tag['attribute'], $left -= $right);
+            break;
             case '.=' :
-                $add = $parser->data($tag['attribute']);
-                $parser->data($tag['attribute'], $add .= $tag['value']);
-                break;
+                $parser->data($tag['attribute'], $left .= $right);
+            break;
             case '!=' :
-                $not = $parser->data($tag['attribute']);
-                $parser->data($tag['attribute'], $not != $tag['value']);
-                break;
+                $parser->data($tag['attribute'], $left != $right);
+            break;
+            case '/=' :
+            	if(empty($right)){
+            		throw new Exception('Cannot divide to zero on line: ' . $tag['line'] . ' column: ' . $tag['column'] . ' in ' . $parser->data('priya.module.parser.document.url'));
+            	}
+            	$parser->data($tag['attribute'], $left / $right);
+            break;
+            case '*=' :
+            	$parser->data($tag['attribute'], $left * $right);
+            break;
             default :
-                $tag['value'] = Assign::cast($tag['value']);
-                $parser->data($tag['attribute'], $tag['value']);
-                break;
+                $parser->data($tag['attribute'], $right);
+            break;
         }
         $temp = explode($tag['tag'], $string, 2);
         $string = implode('', $temp);
         return $string;
     }
-
 }

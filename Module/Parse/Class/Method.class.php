@@ -25,11 +25,13 @@ class Method extends Core {
         );
         $tag['function']['name'] = $name;
 
-        require_once __DIR__ . '/../Function/Function.import.php';
+        $require = $parser->data('priya.module.parser.require');
+        $url =  __DIR__ . '/../Function/Function.Import.php';
+        if(!in_array($url, $require)){
+        	require_once $url;
+        }
 
         $import = $parser->data('priya.module.parser.import');
-        $require = $parser->data('priya.module.parser.require');
-
         foreach($import as $url){
             $url = $url . 'Function.' . $name . '.php';
             if(in_array($url, $require)){
@@ -48,8 +50,6 @@ class Method extends Core {
         if(function_exists($tag['function']['method'])){
             return $name($tag, $parser);
         } else {
-            var_Dump($import);
-
             Throw new Exception('Function "' . $tag['function']['name'] . '" not found on line: ' . $tag['line']  . ' column: ' . $tag['column'] . ' in ' .  $parser->data('priya.module.parser.document.url'));
         }
     }
@@ -57,13 +57,23 @@ class Method extends Core {
     public static function replace($tag=array(), $parser=null){
         $explode = explode($tag['tag'], $tag['string'], 2);
         $type = gettype($tag['execute']);
-        if($type == Parse::TYPE_ARRAY){
-            $tag['execute'] = '';
+        if(
+        	in_array(
+        		$type,
+        		array(
+        			Parse::TYPE_ARRAY,
+        			Parse::TYPE_OBJECT
+        		)
+        	)
+        ){
+        	$tag['string'] = implode('', $explode);
+        	if(empty($tag['string'])){
+        		//have parameters or similar...
+        		$tag['string'] = $tag['execute'];
+        	}
+        } else {
+        	$tag['string'] = implode($tag['execute'], $explode);
         }
-        elseif($type == Parse::TYPE_OBJECT){
-            $tag['execute'] = '';
-        }
-        $tag['string'] = implode($tag['execute'], $explode);
         return $tag;
     }
 
@@ -103,7 +113,6 @@ class Method extends Core {
                         $parser->data($tag['attribute'], $tag['execute']);
                     break;
                 }
-//                 $tag['execute'] = '';
             }
         }
         elseif($type == Parse::TYPE_OBJECT){
@@ -117,45 +126,37 @@ class Method extends Core {
                         $parser->data($tag['attribute'], $tag['execute']);
                         break;
                 }
-//                 $tag['execute'] = '';
             }
         } else {
-            if(isset($tag['attribute'])){
+            if(!empty($tag['attribute'])){
+            	$left = Cast::translate($parser->data($tag['attribute']));
+            	$right = Cast::translate($tag['execute']);
                 switch($tag['assign']){
                     case '.=' :
-                        $left = $parser->data($tag['attribute']);
-                        $parser->data($tag['attribute'], $left . $tag['execute']);
+                        $parser->data($tag['attribute'], $left .= $right);
                         break;
                     case '+=' :
-                        $left = $parser->data($tag['attribute']) + 0;
-                        $right = $tag['execute'] + 0;
-                        $parser->data($tag['attribute'], $left + $right);
+                        $parser->data($tag['attribute'], $left += $right);
                         break;
                     case '-=' :
-                        $left = $parser->data($tag['attribute']) + 0;
-                        $right = $tag['execute'] + 0;
-                        $parser->data($tag['attribute'], $left - $right);
+                        $parser->data($tag['attribute'], $left -= $right);
                         break;
                     case '*=' :
-                        $left = $parser->data($tag['attribute']) + 0;
-                        $right = $tag['execute'] + 0;
                         $parser->data($tag['attribute'], $left * $right);
                         break;
                     case '/=' :
-                        $left = $parser->data($tag['attribute']) + 0;
-                        $right = $tag['execute'] + 0;
-                        $parser->data($tag['attribute'], $left * $right);
+                        if(empty($right)){
+                        	throw new Exception('Cannot divide to zero on line: ' . $tag['line'] . ' column: ' . $tag['column'] . ' in ' . $parser->data('priya.module.parser.document.url'));
+                        }
+                        $parser->data($tag['attribute'], $left / $right);
                         break;
                     case '+' :
-                        $left = $parser->data($tag['attribute']) + 0;
-                        $right = $tag['execute'] + 0;
                         $parser->data($tag['attribute'], $left + $right);
                         break;
                     default :
-                        $parser->data($tag['attribute'], $tag['execute']);
+                        $parser->data($tag['attribute'], $right);
                         break;
                 }
-//                 $tag['execute'] = '';
             }
         }
         $tag = Method::replace($tag, $parser);
