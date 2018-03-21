@@ -7,10 +7,8 @@
 {$z = $x}
 {$z = $x}
 
-{$grid = terminal.grid(0, 0, "auto", 'auto', 9, 3)}
-{debug($grid)}
-{$grid = terminal.grid(0, 0, 'auto', 'auto', 9, 3)}
-{$grid = terminal.grid(0, 2, 80, 50, 9, 7)}
+{$grid = terminal.grid(0, 0, 'auto', 'auto', 9, 4)}
+{$grid = array.merge($grid, terminal.grid(0, 2, 80, 50, 9, 7))}
 {terminal.screen($grid)}
 
 
