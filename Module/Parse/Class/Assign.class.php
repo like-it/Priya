@@ -113,38 +113,73 @@ class Assign extends Core {
             $tag['value'] = rtrim($explode[1], '}');//not allowed
         }
         $tag['value'] = Parse::token($tag['value'], $parser->data(), false, $parser);
-
-        $left = Cast::translate($parser->data($tag['attribute']));
-        $right = Cast::translate($tag['value']);
-
-        switch($tag['assign']){
-            case '+=' :
-                $parser->data($tag['attribute'], $left += $right);
-            break;
-            case '-=' :
-                $parser->data($tag['attribute'], $left -= $right);
-            break;
-            case '.=' :
-                $parser->data($tag['attribute'], $left .= $right);
-            break;
-            case '!=' :
-                $parser->data($tag['attribute'], $left != $right);
-            break;
-            case '/=' :
-            	if(empty($right)){
-            		throw new Exception('Cannot divide to zero on line: ' . $tag['line'] . ' column: ' . $tag['column'] . ' in ' . $parser->data('priya.module.parser.document.url'));
-            	}
-            	$parser->data($tag['attribute'], $left / $right);
-            break;
-            case '*=' :
-            	$parser->data($tag['attribute'], $left * $right);
-            break;
-            default :
-                $parser->data($tag['attribute'], $right);
-            break;
-        }
+        $tag = Assign::execute($tag, 'value', $parser);
         $temp = explode($tag['tag'], $string, 2);
         $string = implode('', $temp);
         return $string;
+    }
+
+    public static function execute($tag=array(), $attribute='', $parser=null){
+    	if(
+    		!empty($tag['attribute']) &&
+    		!empty($tag['assign'])
+    	){
+    		if(!isset($tag[$attribute])){
+    			$tag[$attribute] = null;
+    		}
+    		$left = Cast::translate($parser->data($tag['attribute']));
+    		$right = Cast::translate($tag[$attribute]);
+    		$type = gettype($tag[$attribute]);
+
+    		if($type == Parse::TYPE_ARRAY){
+    			switch($tag['assign']){
+    				case '+' :
+    					$parser->data($tag['attribute'], $left + $right);
+    				break;
+    				default :
+    					$parser->data($tag['attribute'], $right);
+    				break;
+    			}
+    		}
+    		elseif($type == Parse::TYPE_OBJECT){
+    			switch($tag['assign']){
+    				case '+' :
+    					$left = $parser->data($tag['attribute']);
+    					$parser->data($tag['attribute'], $left + $right);
+    				break;
+    				default :
+    					$parser->data($tag['attribute'], $right);
+    				break;
+    			}
+    		} else {
+    			switch($tag['assign']){
+    				case '.=' :
+    					$parser->data($tag['attribute'], $left .= $right);
+    				break;
+    				case '+=' :
+    					$parser->data($tag['attribute'], $left += $right);
+    				break;
+    				case '-=' :
+    					$parser->data($tag['attribute'], $left -= $right);
+    				break;
+    				case '*=' :
+    					$parser->data($tag['attribute'], $left * $right);
+    				break;
+    				case '/=' :
+    					if(empty($right)){
+    						throw new Exception('Cannot divide to zero on line: ' . $tag['line'] . ' column: ' . $tag['column'] . ' in ' . $parser->data('priya.module.parser.document.url'));
+    					}
+    					$parser->data($tag['attribute'], $left / $right);
+    				break;
+    				case '+' :
+    					$parser->data($tag['attribute'], $left + $right);
+    				break;
+    				default :
+    					$parser->data($tag['attribute'], $right);
+    				break;
+    			}
+    		}
+    	}
+    	return $tag;
     }
 }
