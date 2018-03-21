@@ -9,17 +9,22 @@ use Exception;
 class Assign extends Core {
 
     public static function cast($string=''){
-        if($string == 'true'){
-            return true;
-        }
-        elseif($string == 'false'){
-            return false;
-        }
-        elseif($string == 'null'){
-            return null;
-        }
-        elseif(is_numeric($string)){
-            return $string += 0;
+        $type = getType($string);
+        if($type == Parse::TYPE_STRING){
+            $test = strtolower($string);
+        
+            if($test == 'true'){
+                return true;
+            }
+            elseif($test == 'false'){
+                return false;
+            }
+            elseif($test == 'null'){
+                return null;
+            }
+            elseif(is_numeric($string)){
+                return $string += 0;
+            }
         }
         return $string;
 
