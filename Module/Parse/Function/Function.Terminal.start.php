@@ -14,11 +14,6 @@ function function_terminal_start($tag=array(), $parser=null){
     }
     $attribute = array_shift($argumentList);
     $attribute = $attribute ? $attribute : 'priya.module.terminal.start';
-    if(is_array($parser)){
-        var_dump($parser);
-        var_dump(debug_backtrace(true));
-        die;
-    }
     $parser->data($attribute, true);
     $tag['execute'] = '';
     return $tag;

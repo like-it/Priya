@@ -13,4 +13,4 @@
 {terminal.write.line('this is a test')}
 {terminal.screen()}
 {terminal.screen.goto(10, 10)}
-{$command = terminal.readline('Boot: ')}
+{$command = terminal.read.line('Boot: ')}

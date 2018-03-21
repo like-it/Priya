@@ -10,7 +10,7 @@ use Priya\Module\Core\Cli;
  *     -    all
  */
 
-function function_terminal_readline($tag, $parser=null){
+function function_terminal_read_line($tag, $parser=null){
     $argumentList = $tag['parameter'];
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
@@ -19,6 +19,15 @@ function function_terminal_readline($tag, $parser=null){
     $hidden = array_shift($argumentList);
     $timeout = array_shift($argumentList);
     $cli = new Cli($parser->handler(), $parser->route(), $parser->data());
+    if($parser->data('priya.module.terminal.start' === true)){
+        $x = $parser->data('priya.module.terminal.cursor.position.x');
+        $y = $parser->data('priya.module.terminal.cursor.position.y');
+        $grid = $parser->data('priya.module.terminal.grid');
+
+        $cell = $grid[$y][$x];
+
+        echo $cli->color($cell['color'], $cell['background']);
+    }
     $tag['execute'] = $cli->input($input, $hidden, $timeout);
     return $tag;
 }
