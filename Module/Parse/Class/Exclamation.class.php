@@ -18,14 +18,17 @@ class Exclamation extends Core {
         return $tag;
     }
 
-    public static function exectute($tag=array(), $parser=null){
+    public static function exectute($tag=array(), $attribute='', $parser=null){
         if($tag['exclamation'] == 0){
             return $tag;
         }
+        if(!isset($tag[$attribute])){
+        	$tag[$attribute] = null;
+        }
         if($tag['exclamation'] % 2 == 0){
-            $tag['execute'] = !! $tag['execute'];
+        	$tag[$attribute] = !! $tag[$attribute];
         } else {
-            $tag['execute'] = ! $tag['execute'];
+        	$tag[$attribute] = ! $tag[$attribute];
         }
         return $tag;
     }
