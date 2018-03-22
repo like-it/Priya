@@ -19,16 +19,8 @@ class Tag extends Core {
     const NAME = 'name';
     const ASSIGN = 'assign';
     const VALUE = 'value';
+    const RUN = 'function';
 
-    const ATTRIBUTE_EXECUTE = 'execute';
-    const ATTRIBUTE_METHOD = 'method';
-    const ATTRIBUTE_PARAMETER = 'parameter';
-    const ATTRIBUTE_STRING = 'string';
-    const ATTRIBUTE_TAG = 'tag';
-    const ATTRIBUTE_CAST = 'cast';
-    const ATTRIBUTE_EXCLAMATION = 'exclamation';
-    const ATTRIBUTE_FUNCTION = 'function';
-    const ATTRIBUTE_NAME = 'name';
     const ATTRIBUTE_ASSIGN = 'assign';
     const ATTRIBUTE_VALUE = 'value';
 
@@ -55,7 +47,7 @@ class Tag extends Core {
                     $explode = explode("\n", strrev($explode[0]), 2);
                     $column = strlen($explode[0]) +1;
                     $node = array();
-                    $node[Tag::ATTRIBUTE_TAG] = $record[0];
+                    $node[Tag::TAG] = $record[0];
                     $node[Tag::LINE] = $line;
                     $node[Tag::COLUMN] = $column;
                     $tagged[] = $node;
