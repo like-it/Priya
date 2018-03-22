@@ -72,18 +72,18 @@ class Cast extends Core {
             }
         }
         krsort($cast);
-        $tag[Tag::ATTRIBUTE_CAST] = $cast;
+        $tag[Tag::CAST] = $cast;
        return $tag;
     }
 
     public static function execute($tag=array(), $attribute='', $parser=null){
-        if(empty($tag[Tag::ATTRIBUTE_CAST])){
+        if(empty($tag[Tag::CAST])){
             return $tag;
         }
         if(!isset($tag[$attribute])){
             $tag[$attribute] = null;
         }
-        foreach($tag[Tag::ATTRIBUTE_CAST] as $cast){
+        foreach($tag[Tag::CAST] as $cast){
             switch($cast){
                 case Cast::TYPE_INT:
                 case Cast::TYPE_INTEGER:
