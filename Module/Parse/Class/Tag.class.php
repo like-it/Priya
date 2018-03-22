@@ -11,6 +11,14 @@ class Tag extends Core {
     const COLUMN = 'column';
     const EXECUTE = 'execute';
     const PARAMETER = 'parameter';
+    const METHOD = 'method';
+    const STRING = 'string';
+    const TAG = 'tag';
+    const CAST = 'cast';
+    const EXCLAMATION = 'exclamation';
+    const NAME = 'name';
+    const ASSIGN = 'assign';
+    const VALUE = 'value';
 
     const ATTRIBUTE_EXECUTE = 'execute';
     const ATTRIBUTE_METHOD = 'method';
@@ -48,15 +56,6 @@ class Tag extends Core {
                     $column = strlen($explode[0]) +1;
                     $node = array();
                     $node[Tag::ATTRIBUTE_TAG] = $record[0];
-
-                    //below should not be neccesary, otherways the '"}}"' get replaced too
-                    /*
-                    $node['tag'] = str_replace(
-                        array('}}'),
-                        array('}'),
-                        $record[0]
-                    );
-                    */
                     $node[Tag::LINE] = $line;
                     $node[Tag::COLUMN] = $column;
                     $tagged[] = $node;

@@ -124,7 +124,4 @@ class Parse extends Data {
             //first tags, rows + cols
         }
     }
-
-
-
 }

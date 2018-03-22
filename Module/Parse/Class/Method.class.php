@@ -30,7 +30,7 @@ class Method extends Core {
         );
         $tag[Tag::ATTRIBUTE_FUNCTION][Tag::ATTRIBUTE_NAME] = $name;
         $require = $parser->data('priya.module.parser.require');
-        $url =  __DIR__ . '/../Function/Function.Import.php';
+        $url = __DIR__ . '/../Function/Function.Import.php';
         if(!in_array($url, $require)){
             require_once $url;
         }
@@ -101,10 +101,6 @@ class Method extends Core {
         //have method...
         $tag[Tag::ATTRIBUTE_METHOD] = ltrim($explode[0], '{');
         $explode = explode('})', strrev($explode[1]), 2);
-        if(!isset($explode[1])){
-            var_dump($explode);
-            die;
-        }
         $tag[Tag::ATTRIBUTE_PARAMETER] = strrev($explode[1]);
         $tag[Tag::ATTRIBUTE_PARAMETER] = Parameter::find($tag[Tag::ATTRIBUTE_PARAMETER], $parser);
         $tag = Parameter::execute($tag, Tag::ATTRIBUTE_EXECUTE, $parser);
