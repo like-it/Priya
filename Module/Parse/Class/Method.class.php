@@ -14,7 +14,7 @@ class Method extends Core {
     }
 
     public static function execute($tag=array(), $parser=null){
-        if(!isset($tag[Tag::ATTRIBUTE_METHOD])){
+        if(!isset($tag[Tag::METHOD])){
             var_dump($tag);
             var_dump(debug_backtrace(true));
             die;
@@ -26,9 +26,9 @@ class Method extends Core {
                 '\\',
             ),
             '',
-            ucfirst(strtolower($tag[Tag::ATTRIBUTE_METHOD]))
+            ucfirst(strtolower($tag[Tag::METHOD]))
         );
-        $tag[Tag::ATTRIBUTE_FUNCTION][Tag::ATTRIBUTE_NAME] = $name;
+        $tag[Tag::RUN][Tag::NAME] = $name;
         $require = $parser->data('priya.module.parser.require');
         $url = __DIR__ . '/../Function/Function.Import.php';
         if(!in_array($url, $require)){
@@ -36,7 +36,7 @@ class Method extends Core {
         }
         $import = $parser->data('priya.module.parser.import');
         foreach($import as $url){
-            $url = $url . ucfirst(Tag::ATTRIBUTE_FUNCTION) . '.' . $name . '.php';
+            $url = $url . ucfirst(Tag::RUN) . '.' . $name . '.php';
             if(in_array($url, $require)){
                 break;
             }
@@ -47,18 +47,18 @@ class Method extends Core {
                 break;
             }
         }
-        $name = Tag::ATTRIBUTE_FUNCTION .'_' . str_replace('.', '_', strtolower($name));
-        $tag[Tag::ATTRIBUTE_FUNCTION][Tag::ATTRIBUTE_METHOD] = $name;
-        if(function_exists($tag[Tag::ATTRIBUTE_FUNCTION][Tag::ATTRIBUTE_METHOD])){
+        $name = Tag::RUN.'_' . str_replace('.', '_', strtolower($name));
+        $tag[Tag::RUN][Tag::METHOD] = $name;
+        if(function_exists($tag[Tag::RUN][Tag::METHOD])){
             return $name($tag, $parser);
         } else {
             var_dump($url);
-            Throw new Exception(ucfirst(Tag::ATTRIBUTE_FUNCTION) . ' "' . $tag[Tag::ATTRIBUTE_FUNCTION][Tag::ATTRIBUTE_NAME] . '" not found on line: ' . $tag['line']  . ' column: ' . $tag['column'] . ' in ' .  $parser->data('priya.module.parser.document.url'));
+            Throw new Exception(ucfirst(Tag::RUN) . ' "' . $tag[Tag::RUN][Tag::NAME] . '" not found on line: ' . $tag['line']  . ' column: ' . $tag['column'] . ' in ' .  $parser->data('priya.module.parser.document.url'));
         }
     }
 
     public static function replace($tag=array(), $attribute='', $parser=null){
-        $explode = explode($tag[Tag::ATTRIBUTE_TAG], $tag[Tag::ATTRIBUTE_STRING], 2);
+        $explode = explode($tag[Tag::TAG], $tag[Tag::STRING], 2);
         if(!isset($tag[$attribute])){
             $tag[$attribute] = null;
         }
@@ -72,25 +72,25 @@ class Method extends Core {
                 )
             )
         ){
-            $tag[Tag::ATTRIBUTE_STRING] = implode('', $explode);
-            if(empty($tag[Tag::ATTRIBUTE_STRING])){
+            $tag[Tag::STRING] = implode('', $explode);
+            if(empty($tag[Tag::STRING])){
                 //have parameters or similar...
-                $tag[Tag::ATTRIBUTE_STRING] = $tag[$attribute];
+                $tag[Tag::STRING] = $tag[$attribute];
             }
         } else {
-            $tag[Tag::ATTRIBUTE_STRING] = implode($tag[$attribute], $explode);
+            $tag[Tag::STRING] = implode($tag[$attribute], $explode);
         }
         return $tag;
     }
 
     public static function find($tag=array(), $string='', $parser=null){
         $tag = Assign::select($tag, $parser);
-        $tag = Assign::remove($tag, Tag::ATTRIBUTE_METHOD, $parser);
-        $tag = Cast::find($tag, Tag::ATTRIBUTE_METHOD, $parser);
-        $tag = Exclamation::find($tag, Tag::ATTRIBUTE_METHOD, $parser);
-        $tag = Method::clean($tag, Tag::ATTRIBUTE_METHOD, $parser);
+        $tag = Assign::remove($tag, Tag::METHOD, $parser);
+        $tag = Cast::find($tag, Tag::METHOD, $parser);
+        $tag = Exclamation::find($tag, Tag::METHOD, $parser);
+        $tag = Method::clean($tag, Tag::METHOD, $parser);
         $method = '(';
-        $explode = explode($method, $tag[Tag::ATTRIBUTE_METHOD], 2);
+        $explode = explode($method, $tag[Tag::METHOD], 2);
         if(!isset($explode[1])){
             return $string;
         }
@@ -99,21 +99,27 @@ class Method extends Core {
             return $string;
         }
         //have method...
-        $tag[Tag::ATTRIBUTE_METHOD] = ltrim($explode[0], '{');
+        $tag[Tag::METHOD] = ltrim($explode[0], '{');
         $explode = explode('})', strrev($explode[1]), 2);
-        $tag[Tag::ATTRIBUTE_PARAMETER] = strrev($explode[1]);
-        $tag[Tag::ATTRIBUTE_PARAMETER] = Parameter::find($tag[Tag::ATTRIBUTE_PARAMETER], $parser);
-        $tag = Parameter::execute($tag, Tag::ATTRIBUTE_EXECUTE, $parser);
+        $tag[Tag::PARAMETER] = strrev($explode[1]);
+        $tag[Tag::PARAMETER] = Parameter::find($tag[Tag::PARAMETER], $parser);
+        $tag = Parameter::execute($tag, Tag::EXECUTE, $parser);
         //execute to constant
-        $tag[Tag::ATTRIBUTE_STRING] = $string;
+        $tag[Tag::STRING] = $string;
         $tag = Method::execute($tag, $parser);
-        $tag = Exclamation::exectute($tag, Tag::ATTRIBUTE_EXECUTE, $parser);
-        $tag = Cast::execute($tag, Tag::ATTRIBUTE_EXECUTE, $parser);
-        $tag = Assign::execute($tag, Tag::ATTRIBUTE_EXECUTE, $parser);
-        $tag = Method::replace($tag, Tag::ATTRIBUTE_EXECUTE, $parser);
-        return $tag[Tag::ATTRIBUTE_STRING];
+        $tag = Exclamation::exectute($tag, Tag::EXECUTE, $parser);
+        $tag = Cast::execute($tag, Tag::EXECUTE, $parser);
+        $tag = Assign::execute($tag, Tag::EXECUTE, $parser);
+        $tag = Method::replace($tag, Tag::EXECUTE, $parser);
+        return $tag[Tag::STRING];
     }
 
+    /**
+     * rename to get
+     * @param string $string
+     * @param unknown $parser
+     * @return boolean
+     */
     public static function is($string='', $parser){
         $method = '(';
         $explode = explode($method, $string, 2);
