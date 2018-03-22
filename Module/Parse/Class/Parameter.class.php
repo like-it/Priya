@@ -90,11 +90,11 @@ class Parameter extends Core {
     }
 
     public static function execute($tag=array(), $attribute='', $parser=null){
-        foreach($tag[Tag::ATTRIBUTE_PARAMETER] as $nr => $parameter){
+        foreach($tag[Tag::PARAMETER] as $nr => $parameter){
             if(Method::is($parameter, $parser)){
                 $parse = '{' . trim($parameter, '{}') . '}';
                 $parse  = Parse::token($parse, $parser->data(), false, $parser);
-                $tag[Tag::ATTRIBUTE_PARAMETER][$nr] = $parse;
+                $tag[Tag::PARAMETER][$nr] = $parse;
             }
             elseif(Variable::is($parameter, $parser)){
                 var_dump($tag);
