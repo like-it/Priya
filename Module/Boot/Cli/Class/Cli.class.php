@@ -25,9 +25,9 @@ class Cli extends Core_Cli {
 //         $parse->read($this->data('module.dir.data') . 'Bootstrap.json');
 
 
-        $this->read($this->data('module.dir.data') . 'Bootstrap.json');
+//         $this->read($this->data('module.dir.data') . 'Bootstrap.json');
 //         $term = $this->parser('object')->read('Boot.screen');
-        $this->queue($this->data('queue'));
+//         $this->queue($this->data('queue'));
         sleep(5);
 //         var_dump($this->data());
 //         var_dump($this->request());

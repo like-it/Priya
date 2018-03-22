@@ -14,3 +14,5 @@
 {terminal.screen()}
 {terminal.screen.goto(10, 10)}
 {$command = terminal.read.line('Boot: ')}
+{terminal.screen.goto(0, -2)}
+{terminal.write.line("Loading Priya..")}

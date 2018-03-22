@@ -111,7 +111,7 @@ class Cli extends Result {
 //             system('stty -echo');
             $input = trim(fgets(STDIN));
 //             system('stty echo');
-            echo PHP_EOL;
+//             echo PHP_EOL;
 
 //             readline_completion_function(array($this, 'complete'));
 //             $input = rtrim(readline($text), ' ');

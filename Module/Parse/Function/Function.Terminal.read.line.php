@@ -23,11 +23,9 @@ function function_terminal_read_line($tag, $parser=null){
         $x = $parser->data('priya.module.terminal.cursor.position.x');
         $y = $parser->data('priya.module.terminal.cursor.position.y');
         $grid = $parser->data('priya.module.terminal.grid');
-
         $cell = $grid[$y][$x];
-
         echo $cli->color($cell['color'], $cell['background']);
     }
-    $tag['execute'] = $cli->input($input, $hidden, $timeout);
+    $tag['execute'] = $cli->input($input, $hidden, $timeout) . PHP_EOL;
     return $tag;
 }
