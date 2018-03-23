@@ -37,6 +37,10 @@ class Parse extends Data {
 
     const INIT = '{import("{$priya.dir.module}Parse/Function/")}';
 
+    const SPACE = ' ';
+    const QUOTE_SINGLE = '\'';
+    const QUOTE_DOUBLE = '"';
+    const STRING_EMPTY = '';
 
     public function read($url=''){
         $file = new File();

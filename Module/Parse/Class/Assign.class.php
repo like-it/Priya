@@ -7,6 +7,8 @@ use Priya\Module\Parse;
 use Exception;
 
 class Assign extends Core {
+	const TAG = '$';
+
 	const MASK =
 		Operator::ASSIGN_PLUS .
 		Operator::ASSIGN_MIN .
@@ -14,7 +16,7 @@ class Assign extends Core {
 		Operator::ASSIGN_NOT .
 		Operator::ASSIGN_MULTIPLY .
 		Operator::ASSIGN_DIVIDE .
-		' ';
+		Parse::SPACE;
 
 	const METHOD = array(
 		Operator::ASSIGN_PLUS,
@@ -25,20 +27,25 @@ class Assign extends Core {
 		Operator::ASSIGN_DIVIDE
 	);
 
+	const NOT_BEFORE = array(
+		Parse::QUOTE_SINGLE,
+		Parse::QUOTE_DOUBLE
+	);
+
     public static function remove($tag=array(), $attribute='', $parser=null){
-        $method = '=';
+        $method = Operator::ASSIGN_EQUAL;
         $explode = explode($method, $tag[Tag::TAG], 2);
 
         if(!isset($explode[1])){
             $tag[$attribute] = $tag[Tag::TAG];
         } else {
-            $tag[$attribute] = rtrim($explode[1], ' ');
+        	$tag[$attribute] = rtrim($explode[1], Parse::SPACE);
         }
         return $tag;
     }
 
     public static function select($tag=array(), $parser=null){
-        $method = '=';
+    	$method = Operator::ASSIGN_EQUAL;
         $explode = explode($method, $tag[Tag::TAG], 2);
 
         $tag[Tag::ATTRIBUTE] = null;
@@ -48,12 +55,12 @@ class Assign extends Core {
             return $tag;
         }
 
-        $before = $parser->explode_multi(array('\'', '"'), $explode[0], 2);
+        $before = $parser->explode_multi(Assign::NOT_BEFORE, $explode[0], 2);
 
         if(isset($before[1])){
             return $tag;
         }
-        $variable = explode('$', $explode[0], 2);
+        $variable = explode(Assign::TAG, $explode[0], 2);
         if(!isset($variable[1])){
             return $tag;
         }
@@ -73,19 +80,19 @@ class Assign extends Core {
     }
 
     public static function find($tag=array(), $string='', $parser=null){
-        $method = '=';
+    	$method = Operator::ASSIGN_EQUAL;
         $explode = explode($method, $tag[Tag::TAG], 2);
 
         if(!isset($explode[1])){
             return $string;
         }
 
-        $before = $parser->explode_multi(array('\'', '"'), $explode[0], 2);
+        $before = $parser->explode_multi(Assign::NOT_BEFORE, $explode[0], 2);
 
         if(isset($before[1])){
             return $string;
         }
-        $variable = explode('$', $explode[0], 2);
+        $variable = explode(Assign::TAG, $explode[0], 2);
         if(!isset($variable[1])){
             return $string;
         }
@@ -103,23 +110,23 @@ class Assign extends Core {
         }
         $tag[Tag::ASSIGN] = $method;
         $tag[Tag::ATTRIBUTE] = rtrim($variable[1], Assign::MASK);
-        $tag[Tag::VALUE] = trim($explode[1], ' ');
+        $tag[Tag::VALUE] = trim($explode[1], Parse::SPACE);
 
-        if(substr($tag[Tag::VALUE], 0, 1) == '$'){
-        	$tag[Tag::VALUE] = '{' . $tag[Tag::VALUE];
+        if(substr($tag[Tag::VALUE], 0, 1) == Assign::TAG){
+        	$tag[Tag::VALUE] = Tag::OPEN . $tag[Tag::VALUE];
         }
-        elseif(substr($tag[Tag::VALUE], 0, 2) == '{$'){
+        elseif(substr($tag[Tag::VALUE], 0, 2) == Tag::OPEN . Assign::TAG){
             //needs to keep the }
         }
         else {
-        	if(substr($tag[Tag::VALUE], -1) == '}'){
+        	if(substr($tag[Tag::VALUE], -1) == Tag::CLOSE){
         		$tag[Tag::VALUE] = substr($tag[Tag::VALUE], 0, -1);
             }
         }
         $tag[Tag::VALUE] = Parse::token($tag[Tag::VALUE], $parser->data(), false, $parser);
         $tag = Assign::execute($tag, Tag::VALUE, $parser);
         $temp = explode($tag[Tag::TAG], $string, 2);
-        $string = implode('', $temp);
+        $string = implode(Parse::STRING_EMPTY, $temp);
         return $string;
     }
 
@@ -137,9 +144,12 @@ class Assign extends Core {
 
             if($type == Parse::TYPE_ARRAY){
                 switch($tag[Tag::ASSIGN]){
-                    case '+' :
+                	case Operator::ASSIGN_PLUS:
                         $parser->data($tag[Tag::ATTRIBUTE], $left + $right);
                     break;
+                	case Operator::ASSIGN_NOT . Operator::ASSIGN_EQUAL:
+                		$parser->data($tag[Tag::ATTRIBUTE], $left != $right);
+                		break;
                     default :
                         $parser->data($tag[Tag::ATTRIBUTE], $right);
                     break;
@@ -147,35 +157,41 @@ class Assign extends Core {
             }
             elseif($type == Parse::TYPE_OBJECT){
                 switch($tag[Tag::ASSIGN]){
-                    case '+' :
+                	case Operator::ASSIGN_PLUS:
                         $left = $parser->data($tag[Tag::ATTRIBUTE]);
                         $parser->data($tag[Tag::ATTRIBUTE], $left + $right);
                     break;
+                	case Operator::ASSIGN_NOT . Operator::ASSIGN_EQUAL:
+                		$parser->data($tag[Tag::ATTRIBUTE], $left != $right);
+                		break;
                     default :
                         $parser->data($tag[Tag::ATTRIBUTE], $right);
                     break;
                 }
             } else {
                 switch($tag[Tag::ASSIGN]){
-                    case '.=' :
+                    case Operator::ASSIGN_ADD . Operator::ASSIGN_EQUAL :
                         $parser->data($tag[Tag::ATTRIBUTE], $left .= $right);
                     break;
-                    case '+=' :
+                    case Operator::ASSIGN_PLUS . Operator::ASSIGN_EQUAL:
                         $parser->data($tag[Tag::ATTRIBUTE], $left += $right);
                     break;
-                    case '-=' :
+                    case Operator::ASSIGN_MIN . Operator::ASSIGN_EQUAL:
                         $parser->data($tag[Tag::ATTRIBUTE], $left -= $right);
                     break;
-                    case '*=' :
+                    case Operator::ASSIGN_MULTIPLY . Operator::ASSIGN_EQUAL:
                         $parser->data($tag[Tag::ATTRIBUTE], $left * $right);
                     break;
-                    case '/=' :
+                    case Operator::ASSIGN_DIVIDE . Operator::ASSIGN_EQUAL:
                         if(empty($right)){
                             throw new Exception('Cannot divide to zero on line: ' . $tag[Tag::LINE] . ' column: ' . $tag[Tag::COLUMN] . ' in ' . $parser->data('priya.module.parser.document.url'));
                         }
                         $parser->data($tag[Tag::ATTRIBUTE], $left / $right);
                     break;
-                    case '+' :
+                    case Operator::ASSIGN_NOT . Operator::ASSIGN_EQUAL:
+                    	$parser->data($tag[Tag::ATTRIBUTE], $left != $right);
+                    break;
+                    case Operator::ASSIGN_PLUS:
                         $parser->data($tag[Tag::ATTRIBUTE], $left + $right);
                     break;
                     default :
