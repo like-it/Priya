@@ -7,12 +7,15 @@
 {$z = $x}
 {$z = $x}
 
-{terminal.start()}
-{terminal.grid(0, 0, 'auto', 'auto', 10, 5)}
-{terminal.screen.goto(0, 0)}
-{terminal.write.line("Welcome to Priya version {$priya.version}")}
-{terminal.screen()}
-{terminal.screen.goto(10, 10)}
-{$command = terminal.read.line('Boot: ')}
-{terminal.screen.goto(0, -2)}
-{terminal.write.line("Loading Priya..")}
+{priya}
+terminal.start()
+terminal.grid(0, 0, 'auto', 'auto', 10, 5)
+terminal.screen.goto(0, 0)
+terminal.write.line("Welcome to Priya version {$priya.version}")
+terminal.screen()
+terminal.screen.goto(10, 10)
+$command = terminal.read.line('Boot: ')
+terminal.screen.goto(0, -2)
+terminal.write.line("Loading Priya...")
+{/priya}
+hello world

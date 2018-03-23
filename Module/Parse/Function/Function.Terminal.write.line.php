@@ -1,7 +1,7 @@
 <?php
 
 use Priya\Module\Core\Cli;
-
+use Priya\Module\Parse\Tag;
 /**
  * @author         Remco van der Velde
  * @since         2017-04-20
@@ -11,7 +11,7 @@ use Priya\Module\Core\Cli;
  */
 
 function function_terminal_write_line($tag=array(), $parser=null){
-    $argumentList = $tag['parameter'];
+    $argumentList = $tag[Tag::PARAMETER];
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
@@ -22,23 +22,24 @@ function function_terminal_write_line($tag=array(), $parser=null){
         $x = $parser->data('priya.module.terminal.cursor.position.x');
         $y = $parser->data('priya.module.terminal.cursor.position.y');
 
-        $line = str_split($line, 1);
+        $row = str_split($line, 1);
         $length = count($grid[$y]);
-
         $counter = 0;
         for($i=$x; $i < $length; $i++){
-            if(!isset($line[$counter])){
+            if(!isset($row[$counter])){
                 break;
             }
-            $grid[$y][$i]['char'] = $line[$counter];
+            $grid[$y][$i]['char'] = $row[$counter];
             $counter++;
         }
         $parser->data('priya.module.terminal.grid', $grid);
-        $tag['execute'] = '';
+        $tag[Tag::EXECUTE] = '';
+        $cli = new Cli($parser->handler(), $parser->route(), $parser->data());
+        $tag[Tag::EXECUTE] = $cli->output($line . PHP_EOL);
     } else {
         //not sure if this is working correctly...
         $cli = new Cli($parser->handler(), $parser->route(), $parser->data());
-        $tag['execute'] = $cli->output($line . PHP_EOL);
+        $tag[Tag::EXECUTE] = $cli->output($line . PHP_EOL);
     }
 
 

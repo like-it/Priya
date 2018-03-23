@@ -1,6 +1,7 @@
 <?php
 
 use Priya\Module\Core\Cli;
+use Priya\Module\Parse\Tag;
 
 /**
  * @author         Remco van der Velde
@@ -11,7 +12,7 @@ use Priya\Module\Core\Cli;
  */
 
 function function_terminal_grid($tag=array(), $parser=null){
-    $argumentList = $tag['parameter'];
+    $argumentList = $tag[Tag::PARAMETER];
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
@@ -51,7 +52,7 @@ function function_terminal_grid($tag=array(), $parser=null){
         $parser->data('priya.terminal.grid.background', $background);
     }
     $grid = $cli->grid($x, $y, $width, $height, $color, $background);
-    $tag['execute'] = $grid;
+    $tag[Tag::EXECUTE] = $grid;
     if($parser->data('priya.module.terminal.start') === true){
         $parser->data('priya.module.terminal.grid', $grid);
     }

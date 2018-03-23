@@ -1,6 +1,7 @@
 <?php
 
 use Priya\Module\Core\Cli;
+use Priya\Module\Parse\Tag;
 
 /**
  * @author         Remco van der Velde
@@ -11,7 +12,7 @@ use Priya\Module\Core\Cli;
  */
 
 function function_terminal_screen($tag=array(), $parser=null){
-    $argumentList = $tag['parameter'];
+    $argumentList = $tag[Tag::PARAMETER];
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
@@ -21,6 +22,6 @@ function function_terminal_screen($tag=array(), $parser=null){
     }
     $timeout = array_shift($argumentList);
     $cli = new Cli($parser->handler(), $parser->route(), $parser->data());
-    $tag['execute'] = $cli->screen($grid, $timeout);
+    $tag[Tag::EXECUTE] = $cli->screen($grid, $timeout);
     return $tag;
 }

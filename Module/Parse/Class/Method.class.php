@@ -89,6 +89,10 @@ class Method extends Core {
         $tag = Cast::find($tag, Tag::METHOD, $parser);
         $tag = Exclamation::find($tag, Tag::METHOD, $parser);
         $tag = Method::clean($tag, Tag::METHOD, $parser);
+        if($parser->data('priya.module.parser.priya') === true){
+            var_dump($tag);
+//             die;
+        }
         $method = '(';
         $explode = explode($method, $tag[Tag::METHOD], 2);
         if(!isset($explode[1])){
@@ -99,6 +103,7 @@ class Method extends Core {
             return $string;
         }
         //have method...
+
         $tag[Tag::METHOD] = ltrim($explode[0], '{');
         $explode = explode('})', strrev($explode[1]), 2);
         $tag[Tag::PARAMETER] = strrev($explode[1]);

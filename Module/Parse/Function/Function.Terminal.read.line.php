@@ -1,6 +1,7 @@
 <?php
 
 use Priya\Module\Core\Cli;
+use Priya\Module\Parse\Tag;
 
 /**
  * @author         Remco van der Velde
@@ -11,7 +12,7 @@ use Priya\Module\Core\Cli;
  */
 
 function function_terminal_read_line($tag, $parser=null){
-    $argumentList = $tag['parameter'];
+    $argumentList = $tag[Tag::PARAMETER];
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
@@ -26,6 +27,6 @@ function function_terminal_read_line($tag, $parser=null){
         $cell = $grid[$y][$x];
         echo $cli->color($cell['color'], $cell['background']);
     }
-    $tag['execute'] = $cli->input($input, $hidden, $timeout) . PHP_EOL;
+    $tag[Tag::EXECUTE] = $cli->input($input, $hidden, $timeout) . PHP_EOL;
     return $tag;
 }

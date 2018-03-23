@@ -23,6 +23,7 @@ use Priya\Module\Parse\Tag;
 use Priya\Module\Parse\Assign;
 use Priya\Module\Parse\Variable;
 use Priya\Module\Parse\Method;
+use Priya\Module\Parse\Priya;
 
 class Parse extends Data {
     const TYPE_INTEGER = 'integer';
@@ -77,6 +78,10 @@ class Parse extends Data {
         return Parse::token($string, $data, $keep, $this);
     }
 
+    public static function random(){
+        return rand(1000, 9999) . Tag::MIN . rand(1000,9999) . Tag::MIN . rand(1000,9999) . Tag::MIN . rand(1000,9999);
+    }
+
     public static function token($string, $data=null, $keep=false, $parser=null){
         $type = getType($string);
         if(
@@ -122,6 +127,7 @@ class Parse extends Data {
             $tags = Tag::find($string, $parser);
             $string = $string;
             foreach($tags as $nr => $tag){
+                $string = Priya::find($tag, $string, $parser);
                 $string = Method::find($tag, $string, $parser);
                 $string = Variable::find($tag, $string, $keep, $parser);
                 $string = Assign::find($tag, $string, $parser);
