@@ -12,6 +12,8 @@
  *     -    switch function
  *     -    sets, from inside to outside
  *     -    operators
+ *     - 	modifier
+ *     -	literal
  */
 
 namespace Priya\Module;

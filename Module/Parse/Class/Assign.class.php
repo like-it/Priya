@@ -3,10 +3,27 @@
 namespace Priya\Module\Parse;
 
 use Priya\Module\Core;
-use PRiya\Module\Parse;
+use Priya\Module\Parse;
 use Exception;
 
 class Assign extends Core {
+	const MASK =
+		Operator::ASSIGN_PLUS .
+		Operator::ASSIGN_MIN .
+		Operator::ASSIGN_ADD .
+		Operator::ASSIGN_NOT .
+		Operator::ASSIGN_MULTIPLY .
+		Operator::ASSIGN_DIVIDE .
+		' ';
+
+	const METHOD = array(
+		Operator::ASSIGN_PLUS,
+		Operator::ASSIGN_MIN,
+		Operator::ASSIGN_ADD,
+		Operator::ASSIGN_NOT,
+		Operator::ASSIGN_MULTIPLY,
+		Operator::ASSIGN_DIVIDE
+	);
 
     public static function remove($tag=array(), $attribute='', $parser=null){
         $method = '=';
@@ -45,19 +62,12 @@ class Assign extends Core {
         if(
             in_array(
                 $check,
-                array(
-                    '+',
-                    '-',
-                    '.',
-                    '!',
-                    '*',
-                    '/',
-                )
+                Assign::METHOD
             )
         ){
             $method = $check . $method;
         }
-        $tag[Tag::ATTRIBUTE] = rtrim($variable[1], '+-.!*/ ');
+        $tag[Tag::ATTRIBUTE] = rtrim($variable[1], Assign::MASK);
         $tag[Tag::ASSIGN] = $method;
         return $tag;
     }
@@ -86,35 +96,28 @@ class Assign extends Core {
         if(
             in_array(
                 $check,
-                array(
-                    '+',
-                    '-',
-                    '.',
-                    '!',
-                    '*',
-                    '/',
-                )
+            	Assign::METHOD
             )
         ){
             $method = $check . $method;
         }
         $tag[Tag::ASSIGN] = $method;
-        $tag[Tag::ATTRIBUTE] = rtrim($variable[1], ' +-.!');
-        $tag[Tag::ATTRIBUTE_VALUE] = trim($explode[1], ' ');
+        $tag[Tag::ATTRIBUTE] = rtrim($variable[1], Assign::MASK);
+        $tag[Tag::VALUE] = trim($explode[1], ' ');
 
-        if(substr($tag[Tag::ATTRIBUTE_VALUE], 0, 1) == '$'){
-            $tag[Tag::ATTRIBUTE_VALUE] = '{' . $tag[Tag::ATTRIBUTE_VALUE];
+        if(substr($tag[Tag::VALUE], 0, 1) == '$'){
+        	$tag[Tag::VALUE] = '{' . $tag[Tag::VALUE];
         }
-        elseif(substr($tag[Tag::ATTRIBUTE_VALUE], 0, 2) == '{$'){
+        elseif(substr($tag[Tag::VALUE], 0, 2) == '{$'){
             //needs to keep the }
         }
         else {
-            if(substr($tag[Tag::ATTRIBUTE_VALUE], -1) == '}'){
-                $tag[Tag::ATTRIBUTE_VALUE] = substr($tag[Tag::ATTRIBUTE_VALUE], 0, -1);
+        	if(substr($tag[Tag::VALUE], -1) == '}'){
+        		$tag[Tag::VALUE] = substr($tag[Tag::VALUE], 0, -1);
             }
         }
-        $tag[Tag::ATTRIBUTE_VALUE] = Parse::token($tag[Tag::ATTRIBUTE_VALUE], $parser->data(), false, $parser);
-        $tag = Assign::execute($tag, Tag::ATTRIBUTE_VALUE, $parser);
+        $tag[Tag::VALUE] = Parse::token($tag[Tag::VALUE], $parser->data(), false, $parser);
+        $tag = Assign::execute($tag, Tag::VALUE, $parser);
         $temp = explode($tag[Tag::TAG], $string, 2);
         $string = implode('', $temp);
         return $string;
@@ -145,7 +148,7 @@ class Assign extends Core {
             elseif($type == Parse::TYPE_OBJECT){
                 switch($tag[Tag::ASSIGN]){
                     case '+' :
-                        $left = $parser->data($tag['attribute']);
+                        $left = $parser->data($tag[Tag::ATTRIBUTE]);
                         $parser->data($tag[Tag::ATTRIBUTE], $left + $right);
                     break;
                     default :

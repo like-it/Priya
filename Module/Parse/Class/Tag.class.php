@@ -21,9 +21,6 @@ class Tag extends Core {
     const VALUE = 'value';
     const RUN = 'function';
 
-    const ATTRIBUTE_ASSIGN = 'assign';
-    const ATTRIBUTE_VALUE = 'value';
-
     public static function find($input=null, $parser=null){
         $tagged = array();
         if(!is_string($input)){
