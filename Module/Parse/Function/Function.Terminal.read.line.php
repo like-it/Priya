@@ -27,6 +27,21 @@ function function_terminal_read_line($tag, $parser=null){
         $cell = $grid[$y][$x];
         echo $cli->color($cell['color'], $cell['background']);
     }
-    $tag[Tag::EXECUTE] = $cli->input($input, $hidden, $timeout) . PHP_EOL;
+//     $debug = debug_backtrace(true);
+//     var_dump($debug[0]['args']);
+    $execute = $cli->input($input, $hidden, $timeout) . PHP_EOL;
+    $tag[Tag::EXECUTE] = $execute;
+    /*
+    if(!empty($tag[Tag::ATTRIBUTE])){
+        $parser->data($tag[Tag::ATTRIBUTE], $execute);
+        var_dump($parser->data($tag[Tag::ATTRIBUTE]));
+//         die;
+    }
+    */
+    /*
+    if($parser->data('priya.module.terminal.start' === true)){
+        $grid = $parser->data('priya.module.terminal.grid');
+    }
+    */
     return $tag;
 }

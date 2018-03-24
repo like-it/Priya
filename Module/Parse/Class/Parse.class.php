@@ -38,7 +38,14 @@ class Parse extends Data {
 
     const INIT = '{import("{$priya.dir.module}Parse/Function/")}';
 
+    const EQUAL = '=';
     const SPACE = ' ';
+    const DOT = '.';
+    const MIN = '-';
+    const UNDERSCORE = '_';
+    const NEWLINE = "\n"; //move to parse
+    const SLASH_FORWARD = '/';
+    const SLASH_BACKWARD = '\\';
     const QUOTE_SINGLE = '\'';
     const QUOTE_DOUBLE = '"';
     const STRING_EMPTY = '';
@@ -56,7 +63,6 @@ class Parse extends Data {
             $read = $file->read($url);
             $this->data('priya.module.parser.document.url', $url);
             $read = $this->compile($read, $this->data(), false);
-            //             debug($read, __LINE__ . '::' . __FILE__);
         }
         return $read;
     }
@@ -74,15 +80,22 @@ class Parse extends Data {
         if(empty($require)){
             $this->data('priya.module.parser.require', array());
         }
+        if($this->data('priya.module.parser.literal') === true){
+            return $string;
+        }
         Parse::token(Parse::INIT, $data, $keep, $this);
+//         var_dump($string);
         return Parse::token($string, $data, $keep, $this);
     }
 
     public static function random(){
-        return rand(1000, 9999) . Tag::MIN . rand(1000,9999) . Tag::MIN . rand(1000,9999) . Tag::MIN . rand(1000,9999);
+        return rand(1000, 9999) . Parse::MIN . rand(1000,9999) . Parse::MIN . rand(1000,9999) . Parse::MIN . rand(1000,9999);
     }
 
     public static function token($string, $data=null, $keep=false, $parser=null){
+        if($parser->data('priya.module.parser.literal') === true){
+            return $string;
+        }
         $type = getType($string);
         if(
             in_array(
@@ -122,15 +135,23 @@ class Parse extends Data {
             }
             return $string;
         } else {
+            if($parser->data('priya.debug') === true){
+//                 var_dump($string);
+//                 var_dump(debug_backtrace(true));
+//                 die;
+            }
             $parser->data('priya.module.parser.document.size', strlen($string));
             $parser->data('priya.module.parser.document.content', $string);
             $tags = Tag::find($string, $parser);
             $string = $string;
             foreach($tags as $nr => $tag){
-                $string = Priya::find($tag, $string, $parser);
-                $string = Method::find($tag, $string, $parser);
-                $string = Variable::find($tag, $string, $keep, $parser);
-                $string = Assign::find($tag, $string, $parser);
+                $string = Priya::find($tag, $string, $parser); //can trigger literal mode
+
+                if($parser->data('priya.module.parser.literal') !== true){
+                    $string = Assign::find($tag, $string, $parser);
+                    $string = Variable::find($tag, $string, $keep, $parser);
+                    $string = Method::find($tag, $string, $parser);
+                }
             }
             return $string;
             //first tags, rows + cols

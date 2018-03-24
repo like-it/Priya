@@ -1,0 +1,5 @@
+{priya}
+stream.register('boot://')
+debug(hello world)
+    debug(init stream)
+{/priya}

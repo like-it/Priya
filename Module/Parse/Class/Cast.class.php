@@ -7,6 +7,11 @@ use Priya\Module\Parse;
 use Exception;
 
 class Cast extends Core {
+    const OPEN = '(';
+    const CLOSE = ')';
+    const SPACE = ' ';
+    const EMPTY = '';
+
     const TYPE_INT = 'int';
     const TYPE_INTEGER = 'integer';
     const TYPE_FLOAT = 'float';
@@ -52,20 +57,20 @@ class Cast extends Core {
     }
 
     public static function find($tag='', $attribute='', $parser=null){
-        if(strpos($tag[$attribute], '(') === false){
+        if(strpos($tag[$attribute], Cast::OPEN) === false){
             return $tag;
         }
-        $explode = explode('(', $tag[$attribute]);
+        $explode = explode(Cast::OPEN, $tag[$attribute]);
 
         $cast = array();
         foreach($explode as $part){
-            $temp = explode(')', $part, 2);
+            $temp = explode(Cast::CLOSE, $part, 2);
             if(isset($temp[1])){
-                $key = strtolower(trim($temp[0], ' '));
+                $key = strtolower(trim($temp[0], Cast::SPACE));
                 if(in_array($key, Cast::LIST)){
                     $cast[] = $key;
-                    $tmp = explode('(' . $temp[0] . ')', $tag[$attribute], 2);
-                    $tag[$attribute] = implode('', $tmp);
+                    $tmp = explode(Cast::OPEN. $temp[0] . Cast::CLOSE, $tag[$attribute], 2);
+                    $tag[$attribute] = implode(Cast::EMPTY, $tmp);
                 } else {
                     break;
                 }
@@ -83,10 +88,12 @@ class Cast extends Core {
         if(!isset($tag[$attribute])){
             $tag[$attribute] = null;
         }
+        //might add floor & ceil
         foreach($tag[Tag::CAST] as $cast){
             switch($cast){
                 case Cast::TYPE_INT:
                 case Cast::TYPE_INTEGER:
+                    //should use round()
                     $tag[$attribute] = (int) $tag[$attribute];
                 break;
                 case Cast::TYPE_FLOAT:

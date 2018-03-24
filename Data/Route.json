@@ -50,5 +50,15 @@
             "CLI"
         ],
         "translate": false
+    },
+    "Boot-Stream": {
+        "path": "boot://{$boot}",
+        "controller": "Priya.Module.Boot.Stream.run",
+        "format": "html",
+        "language": "en",
+        "method": [
+            "CLI"
+        ],
+        "translate": false
     }
 }

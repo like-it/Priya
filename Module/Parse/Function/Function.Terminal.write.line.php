@@ -36,6 +36,7 @@ function function_terminal_write_line($tag=array(), $parser=null){
         $tag[Tag::EXECUTE] = '';
         $cli = new Cli($parser->handler(), $parser->route(), $parser->data());
         $tag[Tag::EXECUTE] = $cli->output($line . PHP_EOL);
+        $parser->data('priya.module.terminal.cursor.position.y', $y+1);
     } else {
         //not sure if this is working correctly...
         $cli = new Cli($parser->handler(), $parser->route(), $parser->data());

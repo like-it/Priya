@@ -219,6 +219,12 @@ class Cli extends Result {
         foreach($grid as $y => $list_y){
             $row = '';
             foreach($list_y as $x => $pointer){
+                if(!isset($pointer['color'])){
+                    var_dump($x);
+                    var_dump($y);
+                    var_dump($pointer);
+                    die;
+                }
                 $row .= $this->color($pointer['color'], $pointer['background']) . $pointer['char'];
             }
             $content[] = $row;

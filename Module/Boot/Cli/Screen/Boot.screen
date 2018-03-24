@@ -9,13 +9,34 @@
 
 {priya}
 terminal.start()
-terminal.grid(0, 0, 'auto', 'auto', 10, 5)
+terminal.grid(0, 0, 'auto', 'auto', 7, 0)
 terminal.screen.goto(0, 0)
-terminal.write.line("Welcome to Priya version {$priya.version}")
+terminal.write.line("Welcome to Priya")
+terminal.write.line("version {$priya.version}")
+terminal.square(0, 0, 50, 50, null, 2)
 terminal.screen()
 terminal.screen.goto(10, 10)
+{/priya}
 $command = terminal.read.line('Boot: ')
+$priya.debug = true
+$exec = terminal.exec("boot://{$command}")
+terminal.screen.goto(0, 10)
+terminal.write.line($exec)
+hello world <-- not working...
+$exec = terminal.exec($command, 'boot://')
+terminal.screen.move.up(10, 10, 80, 19)
+terminal.screen()
+terminal.screen.goto(10, 10)
+$task = terminal.read.line('Task: ')
+terminal.exec($task, 'task://')
 terminal.screen.goto(0, -2)
 terminal.write.line("Loading Priya...")
-{/priya}
-hello world
+
+/**
+BUGS
+while(true)
+    $command = terminal.read.line('Boot: ')
+    exec($command); //need special linux command for in the meanwhile (sleep 1 sec) write output buffer every second
+
+/while
+**/
