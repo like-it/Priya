@@ -21,6 +21,46 @@ function function_terminal_square($tag=array(), $parser=null){
     $y = array_shift($argumentList);
     $width = array_shift($argumentList);
     $height = array_shift($argumentList);
+
+
+    if(substr($y, -1) == '%'){
+        $percentage = (int) substr($y, 0, -1);
+        $percentage_y = $percentage;
+        $max = $parser->data('priya.terminal.grid.height');
+        $y = (int) ceil($max * ($percentage / 100));
+        if($y > $max){
+            $y = $max;
+        }
+    }
+    if(substr($x, -1) == '%'){
+        $percentage = (int) substr($x, 0, -1);
+        $percentage_x = $percentage;
+        $max = $parser->data('priya.terminal.grid.width');
+        $x = (int) ceil($max * ($percentage / 100));
+        if($x > $max){
+            $x = $max;
+        }
+    }
+
+    if(substr($height, -1) == '%'){
+        $percentage = (int) substr($height, 0, -1);
+        $max = $parser->data('priya.terminal.grid.height');
+        $height = (int) ceil($max * ($percentage / 100));
+        if($height + $y > $max){
+            $height = $max - $y;
+        }
+    }
+    if(substr($width, -1) == '%'){
+        $percentage = (int) substr($width, 0, -1);
+        $max = $parser->data('priya.terminal.grid.width');
+        //if $x + $width == 100 percentage width ==
+
+        $width = (int) ceil($max * ($percentage / 100));
+
+        if($width + $x > $max){
+            $width = $max - $x;
+        }
+    }
     $color = array_shift($argumentList);
     $background = array_shift($argumentList);
     $tag[Tag::EXECUTE] = '';
@@ -47,6 +87,10 @@ function function_terminal_square($tag=array(), $parser=null){
             }
         }
     }
+    $parser->data('priya.module.terminal.cursor.position.x', $x);
+    $parser->data('priya.module.terminal.cursor.position.y', $y);
+    //needed in .screen we can do terminal.cursor.position or screen.cursor.position
+    //terminal.screen.x && terminal.screen.y ?
     $parser->data('priya.module.terminal.grid', $grid);
     return $tag;
 }
