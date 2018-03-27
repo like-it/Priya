@@ -24,7 +24,6 @@ class Comparison extends Core {
     const BITWISE = '';
 
     public static function find($tag='', $attribute='', $parser=null){
-
         return $tag;
     }
 

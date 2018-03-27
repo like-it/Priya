@@ -84,7 +84,6 @@ class Parse extends Data {
             return $string;
         }
         Parse::token(Parse::INIT, $data, $keep, $this);
-//         var_dump($string);
         return Parse::token($string, $data, $keep, $this);
     }
 
@@ -146,15 +145,14 @@ class Parse extends Data {
             $string = $string;
             foreach($tags as $nr => $tag){
                 $string = Priya::find($tag, $string, $parser); //can trigger literal mode
-
-                if($parser->data('priya.module.parser.literal') !== true){
-                    $string = Assign::find($tag, $string, $parser);
-                    $string = Variable::find($tag, $string, $keep, $parser);
-                    $string = Method::find($tag, $string, $parser);
+                if($parser->data('priya.module.parser.literal') === true){
+                	continue;
                 }
+                $string = Assign::find($tag, $string, $parser);
+                $string = Variable::find($tag, $string, $keep, $parser);
+                $string = Method::find($tag, $string, $parser);
             }
             return $string;
-            //first tags, rows + cols
         }
     }
 }

@@ -66,7 +66,14 @@ class Method extends Core {
                 break;
             }
         }
-        $name = Tag::RUN . Method::UNDERSCORE . str_replace(Method::DOT, Method::UNDERSCORE, strtolower($name));
+        $name =
+        	Tag::RUN .
+        	Method::UNDERSCORE .
+        	str_replace(
+        		Method::DOT,
+        		Method::UNDERSCORE,
+        		strtolower($name)
+        	);
         $tag[Tag::RUN][Tag::METHOD] = $name;
         if(function_exists($tag[Tag::RUN][Tag::METHOD])){
             return $name($tag, $parser);
@@ -153,9 +160,6 @@ class Method extends Core {
 //             var_dump($tag);
 //             die;
         }
-
-
-        //execute to constant
         $tag[Tag::STRING] = $string;
         $original = $tag;
         $tag = Method::execute($tag, $parser);

@@ -31,6 +31,7 @@ class Tag extends Core {
     const PATTERN = '/\\' . Tag::OPEN . '.*\\' . Tag::CLOSE . '/';
     const FLAG = PREG_SET_ORDER | PREG_OFFSET_CAPTURE;
 
+    //change to priya.parser.document.tag.counter /nodelist
     const COUNTER = 'parser.document.tag.counter';
     const NODELIST = 'parser.document.tag.nodelist';
 
