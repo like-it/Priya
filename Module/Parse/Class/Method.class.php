@@ -67,13 +67,13 @@ class Method extends Core {
             }
         }
         $name =
-        	Tag::RUN .
-        	Method::UNDERSCORE .
-        	str_replace(
-        		Method::DOT,
-        		Method::UNDERSCORE,
-        		strtolower($name)
-        	);
+            Tag::RUN .
+            Method::UNDERSCORE .
+            str_replace(
+                Method::DOT,
+                Method::UNDERSCORE,
+                strtolower($name)
+            );
         $tag[Tag::RUN][Tag::METHOD] = $name;
         if(function_exists($tag[Tag::RUN][Tag::METHOD])){
             return $name($tag, $parser);
@@ -122,6 +122,7 @@ class Method extends Core {
 //             die;
         }
         $tag = Assign::select($tag, $parser);
+        //might need to delete $tag[Tag::VALUE] (older than 15-04-2018 delete this comment)
         $tag = Assign::remove($tag, Tag::METHOD, $parser);
         $tag = Cast::find($tag, Tag::METHOD, $parser);
         $tag = Exclamation::find($tag, Tag::METHOD, $parser);

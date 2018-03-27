@@ -16,6 +16,13 @@ function function_terminal_square($tag=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
+    if($parser->data('priya.debug') == '123'){
+        $tag[Tag::EXECUTE] = '';
+        if(empty($width)){
+            return $tag;
+        }
+    }
+
     $cli = new Cli($parser->handler(), $parser->route(), $parser->data());
     $x = array_shift($argumentList);
     $y = array_shift($argumentList);

@@ -23,7 +23,8 @@ terminal.square(70%, 0, 10%, 100%, null, 10)
 terminal.square(80%, 0, 10%, 100%, null, 12)
 terminal.square(90%, 0, 10%, 100%, null, 13)
 terminal.square(0, 10%, 100%, 100%, null, 2)
-terminal.square(1, $terminal.cursor.position.y + 1, $terminal.screen.width -1, $terminal.screen.height -1, null, 0)
+$priya.debug = 123
+terminal.square(1, $terminal.cursor.position.y + 1 -1 +1 * 1, $terminal.screen.width -1, $terminal.screen.height -1, null, 0)
 terminal.screen()
 terminal.screen.goto(10, 10)
 {/priya}

@@ -96,37 +96,16 @@ class Assign extends Core {
         }
         $tag[Tag::ATTRIBUTE] = rtrim($variable[1], Assign::MASK);
         $tag[Tag::ASSIGN] = $method;
+        $tag[Tag::VALUE] = trim($explode[1], Parse::SPACE);
         return $tag;
     }
 
     public static function find($tag=array(), $string='', $parser=null){
-        $method = Assign::EQUAL;
-        $explode = explode($method, $tag[Tag::TAG], 2);
-        if(!isset($explode[1])){
+        $tag = Assign::select($tag, $parser);
+        if($tag[Tag::ASSIGN] === null){
             return $string;
         }
-        $before = $parser->explode_multi(Assign::NOT_BEFORE, $explode[0], 2);
-        if(isset($before[1])){
-            return $string;
-        }
-        $variable = explode(Assign::TAG, $explode[0], 2);
-        if(!isset($variable[1])){
-            return $string;
-        }
-        //we have an assign
-        $check = substr($explode[0], -1);
-        if(
-            in_array(
-                $check,
-                Assign::METHOD
-            )
-        ){
-            $method = $check . $method;
-        }
-        $tag[Tag::ASSIGN] = $method;
-        $tag[Tag::ATTRIBUTE] = rtrim($variable[1], Assign::MASK);
-        $tag[Tag::VALUE] = trim($explode[1], Parse::SPACE);
-
+          //we have assign
         if(substr($tag[Tag::VALUE], 0, 1) == Variable::SIGN){
             $tag[Tag::VALUE] = Tag::OPEN . $tag[Tag::VALUE];
         }
