@@ -4,6 +4,7 @@ namespace Priya\Module\Parse;
 
 use Priya\Module\Core;
 use Priya\Module\Parse;
+use Priya\Module\Parse\Literal;
 
 class Priya extends Core {
     const TAG = 'priya';
@@ -14,21 +15,23 @@ class Priya extends Core {
     const DELETE = 'delete';
     const MASK = Priya::SPACE . Tag::OPEN . Tag::CLOSE;
 
+    const DATA_TAG = 'priya.module.parser.tag.priya';
+
     public static function find($tag='', $string='', $parser=null){
         if($tag[Tag::TAG] == Tag::OPEN . Priya::TAG . TAG::CLOSE){
             $random = Parse::random();
-            $parser->data('priya.module.parser.priya', Tag::OPEN . Priya::TAG . Priya::MIN . $random . Tag::CLOSE);
+            $parser->data(Priya::DATA_TAG, Tag::OPEN . Priya::TAG . Priya::MIN . $random . Tag::CLOSE);
 
-            while(stristr($string, $parser->data('priya.module.parser.priya'))){
+            while(stristr($string, $parser->data(Priya::DATA_TAG))){
                 $random = Parse::random();
-                $parser->data('priya.module.parser.priya', Tag::OPEN . Priya::TAG . Priya::MIN . $random .Tag::CLOSE);
+                $parser->data(Priya::DATA_TAG, Tag::OPEN . Priya::TAG . Priya::MIN . $random .Tag::CLOSE);
             }
             $explode = explode(Tag::OPEN . Priya::TAG . TAG::CLOSE, $string, 2);
-            $string = implode($parser->data('priya.module.parser.priya'), $explode);
-            $parser->data('priya.module.parser.literal', true);
+            $string = implode($parser->data(Priya::DATA_TAG), $explode);
+            $parser->data(Literal::DATA_LITERAL, true);
         }
         elseif($tag[Tag::TAG] == Tag::OPEN . Priya::CLOSE . TAG::CLOSE){
-            $priya = $parser->data('priya.module.parser.priya');
+            $priya = $parser->data(Priya::DATA_TAG);
             $explode = explode($priya, $string, 2);
             if(isset($explode[1])){
                 $content = explode(Tag::OPEN . Priya::CLOSE . TAG::CLOSE, $explode[1], 2);
@@ -43,8 +46,7 @@ class Priya extends Core {
                     $program[$nr] = Tag::OPEN . $line . Tag::CLOSE;
                 }
             }
-            $parser->data(Priya::DELETE, 'priya.module.parser.literal');
-
+            $parser->data(Priya::DELETE, Literal::DATA_LITERAL);
             $compile = $parser->compile($program, $parser->data(), false);
 
             $explode[1] = '';
@@ -67,7 +69,7 @@ class Priya extends Core {
 //             var_dump($explode[1]);
 //             die;
             $explode[1] .= $content[1];
-            $parser->data(Priya::DELETE, 'priya.module.parser.priya');
+            $parser->data(Priya::DELETE, Priya::DATA_TAG);
             $string = implode('', $explode);
         }
         return $string;

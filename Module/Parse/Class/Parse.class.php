@@ -12,8 +12,8 @@
  *     -    switch function
  *     -    sets, from inside to outside
  *     -    operators
- *     - 	modifier
- *     -	literal
+ *     -     modifier
+ *     -    literal
  */
 
 namespace Priya\Module;
@@ -24,6 +24,7 @@ use Priya\Module\Parse\Assign;
 use Priya\Module\Parse\Variable;
 use Priya\Module\Parse\Method;
 use Priya\Module\Parse\Priya;
+use Priya\Module\Parse\Literal;
 
 class Parse extends Data {
     const TYPE_INTEGER = 'integer';
@@ -144,9 +145,13 @@ class Parse extends Data {
             $tags = Tag::find($string, $parser);
             $string = $string;
             foreach($tags as $nr => $tag){
+                $string = Literal::find($tag, $string, $parser); //can trigger literal mode
+                if($parser->data('priya.module.parser.literal') === true){
+                    continue;
+                }
                 $string = Priya::find($tag, $string, $parser); //can trigger literal mode
                 if($parser->data('priya.module.parser.literal') === true){
-                	continue;
+                    continue;
                 }
                 $string = Assign::find($tag, $string, $parser);
                 $string = Variable::find($tag, $string, $keep, $parser);

@@ -28,6 +28,8 @@ class Assign extends Core {
     const NOT = '!';
     const MULTIPLY = '*';
     const DIVIDE = '/';
+    const MODULO = '%';
+    const EXPONENTIAL = '**';
 
     const MASK =
     Assign::PLUS .
@@ -86,7 +88,10 @@ class Assign extends Core {
         }
         //we have an assign
         $check = substr($explode[0], -1);
-        if(
+        if(substr($explode[0], -2) == Assign::EXPONENTIAL){
+            $method = Assign::EXPONENTIAL . $method;
+        }
+        elseif(
             in_array(
                 $check,
                 Assign::METHOD
@@ -94,6 +99,7 @@ class Assign extends Core {
         ){
             $method = $check . $method;
         }
+
         $tag[Tag::ATTRIBUTE] = rtrim($variable[1], Assign::MASK);
         $tag[Tag::ASSIGN] = $method;
         $tag[Tag::VALUE] = trim($explode[1], Parse::SPACE);
@@ -186,6 +192,12 @@ class Assign extends Core {
                 break;
                 case Assign::PLUS:
                     $parser->data($tag[Tag::ATTRIBUTE], $left + $right);
+                break;
+                case Assign::MODULO:
+                    $parser->data($tag[Tag::ATTRIBUTE], $left % $right);
+                break;
+                case Assign::EXPONENTIAL:
+                    $parser->data($tag[Tag::ATTRIBUTE], $left ** $right);
                 break;
                 default :
                     $parser->data($tag[Tag::ATTRIBUTE], $right);

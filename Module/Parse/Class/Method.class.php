@@ -127,10 +127,6 @@ class Method extends Core {
         $tag = Cast::find($tag, Tag::METHOD, $parser);
         $tag = Exclamation::find($tag, Tag::METHOD, $parser);
         $tag = Method::clean($tag, Tag::METHOD, $parser);
-        if($parser->data('priya.module.parser.priya') === true){
-            var_dump($tag);
-//             die;
-        }
         $method = METHOD::OPEN;
         $explode = explode($method, $tag[Tag::METHOD], 2);
         if(!isset($explode[1])){
