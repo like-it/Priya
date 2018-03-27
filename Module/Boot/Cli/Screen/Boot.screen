@@ -1,11 +1,14 @@
 {$x= 80}
 {$y = 50}
-{$x **= 1}
+{$x **= 2}
 
 {$cherry = $x}
 
 {$z = $x}
 {$z = $x}
+
+{debug($z)}
+
 {literal}
 {priya}
 terminal.start()

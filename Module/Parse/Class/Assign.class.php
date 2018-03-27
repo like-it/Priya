@@ -196,7 +196,7 @@ class Assign extends Core {
                 case Assign::MODULO:
                     $parser->data($tag[Tag::ATTRIBUTE], $left % $right);
                 break;
-                case Assign::EXPONENTIAL:
+                case Assign::EXPONENTIAL . Assign::EQUAL:
                     $parser->data($tag[Tag::ATTRIBUTE], $left ** $right);
                 break;
                 default :
