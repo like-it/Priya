@@ -102,12 +102,16 @@ class Operator extends Core {
             case '.' :
                 $result = Operator::string($node['left']) . Operator::string($node['right']);
                 break;
-
+            case '==' :
+                //first complete $node['right']
+                $node = Operator::complete($node, 'right', $parser);
+                $result = $node['left'] == $node['right'];
+            break;
             case '===' :
                 //first complete $node['right']
                 $node = Operator::complete($node, 'right', $parser);
                 $result = $node['left'] === $node['right'];
-                break;
+            break;
 
             default :
                 throw new Exception('Unknown operator (' . $node['operator'] . ')');

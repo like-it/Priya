@@ -3,10 +3,10 @@
 {$x **= 2}
 
 {$cherry = $x}
-{$priya.debug = true}
 {$z.parser.test = $x}
-{debug("test" . 'test' === 'test' . 'test')}
+{debug("test" . "test" === "test" . "test")}
 {debug('test' . 'test' === 'test' . 'test')}
+{$priya.debug = true}
 {debug($z.parser.test + 10 * 11 -4 == 70506)}
 
 {literal}

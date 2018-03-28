@@ -61,9 +61,9 @@ class Parameter extends Core {
         * fix statements from left to right 1 by 1.
         */
 
-       $list = Operator::LIST;
-       unset($list[0]); //no .
-           $result = array();
+        $list = Operator::LIST;
+        unset($list[0]); //no .
+        $result = array();
 
         foreach($parameters as $nr => $set){
             $parse = false;
@@ -149,11 +149,6 @@ class Parameter extends Core {
             if(!empty($statement)){
                 $counter = 0;
                 while(Operator::has($statement, $parser)){
-                    if(is_object($statement[0])){
-                        var_dump($statement);
-                        var_dump(debug_backtrace(true));
-                        die;
-                    }
                     $statement = Operator::statement($statement, $parser);
 //                     var_dump($statement);
                     $parser->data('priya.debug2', true);
