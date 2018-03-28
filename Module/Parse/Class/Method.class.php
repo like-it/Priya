@@ -149,6 +149,10 @@ class Method extends Core {
             die;
         }
         $tag[Tag::PARAMETER] = strrev($explode[1]);
+        if($parser->data('priya.debug') === true){
+//             var_dump($tag);
+        }
+        var_dump($tag[Tag::PARAMETER]);
         $tag[Tag::PARAMETER] = Parameter::find($tag[Tag::PARAMETER], $parser);
         $tag = Parameter::execute($tag, Tag::EXECUTE, $parser);
 

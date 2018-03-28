@@ -51,24 +51,51 @@ class Assign extends Core {
 
     const NOT_BEFORE = array(
         Assign::QUOTE_SINGLE,
-        Assign::QUOTE_DOUBLE
+        Assign::QUOTE_DOUBLE,
+        Method::OPEN
     );
 
     public static function remove($tag=array(), $attribute='', $parser=null){
         $method = Assign::EQUAL;
-        $explode = explode($method, $tag[Tag::TAG], 2);
+        $string = $tag[Tag::TAG];
+        if(
+            substr($string, 0, 1) == '{' &&
+            substr($string, -1) == '}'
+        ){
+            $string = substr($string, 1, -1);
+        }
+        $explode = explode($method, $string, 2);
 
         if(!isset($explode[1])){
             $tag[$attribute] = $tag[Tag::TAG];
         } else {
-            $tag[$attribute] = rtrim($explode[1], Parse::SPACE);
+            //check beginning for assign
+            $before = $parser->explode_multi(Assign::NOT_BEFORE, $explode[0], 2);
+            if(isset($before[1])){
+                $tag[$attribute] = $tag[Tag::TAG];
+                return $tag;
+            }
+            $variable = explode(Assign::TAG, $explode[0], 2);
+            if(!isset($variable[1])){
+                $tag[$attribute] = $tag[Tag::TAG];
+                return $tag;
+            }
+            $tag[$attribute] = trim($explode[1], Parse::SPACE);
         }
         return $tag;
     }
 
     public static function select($tag=array(), $parser=null){
         $method = Assign::EQUAL;
-        $explode = explode($method, $tag[Tag::TAG], 2);
+        $string = $tag[Tag::TAG];
+        if(
+            substr($string, 0, 1) == '{' &&
+            substr($string, -1) == '}'
+        ){
+            $string = substr($tag[Tag::TAG], 1, -1);
+        }
+//         var_dump($string);
+        $explode = explode($method, $string, 2);
 
         $tag[Tag::ATTRIBUTE] = null;
         $tag[Tag::ASSIGN] = null;
@@ -76,9 +103,7 @@ class Assign extends Core {
         if(!isset($explode[1])){
             return $tag;
         }
-
         $before = $parser->explode_multi(Assign::NOT_BEFORE, $explode[0], 2);
-
         if(isset($before[1])){
             return $tag;
         }
@@ -103,6 +128,7 @@ class Assign extends Core {
         $tag[Tag::ATTRIBUTE] = rtrim($variable[1], Assign::MASK);
         $tag[Tag::ASSIGN] = $method;
         $tag[Tag::VALUE] = trim($explode[1], Parse::SPACE);
+//         var_dump($tag[Tag::VALUE]);
         return $tag;
     }
 
@@ -113,7 +139,7 @@ class Assign extends Core {
         }
           //we have assign
         if(substr($tag[Tag::VALUE], 0, 1) == Variable::SIGN){
-            $tag[Tag::VALUE] = Tag::OPEN . $tag[Tag::VALUE];
+            $tag[Tag::VALUE] = Tag::OPEN . $tag[Tag::VALUE] . Tag::CLOSE;
         }
         elseif(substr($tag[Tag::VALUE], 0, 2) == Tag::OPEN . Variable::SIGN){
             //needs to keep the }
@@ -123,6 +149,7 @@ class Assign extends Core {
                 $tag[Tag::VALUE] = substr($tag[Tag::VALUE], 0, -1);
             }
         }
+//         var_dump($tag[Tag::VALUE]);
         $tag[Tag::VALUE] = Parse::token($tag[Tag::VALUE], $parser->data(), false, $parser);
         $tag = Assign::execute($tag, Tag::VALUE, $parser);
         $temp = explode($tag[Tag::TAG], $string, 2);
@@ -140,6 +167,9 @@ class Assign extends Core {
         }
         $left = Cast::translate($parser->data($tag[Tag::ATTRIBUTE]));
         $right = Cast::translate($tag[$attribute]);
+//         var_dump($tag);
+//         var_dump($attribute);
+//         var_Dump($right);
         $type = gettype($tag[$attribute]);
 
         if($type == Parse::TYPE_ARRAY){
@@ -200,6 +230,8 @@ class Assign extends Core {
                     $parser->data($tag[Tag::ATTRIBUTE], $left ** $right);
                 break;
                 default :
+//                     var_Dump($tag);
+//                     var_dump($right);
                     $parser->data($tag[Tag::ATTRIBUTE], $right);
                     break;
                 }

@@ -21,6 +21,7 @@ class Tag extends Core {
     const ASSIGN = 'assign';
     const VALUE = 'value';
     const RUN = 'function';
+    const STATEMENT = 'statement';
 
     const OPEN = '{';
     const CLOSE = '}';

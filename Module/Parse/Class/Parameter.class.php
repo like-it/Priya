@@ -53,6 +53,7 @@ class Parameter extends Core {
                 }
             }
        }
+//        var_dump($parameters);
        //fix statements 1 by 1
        /**
         * change variables into values
@@ -60,6 +61,8 @@ class Parameter extends Core {
         * fix statements from left to right 1 by 1.
         */
 
+       $list = Operator::LIST;
+       unset($list[0]); //no .
            $result = array();
 
         foreach($parameters as $nr => $set){
@@ -69,6 +72,7 @@ class Parameter extends Core {
             $compile = array();
             $no_compile = array();
             $statement = array();
+            $argument = array();
 //             var_dump($set);
             foreach($set as $position => $value){
                 if($value == Parameter::QUOTE_DOUBLE && $parse === false && $is_statement === false){
@@ -80,7 +84,7 @@ class Parameter extends Core {
                     //for parse we need the whole set imploded
                     $parse = false;
                     $compile[] = $value;
-                    $result[$nr] = implode(Parameter::EMPTY, $compile);
+                    $statement[] = implode(Parameter::EMPTY, $compile);
                     //parse $result[$nr];
                     continue;
                 }
@@ -97,7 +101,7 @@ class Parameter extends Core {
                     //just implode the set with an empty delimiter
                     $no_parse = false;
                     $no_compile[] = $value;
-                    $result[$nr] = implode(Parameter::EMPTY, $no_compile);
+                    $statement[] = implode(Parameter::EMPTY, $no_compile);
                     continue;
                 }
                 if($no_parse === true){
@@ -105,28 +109,60 @@ class Parameter extends Core {
                     continue;
                 }
                 $value = trim($value, Parameter::SPACE);
-                if($parse === false && $no_parse === false){
-                    $is_statement = true;
-                    if(empty($value)){
-                        continue;
-                    }
-                    //check for . notation
-                    $value = Variable::get($value, $parser);
-                    //add Method::get
-                    $value = Cast::translate($value);
-                    $statement[] = $value;
+                if(empty($value)){
+                    continue;
                 }
+                if($is_statement === false && $parse === false && $no_parse === false){
+                    $is_statement = true;
+                }
+                if(in_array($value, $list)){
+                    if($value == '.'){
+                        //calculate right ?
+                    }
+                    $parameter = implode(Parameter::EMPTY, $argument);
+                    $parameter= Variable::get($parameter, $parser);
+                    //add Method::get (2X)
+                    $parameter= Cast::translate($parameter);
+                    $statement[] = $parameter;
+                    $statement[] = $value;
+                    $argument = array();
+                    $is_statement = false;
+                    continue;
+                    //argument complete
+                }
+                //also on == & === for if statement
+                $argument[] = $value;
             }
+            if(!empty($argument)){
+                $parameter = implode(Parameter::EMPTY, $argument);
+                $parameter= Variable::get($parameter, $parser);
+                //add Method::get (2X)
+                $parameter= Cast::translate($parameter);
+                $statement[] = $parameter;
+            }
+
+//             var_dump($statement);
+
             /**
-             * if $parse  is false variable is like $variable.variable after trim
              * statement can have + /- * / etc...
              */
             if(!empty($statement)){
                 $counter = 0;
                 while(Operator::has($statement, $parser)){
+                    if(is_object($statement[0])){
+                        var_dump($statement);
+                        var_dump(debug_backtrace(true));
+                        die;
+                    }
                     $statement = Operator::statement($statement, $parser);
+//                     var_dump($statement);
+                    $parser->data('priya.debug2', true);
                     $counter++;
+                    if(!isset($statement[1])){
+                        break;
+                    }
                     if($counter > Operator::MAX){
+                        throw new Exception('Operator::MAX reached in Parameter::find');
                         break;
                     }
                 }

@@ -156,6 +156,7 @@ class Parse extends Data {
                 $string = Assign::find($tag, $string, $parser);
                 $string = Variable::find($tag, $string, $keep, $parser);
                 $string = Method::find($tag, $string, $parser);
+//                 var_dump($string);
             }
             return $string;
         }
