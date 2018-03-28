@@ -47,8 +47,14 @@ class Variable extends Core {
     }
 
     //change to get
-    public static function is($string='', $parser=null){
-        return false;
+    public static function get($string='', $parser=null){
+        if(substr($string, 0, 1) !== '$'){
+            return $string;
+        }
+        //have variable
+        $attribute = substr($string, 1);
+        return $parser->data($attribute);
+
     }
 
 }

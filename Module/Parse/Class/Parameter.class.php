@@ -53,9 +53,100 @@ class Parameter extends Core {
                 }
             }
        }
+       //fix statements 1 by 1
+       /**
+        * change variables into values
+        * change methods into values
+        * fix statements from left to right 1 by 1.
+        */
+
+           $result = array();
+
+        foreach($parameters as $nr => $set){
+            $parse = false;
+            $no_parse = false;
+            $is_statement = false;
+            $compile = array();
+            $no_compile = array();
+            $statement = array();
+//             var_dump($set);
+            foreach($set as $position => $value){
+                if($value == Parameter::QUOTE_DOUBLE && $parse === false && $is_statement === false){
+                    $parse = true;
+                    $compile[] = $value;
+                    continue;
+                }
+                elseif($value == Parameter::QUOTE_DOUBLE && $parse === true){
+                    //for parse we need the whole set imploded
+                    $parse = false;
+                    $compile[] = $value;
+                    $result[$nr] = implode(Parameter::EMPTY, $compile);
+                    //parse $result[$nr];
+                    continue;
+                }
+                if($parse === true){
+                    $compile[] = $value;
+                    continue;
+                }
+                if($value == Parameter::QUOTE_SINGLE && $no_parse === false && $is_statement === false){
+                    $no_parse = true;
+                    $no_compile[] = $value;
+                    continue;
+                }
+                elseif($value == Parameter::QUOTE_SINGLE && $no_parse === true){
+                    //just implode the set with an empty delimiter
+                    $no_parse = false;
+                    $no_compile[] = $value;
+                    $result[$nr] = implode(Parameter::EMPTY, $no_compile);
+                    continue;
+                }
+                if($no_parse === true){
+                    $no_compile[] = $value;
+                    continue;
+                }
+                $value = trim($value, Parameter::SPACE);
+                if($parse === false && $no_parse === false){
+                    $is_statement = true;
+                    if(empty($value)){
+                        continue;
+                    }
+                    //check for . notation
+                    $value = Variable::get($value, $parser);
+                    //add Method::get
+                    $value = Cast::translate($value);
+                    $statement[] = $value;
+                }
+            }
+            /**
+             * if $parse  is false variable is like $variable.variable after trim
+             * statement can have + /- * / etc...
+             */
+            if(!empty($statement)){
+                $counter = 0;
+                while(Operator::has($statement, $parser)){
+                    $statement = Operator::statement($statement, $parser);
+                    $counter++;
+                    if($counter > Operator::MAX){
+                        break;
+                    }
+                }
+                $result[$nr] = $statement[0];
+                $statement = array();
+            }
+        }
+
+        $parameters = $result;
+
+//        var_Dump($parameters);
+       /**
+        * old way of parameters, should end up the same...
+        */
+        /*
        foreach($parameters as $nr => $set){
            $parameters[$nr] = trim(implode(Parameter::EMPTY, $set), Parameter::SPACE);
        }
+    */
+
        foreach ($parameters as $nr => $parameter){
             if(
                 substr($parameter, 0, 1) == Parameter::QUOTE_DOUBLE &&
@@ -107,10 +198,12 @@ class Parameter extends Core {
                 $parse  = Parse::token($parse, $parser->data(), false, $parser);
                 $tag[Tag::PARAMETER][$nr] = $parse;
             }
+            /*
             elseif(Variable::is($parameter, $parser)){
                 var_dump($tag);
                 throw new Exception('Please implement variable in parameter...');
             }
+            */
         }
         return $tag;
     }

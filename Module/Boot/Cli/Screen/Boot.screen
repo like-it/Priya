@@ -7,7 +7,7 @@
 {$z = $x}
 {$z = $x}
 
-{debug($z)}
+{debug($z + 10 * 11 -4)}
 
 {literal}
 {priya}
