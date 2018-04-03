@@ -12,13 +12,13 @@ class Literal extends Core {
     const SPACE = ' ';
     const MIN = '-';
     const DELETE = 'delete';
-    const MASK = Priya::SPACE . Tag::OPEN . Tag::CLOSE;
+    const MASK = Literal::SPACE . Tag::OPEN . Tag::CLOSE;
 
     const DATA_TAG = 'priya.module.parser.tag.literal';
     const DATA_LITERAL = 'priya.module.parser.literal';
 
     public static function find($tag='', $string='', $parser=null){
-        if($tag[Tag::TAG] == Tag::OPEN . Priya::TAG . TAG::CLOSE){
+        if($tag[Tag::TAG] == Tag::OPEN . Literal::TAG . TAG::CLOSE){
             $random = Parse::random();
             $parser->data(Literal::DATA_TAG, Tag::OPEN . Literal::TAG . Literal::MIN . $random . Tag::CLOSE);
 
@@ -36,8 +36,8 @@ class Literal extends Core {
             if(isset($explode[1])){
                 $content = explode(Tag::OPEN . Literal::CLOSE . TAG::CLOSE, $explode[1], 2);
             }
-            $parser->data(Priya::DELETE, Literal::DATA_TAG);
-            $parser->data(Priya::DELETE, Literal::DATA_LITERAL);
+            $parser->data(Literal::DELETE, Literal::DATA_TAG);
+            $parser->data(Literal::DELETE, Literal::DATA_LITERAL);
             $string = implode('', $content);
         }
         return $string;
