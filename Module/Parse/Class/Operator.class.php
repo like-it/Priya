@@ -37,13 +37,20 @@ class Operator extends Core {
     const LOGICAL_AND_AND = '&&';
     const LOGICAL_OR_OR = '||';
 
-    const EQUALS = '=';
-    const EQUALS_EQUALS= '==';
-    const EQUALS_EQUALS_EQUALS= '===';
+    const EQUAL = '=';
+    const EQUAL_EQUAL= '==';
+    const EQUAL_EQUAL_EQUAL= '===';
 
     const NOT = '!';
-    const NOT_EQUALS = '!=';
-    const NOT_EQUALS_EQUALS= '!==';
+    const NOT_EQUAL = '!=';
+    const NOT_EQUAL_EQUAL= '!==';
+
+    const LESS_THAN_GREATER_THAN = '<>';    //not equal
+
+    const LESS_THAN = '<';
+    const LESS_THAN_EQUAL = '<=';
+    const GREATER_THAN = '<';
+    const GREATER_THAN_EQUAL = '<=';
 
     /**
      * the key index is also in use (see Parameter::find)
@@ -62,16 +69,20 @@ class Operator extends Core {
         Operator::BITWISE_XOR,
         Operator::BITWISE_SHIFT_LEFT,
         Operator::BITWISE_SHIFT_RIGHT,
-        Operator::EQUALS_EQUALS,
-        Operator::EQUALS_EQUALS_EQUALS,
-        Operator::NOT_EQUALS,
-        Operator::NOT_EQUALS_EQUALS,
+        Operator::EQUAL_EQUAL,
+        Operator::EQUAL_EQUAL_EQUAL,
+        Operator::NOT_EQUAL,
+        Operator::NOT_EQUAL_EQUAL,
         Operator::LOGICAL_AND,
         Operator::LOGICAL_AND_AND,
-        Operator::LOGICAL_NOT,
         Operator::LOGICAL_OR,
         Operator::LOGICAL_OR_OR,
-        Operator::LOGICAL_XOR
+        Operator::LOGICAL_XOR,
+        Operator::LESS_THAN_GREATER_THAN,
+        Operator::LESS_THAN,
+        Operator::LESS_THAN_EQUAL,
+        Operator::GREATER_THAN,
+        Operator::GREATER_THAN_EQUAL
     );
 
     public static function find($tag='', $string='', $parser=null){
@@ -82,6 +93,14 @@ class Operator extends Core {
         $result = null;
         switch($node['operator']){
             case '+' :
+                if(!is_numeric($node['left'])){
+                    var_dump($node);
+                    die;
+                }
+                if(!is_numeric($node['right'])){
+                    var_dump($node);
+                    die;
+                }
                 $result = $node['left'] + $node['right'];
             break;
             case '-' :
@@ -103,8 +122,11 @@ class Operator extends Core {
                 $result = Operator::string($node['left']) . Operator::string($node['right']);
                 break;
             case '==' :
+                var_Dump($node);
                 //first complete $node['right']
                 $node = Operator::complete($node, 'right', $parser);
+                var_dump($node);
+//                 die;
                 $result = $node['left'] == $node['right'];
             break;
             case '===' :
@@ -123,7 +145,28 @@ class Operator extends Core {
 
     public static function has($statement=array(), $parser=null){
         foreach($statement as $part){
-            if(in_array($part, Operator::LIST)){
+            $start = substr($part, 0, 1);
+//             var_dump($part);
+            $end = substr($part, -1, 1);
+            if(
+                in_array(
+                    $start,
+                    array(
+                        '\'',
+                        '"'
+                    )
+                ) &&
+                in_array(
+                    $end,
+                    array(
+                        '\'',
+                        '"'
+                    )
+                )
+            ){
+                continue;
+            }
+            if(in_array($part, Operator::LIST) && $part !== true){
                 return true;
             }
         }
@@ -154,13 +197,21 @@ class Operator extends Core {
         if(empty($statement)){
             return $statement;
         }
-//         var_Dump($statement);
         $before = true;
         $no_statement = $statement;
+        $right_negative = false;
+//         var_dump($statement);
         foreach($statement as $nr => $part){
+            $part = trim($part);
+            if(empty($part)){
+                unset($statement[$nr]);
+                continue;
+            }
             if(in_array($part, Operator::LIST)){
                 if($before === false){
-                    break; //might have another operator but first solve this one...
+                    if(!empty($right)){
+                        break; //might have another operator but first solve this one...
+                    }
                 } else {
                     $before = false;
                     $operator = $part;
@@ -174,6 +225,9 @@ class Operator extends Core {
                 unset($statement[$nr]);
             } else {
                 $right = $part;
+                if($right == '-'){
+                    $right_negative = true;
+                }
                 unset($statement[$nr]);
             }
         }
@@ -185,11 +239,22 @@ class Operator extends Core {
             die;
         }
         $node['left'] = $left;
+        if(!isset($operator)){
+            var_dump($left);
+            var_dump($right);
+            die;
+        }
         $node['operator'] = $operator;
-        $node['right'] = $right;
+        if($right_negative){
+            $node['right'] = -$right;
+        } else {
+            $node['right'] = $right;
+        }
         $node['statement'] = $statement;
+        var_dump($parser->data('priya.module.parser'));
+        var_dump($node);
         $statement = Operator::execute($node, $parser);
-//         var_dump($statement);
+        var_dump($statement);
         return $statement;
     }
 
@@ -200,7 +265,7 @@ class Operator extends Core {
         $counter = 0;
         while(Operator::has($statement, $parser)){
             $statement = Operator::statement($statement, $parser);
-//             var_dump($statement);
+            var_dump($statement);
             $parser->data('priya.debug3', true);
             $counter++;
             if($counter > Operator::MAX){
@@ -216,5 +281,218 @@ class Operator extends Core {
             throw new Exception('Undefined state detected, have unknown data');
         }
         return $node;
+    }
+
+    public static function set($set=array(), $parser=null){
+        $counter = 0;
+        $statement = array();
+        $statement[$counter] = '';
+        $skip = 0;
+        $parse = false;
+        $variable = false;
+        $debug = false;
+        foreach($set as $nr => $char){
+            if(
+                (
+                    $char == '"' ||
+                    $char == '\''
+                ) &&
+                $parse === true
+            ){
+                $statement[$counter] .= $char;
+                $parse = false;
+                $counter++;
+                continue;
+            }
+            if(
+                (
+                    $char == '"' ||
+                    $char == '\''
+                ) &&
+                $parse === false
+            ){
+                if(!empty($statement[$counter])){
+                    $counter++;
+                    $statement[$counter] = '';
+                }
+                $statement[$counter] .= $char;
+                $parse = true;
+                continue;
+            }
+            if($parse === true){
+                $statement[$counter] .= $char;
+                continue;
+            }
+            if(
+                $parse === false &&
+                $variable === false &&
+                $char == '$'
+            ){
+                if(!empty($statement[$counter])){
+                    $counter++;
+                    $statement[$counter] = '';
+                }
+                $statement[$counter] .= $char;
+                $variable = true;
+                $debug = true;
+                continue;
+            }
+            if(
+                $parse === false &&
+                $variable === true
+            ){
+                if(
+                    !in_array(
+                        $char,
+                        array(
+                            ' ',
+                            '=',
+                            '+',
+                            '-',
+                            '/',
+                            '*',
+                            '^',
+                            '%',
+                            '&',
+                            '|'
+                        )
+                    )
+                ){
+                    $statement[$counter] .= $char;
+                    continue;
+                } else {
+                    $variable = false;
+                    $counter++;
+                    $statement[$counter] = '';
+                }
+            }
+            if($skip > 0){
+                $skip--;
+                continue;
+            }
+            elseif(
+                in_array(
+                    $char,
+                    array(
+                        '+',
+                        '-',
+                        '/',
+                        '*',
+                        '&',
+                        '|',
+                        '=',
+                        '~',
+                        '<',
+                        '>',
+                        'a',
+                        'o',
+                        'x',
+                        '!',
+                        '^',
+                        '%',
+                    )
+                )
+            ){
+                $counter++;
+                $statement[$counter] = $char;
+                if(isset($set[$nr + 1])){
+                    $next = $set[$nr + 1];
+                }
+                if(isset($set[$nr + 2])){
+                    $next_next = $set[$nr + 2];
+                }
+                if(
+                    (
+                        $char == '*' &&
+                        $next == '*'
+                    ) ||
+                    (
+                        $char == '<' &&
+                        $next == '='
+                    ) ||
+                    (
+                        $char == '&' &&
+                        $next == '&'
+                    ) ||
+                    (
+                        $char == '|' &&
+                        $next == '|'
+                    ) ||
+                    (
+                        $char == '>' &&
+                        $next == '='
+                    ) ||
+                    (
+                        $char == '<' &&
+                        $next == '>'
+                    ) ||
+                    (
+                        $char == '<' &&
+                        $next == '<'
+                    ) ||
+                    (
+                        $char == '>' &&
+                        $next == '>'
+                    ) ||
+                    (
+                        $char == 'o' &&
+                        $next == 'r'
+                    ) ||
+                    (
+                        $char == '=' &&
+                        $next == '=' &&
+                        $next_next != '='
+                    ) ||
+                    (
+                        $char == '!' &&
+                        $next == '=' &&
+                        $next_next != '='
+                    )
+                ){
+                    $statement[$counter] .= $next;
+                    $skip = 1;
+                }
+                elseif(
+                    (
+                        $char == '=' &&
+                        $next == '=' &&
+                        $next_next == '='
+                    ) ||
+                    (
+                        $char == '!' &&
+                        $next == '=' &&
+                        $next_next == '='
+                    ) ||
+                    (
+                        $char == 'a' &&
+                        $next == 'n' &&
+                        $next_next == 'd'
+                    ) ||
+                    (
+                        $char == 'x' &&
+                        $next == 'o' &&
+                        $next_next == 'r'
+                    )
+                ){
+                    $statement[$counter] .= $next . $next_next;
+                    $skip = 2;
+                }
+                $counter++;
+                $statement[$counter] = '';
+            } else {
+                $statement[$counter] .= $char;
+            }
+
+        }
+        if($debug){
+            var_dump($statement);
+//             die;
+        }
+
+        if($parser->data('priya.debug') === true){
+//             var_Dump($statement);
+//             die;
+        }
+        return $statement;
     }
 }
