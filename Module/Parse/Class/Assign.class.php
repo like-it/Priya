@@ -151,6 +151,7 @@ class Assign extends Core {
         }
 //         var_dump($tag[Tag::VALUE]);
         $tag[Tag::VALUE] = Parse::token($tag[Tag::VALUE], $parser->data(), false, $parser);
+        //add sets, equations
         $tag = Assign::execute($tag, Tag::VALUE, $parser);
         $temp = explode($tag[Tag::TAG], $string, 2);
         $string = implode(Assign::EMPTY, $temp);
