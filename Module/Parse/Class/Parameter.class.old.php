@@ -13,144 +13,14 @@ class Parameter extends Core {
     const QUOTE_SINGLE = '\'';
     const QUOTE_DOUBLE = '"';
 
-    public static function list($string='', $parser=null){
-        $list = array();
-        if(
-            empty($string)
-        ){
-            return $list;
-        }
-        if(strpos($string, ',') === false){
-            $list[] = trim($string);
-            return $list;
-        } else {
-            $split = str_split($string, 1);
-            $set_depth = 0;
-            $counter = 0;
-            $list[$counter] = '';
-            foreach($split as $char){
-                if($char == '('){
-                    $set_depth++;
-                }
-                elseif($char == ')'){
-                    $set_depth--;
-                }
-                if($char == ',' && $set_depth == 0){
-                    $counter++;
-                    $list[$counter] = '';
-                    continue;
-                }
-                $list[$counter] .= $char;
-            }
-            foreach ($list as $nr => $value){
-                $list[$nr] = trim($value);
-            }
-            return $list;
-        }
-    }
-
-    /**
-     * Methods are not allowed as parameter: K.I.S.S.
-     * keep it simple, assigning it as variable first is faster too.
-     * Parameter parsing on methods would be complex and cost high on performance
-     * even performance lost when paramater has no method.
-     *
-     * @param string $string
-     * @param unknown $parser
-     * @throws Exception
-     * @return string|array|NULL[]|string[]|unknown[]|unknown|NULL[]
-     */
     public static function find($string='', $parser=null){
-        $list = Parameter::list($string, $parser);
-
-        foreach($list as $nr => $parameter){
-            $set_counter = 0;
-            if(strpos($parameter, '(') !== false){
-                //set...
-                $statement = Set::statement($parameter, $parser);
-//                 var_dump($statement);
-                $search = '(' . implode(Parameter::EMPTY, $statement) . ')';
-                while($statement){
-                    $set_counter++;
-//                     $statement = Set::statement($set);
-//                     var_dump($statement);
-                    $operator_counter = 0;
-                    while (Operator::has($statement, $parser)){
-                        $operator_counter++;
-                        $statement = Operator::statement($statement, $parser);
-//                         var_dump($statement);
-                        if($operator_counter > Operator::MAX){
-                            throw new Exception('Operator::MAX exceeded');
-                            break;
-                        }
-                    }
-                    if($set_counter> Set::MAX){
-                        throw new Exception('Set::MAX exceeded');
-                        break;
-                    }
-                    $replace = $statement[0];
-//                     var_dump($search);
-//                     var_dump($replace);
-                    $parameter = str_ireplace($search, $replace, $parameter);
-                    $statement = Set::statement($parameter, $parser);
-                    if($statement !== false){
-                        $search = '(' . implode(Parameter::EMPTY, $statement) . ')';
-                    }
-//                     var_dump($parameter);
-//                     var_dump($statement);
-                }
-            }
-//             var_dump($parameter);
-            $statement = Set::statement('(' . $parameter . ')', $parser);
-            var_dump($statement);
-            if($statement !== false){;
-                $search = implode(Parameter::EMPTY, $statement);
-            }
-//             var_dump($statement);
-            $operator_counter = 0;
-            while (Operator::has($statement, $parser)){
-                $operator_counter++;
-                $statement = Operator::statement($statement, $parser);
-                if($operator_counter > Operator::MAX){
-                    throw new Exception('Operator::MAX exceeded');
-                    break;
-                }
-            }
-            $replace = $statement[0];
-            $parameter = str_ireplace($search, $replace, $parameter);
-            $start = substr($parameter, 0, 1);
-            $end = substr($parameter, -1, 1);
-            if(
-                $start == '"' &&
-                $end == '"'
-            ){
-                $parameter = substr($parameter, 1, -1);
-                $parameter= Parse::token($parameter, $parser->data(), false, $parser);
-                $list[$nr] = $parameter;
-            }
-            elseif(
-                $start == '\'' &&
-                $end == '\''
-            ){
-                $parameter = substr($parameter, 1, -1);
-                $list[$nr] = $parameter;
-            } else {
-                $list[$nr] = $parameter;
-            }
-        }
-//         var_dump($list);
-        return $list;
-        var_dump($list);
-
-        var_dump($string);
-        die;
         $parameters = array();
+        $parameter = array();
         $no_parse = array();
         $parse = array();
         $collection = array();
         $statement = array();
         $operator = '';
-        $variable = '';
         $split = str_split($string, 1);
 
         $counter = 0;
@@ -159,86 +29,19 @@ class Parameter extends Core {
         $is_no_parse = false;
         $is_collection = true;
         $is_operator = false;
-        $is_variable = false;
 
         foreach($split as $position => $char){
             if($skip > 0){
                 $skip -= 1;
                 continue;
             }
-
-            if(
-                $is_collection === true &&
-                $is_operator === false &&
-                $is_no_parse === false &&
-                $is_parse === false &&
-                $char == '$'
-            ){
-                //start of variable...
-                $is_variable = true;
-            }
-
-            if($is_variable){
-                if(
-                    in_array(
-                        $char,
-                        array(
-                            '+',
-                            '-',
-                            '/',
-                            '*',
-                            '&',
-                            '|',
-                            '%',
-                            '<',
-                            '>',
-                            '!',
-                            '=',
-                            ' ',
-                            "\t",
-                            "\r",
-                            "\n"
-                        )
-                    )
-                ){
-//                 end of variable
-
-                    var_dump($variable);
-                    die;
-                }
-                if(
-                    $char == ' ' ||
-                    $char == "\t" ||
-                    $char == "\r" ||
-                    $char == '\n'
-                ){
-                    //end of variable
-                    var_dump($variable);
-                    die;
-                }
-
-                $variable .= $char;
-            }
-
-
 //             var_Dump($char);
             //check on is_variable before
             //add skip (skipping operator chars)
-            //new function
-            /**
-             * is_collection
-             * is_operator
-             * is_no_parse
-             * is_variable
-             * is_parse
-             * char
-             * never mind...
-             */
             if(
                 $is_collection === true &&
                 $is_operator === false &&
                 $is_no_parse === false &&
-                $is_variable === false &&
                 $is_parse === false &&
                 in_array(
                     $char,
@@ -256,8 +59,7 @@ class Parameter extends Core {
                         '<',
                         '>',
                         '.',
-                        '!',
-                        '='
+                        '!'
                     )
                 )
             ){
@@ -342,55 +144,28 @@ class Parameter extends Core {
                     $operator .= $next . $next_next;
                     $skip = 2;
                 }
-
-                if(!empty($no_parse)){
-                    $no_parse = implode(Parameter::EMPTY, $no_parse);
-                    $statement[] = $no_parse;
-                    $no_parse = array();
-                }
-                elseif(!empty($parse)){
-                    //parse $parse
-                    $parse = implode(Parameter::EMPTY, $parse);
-                    $parse = Parse::token($parse, $parser->data(), false, $parser);
-                    $statement[] = $parse;
-                    $parse = array();
-                }
-                elseif(!empty($collection)){
-                    $collection = implode(Parameter::EMPTY, $collection);
-                    $statement[] = $collection;
-                    $collection = array();
-                }
+                var_Dump($char);
+                var_dump($no_parse);
+                var_dump($parse);
+                var_dump($collection);
                 $statement[] = $operator;
-                $is_collection = true;
-                $is_operator = false;
-                if($operator =='.'){
-                    $parser->data('priya.debug3', true);
-                }
-//                 var_Dump($operator);
-                $operator = '';
+                $is_collection === true;
+                $is_operator === false;
                 continue;
             }
-            //new function
             if(
                 $is_collection === true &&
                 $is_no_parse === false &&
                 $is_parse === false &&
-                $is_variable === false &&
                 $char == '"'
             ){
                 $is_parse = true;
                 $is_collection = false;
-                if(!empty($collection)){
-                    $collection = implode(Parameter::EMPTY, $collection);
-                    $statement[] = $collection;
-                    $collection = array();
-                }
                 continue;
             }
             elseif(
                 $is_no_parse === false &&
                 $is_parse === true &&
-                $is_variable === false &&
                 $char == '"' &&
                 $previous_char != '\\'
             ){
@@ -402,17 +177,10 @@ class Parameter extends Core {
                 $is_collection === true &&
                 $is_no_parse === false &&
                 $is_parse === false &&
-                $is_variable === false &&
                 $char == '\''
             ){
                 $is_no_parse = true;
                 $is_collection = false;
-                if(!empty($collection)){
-                    $collection = implode(Parameter::EMPTY, $collection);
-                    $statement[] = $collection;
-                    $collection = array();
-                }
-//                 var_dump($char);
 
                 /*
                 $collection = implode(Parameter::EMPTY, $collection);
@@ -426,7 +194,6 @@ class Parameter extends Core {
             elseif(
                 $is_no_parse === true &&
                 $is_parse === false &&
-                $is_variable === false &&
                 $char == '\'' &&
                 $previous_char != '\\'
             ){
@@ -440,7 +207,41 @@ class Parameter extends Core {
             elseif(!$is_no_parse && $is_parse){
                 $parse[] = $char;
             } else {
-               if(
+                if(
+                    $is_no_parse === false &&
+                    $is_parse === false &&
+                    in_array(
+                        $char,
+                        Operator::LIST
+                    )
+                ){
+                    /**
+                     * statement can either be a $no_parse, $parse or $collection (2X)
+                     */
+                    if(!empty($no_parse)){
+                        $no_parse = implode(Parameter::EMPTY, $no_parse);
+                        $statement[] = $no_parse;
+                        var_dump($collection);
+                    }
+                    elseif(!empty($parse)){
+                        //parse $parse
+                        $parse = implode(Parameter::EMPTY, $parse);
+                        $parse = Parse::token($parse, $parser->data(), false, $parser);
+                        $statement[] = $parse;
+                    } else {
+                        $collection = implode(Parameter::EMPTY, $collection);
+                        if(substr($collection, 0, 1) == '$'){
+                            var_dump('make variable');
+                            die;
+                        }
+                        $statement[] = $collection;
+                    }
+                    $no_parse = array();
+                    $parse = array();
+                    $collection = array();
+                    $statement[] = $char;
+                }
+                elseif(
                     $is_no_parse === false &&
                     $is_parse === false &&
                     $char == Parameter::SEPARATOR
@@ -450,46 +251,13 @@ class Parameter extends Core {
                      */
                     $counter++;
                     var_dump('have multiple parameters');
-                    var_dump($previous_char);
-                    var_dump($collection);
-                    var_dump($parse);
-                    var_dump($no_parse);
-                    if(!empty($collection)){
-                        $collection = implode(Parameter::EMPTY, $collection);
-                        $statement[] = $collection;
-                        $collection = array();
-                    }
-                    $parameters[] = Parameter::get($statement, $parser);
+                    var_dump($statement);
+                    die;
+                    $parameter = array();
                 }
                 else {
-                    //can have parse or no_parse
                     //fill collection
-
-                    if(!empty($no_parse)){
-                        $no_parse = implode(Parameter::EMPTY, $no_parse);
-                        $statement[] = $no_parse;
-                        $no_parse = array();
-                    }
-                    elseif(!empty($parse)){
-                        //parse $parse
-                        $parse = implode(Parameter::EMPTY, $parse);
-                        $parse = Parse::token($parse, $parser->data(), false, $parser);
-                        $statement[] = $parse;
-                        $parse = array();
-                    }
-                    if(
-                        !in_array(
-                            $char,
-                            array(
-                            ' '
-                            )
-                        )
-                    ){
-                        if($char == '='){
-                            $parser->data('priya.debug4', true);
-                        }
-                        $collection[] = $char;
-                    }
+                    $collection[] = $char;
                 }
             }
             $previous_char = $char;
@@ -509,73 +277,46 @@ class Parameter extends Core {
         } else {
             $collection = implode(Parameter::EMPTY, $collection);
             if(substr($collection, 0, 1) == '$'){
-                $collection = $parser->data(substr($collection, 1));
+                var_dump('make variable');
+                die;
             }
             $statement[] = $collection;
         }
+        /**
+         * if(!empty($statement)){
+                $counter = 0;
+                while(Operator::has($statement, $parser)){
+                    $statement = Operator::statement($statement, $parser);
+//                     var_dump($statement);
+                    $parser->data('priya.debug2', true);
+                    $counter++;
+                    if(!isset($statement[1])){
+                        break;
+                    }
+                    if($counter > Operator::MAX){
+                        throw new Exception('Operator::MAX reached in Parameter::find');
+                        break;
+                    }
+                }
+                $result[$nr] = $statement[0];
+                $statement = array();
+            }
+         */
+
+
         if(!empty($statement)){
-            $parameters[] = Parameter::get($statement, $parser);
+//             $statement_count = count($statement);
+            if(!isset($statement[1])){
+                $parameters[] = $statement[0];
+            } else {
+                //solve statements
+                var_dump('multiple statements');
+                var_dump($statement);
+                die;
+            }
         }
-        var_dump($parameters);
         return $parameters;
     }
-
-    /*
-    public static function get($statement=array(), $parser=null){
-        if(!isset($statement[1])){
-            return $statement[0];
-        }
-        /**
-         * make floats and strings
-
-        var_dump($statement);
-        foreach($statement as $nr => $part){
-            if($part == '.'){
-                $previous = $nr - 1;
-                $next = $nr + 1;
-                if(
-                    !isset($statement[$previous]) &&
-                    isset($statement[$previous -1])
-                ){
-                    $left = $statement[$previous -1];
-                } else {
-                    $left = $statement[$previous];
-                }
-                $right = '';
-                if(isset($statement[$next])){
-                    $right = $statement[$next];
-                }
-                if(
-                    is_numeric($left) &&
-                    is_numeric($right)
-                ){
-                    $float = floatval($left . '.' . $right);
-                    $statement[$nr] = $float;
-                    unset($statement[$nr + 1]);
-                    unset($statement[$nr - 1]);
-                } else {
-                    $string = $left . $right;
-                    $statement[$nr] = $string;
-                    unset($statement[$nr + 1]);
-                    unset($statement[$nr - 1]);
-                }
-            }
-        }
-        $counter = 0;
-        while(Operator::has($statement, $parser)){
-            $statement = Operator::statement($statement, $parser);
-            $counter++;
-            if(!isset($statement[1])){
-                break;
-            }
-            if($counter > Operator::MAX){
-                throw new Exception('Operator::MAX reached in Parameter::find');
-                break;
-            }
-        }
-        return $statement[0];
-    }
-    */
 
     /*
     public static function find($string='', $parser=null){

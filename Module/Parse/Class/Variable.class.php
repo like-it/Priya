@@ -36,7 +36,7 @@ class Variable extends Core {
             }
             //have variable...
             $attribute = substr($tag[Tag::TAG], 2, -1);
-            var_Dump($attribute);
+//             var_Dump($attribute);
             $result =  $parser->data($attribute);
             if($result === null && $keep){
                 return $string;
