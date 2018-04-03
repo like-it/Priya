@@ -122,7 +122,7 @@ class Method extends Core {
 //             die;
         }
         $tag = Assign::select($tag, $parser);
-        //might need to delete $tag[Tag::VALUE] (older than 15-04-2018 delete this comment)
+        //might need to delete $tag[Tag::VALUE] (older than 15-05-2018 delete this comment)
         $tag = Assign::remove($tag, Tag::METHOD, $parser);
         $tag = Cast::find($tag, Tag::METHOD, $parser);
         $tag = Exclamation::find($tag, Tag::METHOD, $parser);
@@ -183,16 +183,52 @@ class Method extends Core {
      * @param unknown $parser
      * @return boolean
      */
-    public static function is($string='', $parser){
+    public static function is($string='', $parser=null){
         $method = METHOD::OPEN;
         $explode = explode($method, $string, 2);
         if(!isset($explode[1])){
             return false;
         }
+        if(empty($explode[0])){
+            return  false;
+        }
+        $char = substr($explode[0], -1, 1);
+        if(
+            in_array(
+                $char,
+                array(
+                    ' ',
+                    "\t",
+                    "\n",
+                    "\r",
+                    '+',
+                    '-',
+                    '/',
+                    '*',
+                    '%',
+                    '&',
+                    '|',
+                    '<',
+                    '>',
+                    '^',
+                    '(',
+                    '=',
+                    '!'
+                )
+            )
+        ){
+            return false;
+        }
+        return true;
+
+        /*
+
         $before = $parser->explode_multi(Method::NOT_BEFORE, $explode[0], 2);
         if(isset($before[1])){
             return false;
         }
+        var_dump($before);
         return true;
+        */
     }
 }
