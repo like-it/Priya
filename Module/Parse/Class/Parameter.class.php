@@ -72,7 +72,6 @@ class Parameter extends Core {
                 $search = '(' . implode(Parameter::EMPTY, $statement) . ')';
                 while($statement){
                     $set_counter++;
-//                     $statement = Set::statement($set);
 //                     var_dump($statement);
                     $operator_counter = 0;
                     while (Operator::has($statement, $parser)){
@@ -106,23 +105,27 @@ class Parameter extends Core {
             }
 //             var_dump($set_counter);
 //             var_dump($operator_counter);
-//             var_dump($parameter);
+            var_dump($parameter);
             $statement = Set::statement('(' . $parameter . ')', $parser);
 //             var_dump($parameter);
-//             var_dump($statement);
+            var_dump($statement);
             if($statement !== false){;
                 $search = implode(Parameter::EMPTY, $statement);
             }
 //             var_dump($statement);
             $operator_counter = 0;
+            var_dump($statement);
             while (Operator::has($statement, $parser)){
                 $operator_counter++;
+                var_dump('yes');
                 $statement = Operator::statement($statement, $parser);
                 if($operator_counter > Operator::MAX){
                     throw new Exception('Operator::MAX exceeded');
                     break;
                 }
             }
+            var_dump($statement);
+
 //             var_dump($operator_counter);
             $replace = $statement[0];
             if($search == $parameter){

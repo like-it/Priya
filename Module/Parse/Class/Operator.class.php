@@ -345,7 +345,7 @@ class Operator extends Core {
         }
         $node['statement'] = $statement;
 //         var_dump($parser->data('priya.module.parser'));
-//         var_dump($node);
+        var_dump($node);
         $statement = Operator::execute($node, $parser);
 //         var_dump($statement);
         return $statement;
@@ -358,7 +358,7 @@ class Operator extends Core {
         $counter = 0;
         while(Operator::has($statement, $parser)){
             $statement = Operator::statement($statement, $parser);
-            var_dump($statement);
+//             var_dump($statement);
             $parser->data('priya.debug3', true);
             $counter++;
             if($counter > Operator::MAX){
@@ -483,6 +483,7 @@ class Operator extends Core {
                         '!',
                         '^',
                         '%',
+                        '.',
                     )
                 )
             ){

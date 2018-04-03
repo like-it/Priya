@@ -148,8 +148,8 @@ class Set extends Core {
         }
         $result = reset($set[$max_depth]);
 //         var_dump($set);
-//         var_dump($result);
         $result = Operator::set($result, $parser);
+        var_dump($result);
         return $result;
     }
 
