@@ -142,17 +142,15 @@ class Method extends Core {
 //             die;
         }
         $tag[Tag::METHOD] = ltrim($explode[0], Tag::OPEN);
-        $explode = explode(Tag::CLOSE . METHOD::CLOSE, strrev($explode[1]), 2);
+        $explode = explode(METHOD::CLOSE, strrev($explode[1]), 2);
         if(!isset($explode[1])){
-            var_dump($string);
-            var_dump($explode);
-            die;
+            $tag[Tag::PARAMETER] = null;
+        } else {
+            $tag[Tag::PARAMETER] = strrev($explode[1]);
         }
-        $tag[Tag::PARAMETER] = strrev($explode[1]);
         if($parser->data('priya.debug') === true){
 //             var_dump($tag);
         }
-//         var_dump($tag[Tag::PARAMETER]);
         $tag[Tag::PARAMETER] = Parameter::find($tag[Tag::PARAMETER], $parser);
 
         if($parser->data('priya.debug') === true){
