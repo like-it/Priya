@@ -91,7 +91,11 @@ class Parameter extends Core {
                     $replace = $statement[0];
 //                     var_dump($search);
 //                     var_dump($replace);
-                    $parameter = str_ireplace($search, $replace, $parameter);
+                    if($search == $parameter){
+                        $parameter = $replace;
+                    } else {
+                        $parameter = str_ireplace($search, $replace, $parameter);
+                    }
                     $statement = Set::statement($parameter, $parser);
                     if($statement !== false){
                         $search = '(' . implode(Parameter::EMPTY, $statement) . ')';
@@ -100,9 +104,12 @@ class Parameter extends Core {
 //                     var_dump($statement);
                 }
             }
+//             var_dump($set_counter);
+//             var_dump($operator_counter);
 //             var_dump($parameter);
             $statement = Set::statement('(' . $parameter . ')', $parser);
-            var_dump($statement);
+//             var_dump($parameter);
+//             var_dump($statement);
             if($statement !== false){;
                 $search = implode(Parameter::EMPTY, $statement);
             }
@@ -116,8 +123,13 @@ class Parameter extends Core {
                     break;
                 }
             }
+//             var_dump($operator_counter);
             $replace = $statement[0];
-            $parameter = str_ireplace($search, $replace, $parameter);
+            if($search == $parameter){
+                $parameter = $replace;
+            } else {
+                $parameter = str_ireplace($search, $replace, $parameter);
+            }
             $start = substr($parameter, 0, 1);
             $end = substr($parameter, -1, 1);
             if(
@@ -138,386 +150,7 @@ class Parameter extends Core {
                 $list[$nr] = $parameter;
             }
         }
-//         var_dump($list);
         return $list;
-        var_dump($list);
-
-        var_dump($string);
-        die;
-        $parameters = array();
-        $no_parse = array();
-        $parse = array();
-        $collection = array();
-        $statement = array();
-        $operator = '';
-        $variable = '';
-        $split = str_split($string, 1);
-
-        $counter = 0;
-        $skip = 0;
-        $is_parse = false;
-        $is_no_parse = false;
-        $is_collection = true;
-        $is_operator = false;
-        $is_variable = false;
-
-        foreach($split as $position => $char){
-            if($skip > 0){
-                $skip -= 1;
-                continue;
-            }
-
-            if(
-                $is_collection === true &&
-                $is_operator === false &&
-                $is_no_parse === false &&
-                $is_parse === false &&
-                $char == '$'
-            ){
-                //start of variable...
-                $is_variable = true;
-            }
-
-            if($is_variable){
-                if(
-                    in_array(
-                        $char,
-                        array(
-                            '+',
-                            '-',
-                            '/',
-                            '*',
-                            '&',
-                            '|',
-                            '%',
-                            '<',
-                            '>',
-                            '!',
-                            '=',
-                            ' ',
-                            "\t",
-                            "\r",
-                            "\n"
-                        )
-                    )
-                ){
-//                 end of variable
-
-                    var_dump($variable);
-                    die;
-                }
-                if(
-                    $char == ' ' ||
-                    $char == "\t" ||
-                    $char == "\r" ||
-                    $char == '\n'
-                ){
-                    //end of variable
-                    var_dump($variable);
-                    die;
-                }
-
-                $variable .= $char;
-            }
-
-
-//             var_Dump($char);
-            //check on is_variable before
-            //add skip (skipping operator chars)
-            //new function
-            /**
-             * is_collection
-             * is_operator
-             * is_no_parse
-             * is_variable
-             * is_parse
-             * char
-             * never mind...
-             */
-            if(
-                $is_collection === true &&
-                $is_operator === false &&
-                $is_no_parse === false &&
-                $is_variable === false &&
-                $is_parse === false &&
-                in_array(
-                    $char,
-                    array( //Parameter::OPERATOR_START_LIST
-                        '+',
-                        '-',
-                        '/',
-                        '*',
-                        '&',
-                        '|',
-                        '%',
-                        'a',
-                        'x',
-                        'o',
-                        '<',
-                        '>',
-                        '.',
-                        '!',
-                        '='
-                    )
-                )
-            ){
-                $is_operator = true;
-                $is_collection = false;
-                $operator = $char;
-                $next = '';
-                $next_next = '';
-                if(isset($split[$position + 1])){
-                    $next = $split[$position + 1];
-                }
-                if(isset($split[$position + 2])){
-                    $next_next = $split[$position + 2];
-                }
-                if(
-                    (
-                        $operator == '&' &&
-                        $next =='&'
-                    ) ||
-                    (
-                        $operator == '|' &&
-                        $next =='|'
-                    ) ||
-                    (
-                        $operator == '=' &&
-                        $next =='='
-                    ) ||
-                    (
-                        $operator == '!' &&
-                        $next =='='
-                    )  ||
-                    (
-                        $operator == '>' &&
-                        $next =='='
-                    )  ||
-                    (
-                        $operator == '<' &&
-                        $next =='='
-                    )  ||
-                    (
-                        $operator == '*' &&
-                        $next =='*'
-                    )  ||
-                    (
-                        $operator == '<' &&
-                        $next =='<'
-                    )  ||
-                    (
-                        $operator == '>' &&
-                        $next =='>'
-                    )  ||
-                    (
-                        $operator == 'o' &&
-                        $next =='r'
-                    )
-                ){
-                    $operator .= $next;
-                    $skip = 1;
-                }
-                elseif(
-                    (
-                        $operator == '=' &&
-                        $next == '=' &&
-                        $next_next == '='
-                    ) ||
-                    (
-                        $operator == '!' &&
-                        $next == '=' &&
-                        $next_next == '='
-                    ) ||
-                    (
-                        $operator == 'x' &&
-                        $next == 'o' &&
-                        $next_next == 'r'
-                    ) ||
-                    (
-                        $operator == 'a' &&
-                        $next == 'n' &&
-                        $next_next == 'd'
-                    )
-                ){
-                    $operator .= $next . $next_next;
-                    $skip = 2;
-                }
-
-                if(!empty($no_parse)){
-                    $no_parse = implode(Parameter::EMPTY, $no_parse);
-                    $statement[] = $no_parse;
-                    $no_parse = array();
-                }
-                elseif(!empty($parse)){
-                    //parse $parse
-                    $parse = implode(Parameter::EMPTY, $parse);
-                    $parse = Parse::token($parse, $parser->data(), false, $parser);
-                    $statement[] = $parse;
-                    $parse = array();
-                }
-                elseif(!empty($collection)){
-                    $collection = implode(Parameter::EMPTY, $collection);
-                    $statement[] = $collection;
-                    $collection = array();
-                }
-                $statement[] = $operator;
-                $is_collection = true;
-                $is_operator = false;
-                if($operator =='.'){
-                    $parser->data('priya.debug3', true);
-                }
-//                 var_Dump($operator);
-                $operator = '';
-                continue;
-            }
-            //new function
-            if(
-                $is_collection === true &&
-                $is_no_parse === false &&
-                $is_parse === false &&
-                $is_variable === false &&
-                $char == '"'
-            ){
-                $is_parse = true;
-                $is_collection = false;
-                if(!empty($collection)){
-                    $collection = implode(Parameter::EMPTY, $collection);
-                    $statement[] = $collection;
-                    $collection = array();
-                }
-                continue;
-            }
-            elseif(
-                $is_no_parse === false &&
-                $is_parse === true &&
-                $is_variable === false &&
-                $char == '"' &&
-                $previous_char != '\\'
-            ){
-                $is_parse = false;
-                $is_collection = true;
-                continue;
-            }
-            elseif(
-                $is_collection === true &&
-                $is_no_parse === false &&
-                $is_parse === false &&
-                $is_variable === false &&
-                $char == '\''
-            ){
-                $is_no_parse = true;
-                $is_collection = false;
-                if(!empty($collection)){
-                    $collection = implode(Parameter::EMPTY, $collection);
-                    $statement[] = $collection;
-                    $collection = array();
-                }
-//                 var_dump($char);
-
-                /*
-                $collection = implode(Parameter::EMPTY, $collection);
-                if(!empty($collection)){
-                    $statement[] = $collection;
-                }
-                $collection = array();
-                */
-                continue;
-            }
-            elseif(
-                $is_no_parse === true &&
-                $is_parse === false &&
-                $is_variable === false &&
-                $char == '\'' &&
-                $previous_char != '\\'
-            ){
-                $is_no_parse = false;
-                $is_collection = true;
-                continue;
-            }
-            if($is_no_parse && !$is_parse){
-                $no_parse[] = $char;
-            }
-            elseif(!$is_no_parse && $is_parse){
-                $parse[] = $char;
-            } else {
-               if(
-                    $is_no_parse === false &&
-                    $is_parse === false &&
-                    $char == Parameter::SEPARATOR
-                ){
-                    /**
-                     * parameter is stament
-                     */
-                    $counter++;
-                    var_dump('have multiple parameters');
-                    var_dump($previous_char);
-                    var_dump($collection);
-                    var_dump($parse);
-                    var_dump($no_parse);
-                    if(!empty($collection)){
-                        $collection = implode(Parameter::EMPTY, $collection);
-                        $statement[] = $collection;
-                        $collection = array();
-                    }
-                    $parameters[] = Parameter::get($statement, $parser);
-                }
-                else {
-                    //can have parse or no_parse
-                    //fill collection
-
-                    if(!empty($no_parse)){
-                        $no_parse = implode(Parameter::EMPTY, $no_parse);
-                        $statement[] = $no_parse;
-                        $no_parse = array();
-                    }
-                    elseif(!empty($parse)){
-                        //parse $parse
-                        $parse = implode(Parameter::EMPTY, $parse);
-                        $parse = Parse::token($parse, $parser->data(), false, $parser);
-                        $statement[] = $parse;
-                        $parse = array();
-                    }
-                    if(
-                        !in_array(
-                            $char,
-                            array(
-                            ' '
-                            )
-                        )
-                    ){
-                        if($char == '='){
-                            $parser->data('priya.debug4', true);
-                        }
-                        $collection[] = $char;
-                    }
-                }
-            }
-            $previous_char = $char;
-        }
-        /**
-         * statement can either be a $no_parse, $parse or $collection (2X)
-         */
-        if(!empty($no_parse)){
-            $no_parse = implode(Parameter::EMPTY, $no_parse);
-            $statement[] = $no_parse;
-        }
-        elseif(!empty($parse)){
-            //parse $parse
-            $parse = implode(Parameter::EMPTY, $parse);
-            $parse = Parse::token($parse, $parser->data(), false, $parser);
-            $statement[] = $parse;
-        } else {
-            $collection = implode(Parameter::EMPTY, $collection);
-            if(substr($collection, 0, 1) == '$'){
-                $collection = $parser->data(substr($collection, 1));
-            }
-            $statement[] = $collection;
-        }
-        if(!empty($statement)){
-            $parameters[] = Parameter::get($statement, $parser);
-        }
-        var_dump($parameters);
-        return $parameters;
     }
 
     /*

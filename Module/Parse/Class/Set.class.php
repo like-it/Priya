@@ -65,7 +65,7 @@ class Set extends Core {
             if($char == '"' && $parse === true){
                 $set[$set_depth][$counter][] = $char;
                 $parse = false;
-                $counter++;
+//                 $counter++;
                 continue;
             }
             if($char == '"' && $parse === false){
@@ -147,6 +147,8 @@ class Set extends Core {
             return false;
         }
         $result = reset($set[$max_depth]);
+//         var_dump($set);
+//         var_dump($result);
         $result = Operator::set($result, $parser);
         return $result;
     }

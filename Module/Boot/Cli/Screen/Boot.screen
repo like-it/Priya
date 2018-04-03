@@ -6,7 +6,7 @@
 {$z.parser.test = $x}
 
 {$priya.debug = true}
-{debug("nice too {$priya.version}" == "nice too {$priya.version}")}
+{debug("nice too {$priya.version}" === "nice too {$priya.version}")}
 
 {literal}
 

@@ -3,6 +3,7 @@
 namespace Priya\Module\Parse;
 
 use Priya\Module\Core;
+use Priya\Module\Parse;
 use Exception;
 
 class Operator extends Core {
@@ -119,14 +120,22 @@ class Operator extends Core {
                 $result = $node['left'] ** $node['right'];
             break;
             case '.' :
-                $result = Operator::string($node['left']) . Operator::string($node['right']);
-                break;
+                $result = $node['left'] . $node['right'];
+            break;
+            case '|' :
+                $result = $node['left'] | $node['right'];
+            break;
+            case '&' :
+                $result = $node['left'] & $node['right'];
+            break;
+            case '^' :
+                $result = $node['left'] ^ $node['right'];
+            break;
             case '==' :
-                var_Dump($node);
+//                 var_Dump($node);
                 //first complete $node['right']
                 $node = Operator::complete($node, 'right', $parser);
-                var_dump($node);
-//                 die;
+//                 var_dump($node);
                 $result = $node['left'] == $node['right'];
             break;
             case '===' :
@@ -134,7 +143,51 @@ class Operator extends Core {
                 $node = Operator::complete($node, 'right', $parser);
                 $result = $node['left'] === $node['right'];
             break;
-
+            case '!==' :
+                //first complete $node['right']
+                $node = Operator::complete($node, 'right', $parser);
+                $result = $node['left'] !== $node['right'];
+            break;
+            case '!=' :
+                //first complete $node['right']
+                $node = Operator::complete($node, 'right', $parser);
+                $result = $node['left'] != $node['right'];
+            break;
+            case '<>' :
+                //first complete $node['right']
+                $node = Operator::complete($node, 'right', $parser);
+                $result = $node['left'] <> $node['right'];
+            break;
+            case '<=' :
+                //first complete $node['right']
+                $node = Operator::complete($node, 'right', $parser);
+                $result = $node['left'] <= $node['right'];
+            break;
+            case '>=' :
+                //first complete $node['right']
+                $node = Operator::complete($node, 'right', $parser);
+                $result = $node['left'] >= $node['right'];
+            break;
+            case '>>' :
+                //first complete $node['right']
+                $node = Operator::complete($node, 'right', $parser);
+                $result = $node['left'] >> $node['right'];
+            break;
+            case '<<' :
+                //first complete $node['right']
+                $node = Operator::complete($node, 'right', $parser);
+                $result = $node['left'] << $node['right'];
+            break;
+            case '>' :
+                //first complete $node['right']
+                $node = Operator::complete($node, 'right', $parser);
+                $result = $node['left'] > $node['right'];
+            break;
+            case '<' :
+                //first complete $node['right']
+                $node = Operator::complete($node, 'right', $parser);
+                $result = $node['left'] < $node['right'];
+            break;
             default :
                 throw new Exception('Unknown operator (' . $node['operator'] . ')');
             break;
@@ -177,18 +230,31 @@ class Operator extends Core {
         return false;
     }
 
-    public static function string($string=''){
-        if(is_object($string)){
+    public static function variable($string='', $parser=null){
+        if(substr($string, 0, 1) == '$'){
+            var_dump('found');
             var_dump($string);
-            var_dump(debug_backtrace(true));
+            die;
+        }
+        return $string;
+    }
+
+    public static function string($string='', $parser=null){
+        $start = substr($string, 0, 1);
+        $end = substr($string, -1);
+        if(
+            $start == '\'' &&
+            $end == '\''
+        ){
+            return substr($string, 1, -1);
+        }
+        elseif(
+            $start == '"' &&
+            $end == '"'
+        ){
+            $string = substr($string, 1, -1);
+            $string = Parse::token($string, $parser->data(), false, $parser);
             return $string;
-//             die;
-        }
-        if(substr($string, 0, 1) == '\'' && substr($string, -1) == '\''){
-            return substr($string, 1, -1);
-        }
-        elseif(substr($string, 0, 1) == '"' && substr($string, -1) == '"'){
-            return substr($string, 1, -1);
         }
         return $string;
     }
@@ -238,12 +304,11 @@ class Operator extends Core {
             var_dump($statement);
             die;
         }
+        $left = Operator::variable($left, $parser);
+        $left = Operator::string($left, $parser);
+        $right = Operator::variable($right, $parser);
+        $right = Operator::string($right, $parser);
         $node['left'] = $left;
-        if(!isset($operator)){
-            var_dump($left);
-            var_dump($right);
-            die;
-        }
         $node['operator'] = $operator;
         if($right_negative){
             $node['right'] = -$right;
@@ -251,10 +316,10 @@ class Operator extends Core {
             $node['right'] = $right;
         }
         $node['statement'] = $statement;
-        var_dump($parser->data('priya.module.parser'));
-        var_dump($node);
+//         var_dump($parser->data('priya.module.parser'));
+//         var_dump($node);
         $statement = Operator::execute($node, $parser);
-        var_dump($statement);
+//         var_dump($statement);
         return $statement;
     }
 
@@ -480,6 +545,9 @@ class Operator extends Core {
                 $counter++;
                 $statement[$counter] = '';
             } else {
+                if(!isset($statement[$counter])){
+                    $statement[$counter] = '';
+                }
                 $statement[$counter] .= $char;
             }
 
