@@ -198,6 +198,23 @@ class Operator extends Core {
 
     public static function has($statement=array(), $parser=null){
         foreach($statement as $part){
+            $type = gettype($part);
+            if(
+                in_array(
+                    $type,
+                    array(
+                        Cast::TYPE_ARRAY,
+                        Cast::TYPE_OBJECT,
+                        Cast::TYPE_BOOL,
+                        Cast::TYPE_BOOLEAN,
+                        Cast::TYPE_FLOAT,
+                        Cast::TYPE_INT,
+                        Cast::TYPE_INTEGER
+                    )
+                )
+            ){
+                continue;
+            }
             $start = substr($part, 0, 1);
 //             var_dump($part);
             $end = substr($part, -1, 1);
@@ -232,14 +249,25 @@ class Operator extends Core {
 
     public static function variable($string='', $parser=null){
         if(substr($string, 0, 1) == '$'){
-            var_dump('found');
-            var_dump($string);
-            die;
+            $attribute = substr($string, 1);
+            return $parser->data($attribute);
         }
         return $string;
     }
 
     public static function string($string='', $parser=null){
+        $type = gettype($string);
+        if(
+            in_array(
+                $type,
+                array(
+                    Cast::TYPE_ARRAY,
+                    Cast::TYPE_OBJECT,
+                )
+            )
+        ){
+            return $string;
+        }
         $start = substr($string, 0, 1);
         $end = substr($string, -1);
         if(
@@ -553,7 +581,7 @@ class Operator extends Core {
 
         }
         if($debug){
-            var_dump($statement);
+//             var_dump($statement);
 //             die;
         }
 

@@ -154,7 +154,6 @@ class Method extends Core {
         }
 //         var_dump($tag[Tag::PARAMETER]);
         $tag[Tag::PARAMETER] = Parameter::find($tag[Tag::PARAMETER], $parser);
-        $tag = Parameter::execute($tag, Tag::EXECUTE, $parser);
 
         if($parser->data('priya.debug') === true){
 //             var_dump($tag);
