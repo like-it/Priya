@@ -15,10 +15,28 @@ terminal.square(80%, 0, 10%, 100%, null, 12)
 terminal.square(90%, 0, 10%, 100%, null, 13)
 terminal.square(0, 10%, 100%, 100%, null, 2)
 terminal.square(1, $terminal.cursor.position.y + 1, $terminal.screen.width -2, $terminal.screen.height - $terminal.cursor.position.y -2, null, 0)
+terminal.circle($terminal.screen.width / 2, $terminal.screen.height /2, $terminal.screen.width / 2, null, 0)
+terminal.circle.fill($terminal.screen.width / 2, $terminal.screen.height /2, $terminal.screen.width / 2 - 1 , null, 11)
+
+terminal.circle.fill($terminal.screen.width - 75, 20, 25, null, 15)
+terminal.circle.fill($terminal.screen.width - 75, 23, 10, null, 0)
+
+terminal.circle.fill(75, 20, 25, null, 15)
+terminal.circle.fill(75, 23, 10, null, 0)
+
+terminal.square(100, $terminal.screen.height -15, $terminal.screen.width - 200, 2, null, 0)
+terminal.square(95, $terminal.screen.height -17, 5, 2, null, 0)
+terminal.square($terminal.screen.width - 100, $terminal.screen.height -17, 5, 2, null, 0)
+
+terminal.square(90, $terminal.screen.height -19, 5, 2, null, 0)
+terminal.square($terminal.screen.width - 95, $terminal.screen.height -19, 5, 2, null, 0)
+
+
+
 terminal.screen()
 terminal.screen.goto(10, 10)
 terminal.write.line(math.circle(2.82))
 terminal.write.line("{math.circle(5, diameter)}")
 $priya.debug2 = true
-debug(0)
+debug(0.0)
 {/priya}

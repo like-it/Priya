@@ -86,16 +86,8 @@ function function_terminal_square($tag=array(), $parser=null){
             }
             if(isset($background) || ($background == '0' || 0)){
                 $grid[$i][$j]['background'] = $background;
-//                 if($parser->data('priya.debug2') === true){
-//                     echo $i . '.' . $j . '.' . $background . '.' . $color . PHP_EOL;
-//                     var_dump($i);
-//                     var_dump($j);
-//                 }
             }
         }
-    }
-    if($parser->data('priya.debug2') === true){
-//         die;
     }
     $parser->data('priya.module.terminal.cursor.position.x', $x);
     $parser->data('priya.module.terminal.cursor.position.y', $y);
