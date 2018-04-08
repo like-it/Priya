@@ -18,4 +18,6 @@ $priya.debug2 = true
 terminal.square(1, $terminal.cursor.position.y + 1, $terminal.screen.width -2, $terminal.screen.height - $terminal.cursor.position.y -2, null, 0)
 terminal.screen()
 terminal.screen.goto(10, 10)
+terminal.write.line(math.circle(2.82))
+terminal.write.line("{math.circle(5, diameter)}")
 {/priya}

@@ -151,7 +151,8 @@ class Set extends Core {
                         )
                     )
                 ){
-//                     var_dump($string);
+                    //giong for method (in a strange way
+                    var_dump($string);
                     throw new Exception('Possible Method found where not allowed...');
                 }
                 $set_depth++;

@@ -142,15 +142,22 @@ class Operator extends Core {
                 $result = $node['left'] * $node['right'];
             break;
             case '%' :
+//                 var_dump($node);
                 $result = $node['left'] % $node['right'];
             break;
             case '**' :
                 $result = $node['left'] ** $node['right'];
             break;
             case '.' :
-                $result = $node['left'] . $node['right'];
+                if(is_int($node['left']) && is_int($node['right'])){
+                    //we have a float
+                    $result = floatval($node['left'] . '.' . $node['right']);
+                } else {
+                    $result = $node['left'] . $node['right'];
+                }
             break;
             case '|' :
+                //add modifier
                 $result = $node['left'] | $node['right'];
             break;
             case '&' :
@@ -312,6 +319,11 @@ class Operator extends Core {
             $string = Parse::token($string, $parser->data(), false, $parser);
             return $string;
         }
+        elseif(
+            is_numeric($string)
+        ){
+            return $string + 0;
+        }
         return $string;
     }
 
@@ -323,14 +335,17 @@ class Operator extends Core {
         $before = true;
         $no_statement = $statement;
         $right_negative = false;
+        $left = null;
+        $right = null;
+        $operator = null;
 //         var_dump($statement);
         foreach($statement as $nr => $part){
             $part = trim($part);
-            if(empty($part)){
+            if(empty($part) && $part == ''){
                 unset($statement[$nr]);
                 continue;
             }
-            if(in_array($part, Operator::LIST)){
+            elseif(in_array($part, Operator::LIST)){
                 if($before === false){
                     if(!empty($right)){
                         break; //might have another operator but first solve this one...
@@ -343,7 +358,7 @@ class Operator extends Core {
                 }
 
             }
-            if($before === true){
+            elseif($before === true){
                 $left = $part;
                 unset($statement[$nr]);
             } else {
@@ -356,6 +371,7 @@ class Operator extends Core {
         }
         $node = array();
         if($left === null){
+            var_dump($left);
             var_dump($no_statement);
             var_dump($node);
             var_dump($statement);
@@ -364,16 +380,17 @@ class Operator extends Core {
 //         var_dump($left);
         $left = Operator::variable($left, $parser);
         $left = Operator::string($left, $parser);
-        if(!isset($left)){
-            var_dump($parser->data('terminal'));
+        if($left === null){
+//             var_dump($parser->data('terminal'));
             throw new Exception('Operator::statement:Null pointer exception, left is null');
         }
-        if(!isset($right)){
+        if($right === null){
             //we have a percentage
             $result = array();
             $result[] = $left . $operator;
             return $result;
         }
+//         var_dump($right);
         $right = Operator::variable($right, $parser);
         $right = Operator::string($right, $parser);
         $node['left'] = $left;

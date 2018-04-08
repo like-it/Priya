@@ -17,7 +17,7 @@ function function_terminal_square($tag=array(), $parser=null){
         $argumentList = (array) $argumentList;
     }
     if($parser->data('priya.debug2') == true){
-        var_dump($argumentList);
+//         var_dump($argumentList);
 //         die;
     }
     $cli = new Cli($parser->handler(), $parser->route(), $parser->data());
@@ -25,8 +25,6 @@ function function_terminal_square($tag=array(), $parser=null){
     $y = array_shift($argumentList);
     $width = array_shift($argumentList);
     $height = array_shift($argumentList);
-
-
     if(substr($y, -1) == '%'){
         $percentage = (int) substr($y, 0, -1);
         $percentage_y = $percentage;

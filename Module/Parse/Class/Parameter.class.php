@@ -66,45 +66,55 @@ class Parameter extends Core {
         foreach($list as $nr => $parameter){
             $set_counter = 0;
             if(strpos($parameter, '(') !== false){
-                //set...
-//                 var_dump($parameter);
-                if($parameter == "('\"te.st\\\"\"' . 'test')"){
-                    $parser->data('priya.debug2', true);
+                //set or method (methods first...)
+                if(method::is($parameter, $parser)){
+                    $method = trim($parameter, '"{}');
+                    $list[$nr] = Parse::token('{' . $method . '}', $parser->data(), false, $parser);
+                    /**
+                     * should become while(method::is($parameter, $parser))
+                     * then parameter can have methods and operators
+                     * if we create a method::get($parameter, $parser)
+                     * we can do str_replace, but we need an array like statement
+                     */
+                    continue;
                 }
                 $statement = Set::statement($parameter, $parser);
 //                 var_dump($statement);
-                $search = '(' . implode(Parameter::EMPTY, $statement) . ')';
-                while($statement){
-                    $set_counter++;
-//                     var_dump($statement);
-                    $operator_counter = 0;
-                    while (Operator::has($statement, $parser)){
-                        $operator_counter++;
-                        $statement = Operator::statement($statement, $parser);
-//                         var_dump($statement);
-                        if($operator_counter > Operator::MAX){
-                            throw new Exception('Operator::MAX exceeded');
+
+                if($statement  !== false){
+                    $search = '(' . implode(Parameter::EMPTY, $statement) . ')';
+                    while($statement){
+                        $set_counter++;
+                        //                     var_dump($statement);
+                        $operator_counter = 0;
+                        while (Operator::has($statement, $parser)){
+                            $operator_counter++;
+                            $statement = Operator::statement($statement, $parser);
+                            //                         var_dump($statement);
+                            if($operator_counter > Operator::MAX){
+                                throw new Exception('Operator::MAX exceeded');
+                                break;
+                            }
+                        }
+                        if($set_counter> Set::MAX){
+                            throw new Exception('Set::MAX exceeded');
                             break;
                         }
+                        $replace = implode(Parameter::EMPTY, $statement);
+                        //                     var_dump($search);
+                        //                     var_dump($replace);
+                        if($search == $parameter){
+                            $parameter = $replace;
+                        } else {
+                            $parameter = str_ireplace($search, $replace, $parameter);
+                        }
+                        $statement = Set::statement($parameter, $parser);
+                        if($statement !== false){
+                            $search = '(' . implode(Parameter::EMPTY, $statement) . ')';
+                        }
+                        //                     var_dump($parameter);
+                        //                     var_dump($statement);
                     }
-                    if($set_counter> Set::MAX){
-                        throw new Exception('Set::MAX exceeded');
-                        break;
-                    }
-                    $replace = implode(Parameter::EMPTY, $statement);
-//                     var_dump($search);
-//                     var_dump($replace);
-                    if($search == $parameter){
-                        $parameter = $replace;
-                    } else {
-                        $parameter = str_ireplace($search, $replace, $parameter);
-                    }
-                    $statement = Set::statement($parameter, $parser);
-                    if($statement !== false){
-                        $search = '(' . implode(Parameter::EMPTY, $statement) . ')';
-                    }
-//                     var_dump($parameter);
-//                     var_dump($statement);
                 }
             }
 //             var_dump($set_counter);
