@@ -119,6 +119,11 @@ class Parse extends Data {
         }
         if ($type == Parse::TYPE_ARRAY){
             foreach($string as $nr => $line){
+                $line_nr = $parser->data('priya.module.parser.priya.line') + 1;
+                $parser->data('priya.module.parser.priya.line', $line_nr);
+                if(empty($line)){
+                    continue;
+                }
                 $string[$nr] = Parse::token($line, $data, $keep, $parser);
             }
             return $string;

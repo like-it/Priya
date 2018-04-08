@@ -30,6 +30,8 @@ class Priya extends Core {
             $explode = explode(Tag::OPEN . Priya::TAG . TAG::CLOSE, $string, 2);
             $string = implode($parser->data(Priya::DATA_TAG), $explode);
             $parser->data(Priya::DATA_LITERAL, true);
+            $parser->data('priya.module.parser.priya.line', $tag[Tag::LINE] - 1);
+            $parser->data('priya.module.parser.priya.colum', $tag[Tag::COLUMN]);
         }
         elseif($tag[Tag::TAG] == Tag::OPEN . Priya::CLOSE . TAG::CLOSE){
             $priya = $parser->data(Priya::DATA_TAG);
@@ -40,16 +42,20 @@ class Priya extends Core {
             $part = explode(Priya::NEWLINE, $content[0]);
             $program = array();
             $mask = ' ' . Tag::OPEN . Tag::CLOSE;
+            $count = count($part);
+            $counter = 0;
             foreach($part as $nr => $line){
                 //add split on ; or space (not between quotes nor parameter) for single line...
                 $line = trim($line, $mask);
                 if(!empty($line)){
                     $program[$nr] = Tag::OPEN . $line . Tag::CLOSE;
+                } else {
+                    $program[$nr] = '';
                 }
+                $counter++;
             }
             $parser->data(Priya::DELETE, Priya::DATA_LITERAL);
             $compile = $parser->compile($program, $parser->data(), false);
-
             $explode[1] = '';
 
 //             var_dump($program);

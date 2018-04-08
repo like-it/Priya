@@ -15,10 +15,10 @@ function function_debug($tag=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
+    $tag['line'] = $parser->data('priya.module.parser.priya.line');
     $debug = array_shift($argumentList);
     $title= array_shift($argumentList);
     $is_export = array_shift($argumentList);
-
     echo str_repeat('_', 80) . PHP_EOL;
     echo $parser->data('priya.module.parser.document.url') . ':' . $tag['line'] . ':' . $tag['column'] . PHP_EOL;
     echo str_repeat('_', 80) . PHP_EOL;

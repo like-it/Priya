@@ -31,12 +31,11 @@ terminal.square($terminal.screen.width - 100, $terminal.screen.height -17, 5, 2,
 terminal.square(90, $terminal.screen.height -19, 5, 2, null, 0)
 terminal.square($terminal.screen.width - 95, $terminal.screen.height -19, 5, 2, null, 0)
 
-
-
 terminal.screen()
+debug(debug(0.0))
 terminal.screen.goto(10, 10)
 terminal.write.line(math.circle(2.82))
 terminal.write.line("{math.circle(5, diameter)}")
 $priya.debug2 = true
-debug(0.0)
+debug(debug(0.0))
 {/priya}
