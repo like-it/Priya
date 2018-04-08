@@ -35,10 +35,13 @@ function function_terminal_write_line($tag=array(), $parser=null){
         $parser->data('priya.module.terminal.grid', $grid);
         $tag[Tag::EXECUTE] = '';
         $cli = new Cli($parser->handler(), $parser->route(), $parser->data());
+        echo $cli->tput('position', array($x, $y));
         $tag[Tag::EXECUTE] = $cli->output($line . PHP_EOL);
         $parser->data('priya.module.terminal.cursor.position.y', $y + 1);
-        $parser->data('priya.module.terminal.cursor.position.x', 0);
-        $parser->data('terminal.cursor.position.x', 0);
+//         $parser->data('priya.module.terminal.cursor.position.x', 0);
+//         $parser->data('terminal.cursor.position.x', 0);
+        $parser->data('priya.module.terminal.cursor.position.x', $x);
+        $parser->data('terminal.cursor.position.x', $x);
         $parser->data('terminal.cursor.position.y', $y + 1);
     } else {
         //not sure if this is working correctly...
