@@ -8,6 +8,8 @@
  *     -    all
  */
 
+use Priya\Module\Parse\Cast;
+
 function function_debug($tag=array(), $parser=null){
     $argumentList = $tag['parameter'];
     if(!is_array($argumentList)){
@@ -20,9 +22,21 @@ function function_debug($tag=array(), $parser=null){
     echo str_repeat('_', 80) . PHP_EOL;
     echo $parser->data('priya.module.parser.document.url') . ':' . $tag['line'] . ':' . $tag['column'] . PHP_EOL;
     echo str_repeat('_', 80) . PHP_EOL;
-    echo var_export($debug, true);
-//     var_dump($tag);
-//     var_Dump($parser->data('grid'));
+
+    $type = getType($debug);
+    if(
+        in_array(
+            $type,
+            array(
+                Cast::TYPE_ARRAY,
+                Cast::TYPE_OBJECT
+            )
+        )
+    ){
+        var_export($debug);
+    } else {
+        echo $debug;
+    }
     echo PHP_EOL;
     echo PHP_EOL;
     $tag['execute'] = '';

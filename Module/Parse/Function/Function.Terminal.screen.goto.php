@@ -36,6 +36,10 @@ function function_terminal_screen_goto($tag=array(), $parser=null){
 
     $tag[Tag::EXECUTE] = $cli->output($cli->tput('position', array($x, $y)));
 
+    $parser->data('terminal.cursor.position.x', $x);
+    $parser->data('terminal.cursor.position.y', $y);
+
+
 //
 //     $parser->data('priya.terminal.grid.width', $width);
     return $tag;

@@ -41,6 +41,7 @@ class Variable extends Core {
             if($result === null && $keep){
                 return $string;
             }
+
             $explode = explode($tag[Tag::TAG], $string, 2);
             $type = gettype($result);
             if($type == Parse::TYPE_ARRAY){

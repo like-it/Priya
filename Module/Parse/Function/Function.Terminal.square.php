@@ -16,13 +16,10 @@ function function_terminal_square($tag=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    if($parser->data('priya.debug') == '123'){
-        $tag[Tag::EXECUTE] = '';
-        if(empty($width)){
-            return $tag;
-        }
+    if($parser->data('priya.debug2') == true){
+        var_dump($argumentList);
+//         die;
     }
-
     $cli = new Cli($parser->handler(), $parser->route(), $parser->data());
     $x = array_shift($argumentList);
     $y = array_shift($argumentList);
@@ -89,13 +86,23 @@ function function_terminal_square($tag=array(), $parser=null){
             if(isset($color) || ($color == '0' || 0)){
                 $grid[$i][$j]['color'] = $color;
             }
-            if(isset($background)|| ($background == '0' || 0)){
+            if(isset($background) || ($background == '0' || 0)){
                 $grid[$i][$j]['background'] = $background;
+//                 if($parser->data('priya.debug2') === true){
+//                     echo $i . '.' . $j . '.' . $background . '.' . $color . PHP_EOL;
+//                     var_dump($i);
+//                     var_dump($j);
+//                 }
             }
         }
     }
+    if($parser->data('priya.debug2') === true){
+//         die;
+    }
     $parser->data('priya.module.terminal.cursor.position.x', $x);
     $parser->data('priya.module.terminal.cursor.position.y', $y);
+    $parser->data('terminal.cursor.position.x', $x);
+    $parser->data('terminal.cursor.position.y', $y);
     //needed in .screen we can do terminal.cursor.position or screen.cursor.position
     //terminal.screen.x && terminal.screen.y ?
     $parser->data('priya.module.terminal.grid', $grid);

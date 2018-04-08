@@ -25,6 +25,7 @@ use Priya\Module\Parse\Variable;
 use Priya\Module\Parse\Method;
 use Priya\Module\Parse\Priya;
 use Priya\Module\Parse\Literal;
+use Priya\Module\Parse\Operator;
 
 class Parse extends Data {
     const TYPE_INTEGER = 'integer';
@@ -142,15 +143,26 @@ class Parse extends Data {
             }
             $parser->data('priya.module.parser.document.size', strlen($string));
             $parser->data('priya.module.parser.document.content', $string);
+
+            if($parser->data('priya.module.parser.assign.operator') === true){
+                $string = Operator::find($string, $parser);
+                $parser->data('delete', 'priya.module.parser.assign.operator');
+            }
+
+            /*
+            if($parser->data('priya.module.parser.literal') !== true){
+                $string = Operator::find($string, $parser);
+            }
+            */
             $tags = Tag::find($string, $parser);
-            $string = $string;
+//             var_dump($tags);
             foreach($tags as $nr => $tag){
                 $string = Literal::find($tag, $string, $parser); //can trigger literal mode
                 if($parser->data('priya.module.parser.literal') === true){
                     continue;
                 }
                 $string = Priya::find($tag, $string, $parser); //can trigger literal mode
-                if($parser->data('priya.module.parser.literal') === true){
+                if($parser->data(Priya::DATA_LITERAL) === true){
                     continue;
                 }
                 $string = Assign::find($tag, $string, $parser);

@@ -86,8 +86,36 @@ class Operator extends Core {
         Operator::GREATER_THAN_EQUAL
     );
 
-    public static function find($tag='', $string='', $parser=null){
-        return $tag;
+    public static function find($string='', $parser=null){
+        if($parser->data('priya.debug') === true){
+//             var_dump($string);
+        }
+        if(Method::is($string, $parser)){
+            return $string;
+        }
+        $type = getType($string);
+        if($type != Cast::TYPE_STRING){
+            return $string;
+        }
+        if(
+            in_array(
+                $string,
+                array(
+                    'true',
+                    'false',
+                    'null'
+                )
+            )
+        ){
+            return $string;
+        }
+        //if not is_method
+//         var_dump($string);
+        $result = Parameter::find('(' . $string . ')', $parser);
+        if(isset($result[1])){
+            throw new Exception('Operator::find:Multiple results found');
+        }
+        return $result[0];
     }
 
     public static function execute($node=array(), $parser=null){
@@ -291,6 +319,7 @@ class Operator extends Core {
         if(empty($statement)){
             return $statement;
         }
+//         var_dump($statement);
         $before = true;
         $no_statement = $statement;
         $right_negative = false;
@@ -332,8 +361,19 @@ class Operator extends Core {
             var_dump($statement);
             die;
         }
+//         var_dump($left);
         $left = Operator::variable($left, $parser);
         $left = Operator::string($left, $parser);
+        if(!isset($left)){
+            var_dump($parser->data('terminal'));
+            throw new Exception('Operator::statement:Null pointer exception, left is null');
+        }
+        if(!isset($right)){
+            //we have a percentage
+            $result = array();
+            $result[] = $left . $operator;
+            return $result;
+        }
         $right = Operator::variable($right, $parser);
         $right = Operator::string($right, $parser);
         $node['left'] = $left;
@@ -345,9 +385,10 @@ class Operator extends Core {
         }
         $node['statement'] = $statement;
 //         var_dump($parser->data('priya.module.parser'));
-        var_dump($node);
+//         var_dump($node);
         $statement = Operator::execute($node, $parser);
 //         var_dump($statement);
+        $parser->data('priya.debug2', true);
         return $statement;
     }
 
@@ -382,27 +423,29 @@ class Operator extends Core {
         $statement[$counter] = '';
         $skip = 0;
         $parse = false;
+        $no_parse = false;
         $variable = false;
         $debug = false;
+        $previous_char = '';
         foreach($set as $nr => $char){
             if(
-                (
-                    $char == '"' ||
-                    $char == '\''
-                ) &&
-                $parse === true
+                $char == '"' &&
+                $parse === true &&
+                $no_parse == false &&
+                $previous_char !== '\\'
+                //                 add $previous_char != '\'
             ){
                 $statement[$counter] .= $char;
-                $parse = false;
-                $counter++;
+                $parse = false; //no counter++
+                $previous_char = $char;
                 continue;
             }
-            if(
-                (
-                    $char == '"' ||
-                    $char == '\''
-                ) &&
-                $parse === false
+            elseif(
+                $char == '"' &&
+                $parse === false &&
+                $no_parse === false &&
+                $previous_char !== '\\'
+                //                 add $previous_char != '\'
             ){
                 if(!empty($statement[$counter])){
                     $counter++;
@@ -410,14 +453,50 @@ class Operator extends Core {
                 }
                 $statement[$counter] .= $char;
                 $parse = true;
+                $previous_char = $char;
                 continue;
             }
-            if($parse === true){
-                $statement[$counter] .= $char;
-                continue;
-            }
-            if(
+            elseif(
+                $char == '\'' &&
+                $no_parse === true &&
                 $parse === false &&
+                $previous_char !== '\\'
+                //                 add $previous_char != '\'
+            ){
+                $statement[$counter] .= $char;
+                $no_parse = false; //no counter++
+                $previous_char = $char;
+                continue;
+            }
+            elseif(
+                $char == '\'' &&
+                $no_parse === false &&
+                $parse === false &&
+                $previous_char !== '\\'
+//                     add $previous_char != '\'
+            ){
+                if(!empty($statement[$counter])){
+                    $counter++;
+                    $statement[$counter] = '';
+                }
+                $statement[$counter] .= $char;
+                $no_parse = true;
+                $previous_char = $char;
+                continue;
+            }
+            elseif($parse === true && $no_parse === false){
+                $statement[$counter] .= $char;
+                $previous_char = $char;
+                continue;
+            }
+            elseif($no_parse === true && $parse === false){
+                $statement[$counter] .= $char;
+                $previous_char = $char;
+                continue;
+            }
+            elseif(
+                $parse === false &&
+                $no_parse === false &&
                 $variable === false &&
                 $char == '$'
             ){
@@ -427,11 +506,13 @@ class Operator extends Core {
                 }
                 $statement[$counter] .= $char;
                 $variable = true;
-                $debug = true;
+//                 $debug = true;
+                $previous_char = $char;
                 continue;
             }
-            if(
+            elseif(
                 $parse === false &&
+                $no_parse === false &&
                 $variable === true
             ){
                 if(
@@ -452,6 +533,7 @@ class Operator extends Core {
                     )
                 ){
                     $statement[$counter] .= $char;
+                    $previous_char = $char;
                     continue;
                 } else {
                     $variable = false;
@@ -461,6 +543,7 @@ class Operator extends Core {
             }
             if($skip > 0){
                 $skip--;
+                $previous_char = $char;
                 continue;
             }
             elseif(
@@ -579,7 +662,7 @@ class Operator extends Core {
                 }
                 $statement[$counter] .= $char;
             }
-
+            $previous_char = $char;
         }
         if($debug){
 //             var_dump($statement);

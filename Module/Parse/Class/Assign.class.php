@@ -150,6 +150,7 @@ class Assign extends Core {
             }
         }
 //         var_dump($tag[Tag::VALUE]);
+        $parser->data('priya.module.parser.assign.operator', true);
         $tag[Tag::VALUE] = Parse::token($tag[Tag::VALUE], $parser->data(), false, $parser);
         //add sets, equations
         $tag = Assign::execute($tag, Tag::VALUE, $parser);

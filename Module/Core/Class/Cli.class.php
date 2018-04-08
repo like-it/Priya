@@ -90,14 +90,14 @@ class Cli extends Result {
 
     public function color($color='', $background=''){
         $result = '';
-        if(!empty($color) || ($color === 0 || $color ==  '0')){
+        if(!empty($color) || ($color === (0 || '0'))){
             if($color == 'reset' || $color == 'default'){
                 $result .= "\e[0m";
             } else {
                 $result .= "\e[38;5;" . intval($color) . 'm';
             }
         }
-        if(!empty($background) || $background=== (0 || '0')){
+        if(!empty($background) || $background == (0 || '0')){
             $result .= "\e[48;5;" . intval($background) . 'm';
         }
         return $result;
@@ -212,6 +212,8 @@ class Cli extends Result {
         if(!is_array($grid)){
             return;
         }
+
+//         var_Dump($grid);
 
         $this->output($this->tput('clear'));
         $this->output($this->tput('home'));

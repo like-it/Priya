@@ -16,6 +16,7 @@ class Priya extends Core {
     const MASK = Priya::SPACE . Tag::OPEN . Tag::CLOSE;
 
     const DATA_TAG = 'priya.module.parser.tag.priya';
+    const DATA_LITERAL = 'priya.module.parser.priya.literal';
 
     public static function find($tag='', $string='', $parser=null){
         if($tag[Tag::TAG] == Tag::OPEN . Priya::TAG . TAG::CLOSE){
@@ -28,7 +29,7 @@ class Priya extends Core {
             }
             $explode = explode(Tag::OPEN . Priya::TAG . TAG::CLOSE, $string, 2);
             $string = implode($parser->data(Priya::DATA_TAG), $explode);
-            $parser->data(Literal::DATA_LITERAL, true);
+            $parser->data(Priya::DATA_LITERAL, true);
         }
         elseif($tag[Tag::TAG] == Tag::OPEN . Priya::CLOSE . TAG::CLOSE){
             $priya = $parser->data(Priya::DATA_TAG);
@@ -46,7 +47,7 @@ class Priya extends Core {
                     $program[$nr] = Tag::OPEN . $line . Tag::CLOSE;
                 }
             }
-            $parser->data(Priya::DELETE, Literal::DATA_LITERAL);
+            $parser->data(Priya::DELETE, Priya::DATA_LITERAL);
             $compile = $parser->compile($program, $parser->data(), false);
 
             $explode[1] = '';

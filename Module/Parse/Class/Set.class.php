@@ -51,6 +51,14 @@ class Set extends Core {
      * @return boolean
      */
     public static function statement($string='', $parser=null){
+        if($parser->data('priya.debug2') === true){
+            if($string == '("te.st"test)'){
+//                 var_dump(debug_backtrace(true));
+//                 die;
+            }
+//             var_dump($string);
+//             die;
+        }
         $split = str_split($string, 1);
         $set_depth = 0;
         $max_depth = 0;
@@ -59,22 +67,42 @@ class Set extends Core {
         $previous = '';
         $set = array();
         $parse = false;
+        $no_parse = false;
         $variable = false;
 //         var_dump($string);
         foreach ($split as $char){
-            if($char == '"' && $parse === true){
+            if($char == '\'' && $previous !== '\\' && $no_parse === true){
+                $set[$set_depth][$counter][] = $char;
+                $no_parse = false;
+                $previous = $char;
+                continue;
+            }
+            elseif($char == '\'' && $previous !== '\\' && $no_parse === false){
+                $set[$set_depth][$counter][] = $char;
+                $no_parse = true;
+                $previous = $char;
+                continue;
+            }
+            elseif($char == '"' && $previous !== '\\' && $parse === true){
                 $set[$set_depth][$counter][] = $char;
                 $parse = false;
-//                 $counter++;
+                $previous = $char;
                 continue;
             }
-            if($char == '"' && $parse === false){
+            elseif($char == '"' && $previous !== '\\' && $parse === false){
                 $set[$set_depth][$counter][] = $char;
                 $parse = true;
+                $previous = $char;
                 continue;
             }
-            if($parse === true){
+            elseif($no_parse === true){
                 $set[$set_depth][$counter][] = $char;
+                $previous = $char;
+                continue;
+            }
+            elseif($parse === true){
+                $set[$set_depth][$counter][] = $char;
+                $previous = $char;
                 continue;
             }
             /*
@@ -102,6 +130,7 @@ class Set extends Core {
                     !in_array(
                         $previous,
                         array(
+                            '',
                             '+',
                             '-',
                             '/',
@@ -116,14 +145,13 @@ class Set extends Core {
                             '=',
                             ' ',
                             '(',
-                            '',
                             "\t",
                             "\r",
                             "\n"
                         )
                     )
                 ){
-                    var_dump($string);
+//                     var_dump($string);
                     throw new Exception('Possible Method found where not allowed...');
                 }
                 $set_depth++;
@@ -147,9 +175,12 @@ class Set extends Core {
             return false;
         }
         $result = reset($set[$max_depth]);
-//         var_dump($set);
+        if($parser->data('priya.debug2') === true){
+//             var_dump($result);
+        }
+
         $result = Operator::set($result, $parser);
-        var_dump($result);
+//         var_dump($result);
         return $result;
     }
 

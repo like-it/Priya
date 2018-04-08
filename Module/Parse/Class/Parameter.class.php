@@ -67,6 +67,10 @@ class Parameter extends Core {
             $set_counter = 0;
             if(strpos($parameter, '(') !== false){
                 //set...
+//                 var_dump($parameter);
+                if($parameter == "('\"te.st\\\"\"' . 'test')"){
+                    $parser->data('priya.debug2', true);
+                }
                 $statement = Set::statement($parameter, $parser);
 //                 var_dump($statement);
                 $search = '(' . implode(Parameter::EMPTY, $statement) . ')';
@@ -87,7 +91,7 @@ class Parameter extends Core {
                         throw new Exception('Set::MAX exceeded');
                         break;
                     }
-                    $replace = $statement[0];
+                    $replace = implode(Parameter::EMPTY, $statement);
 //                     var_dump($search);
 //                     var_dump($replace);
                     if($search == $parameter){
@@ -105,34 +109,31 @@ class Parameter extends Core {
             }
 //             var_dump($set_counter);
 //             var_dump($operator_counter);
-            var_dump($parameter);
+//             var_dump($parameter);
             $statement = Set::statement('(' . $parameter . ')', $parser);
 //             var_dump($parameter);
-            var_dump($statement);
+//             var_dump($statement);
             if($statement !== false){;
                 $search = implode(Parameter::EMPTY, $statement);
-            }
-//             var_dump($statement);
-            $operator_counter = 0;
-            var_dump($statement);
-            while (Operator::has($statement, $parser)){
-                $operator_counter++;
-                var_dump('yes');
-                $statement = Operator::statement($statement, $parser);
-                if($operator_counter > Operator::MAX){
-                    throw new Exception('Operator::MAX exceeded');
-                    break;
+                $operator_counter = 0;
+                //             var_dump($statement);
+                while (Operator::has($statement, $parser)){
+                    $operator_counter++;
+                    //                 var_dump('yes');
+                    $statement = Operator::statement($statement, $parser);
+                    if($operator_counter > Operator::MAX){
+                        throw new Exception('Operator::MAX exceeded');
+                        break;
+                    }
+                }
+                $replace = implode(Parameter::EMPTY, $statement);
+                if($search == $parameter){
+                    $parameter = $replace;
+                } else {
+                    $parameter = str_ireplace($search, $replace, $parameter);
                 }
             }
-            var_dump($statement);
 
-//             var_dump($operator_counter);
-            $replace = $statement[0];
-            if($search == $parameter){
-                $parameter = $replace;
-            } else {
-                $parameter = str_ireplace($search, $replace, $parameter);
-            }
             $start = substr($parameter, 0, 1);
             $end = substr($parameter, -1, 1);
             if(
@@ -155,11 +156,22 @@ class Parameter extends Core {
             ){
                 $attribute = substr($parameter, 1);
                 $list[$nr] = $parser->data($attribute);
-            }
-
-
-            else {
+            } else {
                 $list[$nr] = $parameter;
+            }
+        }
+        foreach($list as $nr => $parameter){
+            if($parameter == 'null'){
+                $list[$nr] = null;
+            }
+            if($parameter == 'true'){
+                $list[$nr] = true;
+            }
+            if($parameter == 'false'){
+                $list[$nr] = false;
+            }
+            elseif(is_numeric($parameter)){
+                $list[$nr] = $parameter + 0;
             }
         }
         return $list;
