@@ -117,6 +117,7 @@ class Method extends Core {
     }
 
     public static function find($tag=array(), $string='', $parser=null){
+//         var_dump($tag);
         if($parser->data('priya.debug') === true && $tag['tag'] !== '{$priya.debug = true}'){
 //             var_dump($tag);
 //             die;

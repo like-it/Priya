@@ -16,7 +16,7 @@ class Parameter extends Core {
     public static function list($string='', $parser=null){
         $list = array();
         if(
-            empty($string)
+            empty($string) && $string == ''
         ){
             return $list;
         }
@@ -62,6 +62,12 @@ class Parameter extends Core {
      */
     public static function find($string='', $parser=null){
         $list = Parameter::list($string, $parser);
+
+        if($parser->data('priya.debug2') === true){
+//             var_dump($string);
+//             var_dump($list);
+//             die;
+        }
 
         foreach($list as $nr => $parameter){
             $set_counter = 0;

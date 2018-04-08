@@ -14,10 +14,11 @@ terminal.square(70%, 0, 10%, 100%, null, 10)
 terminal.square(80%, 0, 10%, 100%, null, 12)
 terminal.square(90%, 0, 10%, 100%, null, 13)
 terminal.square(0, 10%, 100%, 100%, null, 2)
-$priya.debug2 = true
 terminal.square(1, $terminal.cursor.position.y + 1, $terminal.screen.width -2, $terminal.screen.height - $terminal.cursor.position.y -2, null, 0)
 terminal.screen()
 terminal.screen.goto(10, 10)
 terminal.write.line(math.circle(2.82))
 terminal.write.line("{math.circle(5, diameter)}")
+$priya.debug2 = true
+debug(0)
 {/priya}
