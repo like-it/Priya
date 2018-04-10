@@ -85,6 +85,7 @@ class Method extends Core {
 
     public static function replace($tag=array(), $attribute='', $parser=null){
         if(empty($tag[Tag::TAG])){
+            return $tag;
             var_dump($tag);
             var_dump($attribute);
             var_dump(debug_backtrace(true));
@@ -122,6 +123,11 @@ class Method extends Core {
 //             var_dump($tag);
 //             die;
         }
+        if($parser->data('priya.debug4') === true && $tag['tag'] !== '{$priya.debug4 = true}'){
+            var_dump($tag);
+            var_dump($string);
+//             die;
+        }
         $tag = Assign::select($tag, $parser);
         //might need to delete $tag[Tag::VALUE] (older than 15-05-2018 delete this comment)
         $tag = Assign::remove($tag, Tag::METHOD, $parser);
@@ -152,6 +158,11 @@ class Method extends Core {
         if($parser->data('priya.debug') === true){
 //             var_dump($tag);
         }
+        if($parser->data('priya.debug4') === true){
+            var_dump($tag);
+//             die;
+        }
+//         var_Dump($tag);
         $tag[Tag::PARAMETER] = Parameter::find($tag[Tag::PARAMETER], $parser);
 
         if($parser->data('priya.debug') === true){
@@ -171,6 +182,9 @@ class Method extends Core {
         $tag = Method::replace($tag, Tag::EXECUTE, $parser);
         if($parser->data('priya.debug') === true){
 //             var_Dump($tag[Tag::STRING]);
+        }
+        if(!isset($tag[Tag::STRING]) && isset($tag[Tag::EXECUTE])){
+            return $tag[Tag::EXECUTE];
         }
         return $tag[Tag::STRING];
     }

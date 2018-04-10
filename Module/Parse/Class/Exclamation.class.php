@@ -22,6 +22,9 @@ class Exclamation extends Core {
     }
 
     public static function exectute($tag=array(), $attribute='', $parser=null){
+        if(!isset($tag[Tag::EXCLAMATION])){
+            return $tag;
+        }
         if($tag[Tag::EXCLAMATION] == 0){
             return $tag;
         }

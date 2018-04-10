@@ -64,6 +64,14 @@ class Tag extends Core {
                     }
                     $explode = explode(Tag::NEWLINE, strrev($explode[0]), 2);
                     $column = strlen($explode[0]) +1;
+
+                    if($parser->data('priya.module.parser.tag.line')){
+                        $line += $parser->data('priya.module.parser.tag.line');
+                    }
+                    if($parser->data('priya.module.parser.tag.column')){
+                        $column += $parser->data('priya.module.parser.tag.column');
+                    }
+
                     $node = array();
                     $node[Tag::TAG] = $record[0];
                     $node[Tag::LINE] = $line;

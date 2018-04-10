@@ -84,8 +84,9 @@ class Parameter extends Core {
                      */
                     continue;
                 }
+                var_dump($parameter);
                 $statement = Set::statement($parameter, $parser);
-//                 var_dump($statement);
+                var_dump($statement);
 
                 if($statement  !== false){
                     $search = '(' . implode(Parameter::EMPTY, $statement) . ')';

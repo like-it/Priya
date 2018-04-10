@@ -132,12 +132,21 @@ class Assign extends Core {
         return $tag;
     }
 
-    public static function find($tag=array(), $string='', $parser=null){
-        $tag = Assign::select($tag, $parser);
-        if($tag[Tag::ASSIGN] === null){
-            return $string;
+    /**
+     * should improve variables to priya variables
+     * nice to have methods to priya methods
+     * @param array $tag
+     * @param unknown $parser
+     */
+    public static function improve($tag=array(), $parser=null){
+        if($parser->data('priya.debug3') === true){
+            var_dump($parser->data('end'));
+            $tag[Tag::VALUE] = Parameter::find($tag[Tag::VALUE], $parser);
+            var_dump($tag);
+            die;
         }
-          //we have assign
+
+
         if(substr($tag[Tag::VALUE], 0, 1) == Variable::SIGN){
             $tag[Tag::VALUE] = Tag::OPEN . $tag[Tag::VALUE] . Tag::CLOSE;
         }
@@ -149,10 +158,30 @@ class Assign extends Core {
                 $tag[Tag::VALUE] = substr($tag[Tag::VALUE], 0, -1);
             }
         }
+        return $tag;
+    }
+
+    public static function find($tag=array(), $string='', $parser=null){
+        $tag = Assign::select($tag, $parser);
+        if($tag[Tag::ASSIGN] === null){
+            return $string;
+        }
+        //we have assign
+        $parameter = Parameter::find($tag[Tag::VALUE], $parser);
+        $tag[Tag::VALUE] = $parameter[0];
+        if(isset($parameter[1])){
+            throw new Exception('Assign::find:Unexpected extra parameter. Can only assign 1 value...');
+        }
+//         var_dump($tag);
+        /*
+
+        $tag = Assign::improve($tag, $parser);
+
 //         var_dump($tag[Tag::VALUE]);
         $parser->data('priya.module.parser.assign.operator', true);
         $tag[Tag::VALUE] = Parse::token($tag[Tag::VALUE], $parser->data(), false, $parser);
         //add sets, equations
+         */
         $tag = Assign::execute($tag, Tag::VALUE, $parser);
         $temp = explode($tag[Tag::TAG], $string, 2);
         $string = implode(Assign::EMPTY, $temp);

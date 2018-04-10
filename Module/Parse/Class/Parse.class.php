@@ -149,10 +149,19 @@ class Parse extends Data {
             $parser->data('priya.module.parser.document.size', strlen($string));
             $parser->data('priya.module.parser.document.content', $string);
 
+            if($parser->data('priya.debug4') === true){
+                var_dump($string);
+//                 die;
+            }
+
+
+
+            /*
             if($parser->data('priya.module.parser.assign.operator') === true){
                 $string = Operator::find($string, $parser);
                 $parser->data('delete', 'priya.module.parser.assign.operator');
             }
+            */
 
             /*
             if($parser->data('priya.module.parser.literal') !== true){
@@ -162,6 +171,7 @@ class Parse extends Data {
             $tags = Tag::find($string, $parser);
 //             var_dump($tags);
             foreach($tags as $nr => $tag){
+                $tag['find'] = $tags;
                 $string = Literal::find($tag, $string, $parser); //can trigger literal mode
                 if($parser->data('priya.module.parser.literal') === true){
                     continue;

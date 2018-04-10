@@ -2,6 +2,7 @@
 
 use Priya\Module\Core\Cli;
 use Priya\Module\Parse\Tag;
+use Priya\Module\Parse\Cast;
 /**
  * @author         Remco van der Velde
  * @since         2017-04-20
@@ -15,7 +16,23 @@ function function_terminal_write_line($tag=array(), $parser=null){
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
+    if($parser->data('priya.debug4') === true){
+//         var_dump($parser->data('priya.debug4'));
+//         var_dump($tag);
+//         var_dump($argumentList);
+//         die;
+    }
+//     var_dump($argumentList);
     $line = array_shift($argumentList);
+
+    if(is_array($line)){
+        var_dump($line);
+        die;
+    }
+    elseif(is_object($line)){
+        var_dump($line);
+        die;
+    }
 
     if($parser->data('priya.module.terminal.start') === true){
         $grid = $parser->data('priya.module.terminal.grid');
@@ -25,6 +42,9 @@ function function_terminal_write_line($tag=array(), $parser=null){
         $row = str_split($line, 1);
         $length = count($grid[$y]);
         $counter = 0;
+        for($i=0; $i < $length; $i++){
+            $grid[$y][$i]['char'] = Cast::SPACE;
+        }
         for($i=$x; $i < $length; $i++){
             if(!isset($row[$counter])){
                 break;

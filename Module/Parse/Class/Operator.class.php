@@ -110,7 +110,7 @@ class Operator extends Core {
             return $string;
         }
         //if not is_method
-//         var_dump($string);
+        var_dump($string);
         $result = Parameter::find('(' . $string . ')', $parser);
         if(isset($result[1])){
             throw new Exception('Operator::find:Multiple results found');
@@ -133,6 +133,7 @@ class Operator extends Core {
                 $result = $node['left'] + $node['right'];
             break;
             case '-' :
+//                 var_dump($node);
                 $result = $node['left'] - $node['right'];
             break;
             case '/' :
@@ -331,7 +332,6 @@ class Operator extends Core {
         if(empty($statement)){
             return $statement;
         }
-//         var_dump($statement);
         $before = true;
         $no_statement = $statement;
         $right_negative = false;
@@ -377,8 +377,8 @@ class Operator extends Core {
             var_dump($statement);
             die;
         }
-//         var_dump($left);
         $left = Operator::variable($left, $parser);
+//         var_dump($left);
         $left = Operator::string($left, $parser);
         if($left === null){
 //             var_dump($parser->data('terminal'));
@@ -405,7 +405,7 @@ class Operator extends Core {
 //         var_dump($node);
         $statement = Operator::execute($node, $parser);
 //         var_dump($statement);
-        $parser->data('priya.debug2', true);
+//         $parser->data('priya.debug2', true);
         return $statement;
     }
 
