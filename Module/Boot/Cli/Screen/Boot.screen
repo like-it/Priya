@@ -1,48 +1,10 @@
 {priya}
 $start = microtime(true)
-terminal.start()
-terminal.grid(0, 0, 'auto', 'auto', 7, 0)
-terminal.screen.goto(0, 0)
-terminal.write.line("Welcome to Priya")
-terminal.write.line("version {$priya.version}")
-terminal.square(0, 0, 20%, 100%, null, 2)
-terminal.square(20%, 0, 10%, 100%, null, 3)
-terminal.square(30%, 0, 10%, 100%, null, 6)
-terminal.square(40%, 0, 10%, 100%, null, 7)
-terminal.square(50%, 0, 10%, 100%, null, 8)
-terminal.square(60%, 0, 10%, 100%, null, 9)
-terminal.square(70%, 0, 10%, 100%, null, 10)
-terminal.square(80%, 0, 10%, 100%, null, 12)
-terminal.square(90%, 0, 10%, 100%, null, 13)
-terminal.square(0, 10%, 100%, 100%, null, 2)
-terminal.square(1, $terminal.cursor.position.y + 1, $terminal.screen.width -2, $terminal.screen.height - $terminal.cursor.position.y -2, null, 0)
 $end = microtime(true)
-$priya.debug3 = true
-$duration.1 = $end - $start
-terminal.write.line($duration.1)
-terminal.circle($terminal.screen.width / 2, $terminal.screen.height /2, $terminal.screen.width / 2, null, 0)
-terminal.circle.fill($terminal.screen.width / 2, $terminal.screen.height /2, $terminal.screen.width / 2 - 1 , null, 11)
-
-terminal.circle.fill($terminal.screen.width - 75, 20, 25, null, 15)
-terminal.circle.fill($terminal.screen.width - 75, 23, 10, null, 0)
-
-terminal.circle.fill(75, 20, 25, null, 15)
-terminal.circle.fill(75, 23, 10, null, 0)
-
-terminal.square(100, $terminal.screen.height -15, $terminal.screen.width - 200, 2, null, 0)
-terminal.square(95, $terminal.screen.height -17, 5, 2, null, 0)
-terminal.square($terminal.screen.width - 100, $terminal.screen.height -17, 5, 2, null, 0)
-
-terminal.square(90, $terminal.screen.height -19, 5, 2, null, 0)
-terminal.square($terminal.screen.width - 95, $terminal.screen.height -19, 5, 2, null, 0)
-
-terminal.screen()
-terminal.screen.goto(10, 10)
-$end = microtime(true)
-$priya.debug3 = true
-$duration.2 = $end - $start
-terminal.write.line(' seconds {microtime(true)}')
+$duration.1 = $start - $end;
+$duration. = $end - $start;
 $priya.debug4 = true
+terminal.write.line($duration.2 - $duration.1 . " seconds (1+1){microtime(true)}" . (4.03 + (3 -1)) . microtime(true), title)
 terminal.write.line($duration.2 - $duration.1 . ' seconds {microtime(true)}')
 terminal.write.line($duration.2)
 {/priya}

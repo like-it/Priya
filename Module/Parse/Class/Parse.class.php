@@ -141,6 +141,16 @@ class Parse extends Data {
             }
             return $string;
         } else {
+            if($parser->data('priya.debug4') === true){
+                $tags = Tag::find($string, $parser);
+                //             var_dump($tags);
+                foreach($tags as $nr => $tag){
+                    $tag = Tag::token($tag, $tags, $string, $parser);
+                    var_dump($tag);
+                    die;
+                }
+
+            }
             if($parser->data('priya.debug') === true){
 //                 var_dump($string);
 //                 var_dump(debug_backtrace(true));
@@ -150,7 +160,8 @@ class Parse extends Data {
             $parser->data('priya.module.parser.document.content', $string);
 
             if($parser->data('priya.debug4') === true){
-                var_dump($string);
+//                 var_dump($string);
+//                 var_dump(debug_backtrace(true));
 //                 die;
             }
 

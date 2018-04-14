@@ -124,8 +124,10 @@ class Method extends Core {
 //             die;
         }
         if($parser->data('priya.debug4') === true && $tag['tag'] !== '{$priya.debug4 = true}'){
-            var_dump($tag);
-            var_dump($string);
+//             var_dump($tag);
+//             var_dump($string);
+//             $debug = debug_backtrace(true);
+//             var_dump($debug[0]);
 //             die;
         }
         $tag = Assign::select($tag, $parser);
@@ -169,6 +171,10 @@ class Method extends Core {
 //             var_dump($tag);
 //             die;
         }
+        if($parser->data('priya.debug4') === true){
+                        var_dump($tag);
+                        die;
+        }
         $tag[Tag::STRING] = $string;
         $original = $tag;
         $tag = Method::execute($tag, $parser);
@@ -188,6 +194,42 @@ class Method extends Core {
         }
         return $tag[Tag::STRING];
     }
+
+    public static function get($string='', $parser){
+        $tag = array();
+        $tag[Tag::TAG] = $string;
+        $tag['split'] = str_split($string);
+        $previous_char = '';
+        $no_parse = false;
+        $parse = false;
+
+        $before = '';
+        foreach($tag['split'] as $nr => $char){
+            if($char == '\'' && $previous_char != '\\' && $no_parse === false){
+                $no_parse = true;
+            }
+            elseif($char == '\''&& $previous_char != '\\' && $no_parse === true){
+                $no_parse = false;
+            }
+            if($char == '"' && $previous_char != '\\' && $parse === false){
+                $parse = true;
+            }
+            elseif($char == '"'&& $previous_char != '\\' && $parse === true){
+                $parse = false;
+            }
+            if($no_parse === false && $parse === false){
+                if($char == '(' && !empty($before)){
+                    //we have method
+                    var_dump($before);
+                    die;
+                }
+                $before .= $char;
+            }
+            $previous_char = $char;
+        }
+        return $tag;
+    }
+
 
     /**
      * rename to get

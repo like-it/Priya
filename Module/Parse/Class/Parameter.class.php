@@ -68,13 +68,27 @@ class Parameter extends Core {
 //             var_dump($list);
 //             die;
         }
+        if($parser->data('priya.debug4') === true){
+                        var_dump($string);
+                        var_dump($list);
+//                         die;
+        }
 
         foreach($list as $nr => $parameter){
             $set_counter = 0;
             if(strpos($parameter, '(') !== false){
                 //set or method (methods first...)
+                if($parser->data('priya.debug4') === true){
+                    var_dump(method::get($parameter, $parser));
+//                     die;
+                }
+
                 if(method::is($parameter, $parser)){
                     $method = trim($parameter, '"{}');
+                    if($parser->data('priya.debug4') === true){
+                        var_dump($parameter);
+//                         die('shit');
+                    }
                     $list[$nr] = Parse::token('{' . $method . '}', $parser->data(), false, $parser);
                     /**
                      * should become while(method::is($parameter, $parser))
@@ -83,6 +97,10 @@ class Parameter extends Core {
                      * we can do str_replace, but we need an array like statement
                      */
                     continue;
+                }
+                if($parser->data('priya.debug4') === true){
+                    var_dump($parameter);
+                    die('shit');
                 }
                 var_dump($parameter);
                 $statement = Set::statement($parameter, $parser);

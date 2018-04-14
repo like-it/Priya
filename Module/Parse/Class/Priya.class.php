@@ -54,7 +54,7 @@ class Priya extends Core {
                 if(!empty($line)){
                     $parser->data('priya.module.parser.tag.line', $line_nr + $counter);
 //                     $program[$nr] = Tag::OPEN . $line . Tag::CLOSE;
-                    $program[$nr] = $parser->compile(Tag::OPEN . $line . Tag::CLOSE, $parser->data(), false);
+                    $program[$nr] = Parse::token(Tag::OPEN . $line . Tag::CLOSE, $parser->data(), false, $parser);
                 } else {
                     $program[$nr] = '';
                 }
