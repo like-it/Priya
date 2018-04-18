@@ -1,10 +1,32 @@
+/**
+ * (c) 2000 - 2018 by Remco van der Velde
+ *
+
+ if last char == '}' && set_depth >= 1 then collect next row too and next row untill set_depth == 1...
+in ...
+we also need to remove the first char of the next row = '{'
+
+
+ */
 {priya}
-$start = microtime(true)
-$end = microtime(true)
+$start = microtime(true);
+$end = microtime(true);
 $duration.1 = $start - $end;
-$duration. = $end - $start;
-$priya.debug4 = true
-terminal.write.line($duration.2 - $duration.1 . " seconds (1+1){microtime(true)}" . (4.03 + (3 -1)) . microtime(true), title)
+$duration.2 = $end - $start;
+$priya.debug4 = true;
+$dir = task(
+    ls - al
+);
+terminal.write.line($duration.2 - $duration.1 . " seconds (1+1){microtime(true)}" . (4.03 + (3 -1)) . microtime(true), title);
+terminal.write.line(microtime(true), title);
+/**
+ token cached "microtime(true), title)" ... so it reads $this->data("priya.parser.token.microtime(true), title).token");
+ calculate the cache hits (read.count) per token and we need an id.
+ $this->data("priya.parser.token.microtime(true), title).hit", $this->data("priya.parser.token.microtime(true), title).hit")++)
+ *
+ *
+ *
+ */
 terminal.write.line($duration.2 - $duration.1 . ' seconds {microtime(true)}')
 terminal.write.line($duration.2)
 {/priya}
