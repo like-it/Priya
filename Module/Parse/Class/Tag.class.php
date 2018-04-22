@@ -988,6 +988,7 @@ class Tag extends Core {
                     $statement[$counter]['type'] = Tag::TYPE_VARIABLE;
                     $variable = true;
                     $previous_char = $char;
+
                     continue;
                 }
                 elseif(
@@ -1009,6 +1010,7 @@ class Tag extends Core {
                                 '&',
                                 '|',
                                 '~',
+                                '}'
                             )
                         )
                     ){
