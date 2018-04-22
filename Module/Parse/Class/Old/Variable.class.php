@@ -19,8 +19,6 @@ class Variable extends Core {
     );
 
     public static function find($tag='', $string='', $keep=false, $parser=null){
-        return $string;
-        /*
         if(
             substr($tag[Tag::TAG], 0, 1) == Tag::OPEN &&
             substr($tag[Tag::TAG], -1, 1) == Tag::CLOSE &&
@@ -56,10 +54,8 @@ class Variable extends Core {
             return $string;
         }
         return $string;
-        */
     }
 
-    /*
     public static function get($string='', $parser=null){
         if(substr($string, 0, 1) !== '$'){
             return $string;
@@ -69,5 +65,5 @@ class Variable extends Core {
         return $parser->data($attribute);
 
     }
-    */
+
 }

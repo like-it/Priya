@@ -9,11 +9,12 @@ we also need to remove the first char of the next row = '{'
 for methods we need + for concatinating strings.
  */
 {priya}
+$priya.debug4 = true;
 $start = microtime(true);
 $end = microtime(true);
 $duration.1 = $start - $end;
 $duration.2 = $end - $start;
-$priya.debug4 = true;
+
 $dir.root = !!! ( array )
 (
 task.root(

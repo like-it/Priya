@@ -86,6 +86,7 @@ class Operator extends Core {
         Operator::GREATER_THAN_EQUAL
     );
 
+    /*
     public static function find($string='', $parser=null){
         if($parser->data('priya.debug') === true){
 //             var_dump($string);
@@ -117,7 +118,9 @@ class Operator extends Core {
         }
         return $result[0];
     }
+    */
 
+    /*
     public static function execute($node=array(), $parser=null){
         $result = null;
         switch($node['operator']){
@@ -692,4 +695,5 @@ class Operator extends Core {
         }
         return $statement;
     }
+    */
 }

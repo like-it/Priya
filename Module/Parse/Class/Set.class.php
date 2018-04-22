@@ -13,6 +13,7 @@ class Set extends Core {
     const OPEN= '(';
     const CLOSE = ')';
 
+    /*
     public static function find($tag='', $attribute='', $parser=null){
         return $tag;
     }
@@ -43,13 +44,14 @@ class Set extends Core {
         }
         return false;
     }
-
+    */
     /**
      * Methods should be parsed before entering set statements
      * @param string $string
      * @param unknown $parser
      * @return boolean
      */
+    /*
     public static function statement($string='', $parser=null){
         if($parser->data('priya.debug2') === true){
             if($string == '("te.st"test)'){
@@ -122,7 +124,7 @@ class Set extends Core {
                 $set[$set_depth][$counter][] = $char;
                 continue;
             }
-            */
+
             if(
                 $char == '('
             ){
@@ -189,6 +191,7 @@ class Set extends Core {
         var_dump($string);
         /**
          * get highest set
-         */
+
     }
+    */
 }

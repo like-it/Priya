@@ -31,23 +31,6 @@ class Method extends Core {
         Method::QUOTE_DOUBLE
     );
 
-    public static function execute($method=array(), $parser=null){
-        var_dump($method);
-        die;
-    }
-
-    public static function find($tag=array(), $string='', $parser=null){
-        foreach($tag['statement'] as $nr => $part){
-            if($part['type'] == Tag::TYPE_METHOD){
-                $tag['statement'][$nr]['execute'] = Method::execute($part, $parser);
-            }
-        }
-        var_dump($tag);
-        die;
-        return $string;
-    }
-
-    /*
     public static function clean($tag=array(), $attribute='', $parser=null){
         $tag[$attribute] = trim($tag[$attribute], Parse::SPACE);
         return $tag;
@@ -133,9 +116,7 @@ class Method extends Core {
         }
         return $tag;
     }
-    */
 
-    /*
     public static function find($tag=array(), $string='', $parser=null){
 //         var_dump($tag);
         if($parser->data('priya.debug') === true && $tag['tag'] !== '{$priya.debug = true}'){
@@ -214,7 +195,6 @@ class Method extends Core {
         return $tag[Tag::STRING];
     }
 
-    /*
     public static function get($string='', $parser){
         $tag = array();
         $tag[Tag::TAG] = $string;
@@ -257,7 +237,6 @@ class Method extends Core {
      * @param unknown $parser
      * @return boolean
      */
-    /*
     public static function is($string='', $parser=null){
         $method = METHOD::OPEN;
         $explode = explode($method, $string, 2);
@@ -304,7 +283,6 @@ class Method extends Core {
         }
         var_dump($before);
         return true;
-
+        */
     }
-    */
 }

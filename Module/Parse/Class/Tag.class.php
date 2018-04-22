@@ -1165,7 +1165,6 @@ class Tag extends Core {
                 $set_depth === null &&
                 $previous['type'] == Tag::TYPE_STRING
             ){
-//                 $statement[$nr]['is_method'] = true;
                 $statement[$nr]['type'] = Tag::TYPE_METHOD;
                 $set_depth = $statement[$nr]['set_depth'];
                 $method = true;
@@ -1223,6 +1222,6 @@ class Tag extends Core {
             }
         }
         $tag['statement'] = $statement;
-        return $tag;//110 linr nr
+        return $tag;//122 linr nr
     }
 }

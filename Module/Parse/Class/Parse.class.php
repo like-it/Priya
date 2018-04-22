@@ -141,16 +141,22 @@ class Parse extends Data {
             }
             return $string;
         } else {
-            if($parser->data('priya.debug4') === true){
-                $tags = Tag::find($string, $parser);
-                foreach($tags as $nr => $tag){
-                    $tag = Tag::token($tag, $tags, $string, $parser);
-                    var_dump($tag);
-                    die;
-                }
-                die;
+            $tags = Tag::find($string, $parser);
+            foreach($tags as $nr => $tag){
+                $tag = Tag::token($tag, $tags, $string, $parser);
+                $string = Assign::find($tag, $string, $parser);
+                $string = Variable::find($tag, $string, $keep, $parser);
+                $string = Method::find($tag, $string, $parser);
+                //tags should be found again after every execution.
+                //empty string can be continued
 
+                var_dump($string);
+                var_dump($tag);
+                die;
             }
+            die;
+
+
             if($parser->data('priya.debug') === true){
 //                 var_dump($string);
 //                 var_dump(debug_backtrace(true));
@@ -179,7 +185,7 @@ class Parse extends Data {
                 $string = Operator::find($string, $parser);
             }
             */
-            $tags = Tag::find($string, $parser);            
+            $tags = Tag::find($string, $parser);
             if($parser->data('priya.debug4') === true){
                 var_dump($string);
                 var_dump($tags);

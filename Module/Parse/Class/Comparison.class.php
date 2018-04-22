@@ -6,16 +6,16 @@ use Priya\Module\Core;
 use Priya\Module\Parser\Operator;
 
 class Comparison extends Core {
-	const PLUS = '+';
-	const MIN = '-';
-	const MULTIPLY = '*';
-	const DIVIDE = '/';
-	const MODULO = '%';
-	const IS = '=';
+    const PLUS = '+';
+    const MIN = '-';
+    const MULTIPLY = '*';
+    const DIVIDE = '/';
+    const MODULO = '%';
+    const IS = '=';
 
-	const COMPARE_IS = Operator::IS . Operator::IS;
-	const COMPARE_PLUS = Operator::PLUS;
-	const COMPARE_IS_EQUAL = Operator::IS . Operator::IS . Operator::IS;
+    const COMPARE_IS = '==';
+    const COMPARE_PLUS = '+';
+    const COMPARE_IS_EQUAL = '===';
 
 
     const COMPARE_ARRAY = '';

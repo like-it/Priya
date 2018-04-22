@@ -55,7 +55,6 @@ class Assign extends Core {
         Method::OPEN
     );
 
-    /*
     public static function remove($tag=array(), $attribute='', $parser=null){
         $method = Assign::EQUAL;
         $string = $tag[Tag::TAG];
@@ -139,7 +138,6 @@ class Assign extends Core {
      * @param array $tag
      * @param unknown $parser
      */
-    /*
     public static function improve($tag=array(), $parser=null){
         if($parser->data('priya.debug3') === true){
             var_dump($parser->data('end'));
@@ -162,12 +160,8 @@ class Assign extends Core {
         }
         return $tag;
     }
-    */
-
 
     public static function find($tag=array(), $string='', $parser=null){
-        return $string;
-        /*
         $tag = Assign::select($tag, $parser);
         var_dump($tag);
 //         die;
@@ -190,15 +184,12 @@ class Assign extends Core {
         $tag[Tag::VALUE] = Parse::token($tag[Tag::VALUE], $parser->data(), false, $parser);
         //add sets, equations
          */
-        /*
         $tag = Assign::execute($tag, Tag::VALUE, $parser);
         $temp = explode($tag[Tag::TAG], $string, 2);
         $string = implode(Assign::EMPTY, $temp);
         return $string;
-        */
     }
 
-    /*
     public static function execute($tag=array(), $attribute='', $parser=null){
         if(
             !empty($tag[Tag::ATTRIBUTE]) &&
@@ -281,5 +272,4 @@ class Assign extends Core {
         }
         return $tag;
     }
-    */
 }

@@ -13,7 +13,6 @@ class Parameter extends Core {
     const QUOTE_SINGLE = '\'';
     const QUOTE_DOUBLE = '"';
 
-    /*
     public static function list($string='', $parser=null){
         $list = array();
         if(
@@ -49,7 +48,6 @@ class Parameter extends Core {
             return $list;
         }
     }
-    */
 
     /**
      * Methods are not allowed as parameter: K.I.S.S.
@@ -62,7 +60,6 @@ class Parameter extends Core {
      * @throws Exception
      * @return string|array|NULL[]|string[]|unknown[]|unknown|NULL[]
      */
-    /*
     public static function find($string='', $parser=null){
         $list = Parameter::list($string, $parser);
 
@@ -98,7 +95,7 @@ class Parameter extends Core {
                      * then parameter can have methods and operators
                      * if we create a method::get($parameter, $parser)
                      * we can do str_replace, but we need an array like statement
-
+                     */
                     continue;
                 }
                 if($parser->data('priya.debug4') === true){
@@ -214,7 +211,6 @@ class Parameter extends Core {
         }
         return $list;
     }
-    */
 
     public static function token($tokens=array(), $parser=null){
         $parameter = array();
@@ -232,33 +228,22 @@ class Parameter extends Core {
             }
             $parameter[$counter][] = $token;
         }
-        /**
-         * get highest set per parameter and calculate these first
-         * solve operator, left, right
-         *
-         */
-        $result = array();
-        foreach($parameter as $position => $set){
-            foreach($set as $nr => $token){
-                if($token['type'] == tag::TYPE_PARSER){
-                    $start = substr($token['string'], 0, 1);
-                    $end = substr($token['string'], -1, 1);
-                    if($start == '"' && $end == '"'){
-                        $string = substr($token['string'], 1, -1);
-                    } else {
-                        $string = $token['string'];
-                    }
-                    $string = Parse::token($string, $parser->data(), false, $parser);
-                    $result[$position] = $string;
-                }
-            }
+        /*
+        while($set = Set::get($parameter, $parser)){
+            var_Dump($set);
+            var_dump($parameter);
+//             $parameter
         }
-        return $result;
+
+
+        foreach ($parameter as $nr => $part){
+
+        }
+        */
+        return $parameter;
     }
 
-    /*
     public static function execute($tag=array(), $attribute='', $parser=null){
         return $tag;
     }
-    */
 }
