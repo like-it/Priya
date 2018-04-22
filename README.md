@@ -13,6 +13,6 @@ priya
 ````
 
 # Licence
-Copyright 2017 Remco van der Velde (remco@like-it.cloud)
+Copyright 2017 Remco van der Velde (remco@priya.software)
 
 Permission is hereby granted, to read the code for free. Licences are available on https://priya.software
