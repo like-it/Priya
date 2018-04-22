@@ -1,3 +1,3 @@
 # Priya
 
-Visit priya.software for more information
+Visit https://priya.software for more information
