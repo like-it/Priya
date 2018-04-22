@@ -39,24 +39,29 @@ class Priya extends Core {
             if(isset($explode[1])){
                 $content = explode(Tag::OPEN . Priya::CLOSE . TAG::CLOSE, $explode[1], 2);
             }
-            $code = Priya::tag($content[0]);
+            $code = Priya::tag($content[0], $parser);
             var_dump($code);
-            die;
-            $part = explode(Priya::NEWLINE, $content[0]);
+
             $program = array();
             $mask = ' ' . Tag::OPEN . Tag::CLOSE;
-            $count = count($part);
+            $count = count($code);
             $counter = 0;
 
             $line_nr = $parser->data('priya.module.parser.tag.line');
 
             $parser->data(Priya::DELETE, Priya::DATA_LITERAL);
-            foreach($part as $nr => $line){
-                //add split on ; or space (not between quotes nor parameter) for single line...
+            foreach($code as $nr => $line){
                 $line = trim($line, $mask);
+                if($parser->data('priya.debug4') === true){
+                    $parser->data('priya.module.parser.tag.line', $line_nr + $counter);
+                    $parser->data('priya.module.parser.tag.multiline', true);
+                    $program[$nr] = Parse::token(Tag::OPEN . $line . Tag::CLOSE, $parser->data(), false, $parser);
+                    var_dump($program[$nr]);
+                    die;
+                }
                 if(!empty($line)){
                     $parser->data('priya.module.parser.tag.line', $line_nr + $counter);
-//                     $program[$nr] = Tag::OPEN . $line . Tag::CLOSE;
+                    $parser->data('priya.module.parser.tag.multiline', true);
                     $program[$nr] = Parse::token(Tag::OPEN . $line . Tag::CLOSE, $parser->data(), false, $parser);
                 } else {
                     $program[$nr] = '';
@@ -65,6 +70,8 @@ class Priya extends Core {
             }
 
             $compile = $program;
+            var_Dump($compile);
+            die;
             $explode[1] = '';
 
 //             var_dump($program);
@@ -91,41 +98,59 @@ class Priya extends Core {
         return $string;
     }
 
-    public static function tag($string=''){
-        //add tag['split'] so we only split once...
+    public static function tag($string='', $parser=null){
         $previous_char = '';
         $next = null;
         $next_next = null;
         $parse = false;
         $no_parse = false;
         $variable = false;
+        $skip = 0;
         $counter = 0;
         $set_depth = 0;
         $comment_depth = 0;
+        $comment = '';
         $statement = array();
         $statement[$counter]['string'] = '';
         $split = str_split($string);
-        $count = count($split);        
-        foreach($split as $nr => $char){     
+        $count = count($split);
+        foreach($split as $nr => $char){
+            if($skip > 0){
+                $skip--;
+                $previous_char = $char;
+                continue;
+            }
+            if(isset($split[$nr + 1])){
+                $next = $split[$nr + 1];
+            } else {
+                $next = null;
+            }
+            if(isset($split[$nr + 2])){
+                $next_next = $split[$nr + 2];
+            } else {
+                $next_next = null;
+            }
             if($comment_depth > 0){
-                if(isset($split[$nr + 1])){
-                    $next = $split[$nr + 1];
-                } else {
-                    $next = null;
-                }
-                if(isset($split[$nr + 2])){
-                    $next_next = $split[$nr + 2];
-                } else {
-                    $next_next = null;
-                }
                 if(
                     $variable === false &&
                     $char == '*' &&
-                    $next = '/'
+                    $next == '/'
                 ){
                     $comment_depth--;
+                    $comment_depth = 0; //no nested comments...
+                    $previous_char = $char;
+                    $comment .= '*/';
+                    $counter++;
+                    $statement[$counter]['string'] = $comment;
+                    $statement[$counter]['type'] = Tag::TYPE_COMMENT;
+                    $skip = 1;
+                    $counter++;
+                    $comment = '';
                     continue;
-                }            
+                }
+                $previous_char = $char;
+                $comment .= $char;
+                continue;
             }
             if(
                 $char == '"' &&
@@ -199,7 +224,7 @@ class Priya extends Core {
                 $parse === true &&
                 $no_parse === false &&
                 $variable === false
-                
+
             ){
                 $statement[$counter]['string'] .= $char;
                 $previous_char = $char;
@@ -213,16 +238,6 @@ class Priya extends Core {
                 $statement[$counter]['string'] .= $char;
                 $previous_char = $char;
                 continue;
-            }            
-            if(isset($split[$nr + 1])){
-                $next = $split[$nr + 1];
-            } else {
-                $next = null;
-            }
-            if(isset($split[$nr + 2])){
-                $next_next = $split[$nr + 2];
-            } else {
-                $next_next = null;
             }
             if(
                 $parse === false &&
@@ -232,7 +247,7 @@ class Priya extends Core {
                     $variable === false &&
                     $char == ';'
                 ){
-                    if(!empty($statement[$counter]['string'])){                        
+                    if(!empty($statement[$counter]['string'])){
                         $counter++;
                     }
                     $statement[$counter]['string'] = $char;
@@ -241,23 +256,14 @@ class Priya extends Core {
                     continue;
                 }
                 elseif(
-                    $variable === false && 
-                    $char == '/' && 
-                    $next = '*'
+                    $variable === false &&
+                    $char == '/' &&
+                    $next == '*'
                 ){
                     $comment_depth++;
+                    $comment .= $char;
                     continue;
                 }
-                elseif(
-                    $variable === false &&
-                    $char == '*' &&
-                    $next = '/'
-                ){
-                    $comment_depth--;
-                    continue;
-                }
-                
-                
                 else {
                     if(!isset($statement[$counter]['string'])){
                         $statement[$counter]['string'] = $char;
@@ -275,20 +281,26 @@ class Priya extends Core {
         }
         $result = array();
         $code = '';
+
+//         var_dump($statement);
+
         foreach($statement as $counter => $part){
+            if(isset($part['type']) && $part['type'] == Tag::TYPE_COMMENT){
+//                 var_dump($part);
+                continue; //wtf... yup working again...
+            }
             if(isset($part['type']) && $part['type'] == TAG::TYPE_SEMI_COLON){
                 $result[] = '{' . trim($code) . '}';
-                $code = '';                
+                $code = '';
             } else {
                 $code .= $part['string'];
             }
         }
-        var_dump($result);                      
-        
-        
-        
-//                 var_dump($statement);
-        die;
+        if(!empty($code)){
+            $result[] = '{' . trim($code) . '}';
+        }
+//         var_dump($result);
+        return $result;
     }
 
     public static function exectute($tag=array(), $attribute='', $parser=null){

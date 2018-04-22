@@ -212,6 +212,37 @@ class Parameter extends Core {
         return $list;
     }
 
+    public static function token($tokens=array(), $parser=null){
+        $parameter = array();
+        $counter = 0;
+        foreach($tokens as $nr => $token){
+            if(isset($token['tag']) && $token['tag'] == ''){
+                continue;
+            }
+            elseif($token['type'] == Tag::TYPE_COMMA){
+                $counter++;
+                continue;
+            }
+            if(!isset($parameter[$counter])){
+                $parameter[$counter] = array();
+            }
+            $parameter[$counter][] = $token;
+        }
+        /*
+        while($set = Set::get($parameter, $parser)){
+            var_Dump($set);
+            var_dump($parameter);
+//             $parameter
+        }
+
+
+        foreach ($parameter as $nr => $part){
+
+        }
+        */
+        return $parameter;
+    }
+
     public static function execute($tag=array(), $attribute='', $parser=null){
         return $tag;
     }

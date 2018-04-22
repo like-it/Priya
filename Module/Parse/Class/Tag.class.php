@@ -52,6 +52,9 @@ class Tag extends Core {
     const TYPE_DOUBLE_COLON = 'double-colon';
     const TYPE_COMMA = 'comma';
     const TYPE_BRACKET = 'bracket';
+    const TYPE_COMMENT = 'comment';
+    const TYPE_CAST = 'cast';
+    const TYPE_WHITESPACE = 'whitespace';
 
     const PATTERN = '/\\' . Tag::OPEN . '.*\\' . Tag::CLOSE . '/';
     const FLAG = PREG_SET_ORDER | PREG_OFFSET_CAPTURE;
@@ -64,20 +67,24 @@ class Tag extends Core {
 
 
 
-    public static function find($input=null, $parser=null){
+    public static function find($input=null, $parser=null, $newline=false){
         $tagged = array();
         if(!is_string($input)){
             throw new Exception(Tag::EXCEPTION_TYPE);
             return $tagged;
         }
-        $pattern = '/\\' . Tag::OPEN . '.*\\' . Tag::CLOSE . '/';
+        $pattern = Tag::PATTERN;
         $page = $input;
         $counter = 0;
         if($parser->data('priya.debug') === true){
 //             var_dump($input);
 //             die;
         }
-        preg_match_all(Tag::PATTERN, $input, $matches, Tag::FLAG);
+        if($newline || $parser->data('priya.module.parser.tag.multiline') === true){
+            $pattern .= 's'; //enabled in priya.code
+            //enabling multiline tag support...
+        }
+        preg_match_all($pattern, $input, $matches, Tag::FLAG);
         if(!empty($matches)){
             foreach ($matches as $occurence => $set){
                 foreach ($set as $nr => $record){
@@ -149,7 +156,7 @@ class Tag extends Core {
                 $statement[$counter]['string'] .= $char;
                 $parse = false; //no counter++
                 if($nr < $count){
-                    $counter++;
+//                     $counter++;
                 }
                 $previous_char = $char;
                 continue;
@@ -1019,8 +1026,203 @@ class Tag extends Core {
                 }
             }
         }
-        var_dump($statement);
-        die;
+        $skip = 0;
+        $previous = null;
+        $next = null;
+        $next_next = null;
+        foreach($statement as $nr => $part){
+            if($skip > 0){
+                $skip--;
+                if(isset($statement[$nr])){
+                    $previous = $statement[$nr];
+                }
+                continue;
+            }
+            if(isset($statement[$nr + 1])){
+                $next = $statement[$nr + 1];
+            }
+            if(isset($statement[$nr + 2])){
+                $next_next = $statement[$nr + 2];
+            }
+            if(!isset($part['type'])){
+                $statement[$nr]['tag'] = trim($part['string']);
+                if(empty($statement[$nr]['tag'])){
+                    $statement[$nr]['type'] = Tag::TYPE_WHITESPACE;
+                } else {
+                    $statement[$nr]['type'] = Tag::TYPE_STRING;
+                }
+            }
+            if(
+                isset($statement[$nr]['tag']) &&
+                $previous['string'] == '(' &&
+                $next['string'] == ')' &&
+                in_array(
+                    $statement[$nr]['tag'],
+                    array(
+                        'int',
+                        'integer',
+                        'float',
+                        'bool',
+                        'boolean',
+                        'array',
+                        'object',
+                        'string'
+                    )
+                )
+            ){
+                $statement[$nr]['cast'] = $statement[$nr]['tag'];
+                $statement[$nr]['string'] = $previous['string'] . $statement[$nr]['string'] . $next['string'];
+                $statement[$nr]['type'] = Tag::TYPE_CAST;
+                unset($statement[$nr]['tag']);
+                unset($statement[$nr - 1]);
+                unset($statement[$nr + 1]);
+                $skip = 1;
+                continue;
+            }
+            $counter = $nr + 1;
+
+            if($statement[$nr]['type'] == Tag::TYPE_EXCLAMATION){
+                $skip = 0;
+                while(isset($next['type']) && $next['type'] == Tag::TYPE_EXCLAMATION){
+                    $statement[$nr]['string'] .= $next['string'];
+                    unset($statement[$counter]);
+                    if(isset($statement[$counter + 1])){
+                        $next = $statement[$counter + 1];
+                    } else {
+                        $next = null;
+                    }
+                    $counter++;
+                    $skip++;
+                }
+            }
+            $previous = $statement[$nr];
+        }
+        $skip = 0;
+        $previous = null;
+        $next = null;
+        $next_next = null;
+        $method = false;
+        $method_start = null;
+        $set_depth = null;
+        $parameter = array();
+
+        foreach($statement as $nr => $part){
+            if($skip > 0){
+                $skip--;
+                if(isset($statement[$nr])){
+                    $previous = $statement[$nr];
+                }
+                continue;
+            }
+            if(isset($statement[$nr + 1])){
+                $next = $statement[$nr + 1];
+            }
+            if(isset($statement[$nr + 2])){
+                $next_next = $statement[$nr + 2];
+            }
+            if(!isset($part['type'])){
+                $statement[$nr]['tag'] = trim($part['string']);
+                if(empty($statement[$nr]['tag'])){
+                    $statement[$nr]['type'] = Tag::TYPE_WHITESPACE;
+                } else {
+                    $statement[$nr]['type'] = Tag::TYPE_STRING;
+                }
+            }
+
+            if(
+                $method === true &&
+                $method_start !== null
+            ){
+                if(!isset($statement[$method_start]['method'])){
+                    $statement[$method_start]['method'] = trim(substr($statement[$method_start]['string'], 0, -1));
+                }
+                if(
+                    $part['string'] == ')' &&
+                    $part['set_depth'] == $set_depth
+                ){
+                    foreach ($parameter as $param_nr => $param_value){
+                        if(isset($param_value['string'])){
+                            $statement[$method_start]['string'] .= $param_value['string'];
+                        }
+                    }
+                    $statement[$method_start]['string'] .= $part['string'];
+                    $parameter = Parameter::token($parameter, $parser);
+                    $statement[$method_start]['parameter'] = $parameter;
+                    unset($statement[$nr]);
+                    $method = false;
+                    $method_start = null;
+                    $set_depth = null;
+                    $parameter = array();
+                    continue;
+                } else {
+                    $parameter[] = $part;
+                    unset($statement[$nr]);
+                }
+            }
+            if(
+                isset($statement[$nr]) &&
+                $statement[$nr]['string'] == '(' &&
+                $set_depth === null &&
+                $previous['type'] == Tag::TYPE_STRING
+            ){
+//                 $statement[$nr]['is_method'] = true;
+                $statement[$nr]['type'] = Tag::TYPE_METHOD;
+                $set_depth = $statement[$nr]['set_depth'];
+                $method = true;
+                $method_start = $nr;
+                $counter = $nr - 1;
+                while($previous){
+                    if(
+                        isset($previous) &&
+                        $previous['type'] == Tag::TYPE_OPERATOR
+                    ){
+                        if($previous['string'] != '.'){
+                            break;
+                        } else {
+                            if(isset($previous)){
+                                $statement[$nr]['string'] = $previous['string'] . $statement[$nr]['string'];
+                            }
+                            unset($statement[$counter]);
+                            $counter--;
+                            if(isset($statement[$counter])){
+                                $previous = $statement[$counter];
+                                $original = $previous;
+                            } else {
+                                $previous = null;
+                                break;
+                            }
+                            continue;
+                        }
+                    }
+                    elseif(
+                        isset($previous) &&
+                        $previous['type'] != Tag::TYPE_STRING
+                    ){
+                        break;
+                    }
+                    if(isset($previous['string'])){
+                        $statement[$nr]['string'] = $previous['string'] . $statement[$nr]['string'];
+                    }
+                    unset($statement[$counter]);
+                    $counter--;
+                    if(isset($statement[$counter])){
+                        $previous = $statement[$counter];
+                        $original = $previous;
+                    } else {
+                        $previous = null;
+                        break;
+                    }
+                }
+                if($previous === null){
+                    $previous = $original;
+                }
+                continue;
+            }
+            if(isset($statement[$nr])){
+                $previous = $statement[$nr];
+            }
+        }
+        $tag['statement'] = $statement;
         return $tag;//110 linr nr
     }
 }

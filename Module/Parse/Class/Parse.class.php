@@ -143,12 +143,12 @@ class Parse extends Data {
         } else {
             if($parser->data('priya.debug4') === true){
                 $tags = Tag::find($string, $parser);
-                //             var_dump($tags);
                 foreach($tags as $nr => $tag){
                     $tag = Tag::token($tag, $tags, $string, $parser);
                     var_dump($tag);
                     die;
                 }
+                die;
 
             }
             if($parser->data('priya.debug') === true){
@@ -179,8 +179,12 @@ class Parse extends Data {
                 $string = Operator::find($string, $parser);
             }
             */
-            $tags = Tag::find($string, $parser);
-//             var_dump($tags);
+            $tags = Tag::find($string, $parser);            
+            if($parser->data('priya.debug4') === true){
+                var_dump($string);
+                var_dump($tags);
+                die;
+            }
             foreach($tags as $nr => $tag){
                 $tag['find'] = $tags;
                 $string = Literal::find($tag, $string, $parser); //can trigger literal mode

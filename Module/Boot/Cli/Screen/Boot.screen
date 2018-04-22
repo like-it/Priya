@@ -6,7 +6,7 @@
 in ...
 we also need to remove the first char of the next row = '{'
 
-
+for methods we need + for concatinating strings.
  */
 {priya}
 $start = microtime(true);
@@ -14,10 +14,22 @@ $end = microtime(true);
 $duration.1 = $start - $end;
 $duration.2 = $end - $start;
 $priya.debug4 = true;
-$dir = task(
-    ls - al
+$dir.root = !!! ( array )
+(
+task.root(
+    'ls - al',
+    (100 + (1 * 1.01 + (microtime(true)))),
+    101.12,
+    true,
+    false,
+    null
+) +
+task.root(
+    'ls - al',
+) +
+(array) $data.test.variable
 );
-terminal.write.line($duration.2 - $duration.1 . " seconds (1+1){microtime(true)}" . (4.03 + (3 -1)) . microtime(true), title);
+terminal.write.line($duration.2 - $duration.1 + " seconds (1+1){microtime(true)}" + (4.03 + (3 -1)) + microtime(true), title);
 terminal.write.line(microtime(true), title);
 /**
  token cached "microtime(true), title)" ... so it reads $this->data("priya.parser.token.microtime(true), title).token");
@@ -25,9 +37,10 @@ terminal.write.line(microtime(true), title);
  $this->data("priya.parser.token.microtime(true), title).hit", $this->data("priya.parser.token.microtime(true), title).hit")++)
  *
  *
+ when having a - operator with 2 strings & !is_numeric(string)
  *
  */
-terminal.write.line($duration.2 - $duration.1 . ' seconds {microtime(true)}')
+terminal.write.line($duration.2 - $duration.1 . ' seconds {microtime(true)}');
 terminal.write.line($duration.2)
 {/priya}
 
