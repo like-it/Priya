@@ -18,7 +18,7 @@ class Data extends Core {
     private $object_data;
 
     public function __construct($handler=null, $route=null, $data=null){
-        if(stristr(get_class($handler), 'autoload') !== false){
+        if($handler !== null && stristr(get_class($handler), 'autoload') !== false){
             $this->autoload($handler);
             parent::__construct(null, $route);
         } else {

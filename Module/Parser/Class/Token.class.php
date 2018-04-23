@@ -4,7 +4,6 @@ namespace Priya\Module\Parser;
 
 use stdClass;
 use Exception;
-use Priya\Module\Core\Object;
 
 class Token extends Core {
     const TYPE_NULL = 'null';

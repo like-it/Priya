@@ -11,7 +11,6 @@ namespace Priya\Module;
 
 use stdClass;
 use Priya\Application;
-use Priya\Module\Core\Object;
 
 class Core {
     const FILE = __FILE__;

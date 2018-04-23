@@ -13,7 +13,6 @@ use Priya\Application;
 use Priya\Module\File;
 use Priya\Module\File\Dir;
 use Priya\Module\Core;
-use Priya\Module\Core\Object;
 
 class Cache {
     const DIR = __DIR__;

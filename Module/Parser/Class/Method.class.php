@@ -2,7 +2,6 @@
 
 namespace Priya\Module\Parser;
 
-use Priya\Module\Core\Object;
 use Exception;
 
 class Method extends Core {
