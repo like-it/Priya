@@ -2,10 +2,6 @@
  * (c) 2000 - 2018 by Remco van der Velde
  *
 
- if last char == '}' && set_depth >= 1 then collect next row too and next row untill set_depth == 1...
-in ...
-we also need to remove the first char of the next row = '{'
-
 for methods we need + for concatinating strings.
  */
 {priya}

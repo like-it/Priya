@@ -85,7 +85,118 @@ class Operator extends Core {
         Operator::GREATER_THAN,
         Operator::GREATER_THAN_EQUAL
     );
+    const EXCEPTION_VALUE_CAST = 'Null pointer exception or casting required';
 
+    public static function has($set=array()){
+        foreach($set as $nr => $record){
+            if($record['type'] == Tag::TYPE_OPERATOR){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static function find($set=array(), $parser=null){
+        $left = array();
+        $right = array();
+        $operator = array();
+        foreach($set as $nr => $record){
+            if($record['type'] == Tag::TYPE_OPERATOR){
+                if(!empty($operator)){
+                    $right[] = $record;
+                    continue;
+                }
+                unset($set[$nr]);
+                $operator = $record;
+                continue;
+            }
+            if($record['type'] == Tag::TYPE_VARIABLE){
+                $record['variable'] = $record['string'];
+            }
+            $record['type'] = strtolower(gettype($record['execute']));
+            if(empty($record['type'])){
+                var_dump($record);
+                die;
+            }
+            if(empty($operator)){
+                $left[] = $record;
+            } else {
+                $right[] = $record;
+            }
+        }
+        if(
+            !empty($left) &&
+            !empty($operator) &&
+            !empty($right)
+        ){
+            $operation = Operator::execute($left, $operator, $right, $parser);
+        } else {
+            var_dump($left);
+            var_dump($right);
+            var_dump($operator);
+            die;
+        }
+
+
+die;
+
+
+    }
+
+    public static function execute($left=array(), $operator=array(), $right=array(), $parser=null){
+        if(!isset($operator['string'])){
+            var_dump($operator);
+            var_dump($left);
+            var_dump($right);
+            die;
+        }
+        switch($operator['string']){
+            case '+' :
+                if($left[0]['type'] == Tag::TYPE_NULL){
+                    throw new Exception(Operator::EXCEPTION_VALUE_CAST);
+                }
+                elseif($right[0]['type'] == Tag::TYPE_NULL){
+                    throw new Exception(Operator::EXCEPTION_VALUE_CAST);
+                }
+                elseif(
+                    $left[0]['type'] == Tag::TYPE_OBJECT &&
+                    $right[0]['type'] == Tag::TYPE_OBJECT
+                ){
+                    $result = $left[0]['execute'] + Operator::complete($right, $parser);
+                    var_dump($left);
+                    var_dump($right);
+                }
+                var_dump($operator);
+                var_dump($left);
+                var_dump($right);
+                var_dump($result);
+                var_dump('fine');
+                die;
+
+
+
+                if(!is_numeric($left[0]['execute'])){
+                    var_dump($left);
+                    die;
+                }
+                if(!is_numeric($right[0])){
+                    var_dump($right);
+                    die;
+                }
+                $result = $left[0] + $right[0];
+                break;
+        }
+        var_dump($result);
+        var_dump($left);
+        var_dump($right);
+        var_dump($operator);
+        die;
+    }
+
+    public static function complete($right=array(), $parser){
+        var_dump('complete');
+        return Operator::find($right, $parser);
+    }
     /*
     public static function find($string='', $parser=null){
         if($parser->data('priya.debug') === true){

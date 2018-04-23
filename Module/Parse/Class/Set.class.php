@@ -13,6 +13,53 @@ class Set extends Core {
     const OPEN= '(';
     const CLOSE = ')';
 
+    public static function has($parse =array()){
+        foreach ($parse as $nr => $record){
+            if($record['type'] == Tag::TYPE_SET){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static function get($parse=array()){
+        $highest = Set::highest($parse);
+
+        $is_set = false;
+        $set = array();
+        foreach ($parse as $nr => $record){
+            if($record['type'] == Tag::TYPE_WHITESPACE){
+                continue;
+            }
+            if(isset($record['set_depth']) && $record['set_depth'] == $highest){
+                //first one found
+                $is_set = true;
+                continue;
+                //till first end parenthese with same depth
+            }
+            if($is_set === true){
+                if($record['string'] == ')' && $record['set_depth'] == $highest){
+                    $is_set = false;
+                    return $set;
+                } else {
+                    $set[] = $record;
+                }
+            }
+        }
+        return $set;
+    }
+
+    public static function highest($parse=array()){
+        $depth = 0;
+        foreach ($parse as $nr => $record){
+            if(isset($record['set_depth']) && $record['set_depth'] > $depth){
+                $depth = $record['set_depth'];
+            }
+        }
+        return $depth;
+    }
+
+
     /*
     public static function find($tag='', $attribute='', $parser=null){
         return $tag;

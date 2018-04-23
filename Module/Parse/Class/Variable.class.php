@@ -19,6 +19,52 @@ class Variable extends Core {
     );
 
     public static function find($tag='', $string='', $keep=false, $parser=null){
+        $start_tag = false;
+        $end_tag = false;
+        foreach($tag['statement'] as $nr => $token){
+            if($token['string'] == '{' && $start_tag == false){
+                unset($tag['statement'][$nr]);
+                $start_tag = true;
+                continue;
+            }
+            elseif($token['string'] == '}' && $start_tag === true && $end_tag === false){
+                $end_tag = true;
+                unset($tag['statement'][$nr]);
+                continue;
+            }
+            elseif($token['type'] == Tag::TYPE_VARIABLE){
+                $tag['statement'][$nr]['execute'] = $parser->data(substr($token['string'], 1));
+            }
+        }
+        $set_counter = 0;
+        while(Set::has($tag['statement'])){
+            $set_counter++;
+            $set = Set::get($tag['statement']);
+            $operator_counter = 0;
+            while (Operator::has($set)){
+                $operator_counter++;
+                $set = Operator::find($set, $parser);
+
+                if($operator_counter > Operator::MAX){
+                    break;
+                }
+            }
+            var_dump($set);
+            die;
+        }
+
+
+        /**
+         * while set::depth
+         */
+
+
+
+
+        var_dump($string);
+        var_dump($tag);
+        die;
+
         return $string;
         /*
         if(

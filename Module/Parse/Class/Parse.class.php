@@ -38,7 +38,7 @@ class Parse extends Data {
     const TYPE_NULL = 'NULL';
     const TYPE_UNKNOWN = 'unknown';
 
-    const INIT = '{import("{$priya.dir.module}Parse/Function/")}';
+    const INIT = '{import("{$priya.dir.module - ($priya.dir + $priya.dir + $priya.dir + $priya.dir + $priya.dir.last)}Parse/Function/")}';
 
     const EQUAL = '=';
     const SPACE = ' ';
