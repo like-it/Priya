@@ -9,6 +9,7 @@
 
 namespace Priya\Module\Autoload;
 
+use Exception;
 use Priya\Application;
 use Priya\Module\Autoload;
 
