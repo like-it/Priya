@@ -27,8 +27,11 @@ class Result extends Parser {
     const FILE = __FILE__;
 
     const RESPONSE = 'Response';
+    const EXT_RESPONSE = '.response';
 
     const EXCEPTION_RESPONSE = 'Response file expected in one of these locations: ';
+    const EXCEPTION_COMPILE_DIR = 'Unable to create compile dir';
+    const EXCEPTION_CACHE_DIR = 'Unable to create cache dir';
 
     private $result;
 
@@ -88,7 +91,7 @@ class Result extends Parser {
         $explode = explode('\\', $read);
         $template = array_pop($explode);
         $dir = dirname($read::DIR) . Application::DS . Result::RESPONSE . Application::DS;
-        $url = $dir . $template . '.response';
+        $url = $dir . $template . Result::EXT_RESPONSE;
         if($type == 'url'){
             return $url;
         }
@@ -292,10 +295,10 @@ class Result extends Parser {
             mkdir($dir_cache, Dir::CHMOD, true);
         }
         if(is_dir($dir_compile) === false){
-            trigger_error('unable to create compile dir', E_USER_ERROR);
+            throw new Exception(Result::EXCEPTION_COMPILE_DIR);
         }
         if(is_dir($dir_cache) === false){
-            trigger_error('unable to create cache dir', E_USER_ERROR);
+            throw new Exception(Result::EXCEPTION_CACHE_DIR);
         }
         $this->url($url);
         $dir = dirname($url);
