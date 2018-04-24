@@ -10,6 +10,7 @@
 namespace Priya;
 
 use stdClass;
+use Exception;
 use Priya\Module\File;
 use Priya\Module\Handler;
 use Priya\Module\Core\Parser;
@@ -43,6 +44,10 @@ class Application extends Parser {
     const ROUTE = 'Route.json';
     const CREDENTIAL = 'Credential.json';
     const URL = 'Application';
+
+    const EXCEPTION_DIR_APPLICATION = 'No application directory defined.';
+    const EXCEPTION_REQUEST = 'cannot route to SELF';
+    const EXCEPTION_APPLICATION_ERROR = 'cannot route to Application/Error/';
 
     public function __construct($autoload=null, $data=null){
         $this->cwd(getcwd());
@@ -318,13 +323,12 @@ class Application extends Parser {
         $this->write($url);
         parent::autoload()->environment($this->data('priya.environment'));
         if(!$this->data('priya.dir.application')){
-            var_dump($this->data());
-            die;
+            throw new Exception(Application::EXCEPTION_DIR_APPLICATION);
         }
         chdir($this->data('priya.dir.application'));
         $request = $this->request('request');
         if($request ===  $this->data('parser.request') && $request !== null){
-            trigger_error('cannot route to SELF', E_USER_ERROR);
+            throw new Exception(Application::EXCEPTION_REQUEST);
         }
         $url = $this->handler()->url();
         $etag = sha1($url);
@@ -424,7 +428,7 @@ class Application extends Parser {
         if(!empty($item->controller)){
             $controller = new $item->controller($this->handler(), $this->route(), $this->data());
             if(method_exists($controller, $item->function) === false){
-                trigger_error('method (' . $item->function . ') not exists in class: (' . get_class($controller) . ')');
+                throw new Exception('method (' . $item->function . ') not exists in class: (' . get_class($controller) . ')');
             } else {
                 if(method_exists($controller, 'autoload')){
                     $controller->autoload(parent::autoload());
@@ -474,7 +478,7 @@ class Application extends Parser {
         else {
             if($contentType == Handler::CONTENT_TYPE_CLI){
                 if($request == 'Application/Error/'){
-                    trigger_error('cannot route to Application/Error/', E_USER_ERROR);
+                    throw new Exception(Application::EX);
                     //bug when dir.data = empty ?
                 }
                 if($this->route()->error('read')){
