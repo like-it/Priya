@@ -1,8 +1,0 @@
- Priya {$priya.version}
- {$content.body|default:""}
- /**
- {literal}
- {terminal.screen($x, $y)}
- {terminal.put()
-{/literal}
-**/
