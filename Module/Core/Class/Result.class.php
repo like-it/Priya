@@ -74,6 +74,7 @@ class Result extends Parser {
             );
         }
         $ignore = array();
+        //add user ?
         $ignore[] = 'users';
         $ignore[] = 'contentType';
 //         $ignore[] = 'autoload';
