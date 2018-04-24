@@ -512,7 +512,6 @@ class Handler extends \Priya\Module\Core\Data{
             return implode('.', $explode);
         }
         return false;
-
     }
 
     public function extension(){
