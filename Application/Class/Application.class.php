@@ -201,7 +201,6 @@ class Application extends Parser {
             ;
         }
         $cache = $this->cache($url, 'route');
-
         if($cache){
             $this->route(new Module\Route(
                 $this->handler(),
@@ -507,9 +506,7 @@ class Application extends Parser {
             }
         }
         elseif(is_string($result)){
-            if($result != Handler::CONTENT_TYPE_CLI){
-                $result = $result;
-            } else {
+            if($result == Handler::CONTENT_TYPE_CLI){
                 $result = ob_get_contents();
                 ob_end_clean();
             }
