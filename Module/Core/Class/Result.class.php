@@ -81,21 +81,25 @@ class Result extends Parser {
         $this->data('ignore', $ignore);
     }
 
-    public static function response($object=null){
+    public static function response($object=null, $type='respond'){
         $read = get_called_class();
         $data = $object->read($read);
         $object->data($data);
-
         $explode = explode('\\', $read);
         $template = array_pop($explode);
-
         $dir = dirname($read::DIR) . Application::DS . Result::RESPONSE . Application::DS;
-
         $url = $dir . $template . '.response';
-
+        if($type == 'url'){
+            return $url;
+        }
         $location = array();
         $location[] = $url;
-
+        if($type == 'location'){
+            $template = array_pop($explode) . '.' . $template;
+            $url = $dir . $template . '.response';
+            $location[] = $url;
+            return $location;
+        }
         if(!file_exists($url)){
             $template = array_pop($explode) . '.' . $template;
             $url = $dir . $template . '.response';
@@ -108,8 +112,8 @@ class Result extends Parser {
                 throw new Exception($exception);
             }
         }
-        $parse = new Parse($object->handler(), $object->route(), $object->data());
-        $response = $parse->read($url);
+        $parser = new Parser($object->handler(), $object->route(), $object->data());
+        $response = $parser->read($url);
         return $response;
     }
 

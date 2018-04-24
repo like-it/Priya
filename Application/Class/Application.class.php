@@ -213,7 +213,7 @@ class Application extends Parser {
                 clone $this->data()
             ));
             $this->route()->create('Application.Version');
-            $this->route()->create('Application.Licence');
+            $this->route()->create('Application.License');
             $this->route()->create('Application.Locate');
             $this->route()->create('Application.Config');
             $this->route()->create('Application.Help');
