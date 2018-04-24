@@ -16,6 +16,8 @@ class Tpl extends Autoload {
     const DIR_CSS = 'Css';
     const DIR_JS = 'Js';
 
+    const EXCEPTION_REGISTER = 'unable to register resulting data, no target specified.';
+
     private $seperator = false;
 
     public function __destruct(){
@@ -27,7 +29,7 @@ class Tpl extends Autoload {
     }
 
     public function register($method='tpl_load', $prepend=false){
-        trigger_error('unable to register resulting data, no target specified.');
+        throw new Exception(Tpl::EXCEPTION_REGISTER);
     }
 
     public function tpl_load($load){
