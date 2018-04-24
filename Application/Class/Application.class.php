@@ -429,7 +429,7 @@ class Application extends Parser {
                 trigger_error('method (' . $item->function . ') not exists in class: (' . get_class($controller) . ')');
             } else {
                 if(method_exists($controller, 'autoload')){
-                    $controller->autoload($this->autoload());
+                    $controller->autoload(parent::autoload());
                 }
                 if(method_exists($controller, 'parser')){
                     $controller->parser('object')->random($this->parser('object')->random());
