@@ -10,10 +10,15 @@
 namespace Priya\Module;
 
 use stdClass;
+use Exception;
 use Priya\Application;
 
 class Core {
     const FILE = __FILE__;
+
+    const EXCEPTION_PERMISSION_TYPE = 'unknown permission type.';
+    const EXCEPTION_MERGE_ARRAY_OBJECT = 'cannot merge an array with an object';
+    const EXCEPTION_OBJECT_OUTPUT = 'unknown output in object';
 
     private $cwd;
     private $mail;
@@ -584,7 +589,7 @@ class Core {
                 return $this->has_permission($permission);
             break;
             default:
-                trigger_error('unknown permission type.');
+                throw new Exception(Core::EXCEPTION_PERMISSION_TYPE);
             break;
         }
     }
@@ -737,7 +742,7 @@ class Core {
             elseif($output == 'array') {
                 return array($input);
             } else {
-                throw new Exception('unknown output in object');
+                throw new Exception(Core::EXCEPTION_OBJECT_OUTPUT);
             }
         }
         if(is_null($input)){
@@ -829,7 +834,7 @@ class Core {
         elseif($output=='array'){
             return json_decode($data,true);
         } else {
-            throw new Exception('unknown output in object');
+            throw new Exception(Core::EXCEPTION_OBJECT_OUTPUT);
         }
     }
 
@@ -1089,7 +1094,7 @@ class Core {
             if(is_array($object)){
                 foreach($object as $key => $value){
                     if(is_object($main)){
-                        throw new Exception('cannot merge an array with an object');
+                        throw new Exception(Core::EXCEPTION_MERGE_ARRAY_OBJECT);
                     }
                     if(!isset($main[$key])){
                         $main[$key] = $value;
