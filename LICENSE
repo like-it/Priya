@@ -1,19 +1,13 @@
 Priya License
 
-Copyright (c) 2017 Remco van der Velde (info@priya.software)
+Copyright (c) 2015-2018 Remco van der Velde (info@priya.software)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, subject to the following conditions:
 
 - Personal useage: Free (like a blog)
-- Commercial Licence
-
-  If you wish to use the Priya framework for commercial purposes we have these licences:
-
-  - Security licence: &euro; 1999,- per year (patching the software with security updates)
-  - Backend Whitelabel: &euro; 8999,- per year (No need for showing Priya logo on backend session (either disabled or own logo)
-  - Frontend Whitelabel: &euro; 49,- per year per domain and server. 
+- See https://priya.software for a Commercial Licence
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
