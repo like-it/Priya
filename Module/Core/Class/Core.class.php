@@ -703,7 +703,7 @@ class Core {
         return end($explode);
     }
 
-    public function namespace(){
+    public static function namespace(){
         $explode = explode('\\', get_called_class());
         array_pop($explode);
         if(empty($explode)){
