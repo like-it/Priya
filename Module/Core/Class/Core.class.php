@@ -694,11 +694,11 @@ class Core {
         return $this->autoload;
     }
 
-    public function debug($output='', $title=null, $isExport=false){
+    public static function debug($output='', $title=null, $isExport=false){
         debug($output, $title, $isExport);
     }
 
-    public function class(){
+    public static function class(){
         $explode = explode('\\', get_called_class());
         return end($explode);
     }
