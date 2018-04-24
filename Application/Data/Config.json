@@ -3,7 +3,7 @@
         "environment": "production",
         "version": "{$priya.major|default:0}.{$priya.minor|default:0}.{$priya.patch|default:0}",
         "contentType": {
-            "txt" : "text\/plain",
+            "txt": "text\/plain",
             "html": "text\/html",
             "css": "text\/css",
             "pcss": "text\/css",
@@ -21,7 +21,7 @@
         },
         "major": 0,
         "minor": 3,
-        "patch": 0,
-        "built": "2018-03-01 01:57:59"
+        "patch": 1,
+        "built": "2018-04-25 01:15:05"
     }
 }

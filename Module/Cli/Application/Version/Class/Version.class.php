@@ -20,7 +20,7 @@ class Version extends Cli {
         if($this->parameter('update')){
             $this->update();
             exec('priya version', $output);
-            return implode(PHP_EOL, $output);
+            return implode(PHP_EOL, $output) . PHP_EOL;
         } else {
             return $this->result('cli');
         }
