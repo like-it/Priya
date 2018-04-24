@@ -2,8 +2,6 @@
 
 function debug($debug=null, $title=null, $is_export=false, $trace_extra=0){
     $trace = debug_backtrace(true);
-    var_dump($trace[0]);
-    die;
     if(php_sapi_name() === 'cli'){
         echo strtoupper($title) . PHP_EOL;
         echo '-----------------------------------------------------------------' . PHP_EOL;
