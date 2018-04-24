@@ -15,8 +15,6 @@ use Priya\Module\File;
 
 class Data extends Autoload {
 
-    use \Priya\Module\Core\Object;
-
     public function __destruct(){
         if(!empty($this->read)){
             $dir = dirname(Autoload::DIR) . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;

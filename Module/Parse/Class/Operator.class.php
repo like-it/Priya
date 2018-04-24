@@ -89,6 +89,9 @@ class Operator extends Core {
 
     public static function has($set=array()){
         foreach($set as $nr => $record){
+            if(!isset($record['type'])){
+                continue;
+            }
             if($record['type'] == Tag::TYPE_OPERATOR){
                 return true;
             }
@@ -113,7 +116,13 @@ class Operator extends Core {
             if($record['type'] == Tag::TYPE_VARIABLE){
                 $record['variable'] = $record['string'];
             }
-            $record['type'] = strtolower(gettype($record['execute']));
+            if(!isset($record['execute'])){
+                var_dump($record);
+                die;
+            } else {
+                $record['type'] = strtolower(gettype($record['execute']));
+            }
+
             if(empty($record['type'])){
                 var_dump($record);
                 die;
@@ -130,7 +139,16 @@ class Operator extends Core {
             !empty($right)
         ){
             $operation = Operator::execute($left, $operator, $right, $parser);
-        } else {
+            return $operation;
+        }
+        elseif(
+            !empty($left) &&
+            empty($right)
+        ){
+            return $left[0]['execute'];
+        }
+        else {
+
             var_dump($left);
             var_dump($right);
             var_dump($operator);
@@ -162,9 +180,8 @@ die;
                     $left[0]['type'] == Tag::TYPE_OBJECT &&
                     $right[0]['type'] == Tag::TYPE_OBJECT
                 ){
-                    $result = $left[0]['execute'] + Operator::complete($right, $parser);
-                    var_dump($left);
-                    var_dump($right);
+                    $result = Parse::object_merge($left[0]['execute'], Operator::complete($right, $parser));
+                    return $result;
                 }
                 var_dump($operator);
                 var_dump($left);

@@ -15,6 +15,11 @@ class Set extends Core {
 
     public static function has($parse =array()){
         foreach ($parse as $nr => $record){
+            if(is_object($record)){
+                var_dump($record);
+                var_dump($parse);
+                die;
+            }
             if($record['type'] == Tag::TYPE_SET){
                 return true;
             }
@@ -24,7 +29,6 @@ class Set extends Core {
 
     public static function get($parse=array()){
         $highest = Set::highest($parse);
-
         $is_set = false;
         $set = array();
         foreach ($parse as $nr => $record){
@@ -42,6 +46,7 @@ class Set extends Core {
                     $is_set = false;
                     return $set;
                 } else {
+                    $record['set_depth'] = $highest;
                     $set[] = $record;
                 }
             }
@@ -59,6 +64,62 @@ class Set extends Core {
         return $depth;
     }
 
+    public static function string($parse=array(), $parser=null){
+        $highest = Set::highest($parse);
+        $is_set = false;
+        $string = '';
+        foreach ($parse as $nr => $record){
+            if(isset($record['set_depth']) && $record['set_depth'] == $highest){
+                //first one found
+                $is_set = true;
+                $string .= $record['string'];
+                continue;
+                //till first end parenthese with same depth
+            }
+            if($is_set === true){
+                if($record['string'] == ')' && $record['set_depth'] == $highest){
+                    $is_set = false;
+                    $string .= $record['string'];
+                    return $string;
+                }
+                elseif(isset($record['string'])) {
+                    $string .= $record['string'];
+                }
+            }
+        }
+        return $string;
+    }
+
+    public static function replace($parse=array(), $search=array(), $replace=array()){
+        $match = reset($search); //deep //left to right
+        $remove = false;
+        $is_replace = false;
+        foreach ($parse as $nr => $record){
+            if(isset($record['set_depth']) && $record['set_depth'] == $match['set_depth']){
+                $remove = true;
+            }
+            if(!empty($remove)){
+                if(empty($is_replace)){
+                    $replace['set_depth'] = $match['set_depth']-1; //lower the set_depth
+                    if($replace['set_depth'] === 0){
+                        unset($replace['set_depth']);
+                    }
+                    $parse[$nr] = $replace;
+                    $is_replace = true;
+                    continue;
+                }
+                unset($parse[$nr]);
+                if(
+                    $record['type'] == Tag::TYPE_SET &&
+                    $record['string'] == ')' &&
+                    $record['set_depth'] == $match['set_depth']
+                ){
+                    break;
+                }
+            }
+        }
+        return $parse;
+    }
 
     /*
     public static function find($tag='', $attribute='', $parser=null){

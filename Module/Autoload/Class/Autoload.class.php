@@ -12,7 +12,7 @@ namespace Priya\Module;
 
 use stdClass;
 
-class Autoload{
+class Autoload {
     const DIR = __DIR__;
     const FILE = 'Autoload.json';
     const EXT_PHP = 'php';

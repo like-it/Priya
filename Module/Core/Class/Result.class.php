@@ -10,6 +10,7 @@
 namespace Priya\Module\Core;
 
 use stdClass;
+use Exception;
 use Priya\Application;
 use Priya\Module\Handler;
 use Priya\Module\Route;
@@ -19,10 +20,15 @@ use Priya\Module\File;
 use Priya\Module\File\Dir;
 use Priya\Module\Core\Parser;
 use Priya\Module\File\Cache;
+use Priya\Module\Parse;
 
 class Result extends Parser {
     const DIR = __DIR__;
     const FILE = __FILE__;
+
+    const RESPONSE = 'Response';
+
+    const EXCEPTION_RESPONSE = 'Response file expected in one of these locations: ';
 
     private $result;
 
@@ -73,6 +79,38 @@ class Result extends Parser {
         $ignore[] = 'contentType';
 //         $ignore[] = 'autoload';
         $this->data('ignore', $ignore);
+    }
+
+    public static function response($object=null){
+        $read = get_called_class();
+        $data = $object->read($read);
+        $object->data($data);
+
+        $explode = explode('\\', $read);
+        $template = array_pop($explode);
+
+        $dir = dirname($read::DIR) . Application::DS . Result::RESPONSE . Application::DS;
+
+        $url = $dir . $template . '.response';
+
+        $location = array();
+        $location[] = $url;
+
+        if(!file_exists($url)){
+            $template = array_pop($explode) . '.' . $template;
+            $url = $dir . $template . '.response';
+            $location[] = $url;
+            if(!file_exists($url)){
+                $exception =  Result::EXCEPTION_RESPONSE.
+                    "\n" .
+                    implode("\n", $location)
+                ;
+                throw new Exception($exception);
+            }
+        }
+        $parse = new Parse($object->handler(), $object->route(), $object->data());
+        $response = $parse->read($url);
+        return $response;
     }
 
     public function exec($target='', $read=''){
@@ -554,6 +592,7 @@ class Result extends Parser {
 
     public function createPage($template=''){
         $contentType = $this->request('contentType');
+
         $template_list = (array) $this->locateTemplate($template, 'tpl');
 
         $result = new stdClass();

@@ -39,18 +39,29 @@ class Variable extends Core {
         $set_counter = 0;
         while(Set::has($tag['statement'])){
             $set_counter++;
+            $replace = array();
+
             $set = Set::get($tag['statement']);
+            $tag['set'][] = $set;
+            $search = $set;
+            $replace['string'] = Set::string($tag['statement']);
+
             $operator_counter = 0;
             while (Operator::has($set)){
                 $operator_counter++;
                 $set = Operator::find($set, $parser);
-
                 if($operator_counter > Operator::MAX){
                     break;
                 }
             }
-            var_dump($set);
+            $replace['type'] = strtolower(gettype($set));
+            $replace['execute'] = $set;
+            $tag['statement'] = Set::replace($tag['statement'], $search, $replace);
+            var_dump($tag);
             die;
+            if($set_counter > Set::MAX){
+                break;
+            }
         }
 
 
