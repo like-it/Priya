@@ -2,6 +2,8 @@
 
 namespace Priya\Module\Parser;
 
+use Exception;
+
 class Modifier extends Core {
     const MAX = 1024;
 
@@ -119,7 +121,7 @@ class Modifier extends Core {
             if(file_exists($url)){
                 require_once $url;
             } else {
-                trigger_error('Modifier (' . $name .') not found (' . $url . ')', E_USER_ERROR);
+                throw new Exception('Modifier (' . $name .') not found (' . $url . ')');
             }
             $value = $name($value, $argument, $parser);
             if(!empty($modifier['is_cast'])){
@@ -246,7 +248,7 @@ class Modifier extends Core {
         if(file_exists($url)){
             require_once $url;
         } else {
-            trigger_error('Modifier (' . $name .') not found (' . $url . ')', E_USER_ERROR);
+            throw new Exception('Modifier (' . $name .') not found (' . $url . ')');
         }
         $value = '';
         foreach ($operator['left_parse'] as $before){
