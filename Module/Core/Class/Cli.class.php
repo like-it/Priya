@@ -137,7 +137,6 @@ class Cli extends Result {
                 $this->color($color, $background);
             }
             echo $text;
-//             $this->tput('reset');
             ob_flush();
         } else {
             return parent::write($url);
@@ -188,11 +187,6 @@ class Cli extends Result {
         if(!is_numeric($start_x)){
             $start_x += 0;
         }
-        if(!is_numeric($height)){
-            var_dump('found');
-            var_Dump($height);
-            die;
-        }
         for($y=$start_y; $y < ($height + $start_y); $y++){
             for($x=$start_x; $x < ($width + $start_x); $x++){
                 $char = ' ';
@@ -212,9 +206,6 @@ class Cli extends Result {
         if(!is_array($grid)){
             return;
         }
-
-//         var_Dump($grid);
-
         $this->output($this->tput('clear'));
         $this->output($this->tput('home'));
 
@@ -233,10 +224,7 @@ class Cli extends Result {
         }
         $this->output(implode('', $content));
         $this->output($this->tput('reset'));
-//         $this-
         $this->output($this->tput('home'));
-//         $this->tput('position', array(0, ($this->tput('height') - 1)));
-//         $this->input('Priya: ');
     }
 
     public function output($text='', $class=''){
