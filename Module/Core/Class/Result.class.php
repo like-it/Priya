@@ -67,7 +67,6 @@ class Result extends Parser {
                     Application::DATA .
                     Application::DS
             );
-
             $this->data('module.dir.public',
                     $this->data('module.dir.root') .
                     $this->data('public_html') .
@@ -596,9 +595,7 @@ class Result extends Parser {
 
     public function createPage($template=''){
         $contentType = $this->request('contentType');
-
         $template_list = (array) $this->locateTemplate($template, 'tpl');
-
         $result = new stdClass();
         $file = new \Priya\Module\File();
         $this->data('request', $this->request());
