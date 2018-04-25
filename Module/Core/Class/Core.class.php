@@ -94,6 +94,9 @@ class Core {
     }
 
     public static function mtime(){
+        $class = get_called_class();
+        var_dump($class);
+        
         return filemtime(get_called_class()::FILE);
     }
     public function handler($handler=null){
