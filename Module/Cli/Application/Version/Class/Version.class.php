@@ -19,6 +19,7 @@ class Version extends Cli {
     public function run(){
         if($this->parameter('update')){
             $this->update();
+            exec('priya cache clear', $output);
             exec('priya version', $output);
             return implode(PHP_EOL, $output) . PHP_EOL;
         } else {
