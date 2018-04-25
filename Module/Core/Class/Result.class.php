@@ -352,10 +352,22 @@ class Result extends Parser {
         }
         $smarty->assign('request', $this->object($this->request(), 'array'));
         $session = $this->object($this->session(), 'array');
-        $smarty->assign('session', $session);
         if(!empty($session['user'])){
+            if(isset($session['user']['profile'])){
+                $profile = $session['user']['profile'];
+                $session['user']['profile'] = $this->parser('object')->compile($profile, $this->data());
+                if(file_exists($session['user']['profile'])){
+                    $object = new Data();
+                    $read = $object->read($session['user']['profile']);
+                    $read = $this->parser('object')->compile($read, $this->data());
+                    $session['user']['profile'] = $read;
+                } else {
+                    $session['user']['profile'] = false;
+                }
+            }
             $smarty->assign('user', $session['user']);
         }
+        $smarty->assign('session', $session);
         $error = array();
         if(!empty($session['error'])){
             $error = $session['error'];
