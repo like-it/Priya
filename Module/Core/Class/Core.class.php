@@ -96,8 +96,8 @@ class Core {
     public static function mtime(){
         $class = get_called_class();
         var_dump($class);
-        
-        return filemtime(get_called_class()::FILE);
+        die;
+//         return filemtime(get_called_class()::FILE);
     }
     public function handler($handler=null){
         if($handler !== null){
@@ -706,12 +706,12 @@ class Core {
         debug($output, $title, $isExport);
     }
 
-    public static function class(){
+    public static function php_class(){
         $explode = explode('\\', get_called_class());
         return end($explode);
     }
 
-    public static function namespace(){
+    public static function php_namespace(){
         $explode = explode('\\', get_called_class());
         array_pop($explode);
         if(empty($explode)){

@@ -10,11 +10,10 @@
 namespace Priya\Module;
 
 use stdClass;
-// use Exception;
+use Exception;
 use Priya\Application;
-use Priya\Module\Core\Parser;
 
-class Route extends Parser{
+class Route extends Core\Parser{
     const DIR = __DIR__;
 
     private $item;
