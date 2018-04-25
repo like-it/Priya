@@ -1,0 +1,1 @@
+{if $response == 'binary'}{require("{$module.dir.data}Priya.bin")}{/if}{if $response == 'create'}{require("{$module.dir.response}Create.response")}{/if}

@@ -22,7 +22,6 @@ class Application extends Parser {
     const DS = DIRECTORY_SEPARATOR;
     const DIR = __DIR__;
     const PRIYA = 'Priya';
-    const BIN = 'Bin';
     const ENVIRONMENT = 'development';
     const MODULE = 'Module';
     const TEMPLATE = 'Template';
@@ -30,6 +29,7 @@ class Application extends Parser {
     const PAGE = 'Page';
     const DATA = 'Data';
     const BACKUP = 'Backup';
+    const PROCESSOR = 'Processor';
     const RESTORE = 'Restore';
     const UPDATE = 'Update';
     const VENDOR = 'Vendor';
@@ -182,6 +182,11 @@ class Application extends Parser {
             Cache::CACHE .
             Application::DS
         );
+        $this->data('priya.dir.processor',
+            $this->data('priya.dir.data') .
+            Application::PROCESSOR .
+            Application::DS
+        );
         $this->data('dir.vendor',
             dirname(dirname($this->data('priya.dir.application'))) .
             Application::DS
@@ -226,6 +231,7 @@ class Application extends Parser {
             ));
             $this->route()->create('Application.Version');
             $this->route()->create('Application.License');
+            $this->route()->create('Application.Bin');
             $this->route()->create('Application.Locate');
             $this->route()->create('Application.Config');
             $this->route()->create('Application.Help');

@@ -70,6 +70,11 @@ class Result extends Parser {
                     Application::DATA .
                     Application::DS
             );
+            $this->data('module.dir.response',
+                $this->data('module.dir.root') .
+                Result::RESPONSE .
+                Application::DS
+            );
             $this->data('module.dir.public',
                     $this->data('module.dir.root') .
                     $this->data('public_html') .
@@ -90,6 +95,7 @@ class Result extends Parser {
         $object->data($data);
         $explode = explode('\\', $read);
         $template = array_pop($explode);
+        //can be outside priya module...
         $dir = dirname($read::DIR) . Application::DS . Result::RESPONSE . Application::DS;
         $url = $dir . $template . Result::EXT_RESPONSE;
         if($type == 'url'){

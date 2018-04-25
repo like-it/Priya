@@ -25,7 +25,6 @@ class Version extends Cli {
         } else {
             return $this->result('cli');
         }
-
     }
 
     private function update(){
