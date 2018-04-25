@@ -44,6 +44,7 @@ the target directory should be (Mention the upper case for git & zip):
 there will also be a getting started repository with examples.
 
 The software is **free** for personal usage (like a blog)
+
 Commercial licences are available on https://priya.software
 
 
