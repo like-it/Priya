@@ -6,15 +6,17 @@
         "priya",
         "framework",
         "cli",
-        "like-it"
+        "php",
+        "php7",
+        "javascript"
     ],
     "homepage" : "https://github.com/like-it/Priya/",
-    "license" : "MIT",
+    "license" : "https://priya.software/licence",
     "authors" : [{
             "name" : "Remco van der Velde",
-            "email" : "remco.pc@outlook.com",
-            "homepage" : "http://like-it.cloud",
-            "role" : "Developer"
+            "email" : "remco@priya.software",
+            "homepage" : "http://priya.software",
+            "role" : "Maintainer"
         }
     ],
     "require" : {
