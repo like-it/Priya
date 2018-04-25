@@ -31,13 +31,9 @@ the target directory should be (Mention the upper case for git & zip):
 
  ````
  {
-
     "require" : {
-
         "priya/priya" : ">=0.3.0"
-
     }
-
 }
 ````
 
