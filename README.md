@@ -1,18 +1,17 @@
+<p align="center"><a href="https://priya.software" target="_blank">
+<img src="https://priya.software/Priya/Public/Image/Priya.png" height="24">
+</p>
+
 # Priya
 
-Visit http://priya.software for more information
 
-# CLI
+[Priya][1] is a **PHP & Javascript** framework for web / cli applications.
+It uses a set of built-in **Modules** and **Smarty** or **Priya** as a **template engine**.
 
-````
-cd /bin
-wget https://priya.software/priya
-chmod +x priya
-priya
+Installation
+------------
 
-````
+Commercial licences are available on https://priya.software
 
-# Licence
-Copyright 2017 Remco van der Velde (remco@priya.software)
 
-Permission is hereby granted, to read the code for free. Licences are available on https://priya.software
+[1]: https://priya.software
