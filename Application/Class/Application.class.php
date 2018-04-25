@@ -34,7 +34,6 @@ class Application extends Parser {
     const UPDATE = 'Update';
     const VENDOR = 'Vendor';
     const TEMP = 'Temp';
-    const CACHE = 'Cache';
     const PUBLIC_HTML = 'Public';
     const HOST = 'Host';
     const CSS = 'Css';
@@ -54,11 +53,8 @@ class Application extends Parser {
 //         set_exception_handler(array('Priya\Module\Core','handler_exception'));
 //         set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->init();
-        $url = $this->data('priya.dir.application') .
-            Application::DATA .
-            Application::DS .
-            Cache::CACHE .
-            Application::DS .
+
+        $url = $this->data('priya.dir.cache') .
             Cache::MINUTE .
             Application::DS .
             Application::URL
@@ -173,6 +169,17 @@ class Application extends Parser {
         $this->data('dir.ds', Application::DS);
         $this->data('priya.dir.application',
             dirname(Application::DIR) .
+            Application::DS
+        );
+        $this->data('priya.dir.data',
+            dirname(Application::DIR) .
+            Application::DS .
+            Application::DATA .
+            Application::DS
+        );
+        $this->data('priya.dir.cache',
+            $this->data('priya.dir.data') .
+            Cache::CACHE .
             Application::DS
         );
         $this->data('dir.vendor',

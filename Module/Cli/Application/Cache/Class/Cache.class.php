@@ -18,23 +18,34 @@ class Cache extends Cli {
 
     public function run(){
         if($this->parameter('clear')){
-            $this->clear('smarty');
+            Cache::clear($this, 'application');
+            Cache::clear($this, 'smarty');
         }
-
+        return Cache::response($this);
         return $this->result('cli');
     }
 
-    public function clear($clear=''){
-        switch ($clear){
+    public static function clear($object, $type=''){
+        switch ($type){
             case 'smarty':
-                return $this->clearSmarty();
+                $object->output('Clearing Smarty cache...' . PHP_EOL);
+                return Cache::clearSmarty($object);
+            case 'application':
+                $object->output('Clearing Application cache...' . PHP_EOL);
+                return Cache::clearApplication($object);
             break;
         }
     }
 
-    private function clearSmarty(){
+    private static function clearApplication($object){
+        $url = $object->data('priya.dir.cache');
+        $dir = new Dir();
+        return $dir->delete($url);
+    }
+
+    private static function clearSmarty($object){
         $url =
-            $this->data('priya.dir.module') .
+            $object->data('priya.dir.module') .
               'Smarty' .
               Application::DS .
               'Data' .
