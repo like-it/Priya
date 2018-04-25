@@ -21,17 +21,19 @@ class Cache extends Cli {
             Cache::clear($this, 'application');
             Cache::clear($this, 'smarty');
         }
+        $this->data('delete', 'response');
         return Cache::response($this);
         return $this->result('cli');
     }
 
     public static function clear($object, $type=''){
+        $object->data('response', $type);
         switch ($type){
             case 'smarty':
-                $object->output('Clearing Smarty cache...' . PHP_EOL);
+                echo Cache::response($object);
                 return Cache::clearSmarty($object);
             case 'application':
-                $object->output('Clearing Application cache...' . PHP_EOL);
+                echo Cache::response($object);
                 return Cache::clearApplication($object);
             break;
         }
