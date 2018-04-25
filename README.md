@@ -17,8 +17,23 @@ You have **three** options to install **[Priya][1]**
 2. Clone the repository
 3. Using Composer
 
+the target directory should be (Mention the upper case for git & zip):
+ `root of your project/vendor/Priya` using **git** or **zip**
+ `root of your project/Vendor/Priya` using **git** or **zip**
+ `root of your project/vendor/priya/priya` using **composer**
 
+ composer.json
+------------
 
+ `{
+    "require" : {
+        "priya/priya" : ">=0.3.0"
+    }
+}`
+
+ther will also be a getting started repository with examples.
+
+The software is for personal usage (like a blog) free
 Commercial licences are available on https://priya.software
 
 
