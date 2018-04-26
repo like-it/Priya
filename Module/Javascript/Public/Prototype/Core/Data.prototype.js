@@ -1,4 +1,4 @@
-priya.data = function (attribute, value){
+_('prototype').data = function (attribute, value){
     if(attribute == 'remove'){
         if(this.attribute('has', 'data-' + value)){
             return this.attribute('remove','data-' + value);
@@ -248,3 +248,5 @@ priya.data = function (attribute, value){
         }
     }
 }
+
+priya.data = _('prototype').data;

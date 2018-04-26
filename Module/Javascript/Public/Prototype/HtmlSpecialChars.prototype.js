@@ -133,7 +133,7 @@ string = string.replace(/&#0*39;/g, "'")
   return string
 }
 
-module.exports = function html_entity_decode (string, quoteStyle) { // eslint-disable-line camelcase
+_('prototype').html_entity_decode = function(string, quoteStyle) { // eslint-disable-line camelcase
   //  discuss at: http://locutus.io/php/html_entity_decode/
   // original by: john (http://www.jd-tech.net)
   //    input by: ger

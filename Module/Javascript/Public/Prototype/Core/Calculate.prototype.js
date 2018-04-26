@@ -1,4 +1,4 @@
-priya.calculate = function (calculate){
+_('prototype').calculate = function (calculate){
     var result = null;
     switch(calculate){
         case 'all':
@@ -81,3 +81,5 @@ priya.calculate = function (calculate){
         break;
     }
 }
+
+priya.calculate = _('prototype').calculate;

@@ -1,4 +1,4 @@
-priya.attribute = function (attribute, value){
+_('prototype').attribute = function (attribute, value){
     if(attribute == 'has'){
         var attr;
         for (attr in this.attributes){
@@ -67,3 +67,5 @@ priya.attribute = function (attribute, value){
         return value;
     }
 }
+
+priya.attribute = _('prototype').attribute;

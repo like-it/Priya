@@ -9,18 +9,3 @@ priya.init = function (data, configuration){
     }
     return data;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-priya.children = function (index){
+_('prototype').children = function (index){
     var children;
     if(typeof index == 'undefined'){
         children = this.childNodes;
@@ -24,3 +24,5 @@ priya.children = function (index){
     }
     return false;
 }
+
+priya.children = _('prototype').children;

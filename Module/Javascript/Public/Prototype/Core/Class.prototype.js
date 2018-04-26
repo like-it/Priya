@@ -1,4 +1,4 @@
-priya.addClass = function(className){
+_('prototype').addClass = function(className){
     var className = this.str_replace('&&', ' ', className);
     var list = className.split(' ');
     var index;
@@ -30,7 +30,7 @@ priya.addClass = function(className){
     return this;
 }
 
-priya.removeClass = function(className){
+_('prototype').removeClass = function(className){
     var className = this.str_replace('&&', ' ', className);
     if(typeof this.className == 'undefined'){
         var index;
@@ -55,7 +55,7 @@ priya.removeClass = function(className){
     return this;
 }
 
-priya.toggleClass = function(className){
+_('prototype').toggleClass = function(className){
     var className = this.str_replace('&&', ' ', className);
     if(typeof this.className == 'undefined'){
         var index;
@@ -82,7 +82,9 @@ priya.toggleClass = function(className){
     return this;
 }
 
-priya.hasClass = function (className){
+
+
+_('prototype').hasClass = function (className){
     var className = this.str_replace('&&', ' ', className);
     if(typeof this.className == 'undefined'){
         var index;
@@ -112,3 +114,9 @@ priya.hasClass = function (className){
     }
     return false;
 }
+
+
+priya.addClass = _('prototype').addClass;
+priya.removeClass = _('prototype').removeClass;
+priya.toggleClass = _('prototype').toggleClass;
+priya.hasClass = _('prototype').hasClass;
