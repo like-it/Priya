@@ -1,4 +1,4 @@
-priya.in_array = function (needle, haystack, strict) {
+_('prototype').in_array = function (needle, haystack, strict) {
     var key = ''
     var strict = !!strict
     if (strict) {
@@ -16,3 +16,5 @@ priya.in_array = function (needle, haystack, strict) {
     }
     return false
 }
+
+priya.in_array = _('prototype').in_array;

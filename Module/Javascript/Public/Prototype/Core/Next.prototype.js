@@ -1,4 +1,4 @@
-priya.next = function (tagName){
+_('prototype').next = function (tagName){
     if(!tagName){
         tagName = this.tagName;
     }
@@ -25,3 +25,5 @@ priya.next = function (tagName){
         return attach(found);
     }
 }
+
+priya.next = _('prototype').next;

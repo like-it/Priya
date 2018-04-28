@@ -1,4 +1,4 @@
-priya.on = function (event, action, capture){
+_('prototype').on = function (event, action, capture){
     if(typeof this['Priya'] == 'undefined'){
         console.log('Priya undefined');
         console.log(this);
@@ -40,3 +40,5 @@ priya.on = function (event, action, capture){
         return this;
     }
 }
+
+priya.on = _('prototype').on;

@@ -27,8 +27,6 @@ _('prototype').naturalCompare = function (a, b){
             : code < 123 ? code + 5        /* a-z */
             : code - 63
     }
-
-
     if ((a+="") != (b+="")) for (;codeB;) {
         codeA = getCode(a, posA++)
         codeB = getCode(b, posB++)

@@ -18,7 +18,6 @@ _('prototype').data = function (attribute, value){
                 console.log(value);
                 console.log(data);
                 return
-
             }
         }
     }
@@ -147,7 +146,6 @@ _('prototype').data = function (attribute, value){
                     object.value = textarea.value;
                     value.push(object);
                 }
-
             }
             if(this.is_nodeList(select)){
                 var collection = {};
@@ -219,7 +217,6 @@ _('prototype').data = function (attribute, value){
                     var object = this.object_horizontal(split, this.attributes[attr].value);
                     value = this.object_merge(value, object);
                 }
-
             }
             return value;
         }

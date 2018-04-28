@@ -1,4 +1,4 @@
-priya.remove = function (){
+_('prototype').remove = function (){
     if(this.is_nodeList(this)){
         var index;
         for(index=0; index < this.length; index++){
@@ -15,3 +15,5 @@ priya.remove = function (){
         }
     }
 }
+
+priya.remove = _('prototype').remove;

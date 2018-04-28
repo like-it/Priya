@@ -1,4 +1,4 @@
-priya.previous = function (tagName){
+_('prototype').previous = function (tagName){
     if(!tagName){
         tagName = this.tagName;
     }
@@ -27,3 +27,5 @@ priya.previous = function (tagName){
     }
     return null;
 }
+
+priya.previous = _('prototype').previous;

@@ -1,6 +1,5 @@
 _('prototype').debug = function (data){
     var string = 'Loading Debug...';
-
     var node = run('.debug');
     if(!node){
         var node = priya.create('div', 'dialog no-select debug');

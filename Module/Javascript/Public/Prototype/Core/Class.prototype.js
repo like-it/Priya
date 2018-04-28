@@ -23,7 +23,6 @@ _('prototype').addClass = function(className){
                     this.debug('error in classlist with ' + this.classname + ' ' + name);
                     console.log(this);
                 }
-
             }
         }
     }
@@ -82,8 +81,6 @@ _('prototype').toggleClass = function(className){
     return this;
 }
 
-
-
 _('prototype').hasClass = function (className){
     var className = this.str_replace('&&', ' ', className);
     if(typeof this.className == 'undefined'){
@@ -114,7 +111,6 @@ _('prototype').hasClass = function (className){
     }
     return false;
 }
-
 
 priya.addClass = _('prototype').addClass;
 priya.removeClass = _('prototype').removeClass;

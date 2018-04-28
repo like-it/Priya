@@ -1,4 +1,4 @@
- priya.link = function (data, closure){
+_('prototype').link = function (data, closure){
     if(typeof data == 'undefined'){
         return;
     }
@@ -44,5 +44,6 @@
         }
         return this;
     }
-
 }
+
+priya.link = _('prototype').link;

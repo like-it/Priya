@@ -1,4 +1,4 @@
-priya.scrollbar = function(attribute, type){
+_('prototype').scrollbar = function(attribute, type){
     if(attribute == 'y' || attribute == 'top'){
         return this.data('scrollbar-y', this.scrollTop);
     }
@@ -49,3 +49,5 @@ priya.scrollbar = function(attribute, type){
         }
     }
 }
+
+priya.scrollbar = _('prototype').scrollbar;

@@ -1,4 +1,4 @@
-priya.script = function (data, closure){
+_('prototype').script = function (data, closure){
     if(typeof data == 'undefined'){
         return;
     }
@@ -41,7 +41,7 @@ priya.script = function (data, closure){
     return this;
 }
 
-priya.addScriptSrc = function (data){
+_('prototype').addScriptSrc = function (data){
     var tag = this.readTag(data);
     if(!this.isset(tag['tagName']) || tag['tagName'] != 'script'){
         return;
@@ -60,7 +60,7 @@ priya.addScriptSrc = function (data){
     document.getElementsByTagName("head")[0].appendChild(element);
 }
 
-priya.addScriptText = function (data){
+_('prototype').addScriptText = function (data){
     var tag = this.readTag(data);
     if(!this.isset(tag['tagName']) || tag['tagName'] != 'script'){
         return;
@@ -95,7 +95,7 @@ priya.addScriptText = function (data){
     document.getElementsByTagName("head")[0].appendChild(element);
 }
 
-priya.readTag = function (data){
+_('prototype').readTag = function (data){
     var temp = this.explode('>', this.trim(data));
     temp = this.explode(' ', this.trim(temp[0]));
     var index;
@@ -115,3 +115,8 @@ priya.readTag = function (data){
     }
     return tag;
 }
+
+priya.script = _('prototype').script;
+priya.addScriptSrc = _('prototype').addScriptSrc;
+priya.addScriptText = _('prototype').addScriptText;
+priya.readTag = _('prototype').readTag;

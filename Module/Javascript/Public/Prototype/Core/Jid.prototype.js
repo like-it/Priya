@@ -1,4 +1,4 @@
-priya.jid = function (list){
+_('prototype').jid = function (list){
     if(typeof list == 'undefined'){
         list = 'priya';
     }
@@ -8,5 +8,6 @@ priya.jid = function (list){
     } else{
         console.log(data);
     }
-
 }
+
+priya.jid = _('prototype').jid;

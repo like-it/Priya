@@ -1,4 +1,4 @@
-priya.refresh = function (data){
+_('prototype').refresh = function (data){
     if(typeof data == 'undefined'){
         return;
     }
@@ -11,3 +11,5 @@ priya.refresh = function (data){
     window.location.href = data.refresh;
     return data;
 }
+
+priya.refresh = _('prototype').refresh;
