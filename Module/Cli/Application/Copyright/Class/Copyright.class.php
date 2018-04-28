@@ -9,17 +9,16 @@
 
 namespace Priya\Module\Cli\Application;
 
-use Priya\Application;
 use Priya\Module\Core\Cli;
-use Priya\Module\File\Dir;
+use Priya\Module\Data;
+use Priya\Application;
+use Priya\Module\File;
 
-class Bin extends Cli {
+class Copyright extends Cli {
     const DIR = __DIR__;
 
     public function run(){
-        $this->data('execute', 'binary');
-        $this->data('binary', Bin::execute($this));
-        $this->data('execute', 'create');
-        return Bin::execute($this);
+        $execute = License::execute($this);
+        return $execute;
     }
 }

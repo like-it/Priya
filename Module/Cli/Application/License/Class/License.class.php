@@ -21,36 +21,36 @@ class License extends Cli {
     public function run(){
         $update = $this->parameter('update');
         if($update){
-            License::update(License::response($this, 'url'));
+            License::update(License::execute($this, 'url'));
         }
-        $response = License::response($this);
-        $response = License::require($this, $response);
-        return $response;
+        $execute = License::execute($this);
+        $execute = License::require($this, $execute);
+        return $execute;
     }
 
     private static function update($target=''){
         $file = new File();
-        $response = $file->read(License::URL);
-        if(!empty($response)){
-            $file->write($target, $response);
-            return $response;
+        $execute = $file->read(License::URL);
+        if(!empty($execute)){
+            $file->write($target, $execute);
+            return $execute;
         }
     }
 
-    private static function require($object, $response=''){
-        $url = $object->data('priya.dir.root') . strtoupper(License::class());
+    private static function require($object, $execute=''){
+        $url = $object->data('priya.dir.root') . strtoupper(License::php_class());
         if(!file_exists($url)){
-            $response = License::update(License::response($this, 'url'));
+            $execute = License::update(License::execute($this, 'url'));
             $file = new File();
-            $file->write($url, $response);
+            $file->write($url, $execute);
         } else {
             $file = new File();
             $read = $file->read($url);
-            if($response != $read){
-                $file->write($url, $response);
+            if($execute != $read){
+                $file->write($url, $execute);
             }
         }
-        return $response;
+        return $execute;
     }
 
 }

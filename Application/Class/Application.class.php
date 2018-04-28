@@ -229,6 +229,7 @@ class Application extends Parser {
                 $this->handler(),
                 clone $this->data()
             ));
+            $this->route()->create('Application.Copyright');
             $this->route()->create('Application.Version');
             $this->route()->create('Application.License');
             $this->route()->create('Application.Bin');
@@ -240,7 +241,7 @@ class Application extends Parser {
             $this->route()->create('Application.Parser');
             $this->route()->create('Application.Cache');
             $this->route()->create('Application.Zip');
-            $this->route()->create('Test');
+            $this->route()->create('Test'); //connects to priya.software & submit results (also duration for benchmarks...)
         }
         $this->write($url,'route');
     }

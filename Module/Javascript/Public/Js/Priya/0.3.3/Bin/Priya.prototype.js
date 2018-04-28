@@ -18,7 +18,7 @@
  */
 
 var priya = function (collection){
-    this.version = '0.3.2';
+    this.version = '0.3.3';
     this.collect = {};
     this.parent = this;
     this.load = 0;
@@ -61,10 +61,6 @@ var priya = function (collection){
             });
         }
     });
-}
-
-data = function () {
-    console.log('test');
 }
 
 priya.prototype.namespace = function (namespace) {

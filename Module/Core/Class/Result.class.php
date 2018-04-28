@@ -26,10 +26,10 @@ class Result extends Parser {
     const DIR = __DIR__;
     const FILE = __FILE__;
 
-    const RESPONSE = 'Response';
-    const EXT_RESPONSE = '.response';
+    const EXECUTE = 'Response';
+    const EXT_EXECUTE = '.exe';
 
-    const EXCEPTION_RESPONSE = 'Response file expected in one of these locations: ';
+    const EXCEPTION_EXECUTE = 'Execute file expected in one of these locations: ';
     const EXCEPTION_COMPILE_DIR = 'Unable to create compile dir';
     const EXCEPTION_CACHE_DIR = 'Unable to create cache dir';
 
@@ -70,9 +70,9 @@ class Result extends Parser {
                     Application::DATA .
                     Application::DS
             );
-            $this->data('module.dir.response',
+            $this->data('module.dir.execute',
                 $this->data('module.dir.root') .
-                Result::RESPONSE .
+                Result::EXECUTE .
                 Application::DS
             );
             $this->data('module.dir.public',
@@ -89,15 +89,16 @@ class Result extends Parser {
         $this->data('ignore', $ignore);
     }
 
-    public static function response($object=null, $type='respond'){
+    public static function execute($object=null, $type='respond'){
+        //execution cannot be cached, we need a different name -> response?
         $read = get_called_class();
         $data = $object->read($read);
         $object->data($data);
         $explode = explode('\\', $read);
         $template = array_pop($explode);
         //can be outside priya module...
-        $dir = dirname($read::DIR) . Application::DS . Result::RESPONSE . Application::DS;
-        $url = $dir . $template . Result::EXT_RESPONSE;
+        $dir = dirname($read::DIR) . Application::DS . Result::EXECUTE . Application::DS;
+        $url = $dir . $template . Result::EXT_EXECUTE;
         if($type == 'url'){
             return $url;
         }
@@ -105,16 +106,16 @@ class Result extends Parser {
         $location[] = $url;
         if($type == 'location'){
             $template = array_pop($explode) . '.' . $template;
-            $url = $dir . $template . '.response';
+            $url = $dir . $template . Result::EXT_EXECUTE;
             $location[] = $url;
             return $location;
         }
         if(!file_exists($url)){
             $template = array_pop($explode) . '.' . $template;
-            $url = $dir . $template . '.response';
+            $url = $dir . $template . Result::EXT_EXECUTE;
             $location[] = $url;
             if(!file_exists($url)){
-                $exception =  Result::EXCEPTION_RESPONSE.
+                $exception =  Result::EXCEPTION_EXECUTE.
                     "\n" .
                     implode("\n", $location)
                 ;
@@ -122,10 +123,11 @@ class Result extends Parser {
             }
         }
         $parser = new Parser($object->handler(), $object->route(), $object->data());
-        $response = $parser->read($url);
-        return $response;
+        $execute = $parser->read($url);
+        return $execute;
     }
 
+    /*
     public function exec($target='', $read=''){
         if(empty($read)){
             $read = get_called_class();
@@ -156,6 +158,7 @@ class Result extends Parser {
             }
         }
     }
+    */
 
     public function cache($target='', $read=''){
         $dir = dirname($read::DIR)  .
