@@ -27,14 +27,25 @@ class Cli extends Main {
 
     public function createScript(){
         echo 'Reading Bootstrap.json...' . PHP_EOL;
-        $url = dirname($this->data('module.dir.root')) . Application::DS  . 'Data' . Application::DS . 'Development' . Application::DS . 'Javascript.json';
+        $url = dirname($this->data('module.dir.root')) . Application::DS  . 'Data' . Application::DS . 'Development' . Application::DS . 'Bootstrap.json';
         $this->read($url);
 
         $core = $this->data('require.core');
 
         $file = new File();
 
-        $dirname= dirname($this->data('module.dir.root')) . Application::DS . $this->data('public_html') . Application::DS . 'Js' . Application::DS . 'Priya' . Application::DS;
+        $dirname =
+            dirname($this->data('module.dir.root')) .
+            Application::DS .
+            $this->data('public_html') .
+            Application::DS .
+            'Js' .
+            Application::DS .
+            'Priya' .
+             Application::DS .
+             $this->data('priya.version') .
+             Application::DS
+        ;
 
         if(!is_dir($dirname)){
             mkdir($dirname, Dir::CHMOD, true);
@@ -55,8 +66,17 @@ class Cli extends Main {
                 mkdir($target_dirname, Dir::CHMOD, true);
             }
             echo 'Copy  ('.  $file->basename($target) .') ...' . PHP_EOL;
-            $copy =  $file->copy($source->url, $target);
-
+            $copy = $file->read($source->url);
+            $copy = str_replace(
+                array(
+                    '{$priya.version}'
+                ),
+                array(
+                    $this->data('priya.version')
+                ),
+                $copy
+            );
+            $file->write($target, $copy);
         }
         echo 'Creating Core...' . PHP_EOL;
         $module = '';
@@ -77,9 +97,24 @@ class Cli extends Main {
             }
         }
         echo 'Progress: ' . $counter . '/' . $count . PHP_EOL;
-        $target = dirname($this->data('module.dir.root')) . Application::DS . $this->data('public_html') . Application::DS . 'Js' . Application::DS . 'Priya' . Application::DS . 'Bin' . Application::DS . 'Core-' . $this->data('priya.version') . '.js';
+        $target =
+            dirname($this->data('module.dir.root')) .
+            Application::DS .
+            $this->data('public_html') .
+            Application::DS .
+            'Js' .
+            Application::DS .
+            'Priya' .
+            Application::DS .
+            $this->data('priya.version') .
+            Application::DS .
+            'Bin' .
+            Application::DS .
+            'Core-' .
+            $this->data('priya.version') .
+            '.js'
+        ;
         $dirname = dirname($target);
-
         if(!is_dir($dirname)){
             mkdir($dirname, Dir::CHMOD, true);
         }
@@ -98,5 +133,4 @@ class Cli extends Main {
         }
         echo $target . PHP_EOL;
     }
-
 }

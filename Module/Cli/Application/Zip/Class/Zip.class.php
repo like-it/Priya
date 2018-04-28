@@ -103,7 +103,6 @@ class Zip extends Cli {
 
         $zip = new ZipArchive();
         $res = $zip->open($target, ZipArchive::CREATE);
-
         $count = count($read);
         if($count == 0){
             return;
