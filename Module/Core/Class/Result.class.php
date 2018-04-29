@@ -26,7 +26,7 @@ class Result extends Parser {
     const DIR = __DIR__;
     const FILE = __FILE__;
 
-    const EXECUTE = 'Response';
+    const EXECUTE = 'Execute';
     const EXT_EXECUTE = '.exe';
 
     const EXCEPTION_EXECUTE = 'Execute file expected in one of these locations: ';

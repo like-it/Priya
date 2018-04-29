@@ -18,7 +18,7 @@ class Copyright extends Cli {
     const DIR = __DIR__;
 
     public function run(){
-        $execute = License::execute($this);
+        $execute = Copyright::execute($this);
         return $execute;
     }
 }
