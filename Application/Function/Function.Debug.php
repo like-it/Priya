@@ -10,7 +10,7 @@ function debug($debug=null, $title=null, $is_export=false, $trace_extra=0){
         } else {
             var_dump($debug);
         }
-
+        echo PHP_EOL;
     } else {
         if(isset($trace[0 + $trace_extra])){
             echo '<section class="debug">';

@@ -2,20 +2,20 @@ _('prototype').explode = function (delimiter, string, limit){
     if (arguments.length < 2 || typeof delimiter === 'undefined' || typeof string === 'undefined'){
         return null;
     }
-      if (delimiter === '' || delimiter === false || delimiter === null){
-          return false;
-      }
-      if (typeof delimiter === 'function' || typeof delimiter === 'object' || typeof string === 'function' || typeof string ==='object') {
+    if (delimiter === '' || delimiter === false || delimiter === null){
+        return false;
+    }
+    if (typeof delimiter === 'function' || typeof delimiter === 'object' || typeof string === 'function' || typeof string ==='object') {
         return {
               0: ''
         };
-      }
-      if (delimiter === true){
-          delimiter = '1';
-      }
+    }
+    if (delimiter === true){
+        delimiter = '1';
+    }
     delimiter += '';
     string += '';
-      var s = string.split(delimiter);
+    var s = string.split(delimiter);
     if (typeof limit === 'undefined'){
         return s;
     }

@@ -24,8 +24,12 @@ function function_select($function=array(), $argumentList=array(), $parser=null)
         $result = $parser->data($select);
     }
     if($url){
+        if(file_exists($url) === false){
+            throw new Exception('File not exists (' . $url . ')');
+        }
         $data = new Data();
         $data->read($url);
+        $data->data($parser->compile($data->data(), $parser->data(), true, true));
         $result = $data->data($select);
     }
     $function['execute'] = $result;

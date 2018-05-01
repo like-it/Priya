@@ -1,4 +1,4 @@
-priya.find = function(selector, attach) {
+_('prototype').find = function(selector, attach) {
     if (!this.id) {
         this.id = this.attribute('id', 'priya-find-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999) + '-' + this.rand(1000, 9999));
         var removeId = true;
@@ -29,3 +29,5 @@ priya.find = function(selector, attach) {
     }
     return list;
 };
+
+priya.find = _('prototype').find;

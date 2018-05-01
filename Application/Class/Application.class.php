@@ -10,11 +10,11 @@
 namespace Priya;
 
 use stdClass;
+use Exception;
 use Priya\Module\File;
 use Priya\Module\Handler;
 use Priya\Module\Core\Parser;
 use Priya\Module\Core\Data;
-use Priya\Module\Core\Object;
 use Priya\Module\File\Dir;
 use Priya\Module\File\Cache;
 
@@ -22,7 +22,6 @@ class Application extends Parser {
     const DS = DIRECTORY_SEPARATOR;
     const DIR = __DIR__;
     const PRIYA = 'Priya';
-    const BIN = 'Bin';
     const ENVIRONMENT = 'development';
     const MODULE = 'Module';
     const TEMPLATE = 'Template';
@@ -30,11 +29,11 @@ class Application extends Parser {
     const PAGE = 'Page';
     const DATA = 'Data';
     const BACKUP = 'Backup';
+    const PROCESSOR = 'Processor';
     const RESTORE = 'Restore';
     const UPDATE = 'Update';
     const VENDOR = 'Vendor';
     const TEMP = 'Temp';
-    const CACHE = 'Cache';
     const PUBLIC_HTML = 'Public';
     const HOST = 'Host';
     const CSS = 'Css';
@@ -45,16 +44,17 @@ class Application extends Parser {
     const CREDENTIAL = 'Credential.json';
     const URL = 'Application';
 
+    const EXCEPTION_DIR_APPLICATION = 'No application directory defined.';
+    const EXCEPTION_REQUEST = 'cannot route to SELF';
+    const EXCEPTION_APPLICATION_ERROR = 'cannot route to Application/Error/';
+
     public function __construct($autoload=null, $data=null){
         $this->cwd(getcwd());
 //         set_exception_handler(array('Priya\Module\Core','handler_exception'));
 //         set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->init();
-        $url = $this->data('priya.dir.application') .
-            Application::DATA .
-            Application::DS .
-            Cache::CACHE .
-            Application::DS .
+
+        $url = $this->data('priya.dir.cache') .
             Cache::MINUTE .
             Application::DS .
             Application::URL
@@ -171,6 +171,22 @@ class Application extends Parser {
             dirname(Application::DIR) .
             Application::DS
         );
+        $this->data('priya.dir.data',
+            dirname(Application::DIR) .
+            Application::DS .
+            Application::DATA .
+            Application::DS
+        );
+        $this->data('priya.dir.cache',
+            $this->data('priya.dir.data') .
+            Cache::CACHE .
+            Application::DS
+        );
+        $this->data('priya.dir.processor',
+            $this->data('priya.dir.data') .
+            Application::PROCESSOR .
+            Application::DS
+        );
         $this->data('dir.vendor',
             dirname(dirname($this->data('priya.dir.application'))) .
             Application::DS
@@ -202,7 +218,6 @@ class Application extends Parser {
             ;
         }
         $cache = $this->cache($url, 'route');
-
         if($cache){
             $this->route(new Module\Route(
                 $this->handler(),
@@ -214,7 +229,10 @@ class Application extends Parser {
                 $this->handler(),
                 clone $this->data()
             ));
+            $this->route()->create('Application.Copyright');
             $this->route()->create('Application.Version');
+            $this->route()->create('Application.License');
+            $this->route()->create('Application.Bin');
             $this->route()->create('Application.Locate');
             $this->route()->create('Application.Config');
             $this->route()->create('Application.Help');
@@ -222,22 +240,8 @@ class Application extends Parser {
             $this->route()->create('Application.Route');
             $this->route()->create('Application.Parser');
             $this->route()->create('Application.Cache');
-            $this->route()->create('Application.Check');
-            $this->route()->create('Application.Install');
             $this->route()->create('Application.Zip');
-            $this->route()->create('Test');
-        }
-
-        if(empty($url)){
-            $url = $this->data('priya.dir.application') .
-                Application::DATA .
-                Application::DS .
-                Cache::CACHE .
-                Application::DS .
-                Cache::MINUTE .
-                Application::DS .
-                Application::ROUTE
-            ;
+            $this->route()->create('Test'); //connects to priya.software & submit results (also duration for benchmarks...)
         }
         $this->write($url,'route');
     }
@@ -333,13 +337,12 @@ class Application extends Parser {
         $this->write($url);
         parent::autoload()->environment($this->data('priya.environment'));
         if(!$this->data('priya.dir.application')){
-            var_dump($this->data());
-            die;
+            throw new Exception(Application::EXCEPTION_DIR_APPLICATION);
         }
         chdir($this->data('priya.dir.application'));
         $request = $this->request('request');
         if($request ===  $this->data('parser.request') && $request !== null){
-            trigger_error('cannot route to SELF', E_USER_ERROR);
+            throw new Exception(Application::EXCEPTION_REQUEST);
         }
         $url = $this->handler()->url();
         $etag = sha1($url);
@@ -429,6 +432,7 @@ class Application extends Parser {
             $this->header('Last-Modified: '. $this->request('last-modified'));
         }
         $item = $this->route()->run();
+        $this->cli();
         $handler = $this->handler();
         $contentType = $handler->request('contentType');
         $result = '';
@@ -438,10 +442,10 @@ class Application extends Parser {
         if(!empty($item->controller)){
             $controller = new $item->controller($this->handler(), $this->route(), $this->data());
             if(method_exists($controller, $item->function) === false){
-                trigger_error('method (' . $item->function . ') not exists in class: (' . get_class($controller) . ')');
+                throw new Exception('method (' . $item->function . ') not exists in class: (' . get_class($controller) . ')');
             } else {
                 if(method_exists($controller, 'autoload')){
-                    $controller->autoload($this->autoload());
+                    $controller->autoload(parent::autoload());
                 }
                 if(method_exists($controller, 'parser')){
                     $controller->parser('object')->random($this->parser('object')->random());
@@ -467,9 +471,9 @@ class Application extends Parser {
             }
         }
         elseif(!empty($item->url)){
+            $this->data('request', $item->request);
             $parser = new \Priya\Module\Parser($this->handler(), $this->route(), $this->data());
-            $item->url = $parser->compile($item->url, $this->data());
-
+            $item->url = $parser->compile($item->url, $this->data(), false, true);
 
             if(file_exists($item->url) && strstr(strtolower($item->url), strtolower($this->data('public_html'))) !== false){
                $file = new File();
@@ -478,6 +482,7 @@ class Application extends Parser {
                     $ext = 'txt'; //to handle Licence file
                }
                $contentType = $allowed_contentType->{$ext};
+
                $this->header('Content-Type: ' . $contentType);
                $result = $file->read($item->url);
             } else {
@@ -487,7 +492,7 @@ class Application extends Parser {
         else {
             if($contentType == Handler::CONTENT_TYPE_CLI){
                 if($request == 'Application/Error/'){
-                    trigger_error('cannot route to Application/Error/', E_USER_ERROR);
+                    throw new Exception(Application::EX);
                     //bug when dir.data = empty ?
                 }
                 if($this->route()->error('read')){
@@ -517,15 +522,14 @@ class Application extends Parser {
             }
         }
         elseif(is_string($result)){
-            if($result != Handler::CONTENT_TYPE_CLI){
-                $result = $result;
-            } else {
+            if($result == Handler::CONTENT_TYPE_CLI){
                 $result = ob_get_contents();
                 ob_end_clean();
             }
         }
         elseif(is_array($result)){
             var_dump($result);
+            die;
         }
         else {
 //          404
@@ -538,33 +542,17 @@ class Application extends Parser {
         $request = $this->request('data');
         if(!empty($request)){
             if(is_array($request) || is_object($request)){
-                $key = false;
-                $value = null;
                 foreach($request as $attribute){
-                    if(!empty($key)){
-                        $value = $attribute;
-                    }
                     $attribute = explode('=', $attribute, 2);
-                    if(count($attribute) == 2){
-                        switch($attribute[0]){
-                            case 'dir.data':
-                                $key = $attribute[0];
-                                $value = $attribute[1];
-                            break;
-                        }
-                    } else {
-                        switch($attribute[0]){
-                            case 'dir.data':
-                                $key = $attribute[0];
-                                continue;
-                            break;
-                        }
-                    }
+                    if(isset($attribute[1])){
+                        $key = $attribute[0];
+                        $value = $attribute[1];
 
-                    if(!empty($key) && isset($value)){
-                        $this->data($key, $value);
-                        unset($key);
-                        unset($value);
+                        if(!empty($key) && isset($value)){
+                            $this->request($key, $value);
+                            unset($key);
+                            unset($value);
+                        }
                     }
                 }
             }

@@ -1,4 +1,4 @@
-priya.loader = function(data){
+_('prototype').loader = function(data){
     if(data == 'remove'){
          priya.select('.priya-gui-loader').addClass('fade-out');
          setTimeout(function(){
@@ -11,3 +11,5 @@ priya.loader = function(data){
     load.innerHTML = '<div class="priya-gui-loader"></div>';
     body.append(load);
 }
+
+priya.loader = _('prototype').loader;

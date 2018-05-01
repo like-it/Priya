@@ -1,4 +1,4 @@
-priya.basename = function (path, suffix){
+_('prototype').basename = function (path, suffix){
     var b = path;
     var lastChar = b.charAt(b.length - 1);
     if (lastChar === '/' || lastChar === '\\') {
@@ -10,3 +10,5 @@ priya.basename = function (path, suffix){
     }
     return b;
 }
+
+priya.basename = _('prototype').basename;

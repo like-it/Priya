@@ -1,4 +1,4 @@
-priya.stristr = function (haystack, needle, bool){
+_('prototype').stristr = function (haystack, needle, bool){
     var pos = 0;
     haystack += '';
     pos = haystack.toLowerCase().indexOf((needle + '').toLowerCase());
@@ -12,3 +12,5 @@ priya.stristr = function (haystack, needle, bool){
         }
     }
 }
+
+priya.stristr = _('prototype').stristr;

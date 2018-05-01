@@ -1,4 +1,4 @@
-priya.val = function (value){
+_('prototype').val = function (value){
     if(typeof this.value == 'undefined'){
         return false;
     }
@@ -8,3 +8,5 @@ priya.val = function (value){
 
     return this.value;
 }
+
+priya.val = _('prototype').val;

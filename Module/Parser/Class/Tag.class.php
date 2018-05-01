@@ -16,12 +16,7 @@ class Tag extends Core {
         //might add if too... (in the future, new version)
     );
 
-    public function __construct($input=null, $random=null){
-        $this->input($input);
-        $this->random($random);
-    }
-
-    public function filter($list=array(), $attribute=array(), $value=array(), $action=null){
+    public static function control($list=array()){
         //add source line nr to list tag
         $close_tags = array();
         foreach($list as $nr => $value){
@@ -86,17 +81,15 @@ class Tag extends Core {
         return $list;
     }
 
-    public function find($input=null){
-        if($input === null){
-            $input = $this->input();
-        } else {
-            $this->input($input);
+    public static function find($input=null){
+        $tagged = array();
+        if(!is_string($input)){
+            return $tagged;
         }
-        $input = Literal::replace($input, $this->random());
+//         echo __LINE__ . '::' . __FILE__ . $input;
         $explode = Tag::explode($input);
 //         $pattern = '/\$([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/';
         $pattern = '/\{.*\}/';
-        $tagged = array();
         foreach($explode as $key => $value){
             preg_match_all($pattern, $value, $matches, PREG_SET_ORDER);
             if(!empty($matches)){
@@ -104,6 +97,6 @@ class Tag extends Core {
                 $tagged[][$match] = '';
             }
         }
-        return $this->output($tagged);
+        return $tagged;
     }
 }

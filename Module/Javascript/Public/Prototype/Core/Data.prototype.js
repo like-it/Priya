@@ -1,4 +1,4 @@
-priya.data = function (attribute, value){
+_('prototype').data = function (attribute, value){
     if(attribute == 'remove'){
         if(this.attribute('has', 'data-' + value)){
             return this.attribute('remove','data-' + value);
@@ -18,7 +18,6 @@ priya.data = function (attribute, value){
                 console.log(value);
                 console.log(data);
                 return
-
             }
         }
     }
@@ -147,7 +146,6 @@ priya.data = function (attribute, value){
                     object.value = textarea.value;
                     value.push(object);
                 }
-
             }
             if(this.is_nodeList(select)){
                 var collection = {};
@@ -219,7 +217,6 @@ priya.data = function (attribute, value){
                     var object = this.object_horizontal(split, this.attributes[attr].value);
                     value = this.object_merge(value, object);
                 }
-
             }
             return value;
         }
@@ -248,3 +245,5 @@ priya.data = function (attribute, value){
         }
     }
 }
+
+priya.data = _('prototype').data;

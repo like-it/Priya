@@ -23,6 +23,12 @@ class File {
         return filemtime($url);
     }
 
+    public static function diskusage($url=''){
+        system('du ' . $url, $usage);
+        var_dump($usage);
+        die;
+    }
+
     public static function info(stdClass $node){
         $rev = strrev($node->name);
         $explode = explode('.', $rev, 2);
@@ -106,7 +112,7 @@ class File {
     public function extension($url=''){
         $url = basename($url);
         $ext = explode('.', $url);
-        if(count($ext)==1){
+        if(!isset($ext[1])){
             $extension = '';
         } else {
             $extension = array_pop($ext);

@@ -1,4 +1,4 @@
-priya.css = function(attribute, value){
+_('prototype').css = function(attribute, value){
     if(empty(value) && value !== 0 && value !== '0'){
         if(typeof this.style == 'undefined'){
             return '';
@@ -27,7 +27,7 @@ priya.css = function(attribute, value){
     }
 }
 
-priya.computeStyle = function(attribute, value){
+_('prototype').computeStyle = function(attribute, value){
     if(attribute == 'top' && value=='middle'){
         var height = parseInt(this.css('height'));
         value = 'calc(50% - ' + (height /2) + 'px)';
@@ -39,7 +39,7 @@ priya.computeStyle = function(attribute, value){
     return value;
 }
 
-priya.computedStyle = function(attribute){
+_('prototype').computedStyle = function(attribute){
     if(!this.Priya.style){
         this.Priya.style = window.getComputedStyle(this);
     }
@@ -49,3 +49,7 @@ priya.computedStyle = function(attribute){
         return this.Priya.style;
     }
 }
+
+priya.css = _('prototype').css;
+priya.computeStyle = _('prototype').computeStyle;
+priya.computedStyle = _('prototype').computedStyle;

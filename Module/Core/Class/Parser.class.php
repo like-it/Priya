@@ -32,8 +32,6 @@ class Parser extends Data {
                 )
             );
             $this->get_object_parser()->data($this->data());
-            $this->get_object_parser()->route($this->route());
-            $this->get_object_parser()->handler($this->handler());
         }
         return $this->get_object_parser();
     }
@@ -46,11 +44,11 @@ class Parser extends Data {
         return $this->object_parser;
     }
 
-    public function parser($data=null, $value=null){
-        if($data== 'object'){
+    public function parser($type=null, $data=null){
+        if($type== 'object'){
             return $this->object_parser();
         } else {
-            return $this->object_parser()->compile($data, $value);
+            return $this->object_parser()->compile($type, $data);
         }
     }
 

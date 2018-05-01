@@ -1,6 +1,6 @@
 {
 "archive" : {
-        "source" : "{$priya.dir.root}Module/Javascript/Public/Js/Priya/",
+        "source" : "{$priya.dir.root}Module/Javascript/Public/Js/Priya/{$priya.version}/",
         "target" : "{$priya.dir.root}Module/Javascript/Public/Download/Priya.Js-{$priya.version}.zip"
     }
 }

@@ -1,4 +1,4 @@
-priya.createSelector = function(element){
+_('prototype').createSelector = function(element){
     if(this.empty(element)){
         return '';
     }
@@ -19,3 +19,5 @@ priya.createSelector = function(element){
     }
     return selector;
 }
+
+priya.createSelector = _('prototype').createSelector;

@@ -4,7 +4,6 @@ namespace Priya\Module\Parser;
 
 use stdClass;
 use Exception;
-use Priya\Module\Core\Object;
 
 class Token extends Core {
     const TYPE_NULL = 'null';
@@ -149,31 +148,6 @@ class Token extends Core {
         return $tokens;
     }
 
-    public function unparse($parse=array()){
-        $string = '';
-        foreach($parse as $nr => $record){
-            if(is_array($record['value'])){
-                if(count($parse) == 1){
-                    $string = $record['value'];
-                } else {
-                    throw new Exception('Multiples for array found...');
-                }
-                continue;
-            }
-            elseif(is_object($record['value'])){
-                if(count($parse) == 1){
-                    $string = $record['value'];
-                } else {
-                    throw new Exception('Multiples for object found...');
-                }
-                continue;
-            }
-
-            $string .= $record['value'];
-        }
-        return $string;
-    }
-
     public static function parse($value= ''){
         if(is_array($value)){
             $tokens = $value;
@@ -289,7 +263,7 @@ class Token extends Core {
         }
     }
 
-    public static function create_object($value= '', $attribute='', Variable $variable, $parser=null){
+    public static function create_object($value= '', $attribute='', $parser=null){
         $parse = Token::parse($value);
         $object_start = false;
         $object_end = false;
@@ -307,13 +281,13 @@ class Token extends Core {
                 $object_start === true &&
                 $object_end === true
             ){
-                $parse = Token::variable($parse, $variable, $attribute);
+                $parse = Token::variable($parse, $attribute, $parser);
                 //if is_object($parse... assign the attributes
                 $method = array();
                 $method['parse'] = $parse;
-                $method = Token::method($method, $variable, $parser);
+                $method = Token::method($method, $parser);
                 $parse = $method['parse'];
-                $value = Token::string($value, $variable);
+                $value = Token::string($value, $parser);
                 $result = array();
                 $result['type'] = Token::TYPE_OBJECT;
                 if($record['is_cast'] === true){
@@ -334,6 +308,9 @@ class Token extends Core {
                     }
                 }
                 $result['value'] = $parser->compile($result['value'], $parser->data(), true);
+                if(!is_object($result['value'])){
+                    return array();
+                }
                 return $result;
                 break;
             }
@@ -341,7 +318,7 @@ class Token extends Core {
         return array();
     }
 
-    public static function create_array($value= '', Variable $variable){
+    public static function create_array($value= '', $parser=null){
         if(is_array($value)){
             $tokens = $value;
         } else {
@@ -360,7 +337,7 @@ class Token extends Core {
             if(Token::is_square_bracket($token, Token::TYPE_OPEN) && Token::is_square_bracket(end($tokens) ,  Token::TYPE_CLOSE)){
                 $record['type'] = Token::TYPE_ARRAY;
                 if(is_array($value)){
-                    $value = Token::string($value, $variable);
+                    $value = Token::string($value, parser);
                 }
                 if($record['is_cast'] === true){
                     $explode = explode($record['cast'], $value, 2);
@@ -537,7 +514,10 @@ class Token extends Core {
         return $result;
     }
 
-    public static function variable($parse=array(), Variable $variable, $attribute=null){
+    public static function variable($parse=array(), $attribute=null, $parser=null){
+//         $debug = debug_backtrace(true);
+//         var_dump($debug[0]);
+//         var_dump($debug[0]['args']);
         $parse = Variable::fix($parse);
 //         var_dump($parse);
         $result = array();
@@ -587,9 +567,23 @@ class Token extends Core {
                 $modifier = Token::modifier($parse, $record);
 
                 $original = $record['value'];
-//                 var_dump($modifier);
-//                 var_dump($record);
-                $record['value'] = $variable->replace($record['value'], $modifier);
+                if($parser->data('priya.parser.loop') && !in_array($parser->data('priya.parser.method.method'), array('require'))){
+                    $parser->data('priya.parser.loop2', 'for.each');
+                    if($parser->data('priya.parser.loop3')){
+                        echo 'found 5';
+                        var_dump($parser->data('priya.parser.method'));
+                        var_dump($parser->data());
+                        var_dump($record);
+                        die;
+                    }
+//                     echo 'found';
+//                     return array();
+                }
+                if($parser->data('priya.parser.loop')){
+//                     var_dump($record);
+//                     die;
+                }
+                $record['value'] = Variable::replace($record['value'], $modifier, false, $parser);
                 if($record['exclamation_count'] % 2 == 1){
                     $record['invert'] = true;
                 } else {
@@ -606,6 +600,7 @@ class Token extends Core {
                 $parse[$nr] = $record;
             }
         }
+//         var_dump($result);
         return $result;
     }
 
@@ -642,7 +637,7 @@ class Token extends Core {
      * @todo
      * - add cast
      */
-    public static function create_equation($parse=null, Variable $variable, $parser=null){
+    public static function create_equation($parse=null, $parser=null){
         $set_counter = 0;
         if(Operator::has($parse) === false){
             if(count($parse) == 1){
@@ -669,7 +664,7 @@ class Token extends Core {
             }
             while (Operator::has($statement)){
                 $operator_counter++;
-                $statement = Operator::statement($statement, $variable, $parser);
+                $statement = Operator::statement($statement, $parser);
 
                 if($operator_counter > Operator::MAX){
                     break;
@@ -687,7 +682,7 @@ class Token extends Core {
         $operator_counter = 0;
         while (Operator::has($parse)){
             $operator_counter++;
-            $parse = Operator::statement($parse, $variable, $parser);
+            $parse = Operator::statement($parse, $parser);
             if($operator_counter >= Operator::MAX){
                 break;
             }
@@ -932,7 +927,7 @@ class Token extends Core {
         }
     }
 
-    public static function string($tokens=array(), Variable $variable=null){
+    public static function string($tokens=array(), $parser=null){
         $string = '';
         $is_string = false;
         $is_variable = false;
@@ -994,10 +989,9 @@ class Token extends Core {
                             $token[2], array(
                                 'T_VARIABLE'
                             )
-                        ) &&
-                        is_object($variable)
+                        )
                     ){
-                        $token[1] = $variable->replace($token[1]);
+                        $token[1] = Variable::replace($token[1], '', false, $parser);
                     }
                 }
                 if($token[2] == 'T_COMMA'){
@@ -1051,6 +1045,7 @@ class Token extends Core {
             case 'T_DOUBLE_QUOTE' :
             case 'T_ARRAY' :        //might needs its own type
             case 'T_CLASS' :
+            case 'T_NAMESPACE' :
             case 'T_IS' :             //might needs its own type
             case 'T_DEFAULT' :         //might needs its own type
             case 'T_PUBLIC' :
@@ -1066,6 +1061,7 @@ class Token extends Core {
             case 'T_FOREACH' :
             case 'T_FOR' :
             case 'T_ELSE' :
+            case 'T_PLUS_EQUAL' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
@@ -1207,20 +1203,35 @@ class Token extends Core {
     }
 
     public static function restore_return($value='', $random=''){
-        $search = array();
-        $search[] = '[' . $random . '][return]';
-        $search[] = '[' . $random . '][newline]';
-        $replace = array();
-        $replace[] = "\r";
-        $replace[] = "\n";
-        $value = str_replace($search, $replace, $value);
+        if(is_array($value)){
+            foreach($value as $key => $val){
+                $value[$key] = Token::restore_return($val, $random);
+            }
+        }
+        elseif(is_object($value)){
+            foreach($value as $key => $val){
+                $value->{$key} = Token::restore_return($val, $random);
+            }
+        } else {
+            $search = array();
+            $search[] = '[' . $random . '][return]';
+            $search[] = '[' . $random . '][newline]';
+            $replace = array();
+            $replace[] = "\r";
+            $replace[] = "\n";
+            $value = str_replace($search, $replace, $value);
+        }
         return $value;
     }
 
-    public static function method($record=array(), Variable $variable, $parser=null, $depth=0){
+    public static function method($record=array(), $parser=null, $depth=0){
         $counter = 0;
         $has_method = false;
         $list = array();
+        if(!isset($record['string'])){
+            //create_object
+            //create_array
+        }
         foreach($record['parse'] as $parse){
             if(
                 isset($parse['is_executed']) &&
@@ -1231,9 +1242,15 @@ class Token extends Core {
                 return $record;
             }
         }
-        $method = Method::get($record['parse'], $variable, $parser);
+        $method = Method::get($record['parse'], $parser);
+
+        if($method === false && $parser->data('priya.parser.method')){
+            $parser->data('priya.parser.loop', 'init');
+        }
+//         var_dump($method);
 
         while($method !== false){
+            $parser->data('priya.parser.method', $method);
             $attribute = false;
             if(!empty($method['parse_method']) && is_array($method['parse_method'])){
                 foreach($method['parse_method'] as $key => $parse){
@@ -1249,7 +1266,8 @@ class Token extends Core {
                 } else {
                     $method['string'] = $record['string'];
                 }
-                $method = Method::execute($method, $variable, $parser);
+//                     echo __LINE__ . '::' . __FILE__ . PHP_EOL . '<br>';
+                $method = Method::execute($method, $parser);
                 $method = Method::exclamation($record, $method, $parser);
                 $record = Method::remove_exclamation($record);
                 $method = Token::cast($method);
@@ -1258,7 +1276,7 @@ class Token extends Core {
                 $record['parse'][$attribute] = $method;
                 ksort($record['parse']);
             }
-            $method = Method::get($record['parse'], $variable, $parser);
+            $method = Method::get($record['parse'], $parser);
             $counter++;
             if($counter >= Method::MAX){
                 break;

@@ -1,4 +1,4 @@
-priya.trigger = function (trigger, bubble, cancel){
+_('prototype').trigger = function (trigger, bubble, cancel){
     if(this.empty(bubble)){
         bubble = false;
     } else {
@@ -16,17 +16,19 @@ priya.trigger = function (trigger, bubble, cancel){
     /*event.initEvent(trigger, true, true);*/
     event.synthetic = true;
     if(typeof this.dispatchEvent == 'undefined'){
-    	if(priya.is_nodelist(this)){
-    		var index;
+        if(priya.is_nodelist(this)){
+            var index;
             for(index=0; index < this.length; index++){
                 node = this[index];
-                node.dispatchEvent(event, true);                
-            }    		
-    	} else {
-    		console.log('dispatch problem');
-            console.log(this);	
-    	}       
+                node.dispatchEvent(event, true);
+            }
+        } else {
+            console.log('dispatch problem');
+            console.log(this);
+        }
     } else {
         this.dispatchEvent(event, true);
     }
 }
+
+priya.trigger = _('prototype').trigger;

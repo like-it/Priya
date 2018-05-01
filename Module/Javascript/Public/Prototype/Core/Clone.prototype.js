@@ -1,4 +1,4 @@
-priya.clone = function (deep){
+_('prototype').clone = function (deep){
     var clone  = this.cloneNode(deep);
     clone = this.select(clone);
     if(typeof this['Priya']['eventListener'] != 'undefined'){
@@ -13,3 +13,5 @@ priya.clone = function (deep){
     }
     return clone;
 }
+
+priya.clone = _('prototype').clone;

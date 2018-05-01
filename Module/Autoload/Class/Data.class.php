@@ -9,13 +9,13 @@
 
 namespace Priya\Module\Autoload;
 
+use Exception;
 use Priya\Application;
 use Priya\Module\Autoload;
 use Priya\Module\File;
 
 class Data extends Autoload {
-
-    use \Priya\Module\Core\Object;
+    const EXCEPTION_REGISTER = 'unable to register resulting data, no target specified.';
 
     public function __destruct(){
         if(!empty($this->read)){
@@ -26,7 +26,7 @@ class Data extends Autoload {
     }
 
     public function register($method='data_load', $prepend=false){
-        trigger_error('unable to register resulting data, no target specified.');
+        throw new Exception(Data::EXCEPTION_REGISTER);
     }
 
     public function data_load($load){

@@ -11,7 +11,6 @@ namespace Priya\Module;
 
 use stdClass;
 use Priya\Application;
-use Priya\Module\Core\Object;
 
 class Handler extends \Priya\Module\Core\Data{
     const CONTENT_TYPE_CSS = 'text/css';
@@ -513,7 +512,6 @@ class Handler extends \Priya\Module\Core\Data{
             return implode('.', $explode);
         }
         return false;
-
     }
 
     public function extension(){

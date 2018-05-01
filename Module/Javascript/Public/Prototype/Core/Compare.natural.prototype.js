@@ -1,10 +1,10 @@
-priya.naturalICompare = function (a, b){
+_('prototype').naturalICompare = function (a, b){
     a = a.toLowerCase();
     b = b.toLowerCase();
     return naturalCompare(a, b);
 }
 
-priya.naturalCompare = function (a, b){
+_('prototype').naturalCompare = function (a, b){
     var i, codeA
     , codeB = 1
     , posA = 0
@@ -27,8 +27,6 @@ priya.naturalCompare = function (a, b){
             : code < 123 ? code + 5        /* a-z */
             : code - 63
     }
-
-
     if ((a+="") != (b+="")) for (;codeB;) {
         codeA = getCode(a, posA++)
         codeB = getCode(b, posB++)
@@ -43,3 +41,6 @@ priya.naturalCompare = function (a, b){
     }
     return 0
 }
+
+priya.naturalICompare = _('prototype').naturalICompare;
+priya.naturalCompare = _('prototype').naturalCompare;

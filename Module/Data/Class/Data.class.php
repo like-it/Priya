@@ -20,7 +20,13 @@ class Data extends Core {
     public $data;
 
     public function __construct($handler=null, $route=null, $data=null){
-        $this->data(Data::object_merge($this->data(), $handler));
+        if($handler && $route){
+            $this->handler($handler);
+            $this->route($route);
+            $this->data($data);
+        } else {
+            $this->data(Data::object_merge($this->data(), $handler));
+        }
     }
 
     public static function is_empty($data = array()){

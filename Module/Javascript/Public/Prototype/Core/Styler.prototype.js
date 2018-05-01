@@ -1,4 +1,4 @@
-priya.styler = function (data, closure){
+_('prototype').styler = function (data, closure){
     if(typeof data == 'undefined'){
         return;
     }
@@ -26,3 +26,5 @@ priya.styler = function (data, closure){
     }
     return this;
 }
+
+priya.styler = _('prototype').styler;

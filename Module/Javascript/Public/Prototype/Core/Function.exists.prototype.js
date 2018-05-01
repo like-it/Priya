@@ -1,4 +1,4 @@
-priya.function_exists = function (name){
+_('prototype').function_exists = function (name){
     if (typeof name === 'string'){
         if(typeof this == 'undefined'){
             return false;
@@ -11,3 +11,5 @@ priya.function_exists = function (name){
     }
     return typeof name === 'function';
 }
+
+priya.function_exists = _('prototype').function_exists;

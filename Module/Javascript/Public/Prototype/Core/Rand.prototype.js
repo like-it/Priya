@@ -1,4 +1,4 @@
-priya.rand = function (min, max) {
+_('prototype').rand = function (min, max) {
     var argc = arguments.length;
     if (argc === 0) {
         min = 0;
@@ -6,3 +6,5 @@ priya.rand = function (min, max) {
     }
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+priya.rand = _('prototype').rand;

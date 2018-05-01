@@ -10,6 +10,7 @@
 namespace Priya\Module\Core;
 
 use stdClass;
+use Exception;
 use Priya\Application;
 use Priya\Module\Handler;
 use Priya\Module\Route;
@@ -19,10 +20,21 @@ use Priya\Module\File;
 use Priya\Module\File\Dir;
 use Priya\Module\Core\Parser;
 use Priya\Module\File\Cache;
+use Priya\Module\Parse;
 
 class Result extends Parser {
     const DIR = __DIR__;
     const FILE = __FILE__;
+
+    const DATA = 'Data';
+    const EXECUTE = 'Execute';
+    const TEMPLATE = 'Template';
+
+    const EXT_EXECUTE = '.exe';
+
+    const EXCEPTION_EXECUTE = 'Execute file expected in one of these locations: ';
+    const EXCEPTION_COMPILE_DIR = 'Unable to create compile dir';
+    const EXCEPTION_CACHE_DIR = 'Unable to create cache dir';
 
     private $result;
 
@@ -61,7 +73,11 @@ class Result extends Parser {
                     Application::DATA .
                     Application::DS
             );
-
+            $this->data('module.dir.execute',
+                $this->data('module.dir.root') .
+                Result::EXECUTE .
+                Application::DS
+            );
             $this->data('module.dir.public',
                     $this->data('module.dir.root') .
                     $this->data('public_html') .
@@ -69,12 +85,52 @@ class Result extends Parser {
             );
         }
         $ignore = array();
+        //add user ?
         $ignore[] = 'users';
         $ignore[] = 'contentType';
 //         $ignore[] = 'autoload';
         $this->data('ignore', $ignore);
     }
 
+    public static function execute($object=null, $type='respond'){
+        //execution cannot be cached, we need a different name -> response?
+        $read = get_called_class();
+        $data = $object->read($read);
+        $object->data($data);
+        $explode = explode('\\', $read);
+        $template = array_pop($explode);
+        //can be outside priya module...
+        $dir = dirname($read::DIR) . Application::DS . Result::EXECUTE . Application::DS;
+        $url = $dir . $template . Result::EXT_EXECUTE;
+        if($type == 'url'){
+            return $url;
+        }
+        $location = array();
+        $location[] = $url;
+        if($type == 'location'){
+            $template = array_pop($explode) . '.' . $template;
+            $url = $dir . $template . Result::EXT_EXECUTE;
+            $location[] = $url;
+            return $location;
+        }
+        if(!file_exists($url)){
+            $template = array_pop($explode) . '.' . $template;
+            $url = $dir . $template . Result::EXT_EXECUTE;
+            $location[] = $url;
+            if(!file_exists($url)){
+                $exception =  Result::EXCEPTION_EXECUTE.
+                    "\n" .
+                    implode("\n", $location)
+                ;
+                throw new Exception($exception);
+            }
+        }
+        $parser = new Parser($object->handler(), $object->route(), $object->data());
+        $execute = $parser->read($url);
+        return $execute;
+    }
+
+    /*
     public function exec($target='', $read=''){
         if(empty($read)){
             $read = get_called_class();
@@ -92,15 +148,20 @@ class Result extends Parser {
             $this->read($read);
             if($target == 'page'){
                 $page =  $this->result($target);
-                $this->write($target, $read, $page);
+                if(!$this->session('has')){
+                    $this->write($target, $read, $page);
+                }
                 return $page;
             } else {
                 $data = $this->data($target); //(parsed in read)
-                $this->write($target, $read, $data);
+                if(!$this->session('has')){
+                    $this->write($target, $read, $data);
+                }
                 return $data;
             }
         }
     }
+    */
 
     public function cache($target='', $read=''){
         $dir = dirname($read::DIR)  .
@@ -246,10 +307,10 @@ class Result extends Parser {
             mkdir($dir_cache, Dir::CHMOD, true);
         }
         if(is_dir($dir_compile) === false){
-            trigger_error('unable to create compile dir', E_USER_ERROR);
+            throw new Exception(Result::EXCEPTION_COMPILE_DIR);
         }
         if(is_dir($dir_cache) === false){
-            trigger_error('unable to create cache dir', E_USER_ERROR);
+            throw new Exception(Result::EXCEPTION_CACHE_DIR);
         }
         $this->url($url);
         $dir = dirname($url);
@@ -297,10 +358,22 @@ class Result extends Parser {
         }
         $smarty->assign('request', $this->object($this->request(), 'array'));
         $session = $this->object($this->session(), 'array');
-        $smarty->assign('session', $session);
         if(!empty($session['user'])){
+            if(isset($session['user']['profile'])){
+                $profile = $session['user']['profile'];
+                $session['user']['profile'] = $this->parser('object')->compile($profile, $this->data());
+                if(file_exists($session['user']['profile'])){
+                    $object = new Data();
+                    $read = $object->read($session['user']['profile']);
+                    $read = $this->parser('object')->compile($read, $this->data());
+                    $session['user']['profile'] = $read;
+                } else {
+                    $session['user']['profile'] = false;
+                }
+            }
             $smarty->assign('user', $session['user']);
         }
+        $smarty->assign('session', $session);
         $error = array();
         if(!empty($session['error'])){
             $error = $session['error'];
@@ -551,7 +624,6 @@ class Result extends Parser {
     public function createPage($template=''){
         $contentType = $this->request('contentType');
         $template_list = (array) $this->locateTemplate($template, 'tpl');
-
         $result = new stdClass();
         $file = new \Priya\Module\File();
         $this->data('request', $this->request());

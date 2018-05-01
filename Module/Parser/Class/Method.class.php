@@ -2,18 +2,12 @@
 
 namespace Priya\Module\Parser;
 
-use Priya\Module\Core\Object;
 use Exception;
 
 class Method extends Core {
     const MAX = 1024;
 
-    public function __construct($data=null, $random=null){
-        $this->data($data);
-        $this->random($random);
-    }
-
-    public function find($record=array(), Variable $variable, \Priya\Module\Parser $parser){
+    public static function find($record=array(), \Priya\Module\Parser $parser){
         if(
             substr($record['method']['tag'], 0, 1) != '{' &&
             substr($record['method']['tag'], -1, 1) != '}'
@@ -27,7 +21,7 @@ class Method extends Core {
         //this has to find the first method in parse & return it!
         $is_method = false;
 
-        $record = Token::method($record, $variable, $parser);
+        $record = Token::method($record, $parser);
 
         //fix has_Exclamation
         foreach($record['parse'] as $key => $value){
@@ -41,6 +35,7 @@ class Method extends Core {
         } else {
             return $record;
         }
+//         debug($record, __LINE__ . '::' . __FILE__);
         if(!isset($record['string'])){
             return $record;
         }
@@ -143,7 +138,10 @@ class Method extends Core {
     }
 
 
-    public static function get($parse=array(), Variable $variable, $parser=null){
+    public static function get($parse=array(), $parser=null){
+//         $debug = debug_backtrace(true);
+//         var_dump($debug[0]);
+//         var_dump($debug[0]['args']);
         $is_method = false;
         $possible_method = false;
         $list = array();
@@ -189,7 +187,8 @@ class Method extends Core {
                     $result['method'] = str_replace('!', '', $result['method']);
                     $result['set']['depth'] = $method_part['set']['depth'];
 //                     var_dump($parameter); //not is parameter but parse?
-                    $result['parameter'] = Parameter::get($parameter, $variable);
+                    $result['parameter'] = Parameter::get($parameter, $parser);
+//                     var_dump($result['parameter']);
                     $result['parse_method'] = $parse_method; //all records of parse which is used to create the method
                     //maybe extend cast to all parse_method tokens
                     $possible_cast = reset($parse_method);
@@ -197,6 +196,7 @@ class Method extends Core {
                         $result['is_cast'] = true;;
                         $result['cast'] = $possible_cast['cast'];
                     }
+//                     var_dump($result);
                     return $result;
                 }
                 $parameter[] = $record;
@@ -272,7 +272,7 @@ class Method extends Core {
         return false;
     }
 
-    public static function execute($function=array(), Variable $variable, \Priya\Module\Parser $parser){
+    public static function execute($function=array(), \Priya\Module\Parser $parser){
         $name = str_replace(
             array(
                 '..',
@@ -282,6 +282,7 @@ class Method extends Core {
             '',
             ucfirst(strtolower($function['method']))
         );
+//         debug($function, __LINE__ . '::' . __FILE__);
         $function_name = $name;
         $url = __DIR__ . '/../Function/Function.List.php';
         if(
@@ -308,9 +309,9 @@ class Method extends Core {
         if(function_exists($name)){
             $argument = array();
             if(isset($function['parameter'])){
-                foreach ($function['parameter'] as $parameter){
+                foreach ($function['parameter'] as $nr => $parameter){
                     if(isset($parameter['value']) || $parameter['value'] === null){
-                        $parameter['value'] = $parser->compile($parameter['value'], $variable->data());
+                        $parameter['value'] = $parser->compile($parameter['value'], $parser->data());
                         $parameter = Value::type($parameter);
 
                         if($parameter['type'] == Token::TYPE_STRING && substr($parameter['value'], 0, 1) == '\'' && substr($parameter['value'], -1) == '\''){
@@ -318,10 +319,14 @@ class Method extends Core {
                             $parameter['value'] = str_replace('\\\'', '\'', $parameter['value']);
                         }
                         $argument[] = $parameter['value'];
+                        $function['parameter'][$nr] = $parameter;
                     }
                 }
             }
-            $function = $name($function, $argument, $parser, $variable->data());
+// echo '<hr><hr>';
+// echo $function['string'];
+// echo '<hr><hr>';
+            $function = $name($function, $argument, $parser, $parser->data());
             $function['value'] = $function['execute'];
 
             if($function['has_exclamation'] === true){

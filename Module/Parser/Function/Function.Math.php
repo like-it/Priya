@@ -58,7 +58,7 @@ function function_math($function=array(), $argumentList=array(), $parser=null){
 
     foreach ($match[1] as $function) {
         if ($function && !isset($params[$function]) && !isset($allowed_functions[$function])) {
-            trigger_error("math: function call '{$function}' not allowed, or missing parameter '{$function}'", E_USER_WARNING);
+            throw new Exception("math: function call '{$function}' not allowed, or missing parameter '{$function}'");
             return false;
         }
     }

@@ -83,7 +83,6 @@ _('prototype').request = function (url, data, script){
                 if(time > (start + offset)){
                     priya.loader();
                 }
-
             }
             if (xhttp.readyState == 4 ){
                 //status !- 200
@@ -95,7 +94,6 @@ _('prototype').request = function (url, data, script){
         priya.collection('request.microtime', microtime(true));
         xhttp.open("GET", url, true);
         xhttp.setRequestHeader("Content-Type", "application/json");
-
         xhttp.send();
     } else {
         priya.collection('request.microtime', microtime(true));
@@ -106,7 +104,6 @@ _('prototype').request = function (url, data, script){
         }
         var send = JSON.stringify(data);
         xhttp.send(send);
-
     }
 }
 

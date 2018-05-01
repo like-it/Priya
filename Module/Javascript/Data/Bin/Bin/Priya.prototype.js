@@ -18,7 +18,7 @@
  */
 
 var priya = function (collection){
-    this.version = '0.2.15';
+    this.version = '{$priya.version}';
     this.collect = {};
     this.parent = this;
     this.load = 0;
@@ -55,7 +55,7 @@ var priya = function (collection){
                 priya.expose('window');
                 if(data.require.file){
                     require(data.require.file, function(){
-                        priya.usleep(200);
+//                        priya.usleep(200);
                     });
                 }
             });
