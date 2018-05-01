@@ -64,6 +64,7 @@ class Parser extends ParserCore {
             $read = $file->read($url);
             $read = $this->compile($read, $this->data(), false, false);
             $read = Token::remove_comment($read);
+            $read = Literal::remove($read);
 //             debug($read, __LINE__ . '::' . __FILE__);
         }
         return $read;
