@@ -474,8 +474,10 @@ class Application extends Parser {
             $this->data('request', $item->request);
             $parser = new \Priya\Module\Parser($this->handler(), $this->route(), $this->data());
             $item->url = $parser->compile($item->url, $this->data(), false, true);
-
-            if(file_exists($item->url) && strstr(strtolower($item->url), strtolower($this->data('public_html'))) !== false){
+            if(
+               file_exists($item->url) &&
+               strstr(strtolower($item->url), strtolower($this->data('public_html'))) !== false
+            ){
                $file = new File();
                $ext = $file->extension($item->url);
                if(empty($ext)){

@@ -16,6 +16,8 @@ use Priya\Application;
 class Route extends Core\Parser{
     const DIR = __DIR__;
 
+    const LOCAL = 'local';
+
     private $item;
 
     public function __construct(Handler $handler, $data='', $read=true){
@@ -75,27 +77,39 @@ class Route extends Core\Parser{
                 }
             }
             if(isset($route->host)){
-                $host = explode('.', $route->host);
-                array_pop($host);
-                $host[] = 'local';
-                $host = implode('.', $host);
+                $route->host = (array) $route->host;
+
+                $match = false;
                 $real_host = $this->handler()->host(false);
-                if($route->host != $real_host){
-                    if($host != $real_host){
-                        continue;
+                foreach($route->host as $host){
+                    if($host == $real_host){
+                        $match = true;
+                        break;
                     }
+                    $explode = explode('.', $host);
+                    array_pop($explode);
+                    $explode[] = Route::LOCAL;
+                    $local = implode('.', $explode);
+                    if($local == $real_host){
+                        $match = true;
+                        break;
+                    }
+                }
+                if(empty($match)){
+                    continue;
                 }
             }
             if($isHost && !isset($route->host)){
                 continue;
             }
+
             $node = $this->parsePath($path, $route);
             if(empty($node)){
                 continue;
             }
             if(isset($route->method)){
                 if(!is_array($route->method)){
-                    $route->method = (array) $route->method;
+                    $route->method = Core::object($route->method, 'array');
                 }
                 foreach($route->method as $key => $method){
                     $route->method[$key] = strtoupper($method);
