@@ -377,8 +377,8 @@ class Application extends Parser {
                     if(!file_exists($dir)){
                         $domain = $this->handler()->domain();
                         $extension = $this->handler()->extension();
-                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-                        $dir = $this->data('dir.host') . $domain . '.' . $extension;
+                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                        $dir = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
                     }
                 }
                 if(!file_exists($dir)){
