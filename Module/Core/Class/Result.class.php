@@ -20,7 +20,6 @@ use Priya\Module\File;
 use Priya\Module\File\Dir;
 use Priya\Module\Core\Parser;
 use Priya\Module\File\Cache;
-use Priya\Module\Parse;
 
 class Result extends Parser {
     const DIR = __DIR__;

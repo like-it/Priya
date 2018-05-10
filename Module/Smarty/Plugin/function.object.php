@@ -7,8 +7,6 @@
  *  -    all
  */
 
-use Priya\Module\Core\Object;
-
 function smarty_function_object($params, $template)
 {
     $input = '';

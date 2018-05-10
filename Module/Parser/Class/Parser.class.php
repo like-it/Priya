@@ -30,8 +30,8 @@ class Parser extends ParserCore {
 
     /**
      *
-     * @param Priya\Module\Handler $handler
-     * @param Priya\Module\Route $route
+     * @param $handler
+     * @param $route
      * @param array/object $data
      */
     public function __construct($handler=null, $route=null, $data=null){

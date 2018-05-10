@@ -2,6 +2,8 @@
 
 namespace Priya\Module\Parser;
 
+use Exception;
+
 class Operator extends Core {
     const MAX = 255;
 

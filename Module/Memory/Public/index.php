@@ -1,6 +1,8 @@
 <?php
 namespace Priya\Module;
 
+use Exception;
+
 $dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Class' . DIRECTORY_SEPARATOR;
 
 require $dir . 'Memory.Class.php';

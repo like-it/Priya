@@ -38,7 +38,7 @@ function smarty_block_content($params, $content, $template, &$repeat)
                 throw  new Exception("content_block: unknown attribute '$_key'");
         }
     }
-    if($trim == 'html' || $trim == 'html-line' || $trim == 'svg' || $trim == 'canvas-svg'){
+    if($trim == 'html' || $trim == 'html-line'){
         $content = trim($content, "\r\n\s\t");
         $data = explode('<', $content);
         foreach ($data as $nr => $row){
@@ -54,11 +54,6 @@ function smarty_block_content($params, $content, $template, &$repeat)
             }
         }
         $content = implode('<', $data);
-    }
-    if($trim == 'canvas-svg'){
-        $app = new Priya\Application();
-        $result = new Priya\Module\Canvas\Svg($app->handler(), $app->route(), $app->object($vars));
-        $content = $result->run($content);
     }
     $priya = '<!-- <priya-' . str_replace('_', '-', $assign);
     $class = array();
@@ -78,7 +73,7 @@ function smarty_block_content($params, $content, $template, &$repeat)
     $priya .= $content;
     $priya .= '<!-- </priya-' . str_replace('_', '-', $assign) . '> //-->' . "\r\n";
 
-    if($trim == 'html-line' || $trim == 'svg' || $trim == 'canvas-svg'){
+    if($trim == 'html-line'){
         $priya = $content;
         $priya = str_replace(array("\t","\n", "\r", "\r\n"),'', $priya);
     }
