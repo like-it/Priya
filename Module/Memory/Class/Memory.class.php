@@ -16,10 +16,11 @@ class Memory {
     const DEFAULT_WEIGHT = 1;
     const DEFAULT_TYPE = 'Memcached';
 
-    const NOT_FOUND = 16;
-    const TIMEOUT = 32;
+    const ERROR_CONNECTION = 3;
+    const ERROR_NOT_FOUND = 16;
+    const ERROR_TIMEOUT = 32;
 
-    public static function server(Memcached $dma, $server=array()){
+    public static function server($dma, $server=array()){
         $server = array_merge($server, array(
             'host' => Memory::DEFAULT_HOST,
             'port' => Memory::DEFAULT_PORT,
@@ -33,11 +34,11 @@ class Memory {
         return $dma;
     }
 
-    public static function read(Memcached $dma, $key=''){
+    public static function read($dma, $key=''){
         return $dma->get($key);
     }
 
-    public static function write(Memcached $dma, $key='', $value='', $expiration=0){
+    public static function write($dma, $key='', $value='', $expiration=0){
         $result = array();
         $result['key'] = $key;
         $result['value'] = $value;
@@ -50,7 +51,7 @@ class Memory {
         return $result;
     }
 
-    public static function delete(Memcached $dma, $key='', $time=0){
+    public static function delete($dma, $key='', $time=0){
         if(is_array($key)){
             return $dma->deleteMulti($key, $time);
         } else {
@@ -58,7 +59,7 @@ class Memory {
         }
     }
 
-    public static function touch(Memcached $dma, $key='', $expiration=0){
+    public static function touch($dma, $key='', $expiration=0){
         return $dma->touch($key, $expiration);
     }
 
@@ -66,5 +67,12 @@ class Memory {
         return new Memcached();
     }
 
+    public static function restart(){
+        exec('service memcached restart');
+    }
+
+    public static function start(){
+        exec('service memcached start');
+    }
 
 }

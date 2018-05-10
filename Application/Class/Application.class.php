@@ -263,7 +263,7 @@ class Application extends Parser {
             $data = new Data();
             $data->data($read);
             $data->data('time.cache', $data->data('time.start'));
-            $data->data('delete', 'time.start');
+//             $data->data('delete', 'time.start');
 //             Cache::write($url_cache, $data->data());
             return $read;
         }
@@ -278,6 +278,10 @@ class Application extends Parser {
                 Cache::write($url, $this->route()->data());
             break;
             default:
+                var_dump($url);
+                var_dump('found');
+                var_dump(debug_backtrace(true));
+                die;
                 $data = new Data();
                 $data->data($this->data());
                 $data->data('time.cache', $data->data('time.start'));
@@ -334,8 +338,9 @@ class Application extends Parser {
             ;
         }
         //want to write to cache here...
-        $this->write($url);
+        //         $this->write($url);//(for what purpose?)
         parent::autoload()->environment($this->data('priya.environment'));
+
         if(!$this->data('priya.dir.application')){
             throw new Exception(Application::EXCEPTION_DIR_APPLICATION);
         }
