@@ -174,6 +174,9 @@ class Route extends Core\Parser{
                 return $this->item($node);
             }
             elseif(isset($route->default) && isset($route->default->controller)){
+                /**
+                 * @deprecated since 2018-05-11
+                 */
                 $controller = '\\' . trim(str_replace(array(':', '.'), array('\\','\\'), $route->default->controller), ':\\');
                 $tmp = explode('\\', $controller);
                 $object = new stdClass();
@@ -284,16 +287,20 @@ class Route extends Core\Parser{
         return $this->item;
     }
 
-    public function create($name=''){
-        $this->createRoute($name);
+    public function create($name='', $module='Cli', $method='run'){
+        $this->createRoute($name, $module, $method);
     }
 
     private function createRoute($name, $module='Cli', $method='run'){
         $name = $this->explode_multi(array(':', '.', '/', '\\'), trim($name, '.:/\\'));
         $object = new stdClass();
         $object->path = implode('/', $name) . '/';
-        $object->default = new stdClass();
-        $object->default->controller = 'Priya.Module.' . $module . '.'. implode('.', $name) . '.' .  $method;
+        if(empty($module)){
+            $object->controller = 'Priya.Module.' . implode('.', $name) . '.' .  $method;
+        } else {
+            $object->controller = 'Priya.Module.' . $module . '.'. implode('.', $name) . '.' .  $method;
+        }
+
         $object->method = array('CLI');
         $object->translate = false;
         $this->data(strtolower(implode('-',$name)), $object);

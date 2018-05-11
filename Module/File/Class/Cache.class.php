@@ -24,11 +24,19 @@ class Cache {
     const TEN_MINUTE = '10';
     const HOUR = '60';
 
-    public static function read($url=''){
-        //sha1 only filename, rest of url is target...
+    public static function url($url=''){
         $dir = dirname($url) . Application::DS;
         $sha1 = sha1($url);
         $url = $dir . $sha1 . '.php';
+        return $url;
+    }
+
+    public static function read($url=''){
+        //sha1 only filename, rest of url is target...
+//         $dir = dirname($url) . Application::DS;
+//         $sha1 = sha1($url);
+//         $url = $dir . $sha1 . '.php';
+        $url = Cache::url($url);
         @include $url;
         if(isset($cache)){
             return $cache;
@@ -38,8 +46,9 @@ class Cache {
     public static function write($url='', $data='', $overwrite=false){
         //sha1 only filename, rest of url is target...
         $dir = dirname($url) . Application::DS;
-        $sha1 = sha1($url);
-        $url = $dir . $sha1 . '.php';
+//         $sha1 = sha1($url);
+//         $url = $dir . $sha1 . '.php';
+        $url = Cache::url($url);
         if(file_exists($url)){
             if($overwrite === false){
                 return true;

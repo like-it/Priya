@@ -21,9 +21,19 @@
         ],
         "translate": false
     },
-      "Javascript-CLi": {
+    "Javascript-CLi": {
         "path": "Javascript",
         "controller": "Priya.Module.Javascript.Cli.run",
+        "format": "html",
+        "language": "en",
+        "method": [
+            "CLI"
+        ],
+        "translate": false
+    },
+    "Zip-CLi": {
+        "path": "Zip",
+        "controller": "Priya.Module.File.Zip.Cli.run",
         "format": "html",
         "language": "en",
         "method": [

@@ -15,7 +15,6 @@ use Priya\Module\File;
 use Priya\Module\Handler;
 use Priya\Module\Core\Parser;
 use Priya\Module\Core\Data;
-use Priya\Module\File\Dir;
 use Priya\Module\File\Cache;
 
 class Application extends Parser {
@@ -59,6 +58,7 @@ class Application extends Parser {
             Application::DS .
             Application::URL
         ;
+        /*
         $cache = $this->cache($url);
         if($cache){
             $this->cli();
@@ -70,6 +70,7 @@ class Application extends Parser {
             $this->router();
             return;
         }
+        */
         $url = dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CONFIG;
         $this->read($url);
         $url = dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM;
@@ -217,6 +218,7 @@ class Application extends Parser {
                 Application::ROUTE
             ;
         }
+        $start = microtime(true);
         $cache = $this->cache($url, 'route');
         if($cache){
             $this->route(new Module\Route(
@@ -224,6 +226,11 @@ class Application extends Parser {
                 Module\Core::object($cache, 'object'),
                 false
             ));
+            $this->route()->data('time.route.start', $this->data('time.start'));
+            $this->data('time.route.start', $this->route()->data('time.route.start'));
+            $this->data('time.route.cache', $this->route()->data('time.route.cache'));
+            $this->data('time.route.url', $this->cache($url, 'url'));
+            $this->data('time.route.duration', microtime(true) - $start);
         } else {
             $this->route(new Module\Route(
                 $this->handler(),
@@ -240,10 +247,9 @@ class Application extends Parser {
             $this->route()->create('Application.Route');
             $this->route()->create('Application.Parser');
             $this->route()->create('Application.Cache');
-            $this->route()->create('Application.Zip');
             $this->route()->create('Test'); //connects to priya.software & submit results (also duration for benchmarks...)
+            $this->write($url,'route');
         }
-        $this->write($url,'route');
     }
 
     /**
@@ -255,6 +261,17 @@ class Application extends Parser {
         if(file_exists($url) === false){
             return false;
         }
+        $this->data('time.' . $url . '.start', microtime(true));
+        $read = parent::read($url);
+        $data = new Data();
+        $data->data($read);
+        $this->data('time.' . $url . '.end', microtime(true));
+        $this->data('time.' . $url . '.duration', $this->data('time.' . $url . '.end') - $this->data('time.' . $url . '.start'));
+        return $read;
+
+        //disabled below (for now)
+
+
         $mtime = filemtime($url);
         $url_cache = $url . '?mtime=' . $mtime;
         $cache = Cache::read($url_cache);
@@ -262,7 +279,7 @@ class Application extends Parser {
             $read = parent::read($url);
             $data = new Data();
             $data->data($read);
-            $data->data('time.cache', $data->data('time.start'));
+//             $data->data('time.start', $data->data('time.start'));
 //             $data->data('delete', 'time.start');
 //             Cache::write($url_cache, $data->data());
             return $read;
@@ -274,14 +291,15 @@ class Application extends Parser {
     public function write($url='', $type='data'){
         switch ($type){
             case 'route' :
-                $url = $url . '?' . date('YmdHi', $this->route()->data('time.cache')); //every minute;
+                $this->route()->data('time.route.cache', $this->route()->data('time.start'));
+                $url = $url . '?' . date('YmdHi', $this->route()->data('time.route.cache')); //every minute;
+                $start = $this->route()->data('time.start');
+                $this->route()->data('delete', 'time.start');
                 Cache::write($url, $this->route()->data());
+                $this->route()->data('time.start', $start);
+                $this->data('time.route.start', $this->route()->data('time.start'));
             break;
             default:
-                var_dump($url);
-                var_dump('found');
-                var_dump(debug_backtrace(true));
-                die;
                 $data = new Data();
                 $data->data($this->data());
                 $data->data('time.cache', $data->data('time.start'));
@@ -298,7 +316,10 @@ class Application extends Parser {
         switch($type){
             case 'data':
                 $this->data(Module\Core::object($cache, 'object'));
-                break;
+            break;
+            case 'url':
+                return Cache::url($url);
+            break;
         }
         return $cache;
     }
@@ -326,6 +347,8 @@ class Application extends Parser {
     }
 
     public function run($url=''){
+        $this->data('time.application.run', microtime(true));
+        $this->data('time.application.duration', $this->data('time.application.run') - $this->data('time.start'));
         if(empty($url)){
             $url = $this->data('priya.dir.application') .
                 Application::DATA .
