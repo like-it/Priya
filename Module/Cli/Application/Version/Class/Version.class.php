@@ -18,17 +18,17 @@ class Version extends Cli {
 
     public function run(){
         if($this->parameter('update')){
-            $this->update();
+            Version::update($this);
             exec('priya cache clear', $output);
             exec('priya version', $output);
             return implode(PHP_EOL, $output) . PHP_EOL;
         } else {
-            return $this->result('cli');
+            return Version::execute($this);
         }
     }
 
-    private function update(){
-        $data = $this->request('data');
+    private static function update($object){
+        $data = $object->request('data');
         array_shift($data);
         array_shift($data);
         foreach($data as $parameter){
@@ -41,9 +41,9 @@ class Version extends Cli {
             $version = $parameter;
         }
         if(empty($version)){
-            $major = $this->data('priya.major');
-            $minor = $this->data('priya.minor');
-            $patch = $this->data('priya.patch') + 1;
+            $major = $object->data('priya.major');
+            $minor = $object->data('priya.minor');
+            $patch = $object->data('priya.patch') + 1;
             $version = $major . '.' . $minor . '.' . $patch;
         }
         $explode = explode('.', $version);
@@ -64,7 +64,7 @@ class Version extends Cli {
             $patch = $explode[2] + 0;
         }
         $data = new Data();
-        $data->read($this->data('priya.dir.data') . Application::CONFIG);
+        $data->read($object->data('priya.dir.data') . Application::CONFIG);
         $data->data('priya.major', $major);
         $data->data('priya.minor', $minor);
         $data->data('priya.patch', $patch);

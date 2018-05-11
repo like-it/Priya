@@ -1,3 +1,0 @@
-{if $response == 'application'}Clearing application cache...
-{else}{if $response == 'smarty'}Clearing smarty cache...{else}Cache cleared...{/if}
-{/if}

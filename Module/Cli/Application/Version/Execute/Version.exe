@@ -1,0 +1,4 @@
+Priya {$priya.version} (built: {$priya.built})
+Copyright (c) 2012-{date('Y')} Remco van der Velde
+Installation directory: {$dir.root}
+PHP {constant('PHP_VERSION')} Copyright (c) The PHP Group

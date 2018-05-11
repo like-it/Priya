@@ -9,9 +9,7 @@
 
 namespace Priya\Module\Cli\Application;
 
-use Priya\Application;
 use Priya\Module\Core\Cli;
-use Priya\Module\File\Dir;
 
 class Bin extends Cli {
     const DIR = __DIR__;
