@@ -29,6 +29,14 @@ class File {
         die;
     }
 
+    public static function exist($url){ //File::exist means File has exist and not exists
+        return file_exists($url);
+    }
+
+    public static function touch($url='', $time=null, $atime=null){
+        return touch($url, $time, $atime);
+    }
+
     public static function info(stdClass $node){
         $rev = strrev($node->name);
         $explode = explode('.', $rev, 2);
@@ -65,7 +73,7 @@ class File {
         }
     }
 
-    public function write($url='', $data=''){
+    public static function write($url='', $data=''){
         $url = (string) $url;
         $data = (string) $data;
         $fwrite = 0;
@@ -91,7 +99,7 @@ class File {
         }
     }
 
-    public function read($url=''){
+    public static function read($url=''){
         if(strpos($url, File::SCHEME_HTTP) !== false){
             return implode('',file($url));
         }
@@ -101,15 +109,15 @@ class File {
         return implode('',file($url));
     }
 
-    public function copy($source='', $destination=''){
+    public static function copy($source='', $destination=''){
         return copy($source, $destination);
     }
 
-    public function delete($url=''){
+    public static function delete($url=''){
         return unlink($url);
     }
 
-    public function extension($url=''){
+    public static function extension($url=''){
         $url = basename($url);
         $ext = explode('.', $url);
         if(!isset($ext[1])){
@@ -120,7 +128,7 @@ class File {
         return $extension;
     }
 
-    public function basename($url='', $extension=''){
+    public static function basename($url='', $extension=''){
         $filename = basename($url);
         $explode = explode('?', $filename, 2);
         $filename = $explode[0];
@@ -128,7 +136,7 @@ class File {
         return $filename;
     }
 
-    public function removeExtension($filename='', $extension=array()){
+    public static function removeExtension($filename='', $extension=array()){
         if(!is_array($extension)){
             $extension = array($extension);
         }

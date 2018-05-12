@@ -9,58 +9,122 @@
 
 namespace Priya\Module\File;
 
+use Exception;
 use Priya\Application;
 use Priya\Module\File;
-use Priya\Module\File\Dir;
 use Priya\Module\Core;
+use Priya\Module\Data;
 
 class Cache {
     const DIR = __DIR__;
     const DATA = 'Data';
     const CACHE = 'Cache';
-    const BEGIN = '<?php $cache = ';
-    const END = ';' . "\n";
+
     const MINUTE = '01';
     const TEN_MINUTE = '10';
     const HOUR = '60';
 
-    public static function url($url=''){
-        $dir = dirname($url) . Application::DS;
+    const ERROR_EXPIRE = 1;
+    const ERROR_CORRUPT = 10;
+
+    public static function url($url='', $ext='.php'){
+        $dir = Dir::name($url) . Application::DS;
         $sha1 = sha1($url);
-        $url = $dir . $sha1 . '.php';
+        $url = $dir . $sha1 . $ext;
         return $url;
     }
 
-    public static function read($url=''){
-        //sha1 only filename, rest of url is target...
-//         $dir = dirname($url) . Application::DS;
-//         $sha1 = sha1($url);
-//         $url = $dir . $sha1 . '.php';
-        $url = Cache::url($url);
-        @include $url;
-        if(isset($cache)){
-            return $cache;
+    public static function extend($url, $extend='+1 minute'){
+        $cache = Cache::url($url, '.json');
+        if(!File::exist($cache)){
+            return false;
         }
+        $mtime = strtotime($extend);
+        return File::touch($cache, $mtime);
+    }
+
+    public static function validate($url, $extend='+1 minute'){
+        $expired = Cache::read($url, 0);
+        $data = new Data();
+        $data->data($expired);
+
+        $list = $data->data('priya.cache');
+
+        $cache = false;
+        $renew = false;
+        if(is_array($list)){
+            foreach($list as $file){
+                if(!isset($file->read)){
+                    throw new Exception('Cannot fetch read state in priya.cache');
+                }
+                if(!isset($file->url)){
+                    throw new Exception('Cannot fetch url in priya.cache');
+                }
+                if($file->read === true){
+                    //check if exists and mtime
+                    if(!file::exist($file->url)){
+                        //new cache
+                        $renew = true;
+                        break;
+                    }
+                    if(!isset($file->mtime)){
+                        throw new Exception('Cannot fetch mtime in priya.cache');
+                    }
+                    if(file::mtime($file->url) != $file->mtime){
+                        //new cache
+                        $renew = true;
+                        break;
+                    }
+                } else {
+                    if(file::exist($file->url)){
+                        //new cache
+                        $renew = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if(!$renew){
+            Cache::extend($url, $extend);
+            $cache = $expired;
+        }
+        return $cache;
     }
 
     public static function write($url='', $data='', $overwrite=false){
-        //sha1 only filename, rest of url is target...
-        $dir = dirname($url) . Application::DS;
-//         $sha1 = sha1($url);
-//         $url = $dir . $sha1 . '.php';
-        $url = Cache::url($url);
-        if(file_exists($url)){
+        $dir = Dir::name($url) . Application::DS;
+        $url = Cache::url($url, '.json');
+        if(File::exist($url)){
             if($overwrite === false){
                 return true;
             }
         }
-        $data = Core::object($data, 'array');
-        $data = Cache::BEGIN . var_export($data, true) . Cache::END;
-        if(!is_dir($dir)){
+        if(!Dir::is($dir)){
             Dir::create($dir, Dir::CHMOD);
         }
-        $file = new File();
-        $file->write($url, $data);
+        File::write($url, Core::object($data, 'json'));
         return true;
+    }
+
+    public static function read($url='', $expiration='+1 minute'){
+        $cache = Cache::url($url, '.json');
+
+        if(!File::exist($cache)){
+            return false;
+        }
+        $mtime = File::mtime($cache);
+        if(is_numeric($expiration)){
+            $ttl = $expiration;
+        } else {
+            $ttl = strtotime($expiration, $mtime);
+        }
+        if($ttl < time() && !empty($ttl)){
+            return Cache::ERROR_EXPIRE;
+        }
+        $read = File::read($cache);
+        if(empty($read)){
+            return Cache::ERROR_CORRUPT;
+        }
+        return Core::object($read, 'object');
     }
 }

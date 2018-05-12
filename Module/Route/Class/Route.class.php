@@ -60,9 +60,13 @@ class Route extends Core\Parser{
                     $object = new Data();
                     $this->data($object->read($route->resource));
                     $route->read = true;
+                    $route->mtime = filemtime($route->resource);
+
+                    $this->cache(clone $route);
                     return $this->parseRequest($path);
                 } else {
                     $route->read = false;
+                    $this->cache(clone $route);
                 }
             }
         }
@@ -208,13 +212,29 @@ class Route extends Core\Parser{
                         $object = new Data();
                         $this->data($object->read($route->resource));
                         $route->read = true;
+                        $route->mtime = filemtime($route->resource);
+
+                        $this->cache(clone $route);
                         $this->parseRoute();
                     } else {
                         $route->read = false;
+                        $this->cache(clone $route);
                     }
                 }
             }
         }
+    }
+
+    private function cache($cache=''){
+        $file = $this->data('priya.cache');
+        if(empty($file)){
+            $file = array();
+        }
+        $cache->url = $cache->resource;
+        unset($cache->resource);
+
+        $file[] = $cache;
+        $this->data('priya.cache', $file);
     }
 
     private function parsePath($path='', $route=''){

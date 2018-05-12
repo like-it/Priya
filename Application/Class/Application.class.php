@@ -47,6 +47,8 @@ class Application extends Parser {
     const EXCEPTION_REQUEST = 'cannot route to SELF';
     const EXCEPTION_APPLICATION_ERROR = 'cannot route to Application/Error/';
 
+    const CACHE_ROUTE = '+ 1 minute';
+
     public function __construct($autoload=null, $data=null){
         $this->cwd(getcwd());
 //         set_exception_handler(array('Priya\Module\Core','handler_exception'));
@@ -218,24 +220,41 @@ class Application extends Parser {
                 Application::ROUTE
             ;
         }
+        /*
+        public $duration =>
+        double(0.077732086181641) php
+
+        public $duration =>
+        double(0.030645847320557) json
+        */
         $start = microtime(true);
-        $cache = $this->cache($url, 'route');
+        $cache = Cache::read($url, Application::CACHE_ROUTE);
+        if($cache === Cache::ERROR_EXPIRE){
+            $cache = Cache::validate($url, Application::CACHE_ROUTE);
+
+        }
         if($cache){
             $this->route(new Module\Route(
                 $this->handler(),
-                Module\Core::object($cache, 'object'),
+                $cache,
                 false
             ));
-            $this->route()->data('time.route.start', $this->data('time.start'));
+            $this->route()->data('time.route.start', $start);
             $this->data('time.route.start', $this->route()->data('time.route.start'));
             $this->data('time.route.cache', $this->route()->data('time.route.cache'));
-            $this->data('time.route.url', $this->cache($url, 'url'));
+            $this->data('time.route.url', Cache::url($url, '.json'));
             $this->data('time.route.duration', microtime(true) - $start);
         } else {
+            $route = new Data();
+            $route->data('time', $this->data('time'));
+            $route->data('priya', $this->data('priya'));
+            $route->data('dir', $this->data('dir'));
+
             $this->route(new Module\Route(
                 $this->handler(),
-                clone $this->data()
-            ));
+                $route->data()
+                ));
+
             $this->route()->create('Application.Copyright');
             $this->route()->create('Application.Version');
             $this->route()->create('Application.License');
@@ -248,7 +267,14 @@ class Application extends Parser {
             $this->route()->create('Application.Parser');
             $this->route()->create('Application.Cache');
             $this->route()->create('Test'); //connects to priya.software & submit results (also duration for benchmarks...)
-            $this->write($url,'route');
+
+            $this->route()->data('time.route.cache', $start);
+            $time_start = $this->route()->data('time.start');
+            $this->route()->data('delete', 'time.start');
+
+            Cache::write($url, $this->route()->data(), true);
+            $this->route()->data('time.start', $time_start);
+            $this->data('time.route.start', $start);
         }
     }
 
@@ -293,9 +319,12 @@ class Application extends Parser {
             case 'route' :
                 $this->route()->data('time.route.cache', $this->route()->data('time.start'));
                 $url = $url . '?' . date('YmdHi', $this->route()->data('time.route.cache')); //every minute;
+                var_dump($url);
+                die;
                 $start = $this->route()->data('time.start');
                 $this->route()->data('delete', 'time.start');
-                Cache::write($url, $this->route()->data());
+//                 Cache::write($url, $this->route()->data());
+                Cache::json_write($url, $this->route()->data());
                 $this->route()->data('time.start', $start);
                 $this->data('time.route.start', $this->route()->data('time.start'));
             break;
@@ -318,7 +347,7 @@ class Application extends Parser {
                 $this->data(Module\Core::object($cache, 'object'));
             break;
             case 'url':
-                return Cache::url($url);
+                return Cache::url($url, '.json');
             break;
         }
         return $cache;
@@ -522,7 +551,7 @@ class Application extends Parser {
         else {
             if($contentType == Handler::CONTENT_TYPE_CLI){
                 if($request == 'Application/Error/'){
-                    throw new Exception(Application::EX);
+                    throw new Exception(Application::EXCEPTION_APPLICATION_ERROR);
                     //bug when dir.data = empty ?
                 }
                 if($this->route()->error('read')){

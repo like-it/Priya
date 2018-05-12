@@ -765,6 +765,7 @@ class Core {
             $input = trim($input);
             if($output=='object'){
                 if(substr($input,0,1)=='{' && substr($input,-1,1)=='}'){
+                    /* why replace newlines ?
                     $input = str_replace(
                         array(
                             "\r",
@@ -775,7 +776,8 @@ class Core {
                             ''
                         ),
                         $input
-                        );
+                    );
+                    */
                     $json = json_decode($input);
                     if(json_last_error()){
                         new Exception(json_last_error_msg());

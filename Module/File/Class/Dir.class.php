@@ -32,6 +32,18 @@ class Dir {
         }
     }
 
+    public function is($url=''){
+        return is_dir($url);
+    }
+
+    public function name($url='', $levels=null){
+        if(is_null($levels)){
+            return dirname($url);
+        }
+        $levels += 0;
+        return dirname($url, (int) $levels);
+    }
+
     public function ignore($ignore=null, $attribute=null){
         $node = $this->node();
         if(!isset($node)){
