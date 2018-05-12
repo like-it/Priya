@@ -43,7 +43,7 @@ class Cache {
         return File::touch($cache, $mtime);
     }
 
-    public static function validate($url, $extend='+1 minute'){
+    public static function validate($url='', $extend='+1 minute'){
         $expired = Cache::read($url, 0);
         $data = new Data();
         $data->data($expired);
