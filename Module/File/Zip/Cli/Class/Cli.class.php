@@ -33,10 +33,8 @@ class Cli extends Main {
 
     private static function dir($object, $url=''){
         $name = Dir::name($url);
-        var_dump($object->cwd());
-        die;
         if(empty($name)){
-            return $object->data('dir.current') . $url;
+            return $object->cwd() . $url;
         }
         return $url;
     }

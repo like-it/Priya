@@ -198,12 +198,11 @@ class Core {
     }
 
     protected function cwd($cwd=''){
-        var_dump($cwd);
         if(!empty($cwd)){
             $this->cwd = $cwd;
         }
         elseif(empty($this->cwd)){
-            $this->cwd = getcwd();
+            $this->cwd = getcwd() . Application::DS;
         }
         return $this->cwd;
     }
