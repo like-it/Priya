@@ -1,4 +1,11 @@
-/*
+/** *
+ * (c) 2012 - 2018 https://priya.software
+ * @author 			Remco van der Velde
+ * @version			0.3.3
+ * @see				https://priya.software/licence
+ * @built				2018-05-14 00:56:56
+ *
+**//*
  * @name: Active
  * @url: /mnt/c/Library/Server/Vendor/Priya/Module/Javascript/Public/Prototype/Core/Active.prototype.js
  */

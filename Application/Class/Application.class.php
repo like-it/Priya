@@ -256,21 +256,11 @@ class Application extends Parser {
             $this->route(new Module\Route(
                 $this->handler(),
                 $route->data()
-                ));
+            ));
 
-            $this->route()->create('Application.Copyright');
-            $this->route()->create('Application.Version');
-            $this->route()->create('Application.License');
-            $this->route()->create('Application.Bin');
-            $this->route()->create('Application.Locate');
-            $this->route()->create('Application.Config');
-            $this->route()->create('Application.Help');
-            $this->route()->create('Application.Error');
-            $this->route()->create('Application.Route');
-            $this->route()->create('Application.Parser');
-            $this->route()->create('Application.Cache');
-            $this->route()->create('Test'); //connects to priya.software & submit results (also duration for benchmarks...)
-
+            foreach($this->data('priya.route.default') as $default){
+                $this->route()->create($default);
+            }
             $this->route()->data('time.route.cache', $start);
             $time_start = $this->route()->data('time.start');
             $this->route()->data('delete', 'time.start');
@@ -554,6 +544,11 @@ class Application extends Parser {
         else {
             if($contentType == Handler::CONTENT_TYPE_CLI){
                 if($request == 'Application/Error/'){
+                    var_dump($this->route()->data());
+                        var_dump($this->route($request));
+                        die;
+//                     var_dump($handler->request('route'));
+//                     die;
                     throw new Exception(Application::EXCEPTION_APPLICATION_ERROR);
                     //bug when dir.data = empty ?
                 }

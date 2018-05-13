@@ -28,7 +28,8 @@ class Cli extends Main {
     public function createScript(){
         echo '[javascript] ';
         echo 'Reading Bootstrap.json...' . PHP_EOL;
-        $url = dirname($this->data('module.dir.root')) . Application::DS  . 'Data' . Application::DS . 'Bootstrap.json';
+
+        $url = $this->data('module.dir.data') . 'Bootstrap.json';
         $this->read($url);
         $core = $this->data('require.core');
         $file = new File();
@@ -47,7 +48,7 @@ class Cli extends Main {
         if(!is_dir($dirname)){
             mkdir($dirname, Dir::CHMOD, true);
         }
-        $bin = dirname($this->data('module.dir.root')) . Application::DS . 'Data' . Application::DS . 'Bin' .  Application::DS;
+        $bin = $this->data('module.dir.data') . 'Bin' .  Application::DS;
         echo '[javascript] ';
         echo 'Copying Files...' . PHP_EOL;
         echo '[javascript] ';
@@ -81,21 +82,8 @@ class Cli extends Main {
 //         $copyright = $this->data('priya.dir.data') . 'Copyright.txt';
         echo '[javascript] ';
         echo 'Creating Core...' . PHP_EOL;
-        exec('priya copyright', $copyright);
-        var_dump($copyright);
-        die;
-        $module = '';
-        $read = $file->read($copyright);
-        $module = str_replace(
-            array(
-                '{$version}',
-                '{$built}'
-            ),
-            array(
-
-            ),
-            $read
-        );
+        exec('priya copyright type document', $copyright);
+        $module = implode(PHP_EOL, $copyright);
         $count = count($core);
         $counter = 0;
         foreach($core as $read){
@@ -145,7 +133,7 @@ class Cli extends Main {
         $target = dirname($this->data('module.dir.root')) . Application::DS . $this->data('public_html') . Application::DS . 'Download' . Application::DS . 'Priya.Js-' .$this->data('priya.version') .'.zip';
 
         $archiver = $bin . 'Bin' . Application::DS . 'Archiver.json';
-        exec('priya zip pack ' . $archiver, $output);
+        exec('priya task ' . $archiver, $output);
         foreach($output as $line){
             echo $line . PHP_EOL;
         }

@@ -18,7 +18,22 @@ class Copyright extends Cli {
     const DIR = __DIR__;
 
     public function run(){
-        $execute = Copyright::execute($this);
+        $this->data('type', $this->parameter('type', 1));
+        if($this->data('type') == 'document'){
+            $execute = Copyright::document(Copyright::execute($this));
+        } else {
+            $execute = Copyright::execute($this);
+        }
         return $execute;
+    }
+
+    public static function document($output=''){
+        $result = '/**';
+        $explode = explode(PHP_EOL, $output);
+        foreach($explode as $line){
+            $result .= ' * ' . $line . PHP_EOL;
+        }
+        $result .= '**/';
+        return $result;
     }
 }

@@ -1,6 +1,10 @@
 {
-"archive" : {
-        "source" : "{$priya.dir.root}Module/Javascript/Public/Js/Priya/0.3.3/",
-        "target" : "{$priya.dir.root}Module/Javascript/Public/Download/Priya.Js-0.3.3.zip"
+"task" : {
+	"command" : "priya zip pack",
+	"source" : "{$priya.dir.root}Module/Javascript/Public/Js/Priya/0.3.3/",
+	"target" : "{$priya.dir.root}Module/Javascript/Public/Download/Priya.Js-0.3.3.zip",
+	"ignore" : [
+		"Bin/Archiver.json"
+	]
     }
 }

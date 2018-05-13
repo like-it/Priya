@@ -10,17 +10,6 @@
         ],
         "translate": false
     },
-    "Javascript": {
-        "path": "Priya/Javascript",
-        "controller": "Priya.Module.Javascript.run",
-        "format": "html",
-        "language": "en",
-        "method": [
-            "GET",
-            "POST"
-        ],
-        "translate": false
-    },
     "Javascript-CLi": {
         "path": "Javascript",
         "controller": "Priya.Module.Javascript.Cli.run",

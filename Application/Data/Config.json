@@ -19,6 +19,22 @@
             "wav": "audio\/wav",
             "mp3": "audio\/mp3"
         },
+        "route" : {
+			"default" : [
+				"Application.Copyright",
+				"Application.Version",
+				"Application.License",
+				"Application.Bin",
+				"Application.Locate",
+				"Application.Config",
+				"Application.Help",
+				"Application.Error",
+				"Application.Route",
+				"Application.Parser",
+				"Application.Cache",
+				"Test"
+			]
+        },
         "major": 0,
         "minor": 3,
         "patch": 3,
