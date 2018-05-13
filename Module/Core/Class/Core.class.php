@@ -155,36 +155,50 @@ class Core {
         return $this->handler()->file($attribute, $value);
     }
 
-    public function parameter($parameter){
+    public function parameter($parameter, $offset=0){
         $data = $this->request('data');
+        $result = false;
+        $value = null;
         if(is_numeric($parameter)){
             if(isset($data[$parameter])){
-                $param = ltrim($data[$parameter],'-');
-                return $param;
+                $param = ltrim($data[$parameter], '-');
+                $result = $param;
             } else {
-                return false;
+                $result = false;
             }
         } else {
             foreach($data as $key => $param){
-                $param = ltrim($param,'-');
+                $param = ltrim($param, '-');
                 $tmp = explode('=', $param);
                 if(count($tmp) > 1){
                     $param = array_shift($tmp);
                     $value = implode('=', $tmp);
                 }
                 if(strtolower($param) == strtolower($parameter)){
-                    if(isset($value)){
-                        return $value;
+                    if($offset !== 0){
+                        if(isset($data[($key + $offset)])){
+                            $value = ltrim($data[($key + $offset)], '-');
+                        } else {
+                            $result = false;
+                            break;
+
+                        }
                     }
-                    return true;
+                    if(isset($value) && $value !== null){
+                        $result = $value;
+                    } else {
+                        $result = true;
+                    }
+                    break;
                 }
                 $value = null;
             }
-            return false;
         }
+        return $result;
     }
 
     protected function cwd($cwd=''){
+        var_dump($cwd);
         if(!empty($cwd)){
             $this->cwd = $cwd;
         }

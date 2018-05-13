@@ -8,6 +8,7 @@
  */
 namespace Priya\Module\File\Zip;
 
+use Priya\Module\File\Dir;
 use Priya\Module\Core\Main;
 
 class Cli extends Main {
@@ -15,11 +16,32 @@ class Cli extends Main {
     const FILE = __FILE__;
 
     public function run(){
-        $end = microtime(true);
-        $duration = $end - $this->data('time.application.run');
-        var_dump($duration);
-        var_dump($this->data('time'));
-        die;
+        $pack = $this->parameter('pack');
+
+        if($pack){
+            $source = Cli::dir($this, $this->parameter('pack', 1));
+            $target = Cli::dir($this, $this->parameter('pack', 2));
+
+            Cli::pack($this, $source, $target);
+
+
+            var_dump($source);
+            var_dump($target);
+            die;
+        }
     }
 
+    private static function dir($object, $url=''){
+        $name = Dir::name($url);
+        var_dump($object->cwd());
+        die;
+        if(empty($name)){
+            return $object->data('dir.current') . $url;
+        }
+        return $url;
+    }
+
+    public static function pack($object, $source, $target, $ignore=array()){
+
+    }
 }

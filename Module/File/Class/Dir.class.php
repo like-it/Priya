@@ -38,10 +38,15 @@ class Dir {
 
     public function name($url='', $levels=null){
         if(is_null($levels)){
-            return dirname($url);
+            $name = dirname($url);
+        } else {
+            $levels += 0;
+            $name = dirname($url, (int) $levels);
         }
-        $levels += 0;
-        return dirname($url, (int) $levels);
+        if($name == '.'){
+            return '';
+        }
+        return $name;
     }
 
     public function ignore($ignore=null, $attribute=null){

@@ -50,7 +50,7 @@ class Application extends Parser {
     const CACHE_ROUTE = '+ 1 minute';
 
     public function __construct($autoload=null, $data=null){
-        $this->cwd(getcwd());
+        $this->cwd(rtrim(getcwd(), Application::DS) . Application::DS);
 //         set_exception_handler(array('Priya\Module\Core','handler_exception'));
 //         set_error_handler(array('Priya\Module\Core','handler_error'));
         $this->init();
@@ -92,9 +92,11 @@ class Application extends Parser {
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
 
+        /*
         if($this->data('priya.dir.application')){
             chdir($this->data('priya.dir.application'));
         }
+        */
         $this->autoload($autoload);
         $this->router();
     }
@@ -206,6 +208,7 @@ class Application extends Parser {
                 Application::DS
             );
         }
+        $this->data('dir.current', $this->cwd());
     }
 
     private function router($url=''){
@@ -396,7 +399,7 @@ class Application extends Parser {
         if(!$this->data('priya.dir.application')){
             throw new Exception(Application::EXCEPTION_DIR_APPLICATION);
         }
-        chdir($this->data('priya.dir.application'));
+//         chdir($this->data('priya.dir.application')); //keep working dir normal...
         $request = $this->request('request');
         if($request ===  $this->data('parser.request') && $request !== null){
             throw new Exception(Application::EXCEPTION_REQUEST);
