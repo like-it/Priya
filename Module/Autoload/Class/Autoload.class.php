@@ -300,7 +300,7 @@ class Autoload {
         if(empty($resource)){
             $dir = dirname($url);
             if(is_dir($dir) === false){
-                mkdir($dir, 0777, true);
+                mkdir($dir, 0740, true);
             }
             $resource = fopen($url, 'w');
         }
