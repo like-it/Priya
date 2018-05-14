@@ -39,7 +39,11 @@ class Cache {
         if(!File::exist($cache)){
             return false;
         }
-        $mtime = strtotime($extend);
+        if(is_numeric($extend)){
+            $mtime = $extend + 0;
+        } else {
+            $mtime = strtotime($extend);
+        }
         return File::touch($cache, $mtime);
     }
 
@@ -93,8 +97,8 @@ class Cache {
 
     public static function write($url='', $data='', $overwrite=false){
         $dir = Dir::name($url) . Application::DS;
-        $url = Cache::url($url, '.json');
-        if(File::exist($url)){
+        $cache = Cache::url($url, '.json');
+        if(File::exist($cache)){
             if($overwrite === false){
                 return true;
             }
@@ -102,7 +106,7 @@ class Cache {
         if(!Dir::is($dir)){
             Dir::create($dir, Dir::CHMOD);
         }
-        File::write($url, Core::object($data, 'json'));
+        File::write($cache, Core::object($data, 'json line')); //production 'json line' //develop 'json'
         return true;
     }
 
@@ -126,5 +130,34 @@ class Cache {
             return Cache::ERROR_CORRUPT;
         }
         return Core::object($read, 'object');
+    }
+
+    public static function serialize($object, $url=''){
+        $serialize = serialize($object);
+
+        $dir = Dir::name($url) . Application::DS;
+        if(!Dir::is($dir)){
+            Dir::create($dir, Dir::CHMOD);
+        }
+        $cache = Cache::url($url, '.serialize');
+        return File::write($cache, $serialize);
+    }
+
+    public static function unserialize($url='', $expiration='+1 minute'){
+        $cache = Cache::url($url, '.serialize');
+        if(!File::exist($cache)){
+            return false;
+        }
+        $mtime = File::mtime($cache);
+        if(is_numeric($expiration)){
+            $ttl = $expiration;
+        } else {
+            $ttl = strtotime($expiration, $mtime);
+        }
+        if($ttl < time() && !empty($ttl)){
+            return Cache::ERROR_EXPIRE;
+        }
+        $serialize = File::read($cache);
+        return unserialize($serialize);
     }
 }

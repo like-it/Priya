@@ -223,14 +223,24 @@ class Application extends Parser {
                 Application::ROUTE
             ;
         }
-        /*
-        public $duration =>
-        double(0.077732086181641) php
+        $serialize = str_replace('.json', '.serialize', $url);
 
-        public $duration =>
-        double(0.030645847320557) json
-        */
         $start = microtime(true);
+//         $route = Cache::unserialize($serialize, '+220 minutes');
+        $route = false;
+        if($route){
+            $route->handler($this->handler());
+            $this->route($route);
+
+            $this->route()->data('time.route.start', $start);
+            $this->data('time.route.start', $this->route()->data('time.route.start'));
+            $this->data('time.route.cache', $this->route()->data('time.route.cache'));
+            $this->data('time.route.url', $serialize);
+            $this->data('time.route.duration', microtime(true) - $start);
+
+            var_dump($this->data('time'));
+            die;
+        }
         $cache = Cache::read($url, Application::CACHE_ROUTE);
         if($cache === Cache::ERROR_EXPIRE){
             $cache = Cache::validate($url, Application::CACHE_ROUTE);
@@ -247,6 +257,7 @@ class Application extends Parser {
             $this->data('time.route.cache', $this->route()->data('time.route.cache'));
             $this->data('time.route.url', Cache::url($url, '.json'));
             $this->data('time.route.duration', microtime(true) - $start);
+
             var_dump($this->data('time'));
             die;
         } else {
@@ -268,6 +279,7 @@ class Application extends Parser {
             $this->route()->data('delete', 'time.start');
 
             Cache::write($url, $this->route()->data(), true);
+//             Cache::serialize($this->route(), $serialize);
             $this->route()->data('time.start', $time_start);
             $this->data('time.route.start', $start);
         }
@@ -279,31 +291,6 @@ class Application extends Parser {
         $this->data('time.' . $url . '.end', microtime(true));
         $this->data('time.' . $url . '.duration', $this->data('time.' . $url . '.end') - $this->data('time.' . $url . '.start'));
         return $read;
-    }
-
-    public function write($url='', $type='data'){
-        switch ($type){
-            case 'route' :
-                $this->route()->data('time.route.cache', $this->route()->data('time.start'));
-                $url = $url . '?' . date('YmdHi', $this->route()->data('time.route.cache')); //every minute;
-                var_dump($url);
-                die;
-                $start = $this->route()->data('time.start');
-                $this->route()->data('delete', 'time.start');
-//                 Cache::write($url, $this->route()->data());
-                Cache::json_write($url, $this->route()->data());
-                $this->route()->data('time.start', $start);
-                $this->data('time.route.start', $this->route()->data('time.start'));
-            break;
-            default:
-                $data = new Data();
-                $data->data($this->data());
-                $data->data('time.cache', $data->data('time.start'));
-                $url = $url . '?' . date('YmdHi', $data->data('time.cache')); //every minute;
-                $data->data('delete','time.start');
-                Cache::write($url, $data->data());
-        }
-
     }
 
     public function cache($url='', $type='data'){
