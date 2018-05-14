@@ -10,9 +10,7 @@
 namespace Priya\Module\Cli\Application;
 
 use Priya\Module\Core\Cli;
-use Priya\Module\Data;
-use Priya\Application;
-use Priya\Module\File;
+use Exception;
 
 class Task extends Cli {
     const DIR = __DIR__;
@@ -33,19 +31,11 @@ class Task extends Cli {
         }
         return $execute;
     }
-
     public static function execute($object=null, $task=''){
-        exec($task->command, $output);
-        return implode(PHP_EOL, $output);
-    }
-
-    public static function document($output=''){
-        $result = '/**';
-        $explode = explode(PHP_EOL, $output);
-        foreach($explode as $line){
-            $result .= ' * ' . $line . PHP_EOL;
+        if(!isset($task->execute)){
+            throw new Exception('Nothing to execute in task...');
         }
-        $result .= '**/';
-        return $result;
+        exec($task->execute, $output);
+        return implode(PHP_EOL, $output);
     }
 }

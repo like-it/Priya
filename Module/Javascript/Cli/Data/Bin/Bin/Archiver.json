@@ -1,6 +1,6 @@
 {
 "task" : {
-	"command" : "priya zip task {$priya.dir.module}Javascript/Cli/Data/Bin/Bin/Archiver.json",
+	"execute" : "priya zip task {$priya.dir.module}Javascript/Cli/Data/Bin/Bin/Archiver.json",
 	"request" : "pack",
 	"source" : "{$priya.dir.module}Javascript/Public/Js/Priya/{$priya.version}/",
 	"target" : "{$priya.dir.module}Javascript/Public/Download/Priya.Js-{$priya.version}.zip",
