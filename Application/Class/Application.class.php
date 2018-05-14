@@ -247,6 +247,8 @@ class Application extends Parser {
             $this->data('time.route.cache', $this->route()->data('time.route.cache'));
             $this->data('time.route.url', Cache::url($url, '.json'));
             $this->data('time.route.duration', microtime(true) - $start);
+            var_dump($this->data('time'));
+            die;
         } else {
             $route = new Data();
             $route->data('time', $this->data('time'));
@@ -271,40 +273,12 @@ class Application extends Parser {
         }
     }
 
-    /**
-     * only begin & end...
-     * {@inheritDoc}
-     * @see \Priya\Module\Core\Parser::read()
-     */
     public function read($url=''){
-        if(file_exists($url) === false){
-            return false;
-        }
         $this->data('time.' . $url . '.start', microtime(true));
         $read = parent::read($url);
-        $data = new Data();
-        $data->data($read);
         $this->data('time.' . $url . '.end', microtime(true));
         $this->data('time.' . $url . '.duration', $this->data('time.' . $url . '.end') - $this->data('time.' . $url . '.start'));
         return $read;
-
-        //disabled below (for now)
-
-
-        $mtime = filemtime($url);
-        $url_cache = $url . '?mtime=' . $mtime;
-        $cache = Cache::read($url_cache);
-        if(!$cache){
-            $read = parent::read($url);
-            $data = new Data();
-            $data->data($read);
-//             $data->data('time.start', $data->data('time.start'));
-//             $data->data('delete', 'time.start');
-//             Cache::write($url_cache, $data->data());
-            return $read;
-        }
-        $this->data($cache);
-        return $cache;
     }
 
     public function write($url='', $type='data'){

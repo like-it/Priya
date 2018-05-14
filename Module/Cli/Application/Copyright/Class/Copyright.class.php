@@ -10,9 +10,6 @@
 namespace Priya\Module\Cli\Application;
 
 use Priya\Module\Core\Cli;
-use Priya\Module\Data;
-use Priya\Application;
-use Priya\Module\File;
 
 class Copyright extends Cli {
     const DIR = __DIR__;
