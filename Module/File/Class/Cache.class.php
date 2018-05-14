@@ -143,7 +143,7 @@ class Cache {
         return File::write($cache, $serialize);
     }
 
-    public static function unserialize($url='', $expiration='+1 minute'){
+    public static function deserialize($url='', $expiration='+1 minute'){
         $cache = Cache::url($url, '.serialize');
         if(!File::exist($cache)){
             return false;
