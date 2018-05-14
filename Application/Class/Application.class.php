@@ -257,9 +257,6 @@ class Application extends Parser {
             $this->data('time.route.cache', $this->route()->data('time.route.cache'));
             $this->data('time.route.url', Cache::url($url, '.json'));
             $this->data('time.route.duration', microtime(true) - $start);
-
-            var_dump($this->data('time'));
-            die;
         } else {
             $route = new Data();
             $route->data('time', $this->data('time'));
