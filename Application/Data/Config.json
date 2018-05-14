@@ -32,6 +32,7 @@
 				"Application.Route",
 				"Application.Parser",
 				"Application.Cache",
+				"Application.Task",
 				"Test"
 			]
         },
