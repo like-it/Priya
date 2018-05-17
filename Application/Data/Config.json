@@ -33,6 +33,7 @@
 				"Application.Parser",
 				"Application.Cache",
 				"Application.Task",
+				"Application.Host",
 				"Test"
 			]
         },

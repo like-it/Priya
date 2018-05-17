@@ -15,9 +15,20 @@ class Host extends Cli {
     const DIR = __DIR__;
 
     public function run(){
-        $this->data('server.name', $this->parameter('host', 1));
+        $explode = explode('.',  $this->parameter('host', 1));
+        $extension = array_pop($explode);
+        $domain = array_pop($explode);
+        $this->data('server.name', $domain . '.' . $extension);
+        $this->data('server.alias', '*.' . $this->data('server.name'));
         $this->data('server.port', isset($this->parameter('port', 1)) ? $this->parameter('port', 1) : 80);
+        $this->data('server.administrator', 'administrator@' . $this->data('server.name'));
+        $this->data('server.directory', $this->data('dir.public'));
+
+        var_dump($this->data('server'));
+        die;
         /**
+         *
+         *add when exist (skip things)
          *
          * host <domain.extension> port <port>
          *
