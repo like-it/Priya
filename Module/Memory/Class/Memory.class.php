@@ -75,4 +75,8 @@ class Memory {
         exec('service memcached start');
     }
 
+    public static function stop(){
+        exec('service memcached stop');
+    }
+
 }

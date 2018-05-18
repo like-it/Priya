@@ -27,7 +27,11 @@ class Host extends Cli {
         var_dump($this->data('server'));
         die;
         /**
-         *
+         * proposal: priya-memory
+         * priya memory read <key>
+         * priya memory write <key> url <url> value <value>
+         * priya memory append <key> url <url> value <value>
+         * priya memory prepend <key> url <url> value <value>
          *add when exist (skip things)
          *
          * host <domain.extension> port <port>
@@ -37,7 +41,8 @@ class Host extends Cli {
          * ask for port number (default 80)
          * server directory is automated ($dir.public)
          * server e-mail is automated (administrator@domain.extension)
-         *
+         * when {$dir.host}{$server.name} exist
+         *      check
          * dir read /etc/apache2/sites-available
          * read config files on existing domain.extension
          * create an (amount of files) apache config file in /etc/apache2/sites-available if not exist
