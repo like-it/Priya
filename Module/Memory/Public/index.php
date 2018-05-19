@@ -16,6 +16,12 @@ $server = array(
 $type =  isset($_GET['type']) ? (string) $_GET['type'] : Memory::DEFAULT_TYPE;
 $key =  isset($_GET['key']) ? (string) $_GET['key'] : '';
 
+$explode = explode(DIRECTORY_SEPARATOR, __DIR__);
+
+$public = array_pop($explode);
+
+$key = $public . '\\' . $key; //only public keys are allowed
+
 if(empty($key)){
     throw new Exception('Please provide a key');
 }

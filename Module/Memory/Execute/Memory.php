@@ -20,7 +20,7 @@ $write = parameter($attribute, 'write');
 $read = parameter($attribute, 'read');
 $delete = parameter($attribute, 'delete');
 $touch = parameter($attribute, 'touch');
-//add queue (which needs a json file to process and echo's a returning json file (use queue ? because we shoul process them one at a time)
+//add queue (which needs a json file to process and echo's a returning json file (use queue ? because we should process them one at a time)
 /**
  * {"memory" : { "queue" : [], "result" : {"key_1" : "value", "key_2" : "value"}, "stat", {"duration" : "value"} }
  *
