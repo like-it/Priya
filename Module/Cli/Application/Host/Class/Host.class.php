@@ -59,6 +59,7 @@ class Host extends Cli {
          * this will create a default route to the index.html in post / get and in cli creates a new Index.html (see 1)
          * also need to be added to the main route file in {$dir.data}Route.json
          *      which needs to check if a resource exists of: {$dir.host}{$domain}\/Data\/Route.json
+         * and namespace to autoload... in {$dir.data}Config.json ("LikeIt\\Cloud":"{$dir.host}like-it.cloud/Source")
          * exec certbot (to automatically enable https) (needs expect) (version 2) for domain.extension, www.domain.extension
          */
 
