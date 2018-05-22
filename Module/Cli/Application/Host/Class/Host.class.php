@@ -57,6 +57,8 @@ class Host extends Cli {
          * parse {$dir.host}{$server.name}Execute/Index.exe which writes an {$dir.hot}{$server.name}{$public_html}Index.html (1)
          * parse{$dir.host}{$server.name}Data/Route.json which overwites itself needs variable domain.extension (create www.domain.extension)
          * this will create a default route to the index.html in post / get and in cli creates a new Index.html (see 1)
+         * also need to be added to the main route file in {$dir.data}Route.json
+         *      which needs to check if a resource exists of: {$dir.host}{$domain}\/Data\/Route.json
          * exec certbot (to automatically enable https) (needs expect) (version 2) for domain.extension, www.domain.extension
          */
 
