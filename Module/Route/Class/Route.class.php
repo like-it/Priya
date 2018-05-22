@@ -88,6 +88,7 @@ class Route extends Core\Parser{
                 var_dump($real_host);
 
                 foreach($route->host as $host){
+                    var_dump($host);
                     if($host == $real_host){
                         $match = true;
                         break;
