@@ -167,7 +167,7 @@ class Autoload {
         $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
 
-        $this->fileList[$item['baseName']][] = $data;
+        $this->fileList[$item['file']][] = $data;
 
         $result = array();
         foreach($data as $nr => $file){
@@ -199,6 +199,8 @@ class Autoload {
                     $item['file'] =
                         str_replace('\\', DIRECTORY_SEPARATOR, $item['file']);
                 } else {
+                    continue; //added
+                    var_dump('false');
                     $tmp = explode('.', $load);
                     if(count($tmp) >= 2){
                         array_pop($tmp);
@@ -249,8 +251,11 @@ class Autoload {
             if(!empty($this->expose())){
                 $attribute = $load;
             }
-            if(isset($this->fileList[$item['baseName']])){
-                $object->{$attribute} = $this->fileList[$item['baseName']];
+            if(
+                isset($item['file']) &&
+                isset($this->fileList[$item['file']])
+            ){
+                $object->{$attribute} = $this->fileList[$item['file']];
             }
             if(ob_get_level() !== 0){
                 ob_flush();

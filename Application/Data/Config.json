@@ -1,6 +1,6 @@
 {
     "priya": {
-        "environment": "production",
+        "environment": "development",
         "version": "{$priya.major|default:0}.{$priya.minor|default:0}.{$priya.patch|default:0}",
         "contentType": {
             "txt": "text\/plain",

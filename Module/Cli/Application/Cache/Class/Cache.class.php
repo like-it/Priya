@@ -10,7 +10,9 @@
 namespace Priya\Module\Cli\Application;
 
 use Priya\Application;
+use Priya\Module\Autoload;
 use Priya\Module\Core\Cli;
+use Priya\Module\File;
 use Priya\Module\File\Dir;
 
 class Cache extends Cli {
@@ -20,6 +22,7 @@ class Cache extends Cli {
         if($this->parameter('clear')){
             Cache::clear($this, 'application');
             Cache::clear($this, 'smarty');
+            Cache::clear($this, 'autoload');
         }
         $this->data('delete', 'execute');
         return Cache::execute($this);
@@ -36,6 +39,10 @@ class Cache extends Cli {
                 echo Cache::execute($object);
                 return Cache::clearApplication($object);
             break;
+            case 'autoload':
+                echo Cache::execute($object);
+                return Cache::clearAutoload($object);
+            break;
         }
     }
 
@@ -43,6 +50,17 @@ class Cache extends Cli {
         $url = $object->data('priya.dir.cache');
         $dir = new Dir();
         return $dir->delete($url);
+    }
+
+    private static function clearAutoload($object){
+        $url =
+            dirname(Autoload::DIR) .
+            Application::DS .
+            Application::DATA .
+            Application::DS  .
+            Autoload::FILE
+        ;
+        return File::delete($url);
     }
 
     private static function clearSmarty($object){

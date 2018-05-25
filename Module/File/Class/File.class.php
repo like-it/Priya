@@ -34,7 +34,11 @@ class File {
     }
 
     public static function touch($url='', $time=null, $atime=null){
-        return touch($url, $time, $atime);
+        if($atime === null){
+            return touch($url, $time);
+        } else {
+            return touch($url, $time, $atime);
+        }
     }
 
     public static function info(stdClass $node){
