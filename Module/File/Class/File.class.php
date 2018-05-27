@@ -35,9 +35,9 @@ class File {
 
     public static function touch($url='', $time=null, $atime=null){
         if($atime === null){
-            return touch($url, $time);
+            return @touch($url, $time);
         } else {
-            return touch($url, $time, $atime);
+            return @touch($url, $time, $atime);
         }
     }
 

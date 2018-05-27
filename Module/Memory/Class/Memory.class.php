@@ -9,7 +9,7 @@
 namespace Priya\Module;
 
 use Memcached;
-
+use Exception;
 class Memory {
     const DEFAULT_HOST = '127.0.0.1';
     const DEFAULT_PORT = 11211;
@@ -63,7 +63,12 @@ class Memory {
         return $dma->touch($key, $expiration);
     }
 
+    public static function create($type='Memcached'){
+        return new Memcached();
+    }
+
     public static function dma($type='Memcached'){
+        throw new Exception('Use create');
         return new Memcached();
     }
 

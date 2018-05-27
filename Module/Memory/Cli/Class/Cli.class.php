@@ -63,7 +63,7 @@ class Cli extends Cli_Core{
         if(empty($key)){
             throw new Exception('Please provide a key');
         }
-        $dma = Memory::dma($type);
+        $dma = Memory::create($type);
         $dma = Memory::server($dma, $server);
 
         if(empty($dma)){
@@ -74,6 +74,16 @@ class Cli extends Cli_Core{
             echo "Key: " . $result['key'] . PHP_EOL;
             echo "Expiration: " . $result['expiration'] . PHP_EOL;
             echo "Size: " . strlen($result['value']) . PHP_EOL;
+        } else {
+            Memory::stop();
+            Memory::start();
+            sleep(1);
+            $result = Memory::write($dma, $key, $value, $expiration);
+            if($result['set'] === true){
+                echo "Key: " . $result['key'] . PHP_EOL;
+                echo "Expiration: " . $result['expiration'] . PHP_EOL;
+                echo "Size: " . strlen($result['value']) . PHP_EOL;
+            }
         }
         $dma->quit();
     }

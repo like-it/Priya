@@ -184,6 +184,7 @@ class Autoload {
         $url = $dir . Autoload::FILE;
         $load = ltrim($load, '\\');
         $prefixList = $this->getPrefixList();
+        $select = false;
         if(!empty($prefixList)){
             foreach($prefixList as $nr => $item){
                 if(empty($item['prefix'])){
@@ -229,6 +230,8 @@ class Autoload {
                         unset($item['dirName']);
                     }
                     $fileList = $this->fileList($item, $url);
+                    $location[$item['prefix']][] = $fileList;
+                    $select = $item;
                     if(is_array($fileList) && empty($this->expose())){
                         foreach($fileList as $nr => $file){
                             if(substr($file, 0, 5) == '[---]'){
@@ -252,10 +255,10 @@ class Autoload {
                 $attribute = $load;
             }
             if(
-                isset($item['file']) &&
-                isset($this->fileList[$item['file']])
+                isset($select['file']) &&
+                isset($this->fileList[$select['file']])
             ){
-                $object->{$attribute} = $this->fileList[$item['file']];
+                $object->{$attribute} = $this->fileList[$select['file']];
             }
             if(ob_get_level() !== 0){
                 ob_flush();
