@@ -440,7 +440,8 @@ class Handler extends \Priya\Module\Core\Data{
                     unset($attribute[$nr]);
                     continue;
                 }
-                $attribute[$nr] = trim(escapeshellarg($value), '\'');
+                $attribute[$nr] = trim($value);
+//                 $attribute[$nr] = trim(escapeshellarg($value), '\''); //causes error
             }
             $data = new stdClass();
             $data->nodeList = array();

@@ -9,18 +9,24 @@
 
 namespace Priya\Module\Cli\Application;
 
+use Priya\Application;
 use Priya\Module\Core\Cli;
+
 
 class Host extends Cli {
     const DIR = __DIR__;
+    const REDIRECT = 'redirect';
 
     public function run(){
+        //host redirect command
+        Host::redirect($this);
+
         $explode = explode('.',  $this->parameter('host', 1));
         $extension = array_pop($explode);
         $domain = array_pop($explode);
         $this->data('server.name', $domain . '.' . $extension);
         $this->data('server.alias', '*.' . $this->data('server.name'));
-        $this->data('server.port', isset($this->parameter('port', 1)) ? $this->parameter('port', 1) : 80);
+        $this->data('server.port', null !== $this->parameter('port', 1) ? $this->parameter('port', 1) : 80);
         $this->data('server.administrator', 'administrator@' . $this->data('server.name'));
         $this->data('server.directory', $this->data('dir.public'));
 
@@ -72,6 +78,19 @@ class Host extends Cli {
         }
         return $execute;
         */
+    }
+
+    public static function redirect($object){
+        $redirect = $object->parameter('host', 1);
+        if(strtolower($redirect) == Host::REDIRECT){
+            $data = $object->request('data');
+            $data[0] = $object->data('priya.bin');
+            $exec = implode(' ', $data);
+            $exec = str_ireplace('host redirect', 'host/redirect', $exec);
+            exec($exec, $output);
+            echo implode(PHP_EOL, $output);
+            exit;
+        }
     }
 
     public static function document($output=''){

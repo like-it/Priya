@@ -107,7 +107,6 @@ class Route extends Core\Parser{
             if($isHost && !isset($route->host)){
                 continue;
             }
-
             $node = $this->parsePath($path, $route);
             if(empty($node)){
                 continue;

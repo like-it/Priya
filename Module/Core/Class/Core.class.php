@@ -157,14 +157,14 @@ class Core {
 
     public function parameter($parameter, $offset=0){
         $data = $this->request('data');
-        $result = false;
+        $result = null;
         $value = null;
         if(is_numeric($parameter)){
             if(isset($data[$parameter])){
                 $param = ltrim($data[$parameter], '-');
                 $result = $param;
             } else {
-                $result = false;
+                $result = null;
             }
         } else {
             foreach($data as $key => $param){
@@ -179,9 +179,8 @@ class Core {
                         if(isset($data[($key + $offset)])){
                             $value = ltrim($data[($key + $offset)], '-');
                         } else {
-                            $result = false;
+                            $result = null;
                             break;
-
                         }
                     }
                     if(isset($value) && $value !== null){
@@ -194,7 +193,7 @@ class Core {
                 $value = null;
             }
         }
-        return $result;
+        return trim($result);
     }
 
     protected function cwd($cwd=''){

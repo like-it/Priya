@@ -230,7 +230,6 @@ class Autoload {
                         unset($item['dirName']);
                     }
                     $fileList = $this->fileList($item, $url);
-                    $location[$item['prefix']][] = $fileList;
                     $select = $item;
                     if(is_array($fileList) && empty($this->expose())){
                         foreach($fileList as $nr => $file){
@@ -250,6 +249,12 @@ class Autoload {
         if($this->environment() == 'development' || !empty($this->expose())){
             $object = new stdClass();
             $object->load = $load;
+
+            var_Dump($select);
+            var_Dump($this->fileList[str_replace('/', '\/', $select['file'])]);
+            var_dump($this->fileList);
+            die;
+
             $attribute = 'Priya\Module\Exception\Error';
             if(!empty($this->expose())){
                 $attribute = $load;

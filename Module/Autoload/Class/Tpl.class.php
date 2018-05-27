@@ -107,7 +107,7 @@ class Tpl extends Autoload {
             $data[] = '[---]';
         }
 
-        $this->fileList[$item['baseName']][] = $data;
+        $this->fileList[$item['file']][] = $data;
         return $data;
     }
 }

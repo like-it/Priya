@@ -101,6 +101,236 @@ class Application extends Parser {
         $this->router();
     }
 
+    public function run($url=''){
+        $this->data('time.application.run', microtime(true));
+        $this->data('time.application.duration', $this->data('time.application.run') - $this->data('time.start'));
+        if(empty($url)){
+            $url = $this->data('priya.dir.application') .
+            Application::DATA .
+            Application::DS .
+            Cache::CACHE .
+            Application::DS .
+            Cache::MINUTE .
+            Application::DS .
+            Application::URL
+            ;
+        }
+        //want to write to cache here...
+        //         $this->write($url);//(for what purpose?)
+        parent::autoload()->environment($this->data('priya.environment'));
+
+        if(!$this->data('priya.dir.application')){
+            throw new Exception(Application::EXCEPTION_DIR_APPLICATION);
+        }
+        //         chdir($this->data('priya.dir.application')); //keep working dir normal...
+        $request = $this->request('request');
+        if($request ===  $this->data('parser.request') && $request !== null){
+            throw new Exception(Application::EXCEPTION_REQUEST);
+        }
+        $url = $this->handler()->url();
+        $etag = sha1($url);
+        $tmp = explode('?', $url, 2);
+        $url = reset($tmp);
+        $tmp = explode('.', $url);
+        $ext = strtolower(end($tmp));
+        if(!empty($this->data('prefix'))){
+            $tmp = explode($this->data('prefix'), $url, 2);
+            $url = implode('', $tmp);
+        }
+        $allowed_contentType = $this->data('priya.contentType');
+        if(isset($allowed_contentType->{$ext})){
+            $host = $this->handler()->host(false);
+            if($host=== false){
+                $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+            } else{
+                $subdomain = $this->handler()->subDomain();
+                if($subdomain === false || $subdomain == 'www'){
+                    $url_tmp = $this->data('dir.host') . str_replace('www.', '', $host) . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    //removed $this-data('public_html') from $url_tmp
+                    $dir =  $this->data('dir.host') . str_replace('www.', '', $host);
+                    if(!file_exists($dir)){
+                        $domain = $this->handler()->domain();
+                        $extension = $this->handler()->extension();
+                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                        $dir = $this->data('dir.host') . $domain . '.' . $extension;
+                    }
+                } else {
+                    $url_tmp = $this->data('dir.host') . $host . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    $dir = $this->data('dir.host') . $host ;
+                    if(!file_exists($dir)){
+                        $domain = $this->handler()->domain();
+                        $extension = $this->handler()->extension();
+                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                        $dir = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    }
+                }
+                if(!file_exists($dir)){
+                    $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                } else {
+                    $url = $url_tmp;
+                }
+            }
+            $result = null;
+            $contentType = $allowed_contentType->{$ext};
+
+            if(file_exists($url) && strstr(strtolower($url), strtolower($this->data('public_html'))) !== false){
+                $mtime = File::mtime($url);
+                $this->handler()->since($mtime);
+
+                if(!headers_sent()){
+                    $gm = gmdate('D, d M Y H:i:s T', $mtime);
+                    $this->header('Last-Modified: '. $gm);
+                    $this->header('Content-Type: ' . $contentType);
+                    $this->header('ETag: ' . $etag . '-' . $gm);
+                    $this->header('Cache-Control: public');
+                }
+                if($ext == 'pcss'){
+                    $read = str_replace('/', Application::DS, $request);
+                    $read = str_replace(Application::DS . $this->data('public_html') . Application::DS . 'Pcss' . Application::DS , Application::DS, $read);
+                    $read = str_replace('.pcss', '', $read);
+                    $data = new Data();
+                    $data->read($read);
+                    $parser = new Parser();
+                    $file = new File();
+                    $result = $parser->data('object')->compile($file->read($url), $data->data());
+                }
+                elseif($ext == 'json'){
+                    $file = new File();
+                    $result = $file->read($url);
+                    $object = new stdClass();
+                    $object->url = $this->handler()->url();
+                    $object = Application::object_merge($object, $this->object($result));
+                    $result = $this->object($object, 'json');
+                } else {
+                    $file = new File();
+                    $result = $file->read($url);
+                }
+            }
+            if($result !== null){
+                chdir($this->cwd());
+                return $result;
+            }
+        }
+        if(!headers_sent()){
+            $this->header('Last-Modified: '. $this->request('last-modified'));
+        }
+        $item = $this->route()->run();
+//         var_dump($item);
+        $this->cli(); //why twice -> see constructor
+        $handler = $this->handler();
+        $contentType = $handler->request('contentType');
+        $result = '';
+        if($contentType == Handler::CONTENT_TYPE_CLI){
+            ob_start();
+        }
+        if(!empty($item->controller)){
+            $controller = new $item->controller($this->handler(), $this->route(), $this->data());
+            if(method_exists($controller, $item->function) === false){
+                throw new Exception('method (' . $item->function . ') not exists in class: (' . get_class($controller) . ')');
+            } else {
+                if(method_exists($controller, 'autoload')){
+                    $controller->autoload(parent::autoload());
+                }
+                if(method_exists($controller, 'parser')){
+                    $controller->parser('object')->random($this->parser('object')->random());
+                }
+                $result = $controller->{$item->function}();
+                if(method_exists($controller, 'message')){
+                    $this->message($controller->message());
+                    if(!empty($random)){
+                        $message = $controller->message();
+                        if(is_object($message)){
+                            foreach($message as $attribute => $value){
+                                $this->message($random . '.' . $attribute, $value);
+                            }
+                        }
+                    } else {
+                        $this->message($controller->error());
+                    }
+                }
+                if(method_exists($controller, 'error')){
+                    $this->error($controller->error());
+                }
+                $contentType = $handler->request('contentType'); //can change in the view
+            }
+        }
+        elseif(!empty($item->url)){
+            $this->data('request', $item->request);
+            $parser = new \Priya\Module\Parser($this->handler(), $this->route(), $this->data());
+            $item->url = $parser->compile($item->url, $this->data(), false, true);
+            if(
+                file_exists($item->url) &&
+                strstr(strtolower($item->url), strtolower($this->data('public_html'))) !== false
+                ){
+                    $file = new File();
+                    $ext = $file->extension($item->url);
+                    if(empty($ext)){
+                        $ext = 'txt'; //to handle Licence file
+                    }
+                    $contentType = $allowed_contentType->{$ext};
+
+                    $this->header('Content-Type: ' . $contentType);
+                    $result = $file->read($item->url);
+            } else {
+                //404
+            }
+        }
+        else {
+            if($contentType == Handler::CONTENT_TYPE_CLI){
+                if($request == 'Application/Error/'){
+                    var_dump($this->route()->data());
+                    var_dump($this->route($request));
+                    die;
+                    //                     var_dump($handler->request('route'));
+                    //                     die;
+                    throw new Exception(Application::EXCEPTION_APPLICATION_ERROR);
+                    //bug when dir.data = empty ?
+                }
+                if($this->route()->error('read')){
+                    $handler->request('request', 'Application/Error/');
+                    $handler->request('id', 2);
+                    $result = $this->run();
+                } else {
+                    if(empty($request)){
+                        $handler->request('request', 'Application/Help/');
+                        $result = $this->run();
+                    } else {
+                        $handler->request('route', $handler->request('request'));
+                        $handler->request('request', 'Application/Error/');
+                        $handler->request('id', 1);
+                        $result = $this->run();
+                    }
+                }
+            }
+        }
+        if(is_object($result)){
+            if($contentType == Handler::CONTENT_TYPE_JSON){
+                $result = $this->object($result, 'json');
+            } else {
+                if(isset($result->html)){
+                    $result = $result->html;
+                }
+            }
+        }
+        elseif(is_string($result)){
+            if($result == Handler::CONTENT_TYPE_CLI){
+                $result = ob_get_contents();
+                ob_end_clean();
+            }
+        }
+        elseif(is_array($result)){
+            var_dump($result);
+            die;
+        }
+        else {
+            var_dump($result);
+            die;
+            //          404
+        }
+        chdir($this->cwd());  //for Parser
+        return $result;
+    }
+
     private function dir(){
         if(empty($this->data('priya.dir.root'))){
             $this->data('priya.dir.root',
@@ -324,233 +554,6 @@ class Application extends Parser {
                 parent::autoload()->addPrefix($prefix, $directory);
             }
         }
-    }
-
-    public function run($url=''){
-        $this->data('time.application.run', microtime(true));
-        $this->data('time.application.duration', $this->data('time.application.run') - $this->data('time.start'));
-        if(empty($url)){
-            $url = $this->data('priya.dir.application') .
-                Application::DATA .
-                Application::DS .
-                Cache::CACHE .
-                Application::DS .
-                Cache::MINUTE .
-                Application::DS .
-                Application::URL
-            ;
-        }
-        //want to write to cache here...
-        //         $this->write($url);//(for what purpose?)
-        parent::autoload()->environment($this->data('priya.environment'));
-
-        if(!$this->data('priya.dir.application')){
-            throw new Exception(Application::EXCEPTION_DIR_APPLICATION);
-        }
-//         chdir($this->data('priya.dir.application')); //keep working dir normal...
-        $request = $this->request('request');
-        if($request ===  $this->data('parser.request') && $request !== null){
-            throw new Exception(Application::EXCEPTION_REQUEST);
-        }
-        $url = $this->handler()->url();
-        $etag = sha1($url);
-        $tmp = explode('?', $url, 2);
-        $url = reset($tmp);
-        $tmp = explode('.', $url);
-        $ext = strtolower(end($tmp));
-        if(!empty($this->data('prefix'))){
-            $tmp = explode($this->data('prefix'), $url, 2);
-            $url = implode('', $tmp);
-        }
-        $allowed_contentType = $this->data('priya.contentType');
-        if(isset($allowed_contentType->{$ext})){
-            $host = $this->handler()->host(false);
-            if($host=== false){
-                $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-            } else{
-                $subdomain = $this->handler()->subDomain();
-                if($subdomain === false || $subdomain == 'www'){
-                    $url_tmp = $this->data('dir.host') . str_replace('www.', '', $host) . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-                    //removed $this-data('public_html') from $url_tmp
-                    $dir =  $this->data('dir.host') . str_replace('www.', '', $host);
-                    if(!file_exists($dir)){
-                        $domain = $this->handler()->domain();
-                        $extension = $this->handler()->extension();
-                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-                        $dir = $this->data('dir.host') . $domain . '.' . $extension;
-                    }
-                } else {
-                    $url_tmp = $this->data('dir.host') . $host . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-                    $dir = $this->data('dir.host') . $host ;
-                    if(!file_exists($dir)){
-                        $domain = $this->handler()->domain();
-                        $extension = $this->handler()->extension();
-                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-                        $dir = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-                    }
-                }
-                if(!file_exists($dir)){
-                    $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-                } else {
-                    $url = $url_tmp;
-                }
-            }
-            $result = null;
-            $contentType = $allowed_contentType->{$ext};
-
-            if(file_exists($url) && strstr(strtolower($url), strtolower($this->data('public_html'))) !== false){
-                $mtime = File::mtime($url);
-                $this->handler()->since($mtime);
-
-                if(!headers_sent()){
-                    $gm = gmdate('D, d M Y H:i:s T', $mtime);
-                    $this->header('Last-Modified: '. $gm);
-                    $this->header('Content-Type: ' . $contentType);
-                    $this->header('ETag: ' . $etag . '-' . $gm);
-                    $this->header('Cache-Control: public');
-                }
-                if($ext == 'pcss'){
-                    $read = str_replace('/', Application::DS, $request);
-                    $read = str_replace(Application::DS . $this->data('public_html') . Application::DS . 'Pcss' . Application::DS , Application::DS, $read);
-                    $read = str_replace('.pcss', '', $read);
-                    $data = new Data();
-                    $data->read($read);
-                    $parser = new Parser();
-                    $file = new File();
-                    $result = $parser->data('object')->compile($file->read($url), $data->data());
-                }
-                elseif($ext == 'json'){
-                    $file = new File();
-                    $result = $file->read($url);
-                    $object = new stdClass();
-                    $object->url = $this->handler()->url();
-                    $object = Application::object_merge($object, $this->object($result));
-                    $result = $this->object($object, 'json');
-                } else {
-                    $file = new File();
-                    $result = $file->read($url);
-                }
-            }
-            if($result !== null){
-                chdir($this->cwd());
-                return $result;
-            }
-        }
-        if(!headers_sent()){
-            $this->header('Last-Modified: '. $this->request('last-modified'));
-        }
-        $item = $this->route()->run();
-        $this->cli();
-        $handler = $this->handler();
-        $contentType = $handler->request('contentType');
-        $result = '';
-        if($contentType == Handler::CONTENT_TYPE_CLI){
-            ob_start();
-        }
-        if(!empty($item->controller)){
-            $controller = new $item->controller($this->handler(), $this->route(), $this->data());
-            if(method_exists($controller, $item->function) === false){
-                throw new Exception('method (' . $item->function . ') not exists in class: (' . get_class($controller) . ')');
-            } else {
-                if(method_exists($controller, 'autoload')){
-                    $controller->autoload(parent::autoload());
-                }
-                if(method_exists($controller, 'parser')){
-                    $controller->parser('object')->random($this->parser('object')->random());
-                }
-                $result = $controller->{$item->function}();
-                if(method_exists($controller, 'message')){
-                    $this->message($controller->message());
-                    if(!empty($random)){
-                        $message = $controller->message();
-                        if(is_object($message)){
-                            foreach($message as $attribute => $value){
-                                $this->message($random . '.' . $attribute, $value);
-                            }
-                        }
-                    } else {
-                        $this->message($controller->error());
-                    }
-                }
-                if(method_exists($controller, 'error')){
-                    $this->error($controller->error());
-                }
-                $contentType = $handler->request('contentType'); //can change in the view
-            }
-        }
-        elseif(!empty($item->url)){
-            $this->data('request', $item->request);
-            $parser = new \Priya\Module\Parser($this->handler(), $this->route(), $this->data());
-            $item->url = $parser->compile($item->url, $this->data(), false, true);
-            if(
-               file_exists($item->url) &&
-               strstr(strtolower($item->url), strtolower($this->data('public_html'))) !== false
-            ){
-               $file = new File();
-               $ext = $file->extension($item->url);
-               if(empty($ext)){
-                    $ext = 'txt'; //to handle Licence file
-               }
-               $contentType = $allowed_contentType->{$ext};
-
-               $this->header('Content-Type: ' . $contentType);
-               $result = $file->read($item->url);
-            } else {
-                //404
-            }
-        }
-        else {
-            if($contentType == Handler::CONTENT_TYPE_CLI){
-                if($request == 'Application/Error/'){
-                    var_dump($this->route()->data());
-                        var_dump($this->route($request));
-                        die;
-//                     var_dump($handler->request('route'));
-//                     die;
-                    throw new Exception(Application::EXCEPTION_APPLICATION_ERROR);
-                    //bug when dir.data = empty ?
-                }
-                if($this->route()->error('read')){
-                    $handler->request('request', 'Application/Error/');
-                    $handler->request('id', 2);
-                    $result = $this->run();
-                } else {
-                    if(empty($request)){
-                        $handler->request('request', 'Application/Help/');
-                        $result = $this->run();
-                    } else {
-                        $handler->request('route', $handler->request('request'));
-                        $handler->request('request', 'Application/Error/');
-                        $handler->request('id', 1);
-                        $result = $this->run();
-                    }
-                }
-            }
-        }
-        if(is_object($result)){
-            if($contentType == Handler::CONTENT_TYPE_JSON){
-                $result = $this->object($result, 'json');
-            } else {
-                if(isset($result->html)){
-                    $result = $result->html;
-                }
-            }
-        }
-        elseif(is_string($result)){
-            if($result == Handler::CONTENT_TYPE_CLI){
-                $result = ob_get_contents();
-                ob_end_clean();
-            }
-        }
-        elseif(is_array($result)){
-            var_dump($result);
-            die;
-        }
-        else {
-//          404
-        }
-        chdir($this->cwd());  //for Parser
-        return $result;
     }
 
     private function cli(){
