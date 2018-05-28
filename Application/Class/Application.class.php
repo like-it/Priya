@@ -323,8 +323,6 @@ class Application extends Parser {
             die;
         }
         else {
-            var_dump($result);
-            die;
             //          404
         }
         chdir($this->cwd());  //for Parser

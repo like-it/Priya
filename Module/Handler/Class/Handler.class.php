@@ -475,11 +475,14 @@ class Handler extends \Priya\Module\Core\Data{
         );
     }
 
-    public function web(){
-        $scheme = $this->scheme();
-        if(empty($_SERVER['HTTP_HOST'])){
+    public static function web($host=''){
+        if(empty($host)){
+            $host = $_SERVER['HTTP_HOST'];
+        }
+        if(empty($host)){
             return false;
         }
+        $scheme = Handler::scheme();
         return
             $scheme .
             '://' .
@@ -488,11 +491,13 @@ class Handler extends \Priya\Module\Core\Data{
         ;
     }
 
-    public function domain(){
-        if(empty($_SERVER['HTTP_HOST'])){
+    public static function domain($host=''){
+        if(empty($host)){
+            $host = $_SERVER['HTTP_HOST'];
+        }
+        if(empty($host)){
             return false;
         }
-        $host = $_SERVER['HTTP_HOST'];
         $explode = explode('.', $host);
         if(count($explode) >= 2){
             array_pop($explode);
@@ -501,11 +506,13 @@ class Handler extends \Priya\Module\Core\Data{
         return false;
     }
 
-    public function subdomain(){
-        if(empty($_SERVER['HTTP_HOST'])){
+    public static function subdomain($host=''){
+        if(empty($host)){
+            $host = $_SERVER['HTTP_HOST'];
+        }
+        if(empty($host)){
             return false;
         }
-        $host = $_SERVER['HTTP_HOST'];
         $explode = explode('.', $host);
         if(count($explode) > 2){
             array_pop($explode);
@@ -515,11 +522,13 @@ class Handler extends \Priya\Module\Core\Data{
         return false;
     }
 
-    public function extension(){
-        if(empty($_SERVER['HTTP_HOST'])){
+    public static function extension($host=''){
+        if(empty($host)){
+            $host = $_SERVER['HTTP_HOST'];
+        }
+        if(empty($host)){
             return false;
         }
-        $host = $_SERVER['HTTP_HOST'];
         $explode = explode('.', $host);
         if(count($explode) > 1){
             return array_pop($explode);
@@ -527,7 +536,7 @@ class Handler extends \Priya\Module\Core\Data{
         return false;
     }
 
-    public function scheme(){
+    public static function scheme(){
         $scheme = Handler::SCHEME_HTTP;
         if(!empty($_SERVER['REQUEST_SCHEME'])){
             $scheme = $_SERVER['REQUEST_SCHEME'];
@@ -1007,7 +1016,7 @@ class Handler extends \Priya\Module\Core\Data{
         return false;
     }
 
-    public function host($include_scheme = true){
+    public static function host($include_scheme = true){
         if(isset($_SERVER['HTTP_HOST'])){
             $domain = $_SERVER['HTTP_HOST'];
         }
@@ -1017,7 +1026,7 @@ class Handler extends \Priya\Module\Core\Data{
             $domain = '';
         }
         if($include_scheme) {
-            $scheme = $this->scheme();
+            $scheme = Handler::scheme();
             $host = '';
             if(isset($scheme) && isset($domain)){
                 $host = $scheme . '://' . $domain . '/';

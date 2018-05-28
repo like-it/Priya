@@ -12,6 +12,7 @@ namespace Priya\Module;
 use stdClass;
 use Exception;
 use Priya\Application;
+use Priya\Module\Handler;
 
 class Route extends Core\Parser{
     const DIR = __DIR__;
@@ -84,9 +85,14 @@ class Route extends Core\Parser{
                 $route->host = (array) $route->host;
 
                 $match = false;
-                $real_host = $this->handler()->host(false);
+                $real_host = Handler::host(false);
 
                 foreach($route->host as $host){
+                    $subdomain = Handler::subdomain($host);
+                    if(isset($subdomain) && $subdomain == '*'){
+                        $real_host = Handler::domain($real_host) . '.' . Handler::extension($real_host);
+                        $host = Handler::domain($host) . '.' . Handler::extension($host);
+                    }
                     if($host == $real_host){
                         $match = true;
                         break;
