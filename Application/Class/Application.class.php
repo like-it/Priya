@@ -139,33 +139,33 @@ class Application extends Parser {
         }
         $allowed_contentType = $this->data('priya.contentType');
         if(isset($allowed_contentType->{$ext})){
-            $host = $this->handler()->host(false);
+            $host = Handler::host(false);
             if($host=== false){
-                $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                $url = $this->data('dir.vendor') . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
             } else{
-                $subdomain = $this->handler()->subDomain();
+                $subdomain = Handler::subDomain();
                 if($subdomain === false || $subdomain == 'www'){
-                    $url_tmp = $this->data('dir.host') . str_replace('www.', '', $host) . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    $url_tmp = $this->data('dir.host') . str_replace('.', Application::DS, str_replace('www.', '', $host)) . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
                     //removed $this-data('public_html') from $url_tmp
-                    $dir =  $this->data('dir.host') . str_replace('www.', '', $host);
+                    $dir =  $this->data('dir.host') . str_replace('.', Application::DS, str_replace('www.', '', $host));
                     if(!file_exists($dir)){
-                        $domain = $this->handler()->domain();
-                        $extension = $this->handler()->extension();
-                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-                        $dir = $this->data('dir.host') . $domain . '.' . $extension;
+                        $domain = Handler::domain();
+                        $extension = Handler::extension();
+                        $url_tmp = $this->data('dir.host') . $domain . '/' . $extension . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                        $dir = $this->data('dir.host') . $domain . '/' . $extension;
                     }
                 } else {
-                    $url_tmp = $this->data('dir.host') . $host . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-                    $dir = $this->data('dir.host') . $host ;
+                    $url_tmp = $this->data('dir.host') . str_replace('.', Application::DS, $host) . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                    $dir = $this->data('dir.host') . str_replace('.', Application::DS, $host);
                     if(!file_exists($dir)){
-                        $domain = $this->handler()->domain();
-                        $extension = $this->handler()->extension();
-                        $url_tmp = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
-                        $dir = $this->data('dir.host') . $domain . '.' . $extension . Application::DS . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                        $domain = Handler::domain();
+                        $extension = Handler::extension();
+                        $url_tmp = $this->data('dir.host') . $domain . '/' . $extension . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                        $dir = $this->data('dir.host') . $domain . '/' . $extension . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
                     }
                 }
                 if(!file_exists($dir)){
-                    $url = $this->data('dir.vendor') . str_replace('/', Application::DS, $this->handler()->removeHost($this->url('decode', $url)));
+                    $url = $this->data('dir.vendor') . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
                 } else {
                     $url = $url_tmp;
                 }
@@ -215,7 +215,6 @@ class Application extends Parser {
             $this->header('Last-Modified: '. $this->request('last-modified'));
         }
         $item = $this->route()->run();
-//         var_dump($item);
         $this->cli(); //why twice -> see constructor
         $handler = $this->handler();
         $contentType = $handler->request('contentType');

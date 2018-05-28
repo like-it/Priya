@@ -477,7 +477,9 @@ class Handler extends \Priya\Module\Core\Data{
 
     public static function web($host=''){
         if(empty($host)){
-            $host = $_SERVER['HTTP_HOST'];
+            if(isset($_SERVER['HTTP_HOST'])){
+                $host = $_SERVER['HTTP_HOST'];
+            }
         }
         if(empty($host)){
             return false;
@@ -486,14 +488,16 @@ class Handler extends \Priya\Module\Core\Data{
         return
             $scheme .
             '://' .
-            $_SERVER['HTTP_HOST'] .
+            $host .
             '/'
         ;
     }
 
     public static function domain($host=''){
         if(empty($host)){
-            $host = $_SERVER['HTTP_HOST'];
+            if(isset($_SERVER['HTTP_HOST'])){
+                $host = $_SERVER['HTTP_HOST'];
+            }
         }
         if(empty($host)){
             return false;
@@ -508,7 +512,9 @@ class Handler extends \Priya\Module\Core\Data{
 
     public static function subdomain($host=''){
         if(empty($host)){
-            $host = $_SERVER['HTTP_HOST'];
+            if(isset($_SERVER['HTTP_HOST'])){
+                $host = $_SERVER['HTTP_HOST'];
+            }
         }
         if(empty($host)){
             return false;
@@ -524,7 +530,9 @@ class Handler extends \Priya\Module\Core\Data{
 
     public static function extension($host=''){
         if(empty($host)){
-            $host = $_SERVER['HTTP_HOST'];
+            if(isset($_SERVER['HTTP_HOST'])){
+                $host = $_SERVER['HTTP_HOST'];
+            }
         }
         if(empty($host)){
             return false;
@@ -1009,7 +1017,7 @@ class Handler extends \Priya\Module\Core\Data{
         return $this->request('referer');
     }
 
-    private static function createReferer(){
+    private function createReferer(){
         if(isset($_SERVER['HTTP_REFERER'])){
             return $this->referer($_SERVER['HTTP_REFERER']);
         }
@@ -1058,7 +1066,7 @@ class Handler extends \Priya\Module\Core\Data{
         }
     }
 
-    public static function since($mtime=''){
+    public function since($mtime=''){
         if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])){
             if(strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $mtime){
                 $this->header('HTTP/1.1 304 Not Modified');

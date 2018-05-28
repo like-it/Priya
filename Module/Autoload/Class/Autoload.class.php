@@ -250,11 +250,6 @@ class Autoload {
             $object = new stdClass();
             $object->load = $load;
 
-            var_Dump($select);
-            var_Dump($this->fileList[str_replace('/', '\/', $select['file'])]);
-            var_dump($this->fileList);
-            die;
-
             $attribute = 'Priya\Module\Exception\Error';
             if(!empty($this->expose())){
                 $attribute = $load;
