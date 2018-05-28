@@ -549,7 +549,7 @@ class Handler extends \Priya\Module\Core\Data{
     }
 
     public function url($url=null, $attribute=null){
-        $scheme = $this->scheme();
+        $scheme = Handler::scheme();
         if(empty($scheme)){
             return false;
         }
@@ -1009,7 +1009,7 @@ class Handler extends \Priya\Module\Core\Data{
         return $this->request('referer');
     }
 
-    private function createReferer(){
+    private static function createReferer(){
         if(isset($_SERVER['HTTP_REFERER'])){
             return $this->referer($_SERVER['HTTP_REFERER']);
         }
@@ -1037,8 +1037,8 @@ class Handler extends \Priya\Module\Core\Data{
         return $host;
     }
 
-    public function removeHost($value=''){
-        $host = $this->host();
+    public static function removeHost($value=''){
+        $host = Handler::host();
         if(empty($host)){
             return $value;
         }
@@ -1058,7 +1058,7 @@ class Handler extends \Priya\Module\Core\Data{
         }
     }
 
-    public function since($mtime=''){
+    public static function since($mtime=''){
         if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])){
             if(strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $mtime){
                 $this->header('HTTP/1.1 304 Not Modified');
