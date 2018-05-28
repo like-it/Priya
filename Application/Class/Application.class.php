@@ -145,23 +145,23 @@ class Application extends Parser {
             } else{
                 $subdomain = Handler::subDomain();
                 if($subdomain === false || $subdomain == 'www'){
-                    $url_tmp = $this->data('dir.host') . str_replace('.', Application::DS, str_replace('www.', '', $host)) . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                    $url_tmp = $this->data('dir.host') . $this->ucfirst(Handler::domain($host) . Application::DS . Handler::extension($host)) . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
                     //removed $this-data('public_html') from $url_tmp
-                    $dir =  $this->data('dir.host') . str_replace('.', Application::DS, str_replace('www.', '', $host));
+                    $dir =  $this->data('dir.host') . ucfirst(Handler::domain($host)) . Application::DS . ucfirst(Handler::extension($host));
                     if(!file_exists($dir)){
                         $domain = Handler::domain();
                         $extension = Handler::extension();
-                        $url_tmp = $this->data('dir.host') . $domain . '/' . $extension . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
-                        $dir = $this->data('dir.host') . $domain . '/' . $extension;
+                        $url_tmp = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension) . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                        $dir = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension);
                     }
                 } else {
-                    $url_tmp = $this->data('dir.host') . str_replace('.', Application::DS, $host) . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
-                    $dir = $this->data('dir.host') . str_replace('.', Application::DS, $host);
+                    $url_tmp = $this->data('dir.host') . $this->ucfirst(str_replace('.', Application::DS, $host)) . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                    $dir = $this->data('dir.host') . $this->ucfirst(str_replace('.', Application::DS, $host));
                     if(!file_exists($dir)){
                         $domain = Handler::domain();
                         $extension = Handler::extension();
-                        $url_tmp = $this->data('dir.host') . $domain . '/' . $extension . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
-                        $dir = $this->data('dir.host') . $domain . '/' . $extension . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                        $url_tmp = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension) . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                        $dir = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension) . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
                     }
                 }
                 if(!file_exists($dir)){
@@ -326,6 +326,14 @@ class Application extends Parser {
         }
         chdir($this->cwd());  //for Parser
         return $result;
+    }
+
+    private function ucfirst($dir=''){
+        $explode = explode(Application::DS, $dir);
+        foreach($explode as $nr => $value){
+            $explode[$nr] = ucfirst($value);
+        }
+        return implode(Application::DS, $explode);
     }
 
     private function dir(){
