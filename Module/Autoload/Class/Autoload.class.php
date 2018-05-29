@@ -97,6 +97,20 @@ class Autoload {
     }
 
     private function setPrefixList($list = array()){
+        $list_length = array();
+        foreach($list as $key => $value){
+            if(isset($value['prefix'])){
+                $list_length[strlen($value['prefix'])][] = $key;
+            }
+        }
+        krsort($list_length, SORT_NATURAL);
+
+        $list_prefix = array();
+        foreach($list_length as $length => $sorted){
+            foreach($sorted as $nr => $key){
+                $list_prefix[] = $list[$key];
+            }
+        }
         $this->prefixList = $list;
     }
 
