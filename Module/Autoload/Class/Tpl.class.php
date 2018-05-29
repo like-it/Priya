@@ -53,9 +53,8 @@ class Tpl extends Autoload {
         }
         $data = array();
 
-        if($item['prefix'] != 'none'){
-            $prefix = str_replace('\\',Application::DS, $item['prefix']);
-            if(strpos($item['load'], $prefix) === false){
+        if($item['prefix'] != Autoload::PREFIX_NONE){
+            if(strpos($item['load'], $item['prefix']) === false){
                 return $data;
             }
         }
@@ -85,6 +84,7 @@ class Tpl extends Autoload {
             $directory = implode(Application::DS, $directory) . Application::DS;
             if(stristr($file, $item['extension']) !== false){
                 $data[] = $item['directory'] . $directory . Application::TEMPLATE . Application::DS . $file;
+                $data[] = $item['directory'] . $directory .  $item['baseName'] . Application::DS . Application::TEMPLATE . Application::DS . $item['baseName'] . '.' . $item['extension'];
                 $data[] = $item['directory'] . Application::TEMPLATE . Application::DS . $file;
             } else {
                 $data[] = $item['directory'] . $directory . $file . Application::DS . Application::TEMPLATE. Application::DS . $file . '.' . $item['extension'];
@@ -106,7 +106,6 @@ class Tpl extends Autoload {
             $data[] = $item['directory'] . $item['file'] . '.' . $item['extension'];
             $data[] = '[---]';
         }
-
         $this->fileList[$item['file']][] = $data;
         return $data;
     }

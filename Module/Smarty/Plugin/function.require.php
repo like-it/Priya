@@ -19,8 +19,10 @@ function smarty_function_require($params, $template)
     if(isset($params['environment'])){
         $result->data('priya.environment', Application::ENVIRONMENT);
     }
-    if(isset($vars['autoload'])){
-        $result->data('autoload', $vars['autoload']);
+    if(
+        isset($vars['priya'])
+    ){
+        $result->data('priya', Application::array_object($vars['priya']));
     }
     if(
         isset($vars['module']) &&

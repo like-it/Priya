@@ -15,11 +15,14 @@ use stdClass;
 class Autoload {
     const DIR = __DIR__;
     const FILE = 'Autoload.json';
+
     const EXT_PHP = 'php';
     const EXT_TPL = 'tpl';
     const EXT_JSON = 'json';
     const EXT_CLASS_PHP = 'class.php';
     const EXT_TRAIT_PHP = 'trait.php';
+
+    const PREFIX_NONE = 'none';
 
     protected $expose;
 
@@ -182,6 +185,7 @@ class Autoload {
     public function locate($load=null){
         $dir = dirname(Autoload::DIR) . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;
         $url = $dir . Autoload::FILE;
+        $load = str_replace('/', '\\', $load);
         $load = ltrim($load, '\\');
         $prefixList = $this->getPrefixList();
         $select = false;
@@ -199,15 +203,16 @@ class Autoload {
                         trim(substr($load, strlen($item['prefix'])),'\\');
                     $item['file'] =
                         str_replace('\\', DIRECTORY_SEPARATOR, $item['file']);
-                } else {
-                    continue; //added
-                    var_dump('false');
+                }
+                elseif($item['prefix'] === Autoload::PREFIX_NONE){
                     $tmp = explode('.', $load);
                     if(count($tmp) >= 2){
                         array_pop($tmp);
                     }
                     $item['file'] = implode('.',$tmp);
-
+                }
+                else {
+                    continue; //added
                 }
                 if(empty($item['file'])){
                     $item['file'] = $load;
@@ -217,12 +222,14 @@ class Autoload {
                     $item['file'] = str_replace('\\', DIRECTORY_SEPARATOR, $item['file']);
                     $item['file'] = str_replace('.'  . DIRECTORY_SEPARATOR , DIRECTORY_SEPARATOR, $item['file']);
                     $item['baseName'] = basename(
-                        $this->removeExtension($item['file'],
+                        $this->removeExtension(
+                            $item['file'],
                             array(
                                 Autoload::EXT_PHP,
                                 Autoload::EXT_TPL
                             )
-                    ));
+                        )
+                    );
                     $item['baseName'] = explode(DIRECTORY_SEPARATOR, $item['baseName'], 2);
                     $item['baseName'] = end($item['baseName']);
                     $item['dirName'] = dirname($item['file']);
