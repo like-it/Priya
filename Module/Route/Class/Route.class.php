@@ -86,8 +86,14 @@ class Route extends Core\Parser{
 
                 $match = false;
                 $real_host = Handler::host(false);
-
+                $skip = Route::skip($route->host);
                 foreach($route->host as $host){
+                    if(substr($host,0, 1) == '!'){
+                        continue;
+                    }
+                    if(in_array($real_host, $skip)){
+                        continue;
+                    }
                     $subdomain = Handler::subdomain($host);
                     if(isset($subdomain) && $subdomain == '*'){
                         $real_host = Handler::domain($real_host) . '.' . Handler::extension($real_host);
@@ -206,6 +212,20 @@ class Route extends Core\Parser{
                 return $this->item($route);
             }
         }
+    }
+
+    private static function skip($host=array()){
+        $skip = array();
+        foreach($host as $name){
+            if(substr($name, 0, 1) == '!'){
+                $skip[] = substr($name, 1);
+                $explode = explode('.', $name);
+                array_pop($explode);
+                $explode[] = Route::LOCAL;
+                $skip[] = implode('.', $explode);
+            }
+        }
+        return $skip;
     }
 
     private function parseRoute(){
