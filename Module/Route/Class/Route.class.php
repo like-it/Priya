@@ -87,7 +87,6 @@ class Route extends Core\Parser{
                 $match = false;
                 $real_host = Handler::host(false);
                 $skip = Route::skip($route->host);
-                $skip = array();
                 foreach($route->host as $host){
                     if(substr($host,0, 1) == '!'){
                         continue;
