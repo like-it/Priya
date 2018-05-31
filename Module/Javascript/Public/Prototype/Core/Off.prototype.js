@@ -1,5 +1,5 @@
 _('prototype').off = function (event, action){
-    console.log(this['Priya']['eventListener']);
+    console.log(this['Priya']['eventListener']); //need to remove it from the eventListener
     this.removeEventListener(event, action)
 }
 

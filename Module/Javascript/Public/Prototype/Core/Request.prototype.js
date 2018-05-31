@@ -81,7 +81,7 @@ _('prototype').request = function (url, data, script){
                 var start = priya.collection('request.microtime');
                 time = microtime(true);
                 if(time > (start + offset)){
-                    priya.loader();
+//                    priya.loader(); //buggy
                 }
             }
             if (xhttp.readyState == 4 ){

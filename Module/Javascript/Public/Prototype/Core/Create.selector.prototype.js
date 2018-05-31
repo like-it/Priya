@@ -4,10 +4,6 @@ _('prototype').createSelector = function(element){
     }
     selector = element.tagName;
     if(typeof selector == 'undefined' && element instanceof HTMLDocument){
-        /*
-        var priya = this.attach(this.create('element', selector));
-        priya.data('selector', selector);
-        */
         return element;
     }
     selector = selector.toLowerCase();

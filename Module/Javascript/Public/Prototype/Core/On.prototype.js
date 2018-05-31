@@ -1,9 +1,5 @@
 _('prototype').on = function (event, action, capture){
     if(typeof this['Priya'] == 'undefined'){
-        console.log('Priya undefined');
-        console.log(this);
-        console.log(event);
-        console.log(action);
         return this;
     }
     if(typeof this['Priya']['eventListener'] != 'object'){
