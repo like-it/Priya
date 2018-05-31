@@ -4,9 +4,9 @@
     "core": "Bin\/",
     "prototype": "",
     "extension": ".js",
-    "query": "0.3.3",
+    "query": "0.3.4",
     "collect": {
-        "version": "0.3.3",
+        "version": "0.3.4",
         "expose": {
             "namespace": "_",
             "require": "require",
@@ -25,7 +25,7 @@
     },
     "require": {
         "core": [
-            "Bin\/Core-0.3.3.js?0.3.3"
+            "Bin\/Core-0.3.4.js?0.3.4"
         ]
     }
 }

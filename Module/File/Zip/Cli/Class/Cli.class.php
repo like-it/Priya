@@ -26,11 +26,6 @@ class Cli extends Core {
             $target = Cli::dir($this, $this->parameter('pack', 2));
 
             Cli::pack($this, $source, $target);
-
-
-            var_dump($source);
-            var_dump($target);
-            die;
         }
         $url = $this->parameter('task', 1);
         if($url){
@@ -48,7 +43,6 @@ class Cli extends Core {
                     case 'extract':
                     break;
                 }
-
             }
         }
     }

@@ -133,7 +133,8 @@ class Cli extends Main {
         $target = dirname($this->data('module.dir.root')) . Application::DS . $this->data('public_html') . Application::DS . 'Download' . Application::DS . 'Priya.Js-' .$this->data('priya.version') .'.zip';
 
         $archiver = $bin . 'Bin' . Application::DS . 'Archiver.json';
-        exec('priya task ' . $archiver, $output);
+        $exec = 'priya task ' . $archiver;
+        exec($exec, $output);
         foreach($output as $line){
             echo $line . PHP_EOL;
         }

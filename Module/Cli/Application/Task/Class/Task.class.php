@@ -35,6 +35,7 @@ class Task extends Cli {
         if(!isset($task->execute)){
             throw new Exception('Nothing to execute in task...');
         }
+        echo '[task] ' . $task->execute . PHP_EOL;
         exec($task->execute, $output);
         return implode(PHP_EOL, $output);
     }

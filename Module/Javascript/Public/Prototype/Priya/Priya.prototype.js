@@ -2,19 +2,11 @@
  * @author Remco van der Velde
  * @since 2015-02-18
  * @version 1.0
+ * @see https://priya.software
  *
  * @package priya
  * @subpackage js
  * @category core
- *
- * @description
- *
- * @todo
- *
- *
- * @changeLog
- * 1.0
- *  -    all
  */
 
 var priya = function (url){

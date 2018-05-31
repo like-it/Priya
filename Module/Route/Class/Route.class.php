@@ -12,7 +12,6 @@ namespace Priya\Module;
 use stdClass;
 use Exception;
 use Priya\Application;
-use Priya\Module\Handler;
 
 class Route extends Core\Parser{
     const DIR = __DIR__;

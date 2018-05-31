@@ -18,7 +18,7 @@
  */
 
 var priya = function (collection){
-    this.version = '0.3.3';
+    this.version = '0.3.4';
     this.collect = {};
     this.parent = this;
     this.load = 0;

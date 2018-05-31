@@ -1,9 +1,9 @@
 /** *
  * (c) 2012 - 2018 https://priya.software
  * @author 			Remco van der Velde
- * @version			0.3.3
+ * @version			0.3.4
  * @see				https://priya.software/licence
- * @built				2018-05-14 02:31:58
+ * @built				2018-05-31 21:48:30
  *
 **//*
  * @name: Active
@@ -646,10 +646,6 @@ priya.content = _('prototype').content;
  */
 _('prototype').create = function (type, create){
     if(typeof type.toLowerCase != 'function'){
-        console.log('no function toLowerCase______________________________________________');
-        console.log(type);
-        console.log(create);
-        console.log(_('prototype').create.caller);
         return;
     }
     switch(type.toLowerCase()){
@@ -741,10 +737,6 @@ _('prototype').createSelector = function(element){
     }
     selector = element.tagName;
     if(typeof selector == 'undefined' && element instanceof HTMLDocument){
-        /*
-        var priya = this.attach(this.create('element', selector));
-        priya.data('selector', selector);
-        */
         return element;
     }
     selector = selector.toLowerCase();
@@ -2010,7 +2002,7 @@ priya.object_set = _('prototype').object_set;
  * @url: /mnt/c/Library/Server/Vendor/Priya/Module/Javascript/Public/Prototype/Core/Off.prototype.js
  */
 _('prototype').off = function (event, action){
-    console.log(this['Priya']['eventListener']);
+    console.log(this['Priya']['eventListener']); //need to remove it from the eventListener
     this.removeEventListener(event, action)
 }
 
@@ -2022,10 +2014,6 @@ priya.off = _('prototype').off;
  */
 _('prototype').on = function (event, action, capture){
     if(typeof this['Priya'] == 'undefined'){
-        console.log('Priya undefined');
-        console.log(this);
-        console.log(event);
-        console.log(action);
         return this;
     }
     if(typeof this['Priya']['eventListener'] != 'object'){
@@ -2247,7 +2235,7 @@ _('prototype').request = function (url, data, script){
                 var start = priya.collection('request.microtime');
                 time = microtime(true);
                 if(time > (start + offset)){
-                    priya.loader();
+//                    priya.loader(); //buggy
                 }
             }
             if (xhttp.readyState == 4 ){
@@ -2602,12 +2590,7 @@ _('prototype').select = function(selector){
         else if(typeof selector['Priya'] == 'object'){
             return selector;
         } else {
-            console.log(object);
-            console.log(selector);
-            console.log(call);
-            console.log('error, cannot attach ??? with priya.attach(object)');
             var object =  object.attach(call);
-            console.log(object);
             return object;
         }
     }

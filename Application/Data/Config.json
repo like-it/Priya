@@ -1,6 +1,6 @@
 {
     "priya": {
-    	"bin" : "priya",
+        "bin": "priya",
         "environment": "production",
         "version": "{$priya.major|default:0}.{$priya.minor|default:0}.{$priya.patch|default:0}",
         "contentType": {
@@ -19,30 +19,30 @@
             "ttf": "font\/ttf",
             "wav": "audio\/wav",
             "mp3": "audio\/mp3",
-            "zip" : "application/zip",
-            "rar" : "application/octet-stream"
+            "zip": "application\/zip",
+            "rar": "application\/octet-stream"
         },
-        "route" : {
-			"default" : [
-				"Application.Copyright",
-				"Application.Version",
-				"Application.License",
-				"Application.Bin",
-				"Application.Locate",
-				"Application.Config",
-				"Application.Help",
-				"Application.Error",
-				"Application.Route",
-				"Application.Parser",
-				"Application.Cache",
-				"Application.Task",
-				"Application.Host",
-				"Test"
-			]
+        "route": {
+            "default": [
+                "Application.Copyright",
+                "Application.Version",
+                "Application.License",
+                "Application.Bin",
+                "Application.Locate",
+                "Application.Config",
+                "Application.Help",
+                "Application.Error",
+                "Application.Route",
+                "Application.Parser",
+                "Application.Cache",
+                "Application.Task",
+                "Application.Host",
+                "Test"
+            ]
         },
         "major": 0,
         "minor": 3,
-        "patch": 3,
-        "built": "2018-05-12 14:54:05"
+        "patch": 4,
+        "built": "2018-05-31 21:07:29"
     }
 }

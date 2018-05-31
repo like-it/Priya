@@ -273,6 +273,8 @@ class Handler extends \Priya\Module\Core\Data{
         $host = $this->host();
         if(empty($host) || $host == 'http:///'){
             $contentType = Handler::CONTENT_TYPE_CLI;
+            $this->request('contentType',$contentType);
+            return $this->contentType($contentType);
         }
         $ct = $this->request('contentType');
         if($ct){
