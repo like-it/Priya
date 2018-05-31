@@ -18,7 +18,9 @@
             "woff": "application\/font-woff",
             "ttf": "font\/ttf",
             "wav": "audio\/wav",
-            "mp3": "audio\/mp3"
+            "mp3": "audio\/mp3",
+            "zip" : "application/zip",
+            "rar" : "application/octet-stream"
         },
         "route" : {
 			"default" : [

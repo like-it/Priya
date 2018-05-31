@@ -266,10 +266,16 @@ class Application extends Parser {
                     if(empty($ext)){
                         $ext = 'txt'; //to handle Licence file
                     }
-                    $contentType = $allowed_contentType->{$ext};
+                    if(isset($allowed_contentType->{$ext})){
+                        $contentType = $allowed_contentType->{$ext};
+                        $this->header('Content-Type: ' . $contentType);
+                        $result = $file->read($item->url);
+                    } else {
+                        throw new  Exception('Content type not allowed...');
+                    }
 
-                    $this->header('Content-Type: ' . $contentType);
-                    $result = $file->read($item->url);
+
+
             } else {
                 //404
             }
