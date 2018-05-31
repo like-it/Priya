@@ -41,8 +41,8 @@ class Version extends Cli {
             $version = $parameter;
         }
         if(empty($version)){
-            $major = $object->data('priya.major');
-            $minor = $object->data('priya.minor');
+            $major = $object->data('priya.major') + 0;
+            $minor = $object->data('priya.minor') + 0;
             $patch = $object->data('priya.patch') + 1;
             $version = $major . '.' . $minor . '.' . $patch;
         }
