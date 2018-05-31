@@ -23,7 +23,6 @@ class Route extends Core\Parser{
     public function __construct(Handler $handler, $data='', $read=true){
         $this->handler($handler);
         $this->data($data);
-
         if($read){
             $data = new Data();
             $read = $data->read($this->data('dir.data') . Application::ROUTE);
@@ -52,6 +51,9 @@ class Route extends Core\Parser{
         $data = $this->data();
         if(empty($path)){
             $path = trim($handler->request('request'), '/') . '/';
+        }
+        if(empty($data)){
+            throw new Exception('Route file corrupted?');
         }
         foreach($data as $name => $route){
             if(isset($route->resource) && !isset($route->read)){
@@ -217,7 +219,8 @@ class Route extends Core\Parser{
         $skip = array();
         foreach($host as $name){
             if(substr($name, 0, 1) == '!'){
-                $skip[] = substr($name, 1);
+                $name = substr($name, 1);
+                $skip[] = $name;
                 $explode = explode('.', $name);
                 array_pop($explode);
                 $explode[] = Route::LOCAL;
