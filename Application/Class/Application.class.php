@@ -155,7 +155,7 @@ class Application extends Parser {
                         $dir = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension);
                     }
                 } else {
-                    $url_tmp = $this->data('dir.host') . $this->ucfirst(str_replace('.', Application::DS, $host)) . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                    $url_tmp = $this->data('dir.host') . $this->ucfirst(str_replace('.', Application::DS, $host)) . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
                     $dir = $this->data('dir.host') . $this->ucfirst(str_replace('.', Application::DS, $host));
                     if(!file_exists($dir)){
                         $domain = Handler::domain();
