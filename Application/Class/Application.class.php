@@ -504,9 +504,9 @@ class Application extends Parser {
             $this->data('time.route.url', Cache::url($url, '.json'));
             $this->data('time.route.duration', microtime(true) - $start);
             //constant refresh...
-            $route->data('priya', $this->data('priya'));
-            $route->data('dir', $this->data('dir'));
-            $route->data('web', $this->data('web'));
+            $this->route()->data('priya', $this->data('priya'));
+            $this->route()->data('dir', $this->data('dir'));
+            $this->route()->data('web', $this->data('web'));
         } else {
             $route = new Data();
             $route->data('time', $this->data('time'));
