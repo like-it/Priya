@@ -503,6 +503,10 @@ class Application extends Parser {
             $this->data('time.route.cache', $this->route()->data('time.route.cache'));
             $this->data('time.route.url', Cache::url($url, '.json'));
             $this->data('time.route.duration', microtime(true) - $start);
+            //constant refresh...
+            $route->data('priya', $this->data('priya'));
+            $route->data('dir', $this->data('dir'));
+            $route->data('web', $this->data('web'));
         } else {
             $route = new Data();
             $route->data('time', $this->data('time'));
