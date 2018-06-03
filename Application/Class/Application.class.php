@@ -140,32 +140,37 @@ class Application extends Parser {
         $allowed_contentType = $this->data('priya.contentType');
         if(isset($allowed_contentType->{$ext})){
             $host = Handler::host(false);
+            $path = str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
             if($host=== false){
-                $url = $this->data('dir.vendor') . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                $url = $this->data('dir.vendor') . $path;
             } else{
                 $subdomain = Handler::subDomain();
                 if($subdomain === false || $subdomain == 'www'){
-                    $url_tmp = $this->data('dir.host') . $this->ucfirst(Handler::domain($host) . Application::DS . Handler::extension($host)) . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                    $url_tmp = $this->data('dir.host') . $this->ucfirst(Handler::domain($host) . Application::DS . Handler::extension($host)) . Application::DS . $path;
                     //removed $this-data('public_html') from $url_tmp
                     $dir =  $this->data('dir.host') . ucfirst(Handler::domain($host)) . Application::DS . ucfirst(Handler::extension($host));
                     if(!file_exists($dir)){
                         $domain = Handler::domain();
                         $extension = Handler::extension();
-                        $url_tmp = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension) . Application::DS . $this->data('public_html') . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                        $url_tmp = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension) . Application::DS . $this->data('public_html') . Application::DS . $path;
                         $dir = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension);
                     }
                 } else {
-                    $url_tmp = $this->data('dir.host') . $this->ucfirst(str_replace('.', Application::DS, $host)) . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                    if(strstr($path, $this->data('public_html'))){
+                        $url_tmp = $this->data('dir.host') . $this->ucfirst(str_replace('.', Application::DS, $host)) . Application::DS . $path;
+                    } else {
+                        $url_tmp = $this->data('dir.host') . $this->ucfirst(str_replace('.', Application::DS, $host)) . Application::DS . $this->data('public_html') . Application::DS . $path;
+                    }
                     $dir = $this->data('dir.host') . $this->ucfirst(str_replace('.', Application::DS, $host));
                     if(!file_exists($dir)){
                         $domain = Handler::domain();
                         $extension = Handler::extension();
-                        $url_tmp = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension) . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
-                        $dir = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension) . Application::DS . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                        $url_tmp = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension) . Application::DS . $path;
+                        $dir = $this->data('dir.host') . ucfirst($domain) . Application::DS . ucfirst($extension) . Application::DS . $path;
                     }
                 }
                 if(!file_exists($dir)){
-                    $url = $this->data('dir.vendor') . str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
+                    $url = $this->data('dir.vendor') . $path;
                 } else {
                     $url = $url_tmp;
                 }
@@ -503,6 +508,7 @@ class Application extends Parser {
             $route->data('time', $this->data('time'));
             $route->data('priya', $this->data('priya'));
             $route->data('dir', $this->data('dir'));
+            $route->data('web', $this->data('web'));
 
             $this->route(new Module\Route(
                 $this->handler(),

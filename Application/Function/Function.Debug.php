@@ -1,5 +1,10 @@
 <?php
 
+function dd($debug=null){
+    var_dump($debug);
+    die;
+}
+
 function debug($debug=null, $title=null, $is_export=false, $trace_extra=0){
     $trace = debug_backtrace(true);
     if(php_sapi_name() === 'cli'){

@@ -420,7 +420,8 @@ class Route extends Core\Parser{
                     unset($route_path[$part_nr]);
                 }
             }
-            $path = implode('/', $route_path);
+            $path = implode('/', $route_path) . '/';       //added '/' for Doxygen url
+
             if(strpos($path, Handler::SCHEME_HTTP) !== 0){
                 $path = $this->data('web.root') . $path;
             }

@@ -32,11 +32,11 @@ class Dir {
         }
     }
 
-    public function is($url=''){
+    public static function is($url=''){
         return is_dir($url);
     }
 
-    public function name($url='', $levels=null){
+    public static function name($url='', $levels=null){
         if(is_null($levels)){
             $name = dirname($url);
         } else {
