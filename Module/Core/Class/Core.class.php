@@ -74,6 +74,13 @@ class Core {
         */
     }
 
+    public static function decode($html=''){
+        return htmlspecialchars_decode(
+            $html,
+            ENT_NOQUOTES
+        );
+    }
+
     public static function sentence($sentence=''){
         $sentence= explode('.', $sentence);
         foreach ($sentence as $nr => $part){
