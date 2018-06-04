@@ -129,7 +129,7 @@ class Handler extends \Priya\Module\Core\Data{
     }
 
     private function createRequest($data=''){
-        foreach($data as $attribute =>$post){
+        foreach($data as $attribute => $post){
             if(isset($post->name) && isset($post->value)){
                 $this->request($post->name, $post->value);
             } elseif($attribute !== 'nodeList') {
