@@ -262,7 +262,12 @@ class Application extends Parser {
             $this->data('request', $item->request);
             $parser = new \Priya\Module\Parser($this->handler(), $this->route(), $this->data());
             $item->url = $parser->compile($item->url, $this->data(), false, true);
-            if(
+            if(stristr($item->url, Handler::SCHEME_HTTPS)){
+                $this->header('Location: ' . $item->url);
+                //no http support... (people changed...)
+                exit();
+            }
+            elseif(
                 file_exists($item->url) &&
                 strstr(strtolower($item->url), strtolower($this->data('public_html'))) !== false
                 ){
