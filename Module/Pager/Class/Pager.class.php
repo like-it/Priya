@@ -60,10 +60,6 @@ class Pager extends Data {
         if(empty($this->session('has'))){
             return false;
         }
-        if(empty($result->route)){
-            var_dump($result->route);
-            die;
-        }
         $attribute = str_replace(array('-', '/'),'.', $result->route);
         $attribute = str_replace('....', '.', $attribute);
         $attribute = str_replace('...', '.', $attribute);
@@ -71,6 +67,7 @@ class Pager extends Data {
         if(empty($attribute)){
             throw new Exception(Pager::EXCEPTION_ATTRIBUTE);
         }
+        $attribute = rtrim($attribute, '.');
         $this->session($attribute . '.page', $result->page);
         $this->session($attribute . '.method', $result->method);
         $this->session($attribute . '.target', $result->target);

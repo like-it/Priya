@@ -7,6 +7,8 @@
  *  -    all
  */
 
+use Priya\Module\Core\Data;
+
 function smarty_function_object($params, $template)
 {
     $input = '';
@@ -28,11 +30,12 @@ function smarty_function_object($params, $template)
     if(!is_array($ignoreList)){
         $ignoreList = explode(',', $ignoreList);
     }
-    $data = new Priya\Module\Core\Data();
-    $data->data('node', $data->object($input));
+    $data = new Data();
+    $data->data('node', Data::object($input));
     foreach ($ignoreList as $ignore){
         $data->data('delete', 'node.' . $ignore);
     }
     $input = $data->data('node');
     return $data->object($input, $output, $type);
 }
+
