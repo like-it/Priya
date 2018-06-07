@@ -17,8 +17,9 @@ class Core {
     const FILE = __FILE__;
 
     const EXCEPTION_PERMISSION_TYPE = 'unknown permission type.';
-    const EXCEPTION_MERGE_ARRAY_OBJECT = 'cannot merge an array with an object';
-    const EXCEPTION_OBJECT_OUTPUT = 'unknown output in object';
+    const EXCEPTION_MERGE_ARRAY_OBJECT = 'cannot merge an array with an object.';
+    const EXCEPTION_KEY_ARRAY_OBJECT = 'cannot create object from array with empty key.';
+    const EXCEPTION_OBJECT_OUTPUT = 'unknown output in object.';
 
     private $cwd;
     private $mail;
@@ -864,6 +865,11 @@ class Core {
     public static function array_object($array=array()){
         $object = new stdClass();
         foreach ($array as $key => $value){
+            /** slows down...
+            if(empty($key)){
+                throw new Exception(EXCEPTION_KEY_ARRAY_OBJECT);
+            }
+            **/
             if(is_array($value)){
                 $object->{$key} = Core::array_object($value);
             } else {
