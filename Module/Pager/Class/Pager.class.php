@@ -10,12 +10,15 @@
 namespace Priya\Module;
 
 use stdClass;
+use Exception;
 use Priya\Module\Core\Data;
 
 class Pager extends Data {
     const LENGTH = 20;
     const METHOD = 'replace-with';
     const TARGET = 'body';
+
+    const EXCEPTION_ATTRIBUTE = 'Empty attribute, please provide a valid route';
 
     private $recordStart;
     private $recordLength;
@@ -57,10 +60,17 @@ class Pager extends Data {
         if(empty($this->session('has'))){
             return false;
         }
+        if(empty($result->route)){
+            var_dump($result->route);
+            die;
+        }
         $attribute = str_replace(array('-', '/'),'.', $result->route);
         $attribute = str_replace('....', '.', $attribute);
         $attribute = str_replace('...', '.', $attribute);
         $attribute = str_replace('..', '.', $attribute);
+        if(empty($attribute)){
+            throw new Exception(Pager::EXCEPTION_ATTRIBUTE);
+        }
         $this->session($attribute . '.page', $result->page);
         $this->session($attribute . '.method', $result->method);
         $this->session($attribute . '.target', $result->target);
@@ -340,7 +350,7 @@ class Pager extends Data {
         $node->page->length = $this->length();
         $node->method = $this->method();
         $node->target = $this->target();
-        $node->nodeList = $this->object($content);
+        $node->nodeList = Pager::object($content);
         return $this->content($node);
     }
 }
