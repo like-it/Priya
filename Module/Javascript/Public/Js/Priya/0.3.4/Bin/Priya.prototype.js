@@ -50,14 +50,13 @@ var priya = function (collection){
         priya.collect.data.file.push(url);
 
         if(data.require.core){
-            console.log(priya.collect);
-            require(priya.collect.web.priya + data.require.core, function(){
+            var load = [];
+            var index;
+            for(index=0; index < data.require.core.length; index++){
+            	load.push(priya.collect.web.priya + data.require.core[index]);
+            }
+            require(load, function(){
                 priya.expose('window');
-                if(data.require.file){
-                    require(data.require.file, function(){
-//                        priya.usleep(200);
-                    });
-                }
             });
         }
     });
