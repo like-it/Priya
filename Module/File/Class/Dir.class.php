@@ -148,6 +148,14 @@ class Dir {
         return $list;
     }
 
+    public static function remove($dir=''){
+        if(is_dir($dir) === false){
+            return true;
+        }
+        exec('rm -rf ' . $dir);
+        return true;
+    }
+
     public function delete($dir=''){
         if(is_dir($dir) === false){
             return true;
