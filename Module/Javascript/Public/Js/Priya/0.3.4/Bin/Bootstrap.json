@@ -25,8 +25,7 @@
     },
     "require": {
         "core": [
-            "Bin\/Core-0.3.4.js?0.3.4",
-            "Core\/Text.prototype.js?0.3.4"
+            "Bin\/Core-0.3.4.js?0.3.4"
         ]
     }
 }
