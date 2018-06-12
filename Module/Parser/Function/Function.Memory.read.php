@@ -24,7 +24,7 @@ function function_memory_read($function=array(), $argumentList=array(), $parser=
     if(empty($key)){
         throw new Exception('Please provide a key');
     }
-    $dma = Memory::dma($type);
+    $dma = Memory::create($type);
     $dma = Memory::server($dma, $server);
 
     if(empty($dma)){

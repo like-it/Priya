@@ -6,7 +6,7 @@ require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'File' . DIRECTORY_SEP
 use Priya\Module\Memory;
 use Priya\Module\File;
 
-$dma = Memory::dma();
+$dma = Memory::create();
 $attribute = array();
 foreach($argv as $nr => $value){
     if($value=== '""' || $value=== ''){

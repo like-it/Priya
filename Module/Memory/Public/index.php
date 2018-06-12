@@ -18,14 +18,14 @@ $key =  isset($_GET['key']) ? (string) $_GET['key'] : '';
 
 $explode = explode(DIRECTORY_SEPARATOR, __DIR__);
 
-$public = array_pop($explode);
+$public = array_pop($explode); //Public
 
 $key = $public . '\\' . $key; //only public keys are allowed
 
 if(empty($key)){
     throw new Exception('Please provide a key');
 }
-$dma = Memory::dma($type);
+$dma = Memory::create($type);
 $dma = Memory::server($dma, $server);
 
 if(empty($dma)){
