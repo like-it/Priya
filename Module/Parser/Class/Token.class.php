@@ -108,6 +108,8 @@ class Token extends Core {
                     case '&&' :
                         $tokens[$key][2] = 'T_BOOLEAN_AND';
                     break;
+                    case '`' :
+                        $tokens[$key][2] = 'T_BACKTICK';
                 }
             }
             if(empty($tokens[$key][2])){
@@ -1062,6 +1064,7 @@ class Token extends Core {
             case 'T_FOR' :
             case 'T_ELSE' :
             case 'T_PLUS_EQUAL' :
+            case 'T_BACKTICK' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
@@ -1179,6 +1182,10 @@ class Token extends Core {
     public static function remove_comment($string='', $test=false){
         $tokens = Token::all($string);
         foreach($tokens as $nr => $token){
+            if(!isset($token[2])){
+                var_dump($token);
+                die;
+            }
             if(
                 in_array(
                     $token[2],
