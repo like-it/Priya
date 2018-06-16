@@ -228,7 +228,6 @@ class Data extends Core {
         if($url !== false){
             $this->url($url);
         }
-
         $file = new File();
         $read = $file->read($url);
         if($read !== false){
