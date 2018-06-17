@@ -293,9 +293,6 @@ class Application extends Parser {
         else {
             if($contentType == Handler::CONTENT_TYPE_CLI){
                 if($request == 'Application/Error/'){
-                    var_dump($this->route()->data());
-                    var_dump($this->route($request));
-                    die;
                     //                     var_dump($handler->request('route'));
                     //                     die;
                     throw new Exception(Application::EXCEPTION_APPLICATION_ERROR);
