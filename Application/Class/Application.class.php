@@ -188,6 +188,7 @@ class Application extends Parser {
                     $this->header('Content-Type: ' . $contentType);
                     $this->header('ETag: ' . $etag . '-' . $gm);
                     $this->header('Cache-Control: public');
+                    $this->header('Access-Control-Allow-Origin: http://' . $host);
                 }
                 if($ext == 'pcss'){
                     $read = str_replace('/', Application::DS, $request);
