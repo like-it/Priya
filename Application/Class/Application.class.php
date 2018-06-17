@@ -129,6 +129,7 @@ class Application extends Parser {
         }
         $url = $this->handler()->url();
         $etag = sha1($url);
+        $host = Handler::host(false);
         $tmp = explode('?', $url, 2);
         $url = reset($tmp);
         $tmp = explode('.', $url);
@@ -139,7 +140,6 @@ class Application extends Parser {
         }
         $allowed_contentType = $this->data('priya.contentType');
         if(isset($allowed_contentType->{$ext})){
-            $host = Handler::host(false);
             $path = str_replace('/', Application::DS, Handler::removeHost($this->url('decode', $url)));
             if($host=== false){
                 $url = $this->data('dir.vendor') . $path;
@@ -219,6 +219,7 @@ class Application extends Parser {
         }
         if(!headers_sent()){
             $this->header('Last-Modified: '. $this->request('last-modified'));
+            $this->header('Access-Control-Allow-Origin: http://' . $host);
         }
         $item = $this->route()->run();
         $this->cli(); //why twice -> see constructor
@@ -280,13 +281,11 @@ class Application extends Parser {
                     if(isset($allowed_contentType->{$ext})){
                         $contentType = $allowed_contentType->{$ext};
                         $this->header('Content-Type: ' . $contentType);
+                        $this->header('Access-Control-Allow-Origin: http://' . $host);
                         $result = $file->read($item->url);
                     } else {
                         throw new  Exception('Content type not allowed...');
                     }
-
-
-
             } else {
                 //404
             }
