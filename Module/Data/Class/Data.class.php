@@ -49,7 +49,15 @@ class Data extends Core {
                 return $this->object_get($value, $this->data());
             }
             if($value !== null){
-                if($attribute=='delete'){
+                if(
+                    in_array(
+                        $attribute,
+                        [
+                            'delete',
+                            'remove'
+                        ]
+                    )
+                ){
                     return $this->deleteData($value);
                 } else {
                     $this->object_delete($attribute, $this->data()); //for sorting an object
@@ -661,9 +669,4 @@ class Data extends Core {
             return strval($number);
         }
     }
-
-    public function copy($copy=null){
-        return unserialize(serialize($copy));
-    }
-
 }

@@ -1175,4 +1175,8 @@ class Core {
         }
         return $array;
     }
+
+    public static function copy($copy=null){
+        return unserialize(serialize($copy));
+    }
 }

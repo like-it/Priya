@@ -62,10 +62,6 @@ class Data extends Core {
         return $this->data('object')->write($url);
     }
 
-    public function copy($copy=null){
-        return $this->data('object')->copy($copy);
-    }
-
     public function url($url=null, $attribute=null){
         return $this->data('object')->url($url, $attribute);
     }

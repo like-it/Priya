@@ -222,7 +222,7 @@ class Application extends Parser {
             $this->header('Access-Control-Allow-Origin: http://' . $host);
         }
         $item = $this->route()->run();
-        $this->cli(); //why twice -> see constructor
+//         $this->cli(); //why twice -> see constructor
         $handler = $this->handler();
         $contentType = $handler->request('contentType');
         $result = '';
