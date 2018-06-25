@@ -227,6 +227,8 @@ _('prototype').data = function (attribute, value){
         } else {
             var data = this.attribute('data-' + attribute, value);
             if(this.empty(data) && !this.empty(attribute)){
+            	return null; //added @2018-06-25 below doesn't work anymore...
+            	/*
                 data = this.data();
                 var collection = {};
                 for(key in data){
@@ -239,6 +241,7 @@ _('prototype').data = function (attribute, value){
                 } else {
                     return collection;
                 }
+                */
             } else {
                 return data;
             }
