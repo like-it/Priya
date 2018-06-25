@@ -1998,17 +1998,6 @@ _('prototype').object_set = function(attributeList, value, object, result){
 priya.object_set = _('prototype').object_set;
 
 /*
- * @name: Off
- * @url: /mnt/c/Library/Server/Vendor/Priya/Module/Javascript/Public/Prototype/Core/Off.prototype.js
- */
-_('prototype').off = function (event, action){
-    console.log(this['Priya']['eventListener']); //need to remove it from the eventListener
-    this.removeEventListener(event, action)
-}
-
-priya.off = _('prototype').off;
-
-/*
  * @name: On
  * @url: /mnt/c/Library/Server/Vendor/Priya/Module/Javascript/Public/Prototype/Core/On.prototype.js
  */
