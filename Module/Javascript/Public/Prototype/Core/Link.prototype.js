@@ -18,7 +18,7 @@ _('prototype').link = function (data, closure){
                 closure();
             }, false);
             data.addEventListener('error', function(event){
-                console.log('error');
+                console.log('error loading link');
                 closure();
             }, false);
         }

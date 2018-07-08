@@ -35,7 +35,18 @@ class Cache {
     }
 
     public static function extend($url, $extend='+1 minute'){
-        $cache = Cache::url($url, '.json');
+        $extension = File::extension($url);
+        if($extension == 'json'){
+            $cache = Cache::url($url, '.json');
+        }
+        elseif($extension == 'export'){
+            $cache = Cache::url($url, '.export');
+        }
+        elseif($extension == 'php'){
+            $cache = Cache::url($url, '.object.php');
+        } else {
+            throw new Exception('Extension ('. $extension .') not supported in Cache::read...');
+        }
         if(!File::exist($cache)){
             return false;
         }
@@ -95,9 +106,9 @@ class Cache {
         return $cache;
     }
 
-    public static function write($url='', $data='', $overwrite=false){
+    public static function write($url='', $data='', $overwrite=false, $type='object.php'){
         $dir = Dir::name($url) . Application::DS;
-        $cache = Cache::url($url, '.json');
+        $cache = Cache::url($url, '.' . $type);
         if(File::exist($cache)){
             if($overwrite === false){
                 return true;
@@ -106,13 +117,31 @@ class Cache {
         if(!Dir::is($dir)){
             Dir::create($dir, Dir::CHMOD);
         }
-        File::write($cache, Core::object($data, 'json line')); //production 'json line' //develop 'json'
-        return true;
+        if($type=='json'){
+            File::write($cache, Core::object($data, 'json line')); //production 'json line' //develop 'json'
+            return true;
+        } else {
+            $data = var_export($data, true);
+            $data = str_replace('stdClass::__set_state', '(object)', $data);
+            $data = '<?php $read = ' . $data . ';';
+            File::write($cache, $data);
+            return true;
+        }
     }
 
     public static function read($url='', $expiration='+1 minute'){
-        $cache = Cache::url($url, '.json');
-
+        $extension = File::extension($url);
+        if($extension == 'json'){
+            $cache = Cache::url($url, '.json');
+        }
+        elseif($extension == 'export'){
+            $cache = Cache::url($url, '.export');
+        }
+        elseif($extension == 'php'){
+                $cache = Cache::url($url, '.object.php');
+        } else {
+            throw new Exception('Extension ('. $extension .') not supported in Cache::read...');
+        }
         if(!File::exist($cache)){
             return false;
         }
@@ -125,11 +154,19 @@ class Cache {
         if($ttl < time() && !empty($ttl)){
             return Cache::ERROR_EXPIRE;
         }
-        $read = File::read($cache);
-        if(empty($read)){
-            return Cache::ERROR_CORRUPT;
+        if($extension == 'json'){
+            $read = File::read($cache);
+            if(empty($read)){
+                return Cache::ERROR_CORRUPT;
+            }
+            return Core::object($read, 'object');
+        } else {
+            @include_once $cache;
+            if(empty($read)){
+                return Cache::ERROR_CORRUPT;
+            }
+            return $read;
         }
-        return Core::object($read, 'object');
     }
 
     public static function serialize($object, $url=''){

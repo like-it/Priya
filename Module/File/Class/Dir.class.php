@@ -148,6 +148,11 @@ class Dir {
         return $list;
     }
 
+    public static function copy($source='', $target=''){
+        exec('cp ' . $source . ' ' . $target . ' -R');
+        return true;
+    }
+
     public static function remove($dir=''){
         if(is_dir($dir) === false){
             return true;

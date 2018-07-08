@@ -16,7 +16,7 @@ _('prototype').script = function (data, closure){
         return data;
     }
     if(typeof attempt == 'undefined'){
-        attempt = 0;
+        var attempt = 0;
     }
     if(parseInt(priya.load) != 0 && attempt < 500){
         setTimeout(function(){

@@ -25,7 +25,22 @@ class Route extends Core\Parser{
         $this->data($data);
         if($read){
             $data = new Data();
-            $read = $data->read($this->data('dir.data') . Application::ROUTE);
+
+            $source = $this->data('priya.route.url');
+            if(empty($source)){
+                $source == $this->data('dir.data') . Application::ROUTE;
+            }
+            $extension = File::extension($source);
+
+            if($extension == 'json'){
+                $read = $data->read($source);
+            }
+            elseif($extension == 'export'){
+                @include $source;
+            }
+            elseif($extension == 'php'){
+                @include $source;
+            }
             if(empty($read)){
                 $this->error('read', true);
             } else {

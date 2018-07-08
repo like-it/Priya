@@ -38,7 +38,11 @@
                 "Application.Task",
                 "Application.Host",
                 "Test"
-            ]
+            ],
+            "url" : "{$dir.data}Route.json",
+            "cache" : {
+            	"url" : "/tmp/Priya/Module/Route/Route.php"
+            }
         },
         "major": 0,
         "minor": 3,
