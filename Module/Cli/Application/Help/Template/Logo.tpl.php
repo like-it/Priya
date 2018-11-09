@@ -14,7 +14,7 @@ namespace Priya;
 $cols = $this->tput('columns');
 $rows = $this->tput('rows');
 
-if($rows > 50){
+if($rows >= 25 && $cols >= 83){
     $this->output(str_repeat('-', $cols) . PHP_EOL);
     $this->output('                                                               ' . PHP_EOL);
     $this->output('    ########       #######     ##    ##       ##    #######    ' . PHP_EOL);
