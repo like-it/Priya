@@ -27,7 +27,7 @@ class Application extends Parser {
     const TEMPLATE = 'Template';
     const PLUGIN = 'Plugin';
     const PAGE = 'Page';
-    const DATA = 'Data';
+    const DATA = 'Data';    
     const BACKUP = 'Backup';
     const PROCESSOR = 'Processor';
     const RESTORE = 'Restore';
@@ -163,7 +163,7 @@ class Application extends Parser {
     }
 
     private function init(){
-        $this->data('time.start', microtime(true));
+        $this->data('time.start', microtime(true));        
         $this->data('priya.environment', Application::ENVIRONMENT);
         $this->data('module.name', $this->module());
         $this->data('dir.ds', Application::DS);
@@ -333,8 +333,9 @@ class Application extends Parser {
                 Application::URL
             ;
         }
+        
         //want to write to cache here...
-        $this->write($url);
+//         $this->write($url); //@2018-11-08 thought i disabled this one...
         parent::autoload()->environment($this->data('priya.environment'));
         if(!$this->data('priya.dir.application')){
             throw new Exception(Application::EXCEPTION_DIR_APPLICATION);
