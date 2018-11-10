@@ -88,6 +88,11 @@ class Cli extends Result {
         return $result;
     }
 
+    public function bold($bold = null){
+        //make bold
+        //make unbold with false... 
+    }
+    
     public function color($color='', $background=''){
         $result = '';
         if(!empty($color) || ($color === (0 || '0'))){

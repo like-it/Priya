@@ -11,7 +11,7 @@ namespace Priya\Module;
 use stdClass;
 
 class File {
-    const CHMOD = 0640;
+    const CHMOD = 0640; //might be wrong...s recalculate read write read ?
     const TYPE = 'File';
     const SCHEME_HTTP = 'http';
 
@@ -93,7 +93,12 @@ class File {
 
     public function read($url=''){
         if(strpos($url, File::SCHEME_HTTP) !== false){
-            return implode('',file($url));
+            $http = @file($url);
+            if(empty($http)){
+                //error cannot retrieve read url
+                return false;
+            }
+            return implode('',$http); //surpress network errors & checks
         }
         if(file_exists($url) === false){
             return false;
