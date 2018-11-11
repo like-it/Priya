@@ -24,11 +24,13 @@ class Dir {
         elseif(file_exists($url) && is_dir($url)){
             return true;
         } else {
+            $mkdir = false;
             if(empty($chmod)){
-                return mkdir($url, DIR::CHMOD, true);
+                $mkdir = @mkdir($url, DIR::CHMOD, true);
             } else {
-                return mkdir($url, $chmod, true);
+                $mkdir = @mkdir($url, $chmod, true);
             }
+            return $mkdir;
         }
     }
 

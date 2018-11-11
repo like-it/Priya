@@ -26,7 +26,7 @@ class File {
     public static function diskusage($url=''){
         system('du ' . $url, $usage);
         var_dump($usage);
-        die;
+        exit;
     }
 
     public static function exist($url){ //File::exist means File has exist and not exists
@@ -81,7 +81,7 @@ class File {
         $url = (string) $url;
         $data = (string) $data;
         $fwrite = 0;
-        $resource = fopen($url, 'w');
+        $resource = @fopen($url, 'w');
         if($resource === false){
             return $resource;
         }
