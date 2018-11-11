@@ -22,7 +22,7 @@ echo "  " . 'locate <route>                 (locate a route <route> name in json
 echo "  " . 'route --list                   (this will show available cli routes)' . PHP_EOL;
 echo "  " . 'route --list-all               (this will show all available routes)' . PHP_EOL;
 echo "  " . 'test <class> <file>            (this will test the <class> with <file>)' . PHP_EOL;
-echo "  " . 'cache clear                    (clear cache)' . PHP_EOL;
+echo "  " . 'cache/clear                    (clear cache)' . PHP_EOL;
 echo "  " . 'config                         (current configuration in json format)' . PHP_EOL;
 echo "  " . 'parser                         (generates a parser file (speed up parsing))' . PHP_EOL;
 # echo "  " . 'javascript create              (generates the javascript source)' . PHP_EOL;

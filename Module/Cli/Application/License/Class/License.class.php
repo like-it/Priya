@@ -52,4 +52,5 @@ class License extends Cli {
         }
         return $execute;
     }
+
 }
