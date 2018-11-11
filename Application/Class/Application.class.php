@@ -658,12 +658,10 @@ class Application extends Parser {
 //             $this->route()->run('Cache');
 
             $dir = dirname($url);
-
             //add sudo / root rights
-            
-            
+                        
             if(!is_dir($dir)){
-                mkdir($dir, Dir::CHMOD, true);
+                @mkdir($dir, Dir::CHMOD, true);
             }
             Cache::write($url, $this->route()->data(), true);
 //             Cache::serialize($this->route(), $serialize);
