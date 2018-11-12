@@ -16,11 +16,12 @@ use Priya\Application;
 class Version extends Cli {
     const DIR = __DIR__;
 
-    public function run(){
+    public function run(){        
         if($this->parameter('update')){
             Version::update($this);
             exec('priya cache clear', $output);
             exec('priya version', $output);
+            exec('priya', $output);
             return implode(PHP_EOL, $output) . PHP_EOL;
         } else {
             return Version::execute($this);

@@ -39,14 +39,14 @@
                 "Application.Host",
                 "Test"
             ],
-            "url" : "{$dir.data}Route.json",
-            "cache" : {
-            	"url" : "/tmp/Priya/Module/Route/Route.php"
+            "url": "{$dir.data}Route.json",
+            "cache": {
+                "url": "\/tmp\/Priya\/Module\/Route\/Route.php"
             }
         },
         "major": 0,
         "minor": 3,
-        "patch": 4,
-        "built": "2018-05-31 21:07:29"
+        "patch": 10,
+        "built": "2018-11-11 17:21:40"
     }
 }
