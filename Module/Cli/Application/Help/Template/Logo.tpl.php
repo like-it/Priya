@@ -53,7 +53,8 @@ $copyright =
 ;
     
 if($rows >= 25 && $cols >= 83){
-    $this->output(str_repeat('-', $cols) . PHP_EOL);
+    $this->output($this->color(0,3) .str_repeat('-', $cols) . PHP_EOL);
+    $this->output($this->color('reset'));
     $this->output('                                                               ' . PHP_EOL);
     $this->output('    ########       #######     ##    ##       ##    #######    ' . PHP_EOL);
     $this->output('   ##       ##    ##     ##     ##   ##      ##    ##     ##   ' . PHP_EOL);
@@ -66,6 +67,7 @@ if($rows >= 25 && $cols >= 83){
     $this->output('   ##            ##      ##    ##       ##        ##       ##  ' . PHP_EOL);
     $this->output('                                                               ' . PHP_EOL);
     $this->output('   '. $copyright . ' ' . $year_start . '-'. $year_current . ' ' . $author . '                  ' . $version . PHP_EOL);
-    $this->output('                                                               ' . PHP_EOL);
-    $this->output(str_repeat('-', $cols) . PHP_EOL);
+    $this->output('       ' . 'All rights reserved                                     ' . PHP_EOL);
+    $this->output($this->color(12,12) .str_repeat('-', $cols) . PHP_EOL);
+    $this->output($this->color('reset'));
 }
