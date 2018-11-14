@@ -105,7 +105,12 @@ class File {
 
     public static function read($url=''){
         if(strpos($url, File::SCHEME_HTTP) !== false){
-            return implode('',file($url));
+		  //check network connection first (@) added for that 			 //error
+		 $file = @file($url);
+		 if(!is_array($file)){
+			return false;
+		 }
+            return implode('', $file);
         }
         if(file_exists($url) === false){
             return false;
