@@ -176,7 +176,7 @@ class Data extends Core {
         return $url;
     }
 
-    public function read($url=''){
+    public function read($url='', $test=false){
         $namespace = '';
         if(empty($url)){
             $url = get_called_class();
@@ -184,19 +184,12 @@ class Data extends Core {
         if(file_exists($url)){
             $file = new File();
             $read = $file->read($this->url($url));
-            $read = $this->object($read);
-            $data = $this->data();
-            if(empty($data)){
-                $data = new stdClass();
-            }
             if(!empty($read)){
-                if(is_array($read) || is_object($read)){
-                    foreach($read as $attribute => $value){
-                        $this->object_set($attribute, $value, $data);
-                    }
-                }
+                $read = $this->object($read);
+                return $this->data(Data::object_merge($this->data(), $read));
+            } else {
+                return false;
             }
-            return $this->data($data);
         } else {
             $module = $url;
         }
@@ -238,22 +231,12 @@ class Data extends Core {
         }
         $file = new File();
         $read = $file->read($url);
-        if($read !== false){
-            $read = $this->object($read);
-        }
-        $data = $this->data();
-        if(empty($data)){
-            $data = new stdClass();
-        }
-
         if(!empty($read)){
-            foreach($read as $attribute => $value){
-                $this->object_set($attribute, $value, $data);
-            }
+            $read = $this->object($read);
+            return $this->data(Data::object_merge($this->data(), $read));
         } else {
             return false;
         }
-        return $this->data($data);
     }
 
     public function write($url=''){

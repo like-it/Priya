@@ -43,6 +43,9 @@ class Literal extends Core {
             }
             return $value;
         }
+        if(!is_string($value)){
+            return $value;
+        }
         return str_replace(
             array(
                 Literal::OPEN,

@@ -1,0 +1,18 @@
+{
+
+"command" : {
+	"help" : {
+		"parameter" : [
+			"command",
+			"test",
+			"multiple",
+			"commands",
+			"in",
+			"abc",
+			"rowing"
+		],
+		"info" : "Help center, without command it shows available commands"
+	},
+	"bin" : {}
+}
+}

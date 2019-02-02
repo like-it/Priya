@@ -9,9 +9,31 @@
 namespace Priya\Module\Core;
 
 class Cli extends Result {
+    const COLOR_GRAY = 0;
+    const COLOR_YELLOW = 3;
+    const COLOR_YELLOW_LIGHT = 9;
+    const COLOR_BLUE = 4;
+    const COLOR_BLUE_LIGHT = 12;
+    const COLOR_WHITE = 15;
+    const COLOR_PURPLE = 9;
+    const COLOR_PINK = 13;
+    const COLOR_GREEN = 2;
+    const COLOR_GREEN_LIGHT = 10;
+    const COLOR_RED = 1;
+    const COLOR_RED_LIGHT = 9;
+    const COLOR_BLACK = 12;
+
 
     public function __construct($handler=null, $route=null, $data=null){
         parent::__construct($handler, $route, $data);
+        $called = get_called_class();
+        $dir = dirname($called::DIR);
+        $this->data('module.dir.root', $dir . Cli::DS);
+        $this->data('module.dir.data', $this->data('module.dir.root') . Cli::DATA . Cli::DS);
+        $this->data('module.dir.public', $this->data('module.dir.root') . $this->data('public_html') . Cli::DS);
+        $this->data('module.dir.execute', $this->data('module.dir.root') . Cli::EXECUTE . Cli::DS);
+        $this->data('module.dir.template', $this->data('module.dir.root') . Cli::TEMPLATE . Cli::DS);
+        $this->data('module.dir.help', $this->data('module.dir.root') . Cli::HELP . Cli::DS);
     }
 
     public function tput($tput='', $arguments=array()){
@@ -43,12 +65,19 @@ class Cli extends Result {
             case 'cursor.restore' :
                 $tput = 'rc';
             break;
+            case 'underline' :
+            case 'underline.start' :
+                $tput = 'smul';
+            break;
+            case 'underline.stop' :
+                $tput = 'rmul';
+            break;
             case 'color' :
                 $color = isset($arguments[0]) ? (int) $arguments[0] : 9; //9 = default
                 $tput = 'setaf ' . $color;
             break;
             case 'background' :
-                $color = isset($arguments[0]) ? (int) $arguments[0] : 0; //9 = default
+                $color = isset($arguments[0]) ? (int) $arguments[0] : 0; //0 = default
                 $tput = 'setab ' . $color;
                 break;
             case 'cursor.up' :

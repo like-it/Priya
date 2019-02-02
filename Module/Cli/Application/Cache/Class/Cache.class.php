@@ -14,6 +14,7 @@ use Priya\Module\Autoload;
 use Priya\Module\Core\Cli;
 use Priya\Module\File;
 use Priya\Module\File\Dir;
+use Priya\Module\Data;
 
 class Cache extends Cli {
     const DIR = __DIR__;
@@ -23,18 +24,44 @@ class Cache extends Cli {
             Cache::clear($this, 'application');
             Cache::clear($this, 'smarty');
             Cache::clear($this, 'autoload');
+            Cache::clear($this, 'route');
+        }
+        elseif($this->parameter('on')){
+            Cache::on($this);
+        }
+        elseif($this->parameter('off')){
+            Cache::off($this);
         }
         $this->data('delete', 'execute');
         return Cache::execute($this);
     }
 
+    public static function on($object){
+        $url = $object->data('dir.data') . Application::CONFIG;
+        if(File::exist($url)){
+            $data = new Data();
+            $data->read($url);
+            $data->data('delete', 'priya.cache.disable');
+            $data->write();
+        }
+    }
+
+    public static function off($object){
+        $url = $object->data('dir.data') . Application::CONFIG;
+        if(File::exist($url)){
+            $data = new Data();
+            $data->read($url);
+            $data->data('priya.cache.disable', true);
+            $data->write();
+        }
+        if(File::exist($object->data('priya.cache.init.url'))){
+            File::delete($object->data('priya.cache.init.url'));
+        }
+    }
+
     public static function clear($object, $type=''){
         $object->data('execute', $type);
         switch ($type){
-            case 'smarty':
-                echo Cache::execute($object);
-                return Cache::clearSmarty($object);
-            break;
             case 'application':
                 echo Cache::execute($object);
                 return Cache::clearApplication($object);
@@ -42,6 +69,14 @@ class Cache extends Cli {
             case 'autoload':
                 echo Cache::execute($object);
                 return Cache::clearAutoload($object);
+            break;
+            case 'route':
+                echo Cache::execute($object);
+                return Cache::clearRoute($object);
+            break;
+            case 'smarty':
+                echo Cache::execute($object);
+                return Cache::clearSmarty($object);
             break;
         }
     }
@@ -60,7 +95,23 @@ class Cache extends Cli {
             Application::DS  .
             Autoload::FILE
         ;
+        if(!file_exists($url)){
+            return false;
+        }
         return File::delete($url);
+    }
+
+    private static function clearRoute($object){
+        /*
+        $url =
+        dirname(Autoload::DIR) .
+        Application::DS .
+        Application::DATA .
+        Application::DS  .
+        Autoload::FILE
+        ;
+        return File::delete($url);
+        */
     }
 
     private static function clearSmarty($object){

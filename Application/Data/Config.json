@@ -41,8 +41,19 @@
             ],
             "url": "{$dir.data}Route.json",
             "cache": {
-                "url": "\/tmp\/Priya\/Module\/Route\/Route.php"
+                "url": "{$priya.dir.cache}60\/Route.json",
+                "interval" : "+ 1 minute"
             }
+        },
+        "bug" : {
+        	"cli" : {
+        		"line" : {
+        			"ending" : 2
+        		}
+        	},
+        	"description" : {
+        		"1" : "bug.cli.line.ending: 0: not adding newline character, 1: adding 1 newline character, 2: adding 2 newline characters. Default: 2. In CLI mode while echoing, newlines at the end don't work. Adding extra newlines work."
+        	}
         },
         "major": 0,
         "minor": 3,

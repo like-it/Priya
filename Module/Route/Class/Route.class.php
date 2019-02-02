@@ -15,38 +15,37 @@ use Priya\Application;
 
 class Route extends Core\Parser{
     const DIR = __DIR__;
-
     const LOCAL = 'local';
 
+    const EXCEPTION_ROUTE_CURRUPT = 'Route file corrupted? {$name}';
+    const EXCEPTION_ROUTE_DUPLICATE = 'Duplicate route found: {$name}';
+
+    private $storage;
     private $item;
 
     public function __construct(Handler $handler, $data='', $read=true){
         $this->handler($handler);
-        $this->data($data);
+        $this->storage(new Data($data));
         if($read){
+            $this->storage()->data('priya.cache.file', []);
             $data = new Data();
-
-            $source = $this->data('priya.route.url');
-            if(empty($source)){
-                $source == $this->data('dir.data') . Application::ROUTE;
+            $url = $this->storage()->data('priya.route.url');
+            if(empty($url)){
+                $url == $this->storage()->data('priya.dir.data') . Application::ROUTE;
             }
-            $extension = File::extension($source);
-
-            if($extension == 'json'){
-                $read = $data->read($source);
-            }
-            elseif($extension == 'export'){
-                @include $source;
-            }
-            elseif($extension == 'php'){
-                @include $source;
-            }
+            $read = $data->read($url);
             if(empty($read)){
                 $this->error('read', true);
             } else {
-                $this->data($read);
+                $this->data('route', $read);
             }
             $this->parseRoute();
+        }
+        $list = $this->storage()->data('priya.route.default');
+        if(is_array($list)){
+            foreach($list as $default){
+                $this->create($default);
+            }
         }
     }
 
@@ -63,22 +62,25 @@ class Route extends Core\Parser{
 
     public function parseRequest($path='', $isHost=true){
         $handler = $this->handler();
-        $data = $this->data();
+        $data = $this->data('route');
         if(empty($path)){
             $path = trim($handler->request('request'), '/') . '/';
         }
         if(empty($data)){
-            throw new Exception('Route file corrupted?');
+            throw new Exception($this->parser('object')->compile(Route::EXCEPTION_ROUTE_CURRUPT, $this->storage()->data()));
         }
+        $parser = false;
         foreach($data as $name => $route){
             if(isset($route->resource) && !isset($route->read)){
-                $route->resource = $this->parser('object')->compile($route->resource, $this->data());
+                if(!$parser){
+                    $parser = new Parser();
+                }
+                $route->resource = $parser->compile($route->resource, $this->storage()->data());
                 if(file_exists($route->resource)){
                     $object = new Data();
-                    $this->data($object->read($route->resource));
+                    $this->data('route', Data::object_merge($this->data('route'), $object->read($route->resource)));
                     $route->read = true;
                     $route->mtime = filemtime($route->resource);
-
                     $this->cache(clone $route);
                     return $this->parseRequest($path);
                 } else {
@@ -161,8 +163,10 @@ class Route extends Core\Parser{
                 isset($route->default) &&
                 isset($route->default->read)
             ){
+                var_dump('yep');
+                die;
                 $read =
-                    $this->data('dir.host') .
+                    $this->data('priya.route.dir.host') .
                     $this->handler()->host(false) .
                     Application::DS .
                     $this->data('public_html') .
@@ -246,22 +250,36 @@ class Route extends Core\Parser{
     }
 
     private function parseRoute(){
-        $data = $this->data();
+        $data = $this->data('route');
+        $parser = false;
         if(is_array($data) || is_object($data)){
             foreach($data as $name => $route){
                 if(isset($route->resource) && !isset($route->read)){
-                    $route->resource = $this->parser('object')->compile($route->resource, $this->data());
+                    if(!$parser){
+                        $parser = new Parser();
+                    }
+                    $route->resource = $parser->compile($route->resource, $this->storage()->data());
                     if(file_exists($route->resource)){
                         $object = new Data();
-                        $this->data($object->read($route->resource));
+                        $object->read($route->resource);
+                        foreach($this->data('route') as $test_name => $test_route){
+                            if(!empty($object->data($test_name))){
+                                $this->storage()->data('name', $test_name);
+                                throw new Exception($this->parser('object')->compile(Route::EXCEPTION_ROUTE_DUPLICATE, $this->storage()->data()));
+                            }
+                        }
+                        $merge = Data::object_merge($this->data('route'), $object->data());
+                        $this->data('route', $merge);
                         $route->read = true;
                         $route->mtime = filemtime($route->resource);
 
                         $this->cache(clone $route);
+                        $this->data('delete', 'route.' . $name);
                         $this->parseRoute();
                     } else {
                         $route->read = false;
-                        $this->cache(clone $route);
+                        $this->cache(clone $route, $name);
+                        $this->data('delete', 'route.' . $name);
                     }
                 }
             }
@@ -269,7 +287,7 @@ class Route extends Core\Parser{
     }
 
     private function cache($cache=''){
-        $file = $this->data('priya.cache');
+        $file = $this->data('priya.cache.file');
         if(empty($file)){
             $file = array();
         }
@@ -277,7 +295,7 @@ class Route extends Core\Parser{
         unset($cache->resource);
 
         $file[] = $cache;
-        $this->data('priya.cache', $file);
+        $this->data('priya.cache.file', $file);
     }
 
     private function parsePath($path='', $route=''){
@@ -366,12 +384,12 @@ class Route extends Core\Parser{
 
         $object->method = array('CLI');
         $object->translate = false;
-        $this->data(strtolower(implode('-',$name)), $object);
+        $this->data('route.' . strtolower(implode('-',$name)), $object);
         if(count($name) > 1){
             $object = $this->copy($object);
             array_shift($name);
             $object->path = implode('/', $name) . '/';
-            $this->data(strtolower(implode('-',$name) . '-shorthand'), $object);
+            $this->data('route.' . strtolower(implode('-',$name) . '-shorthand'), $object);
         }
     }
 
@@ -413,7 +431,7 @@ class Route extends Core\Parser{
             $attribute = (array) $attribute;
         }
         $found = false;
-        $data = $this->data();
+        $data = $this->data('route');
         foreach($data as $routeName => $route){
             if(!isset($route->path)){
                 continue;
@@ -438,10 +456,25 @@ class Route extends Core\Parser{
             $path = implode('/', $route_path) . '/';       //added '/' for Doxygen url
 
             if(strpos($path, Handler::SCHEME_HTTP) !== 0){
-                $path = $this->data('web.root') . $path;
+                $path = $this->data('priya.root.web.root') . $path;
             }
             return $path;
         }
+    }
+
+    public function storage($storage=null){
+        if($storage !== null){
+            $this->setStorage($storage);
+        }
+        return $this->getStorage();
+    }
+
+    private function setStorage($storage=''){
+        $this->storage = $storage;
+    }
+
+    private function getStorage(){
+        return $this->storage;
     }
 }
 ?>

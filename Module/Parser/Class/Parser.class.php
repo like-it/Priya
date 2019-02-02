@@ -50,13 +50,13 @@ class Parser extends ParserCore {
         $this->data($this->compile($this->data(), $this->data()));
     }
 
-    public function read($url=''){
+    public function read($url='', $test=false){
         $file = new File();
         $ext = $file->extension($url);
         if($ext == '' || $ext == Autoload::EXT_JSON){
             $read = parent::read($url);
             if(!empty($read)){
-                $read = $this->data($this->compile($this->data(), $this->data(), false, false));
+                $read = $this->data(Parser::object_merge($this->data(), ($this->compile($this->data(), $this->data(), false, false))));
             }
             //might need to add comment...
             $read = $this->data(Literal::remove($this->data()));

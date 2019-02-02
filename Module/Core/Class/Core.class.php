@@ -15,7 +15,7 @@ use Priya\Application;
 
 class Core {
     const FILE = __FILE__;
-
+    const DS = Application::DS;
     const EXCEPTION_PERMISSION_TYPE = 'unknown permission type.';
     const EXCEPTION_MERGE_ARRAY_OBJECT = 'cannot merge an array with an object.';
     const EXCEPTION_KEY_ARRAY_OBJECT = 'cannot create object from array with empty key.';
@@ -1111,6 +1111,21 @@ class Core {
             }
         }
         return null;
+    }
+
+    public static function object_extend(){
+        $objects = func_get_args();
+        $main = array_shift($objects);
+
+        foreach($objects as $nr => $object){
+            foreach($object as $attribute => $value){
+                if(isset($main->{$attribute})){
+                    continue;
+                }
+                $main->{$attribute} = $value;
+            }
+        }
+        return $main;
     }
 
     public static function object_merge(){

@@ -15,6 +15,7 @@ class Help extends Cli {
     const DIR = __DIR__;
 
     public function run(){
+        $this->read(__CLASS__);
         return $this->result('cli');
     }
 }

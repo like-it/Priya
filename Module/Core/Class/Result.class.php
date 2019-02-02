@@ -26,6 +26,7 @@ class Result extends Parser {
     const FILE = __FILE__;
 
     const DATA = 'Data';
+    const HELP = 'Help';
     const EXECUTE = 'Execute';
     const TEMPLATE = 'Template';
 
@@ -77,12 +78,18 @@ class Result extends Parser {
                 Result::EXECUTE .
                 Application::DS
             );
+            $this->data('module.dir.help',
+                $this->data('module.dir.root') .
+                Result::HELP .
+                Application::DS
+            );
             $this->data('module.dir.public',
                     $this->data('module.dir.root') .
                     $this->data('public_html') .
                     Application::DS
             );
         }
+        $this->data('module.route', $this->route()->item());
         $ignore = array();
         //add user ?
         $ignore[] = 'users';

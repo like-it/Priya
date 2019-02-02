@@ -13,5 +13,15 @@ namespace Priya;
 
 echo "\t" . 'Version: ' . $this->data('priya.version') . PHP_EOL;
 echo "\t" . 'Options:' . PHP_EOL;
+
+$end = microtime(true);
+
+$duration = $end - $this->data('time.start');
+
+
+var_dump($duration);
+die;
+
+
 echo "\t" . 'test all                   (testing all available tests)' . PHP_EOL;
 echo "\t" . 'test parser                (testing parser)' . PHP_EOL;
