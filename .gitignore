@@ -3,7 +3,7 @@
 .settings
 org.*
 Application/Data/Cache/*
-Application/Data/Object/*
+Application/Data/Object/
 Application/Data/Custom.json
 Application/Data/Pack/
 Module/Autoload/Data/*
