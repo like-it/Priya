@@ -32,21 +32,23 @@ class Cache extends Cli {
         elseif($this->parameter('off')){
             Cache::off($this);
         }
-        $this->data('delete', 'execute');
-        return Cache::execute($this);
     }
 
     public static function on($object){
+        $object->data('execute', 'on');
         $url = $object->data('dir.data') . Application::CONFIG;
         if(File::exist($url)){
             $data = new Data();
             $data->read($url);
             $data->data('delete', 'priya.cache.disable');
             $data->write();
+            echo Cache::execute($object);
+            $object->data('delete', 'execute');
         }
     }
 
     public static function off($object){
+        $object->data('execute', 'off');
         $url = $object->data('dir.data') . Application::CONFIG;
         if(File::exist($url)){
             $data = new Data();
@@ -57,6 +59,8 @@ class Cache extends Cli {
         if(File::exist($object->data('priya.cache.init.url'))){
             File::delete($object->data('priya.cache.init.url'));
         }
+        echo Cache::execute($object);
+        $object->data('delete', 'execute');
     }
 
     public static function clear($object, $type=''){
@@ -64,21 +68,23 @@ class Cache extends Cli {
         switch ($type){
             case 'application':
                 echo Cache::execute($object);
-                return Cache::clearApplication($object);
+                $result =  Cache::clearApplication($object);
             break;
             case 'autoload':
                 echo Cache::execute($object);
-                return Cache::clearAutoload($object);
+                $result = Cache::clearAutoload($object);
             break;
             case 'route':
                 echo Cache::execute($object);
-                return Cache::clearRoute($object);
+                $result = Cache::clearRoute($object);
             break;
             case 'smarty':
                 echo Cache::execute($object);
-                return Cache::clearSmarty($object);
+                $result = Cache::clearSmarty($object);
             break;
         }
+        $this->data('delete', 'execute');
+        return $result;
     }
 
     private static function clearApplication($object){

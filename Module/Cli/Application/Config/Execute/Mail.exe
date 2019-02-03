@@ -1,0 +1,15 @@
+{$mail.host = terminal.readline('Host: ')}
+{if !is.empty($mail.host)}
+	{$mail.port = terminal.readline('Port: default:587: ')}
+	{if is.empty($mail.port)}
+		{$mail.port = 587}
+	{/if}
+	{$mail.secure = terminal.readline('Secure: default:tls: ')}
+	{if is.empty($mail.secure)}
+		{$mail.port = 'tls'}
+	{/if}
+	{$mail.username = terminal.readline('Username: ')}
+	{$mail.password = terminal.readline('Password: ', true)}
+	{$mail.from.email = terminal.readline('E-mail: ')}
+	{$mail.from.name = terminal.readline('Name: ')}
+{/if}

@@ -283,12 +283,6 @@ class Token extends Core {
                 $object_start === true &&
                 $object_end === true
             ){
-                $parse = Token::variable($parse, $attribute, $parser);
-                //if is_object($parse... assign the attributes
-                $method = array();
-                $method['parse'] = $parse;
-                $method = Token::method($method, $parser);
-                $parse = $method['parse'];
                 $value = Token::string($value, $parser);
                 $result = array();
                 $result['type'] = Token::TYPE_OBJECT;
@@ -301,10 +295,7 @@ class Token extends Core {
                 $result['attribute'] = $attribute;
                 $result['original'] = $result['value'];
                 $result['value'] = Token::object($result['value']);
-                if(
-                    is_array($result['value']) ||
-                    is_object($result['value'])
-                ){
+                if(is_object($result['value'])){
                     foreach($result['value'] as $key => $assign){
                         $parser->data($attribute . '.' . $key, $assign);
                     }
@@ -1012,18 +1003,6 @@ class Token extends Core {
         }
         if(is_string($string)){
             $string = str_replace('""', '', $string);
-            if(
-                strpos($string, '{"') !== false &&
-                strpos($string, '"(') !== false
-            ){
-                $explode = explode('{"', $string, 2);
-                $string = implode('{', $explode);
-                $explode = explode('"."', $string);
-                $string = implode('.', $explode);
-                $explode = explode('"(', $string, 2);
-                $string = implode('(', $explode);
-                debug($string, 'string');
-            }
         }
         return $string;
     }
@@ -1031,9 +1010,6 @@ class Token extends Core {
     public static function get($token=array()){
         if(isset($token[2])){
             return $token[2];
-        } else {
-            debug($token);
-            debug(debug_backtrace(true));
         }
     }
 
@@ -1254,8 +1230,6 @@ class Token extends Core {
         if($method === false && $parser->data('priya.parser.method')){
             $parser->data('priya.parser.loop', 'init');
         }
-//         var_dump($method);
-
         while($method !== false){
             $parser->data('priya.parser.method', $method);
             $attribute = false;
@@ -1273,7 +1247,6 @@ class Token extends Core {
                 } else {
                     $method['string'] = $record['string'];
                 }
-//                     echo __LINE__ . '::' . __FILE__ . PHP_EOL . '<br>';
                 $method = Method::execute($method, $parser);
                 $method = Method::exclamation($record, $method, $parser);
                 $record = Method::remove_exclamation($record);
@@ -1281,6 +1254,7 @@ class Token extends Core {
                 $method['type'] = Token::TYPE_METHOD;
                 $record['string'] = $method['string'];
                 $record['parse'][$attribute] = $method;
+                $record['status'] = Method::STATUS;
                 ksort($record['parse']);
             }
             $method = Method::get($record['parse'], $parser);
@@ -1292,6 +1266,3 @@ class Token extends Core {
         return $record;
     }
 }
-
-
-

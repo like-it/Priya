@@ -6,6 +6,7 @@ use Exception;
 use Priya\Module\Parser\Tag;
 
 class Variable extends Core {
+    CONST STATUS = 'is_variable';
 
     public static function type($mixed=null){
         if(is_int($mixed)){
@@ -207,6 +208,7 @@ class Variable extends Core {
             //cast record string
             return $record;
         }
+        $record['status'] = Variable::STATUS;
         $modifier_list = explode('|', $attribute);
         $attribute = trim(array_shift($modifier_list), ' ');
         if(!empty($modifier_list)){

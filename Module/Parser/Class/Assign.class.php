@@ -5,6 +5,7 @@ namespace Priya\Module\Parser;
 use Exception;
 
 class Assign extends Core {
+    CONST STATUS = 'is_assign';
 
     public static function is_variable($record=array()){
         if(isset($record['type']) && $record['type'] == Token::TYPE_VARIABLE){
@@ -151,6 +152,8 @@ class Assign extends Core {
             }
             $string = implode("\n", $explode);
             $record['string'] = Newline::replace($string, $random);
+            $record['assign']['tag'] = str_replace($tag,'',$record['assign']['tag']);
+            $record['status'] = Assign::STATUS;
         }
         return $record;
     }
@@ -189,6 +192,7 @@ class Assign extends Core {
             $create = Token::all($create);
             $object = Token::create_object($create, $attribute, $parser);
             if(!empty($object)){
+                    //
                 $object['value'] = Variable::replace($object['value'], '', false, $parser);
                 //is variable data changed?
                 $object = Token::cast($object);

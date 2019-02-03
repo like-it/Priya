@@ -50,7 +50,7 @@ class Parser extends ParserCore {
         $this->data($this->compile($this->data(), $this->data()));
     }
 
-    public function read($url='', $test=false){
+    public function read($url=''){
         $file = new File();
         $ext = $file->extension($url);
         if($ext == '' || $ext == Autoload::EXT_JSON){
@@ -65,13 +65,11 @@ class Parser extends ParserCore {
             $read = $this->compile($read, $this->data(), false, false);
             $read = Token::remove_comment($read);
             $read = Literal::remove($read);
-//             debug($read, __LINE__ . '::' . __FILE__);
         }
         return $read;
     }
 
     public function compile($string, $data=null, $keep=false, $root=true){
-//         $this->input($string);
         if(
             is_null($string) ||
             is_bool($string) ||
@@ -105,9 +103,7 @@ class Parser extends ParserCore {
             $string = Literal::extra($string);
             $string = Newline::replace($string, $this->random());
             $string = Literal::replace($string, $this->random());
-
             $list = Tag::find($string);
-
             /**
              * invalid for capture.append
              *
@@ -119,29 +115,33 @@ class Parser extends ParserCore {
                 $this->data($data);
             }
             $if_counter = 0;
-
             $record = array();
             $record['string'] = $string;
-
             while(Control_If::has($list)){
                 foreach($list as $value){
                     $key = key($value);
                     if(substr($key, 0, 3) == '{if'){
                         break;
                     }
-                    Assign::find($key, $this);
-                    $record['assign']['tag'] = $key;
-                    $record = Assign::row($record, $this->random());
+                    if(empty($record['status'])){
+                        Assign::find($key, $this);
+                        $record['assign']['tag'] = $key;
+                        $record = Assign::row($record, $this->random());
+                    }
+                    if(empty($record['status'])){
+                        $record['variable']['tag'] = $key;
+                        $record = Variable::find($record, $keep, $this);
+                    }
 
-                    $record['variable']['tag'] = $key;
-                    $record = Variable::find($record, $keep, $this);
-
-                    $record['method']['tag'] = $key;
-                    $record = Method::find($record, $this);
+                    if(empty($record['status'])){
+                        $record['method']['tag'] = $key;
+                        $record = Method::find($record, $this);
+                    }
                 }
                 $record = Control_If::create($list, $record['string'], $this->random());
                 $record = Control_If::statement($record, $this);
                 $list = Tag::find($record['string']);
+                unset($record['status']);
                 if($if_counter >= Control_If::MAX){
                     throw new Exception('Parser::compile:$if_counter>=Control_If::MAX');
                     break;
@@ -150,30 +150,40 @@ class Parser extends ParserCore {
             }
             foreach($list as $value){
                 $key = key($value);
-                Assign::find($key, $this);
-                $record['assign']['tag'] = $key;
-                $record = Assign::row($record, $this->random());
-
-                $record['variable']['tag'] = $key;
-                $record = Variable::find($record, $keep, $this);
-
-                $record['method']['tag'] = $key;
-                $record = method::find($record, $this);
+                if(empty($record['status'])){
+                    Assign::find($key, $this);
+                    $record['assign']['tag'] = $key;
+                    $record = Assign::row($record, $this->random());
+                }
+                if(empty($record['status'])){
+                    $record['variable']['tag'] = $key;
+                    $record = Variable::find($record, $keep, $this);
+                }
+                if(empty($record['status'])){
+                    $record['method']['tag'] = $key;
+                    $record = method::find($record, $this);
+                }
+                unset($record['status']);
             }
             if(empty($list)){
                 $key = $record['string'];
-                Assign::find($key, $this);
-                $record['assign']['tag'] = $key;
-                $record = Assign::row($record, $this->random());
-
-                $record['variable']['tag'] = $key;
-                $record = Variable::find($record, $keep, $this);
-
-                $record['method']['tag'] = $key;
-                $record = method::find($record, $this);
+                if(empty($record['status'])){
+                    Assign::find($key, $this);
+                    $record['assign']['tag'] = $key;
+                    $record = Assign::row($record, $this->random());
+                }
+                if(empty($record['status'])){
+                    $record['variable']['tag'] = $key;
+                    $record = Variable::find($record, $keep, $this);
+                }
+                if(empty($record['status'])){
+                    $record['method']['tag'] = $key;
+                    $record = Method::find($record, $this);
+                }
             }
             $string = $record['string'];
             $string = Token::restore_return($string, $this->random());
+
             if(is_string($string)){
                 $string = Literal::restore($string, $this->random());
                 $string = str_replace(

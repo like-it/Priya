@@ -98,15 +98,17 @@ class Result extends Parser {
         $this->data('ignore', $ignore);
     }
 
-    public static function execute($object=null, $type='respond'){
+    public static function execute($object=null, $type='respond', $template=''){
+        $class = get_called_class();
         //execution cannot be cached, we need a different name -> response?
-        $read = get_called_class();
-        $data = $object->read($read);
+        $data = $object->read($class);
         $object->data($data);
-        $explode = explode('\\', $read);
-        $template = array_pop($explode);
+        $explode = explode('\\', $class);
+        if(empty($template)){
+            $template = array_pop($explode);
+        }
         //can be outside priya module...
-        $dir = dirname($read::DIR) . Application::DS . Result::EXECUTE . Application::DS;
+        $dir = dirname($class::DIR) . Application::DS . Result::EXECUTE . Application::DS;
         $url = $dir . $template . Result::EXT_EXECUTE;
         if($type == 'url'){
             return $url;
@@ -133,6 +135,7 @@ class Result extends Parser {
         }
         $parser = new Parser($object->handler(), $object->route(), $object->data());
         $execute = $parser->read($url);
+        $object->data($parser->data());
         return $execute;
     }
 
@@ -169,6 +172,7 @@ class Result extends Parser {
     }
     */
 
+    /*
     public function cache($target='', $read=''){
         $dir = dirname($read::DIR)  .
         Application::DS .
@@ -207,6 +211,7 @@ class Result extends Parser {
         }
         return Cache::write($url, $data);
     }
+    */
 
     public function result($type=null, $result=''){
         if($type == 'template'){
