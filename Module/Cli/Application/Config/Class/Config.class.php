@@ -33,8 +33,7 @@ class Config extends Cli {
         }
         if($this->parameter('mail')){
             Config::execute($this, null, 'Mail');
-            var_dump($this->data());
-            die;
+            return;
         }
 
 
