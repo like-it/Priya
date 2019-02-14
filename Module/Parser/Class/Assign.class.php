@@ -121,53 +121,42 @@ class Assign extends Core {
             return $record;
         }
         if(is_string($record['string'])){
-            $string = Token::restore_return($record['string'], $random);
+            $string = Token::newline_restore($record['string'], $random);
         } else {
             $string = $record['string'];
         }
-        $tag = Token::restore_return($record['assign']['tag'], $random);
+        if(!isset($record['assign'])){
+            return $record;
+        }
+        $tag = Token::newline_restore($record['assign']['tag'], $random);
         $explode = explode('=', substr($tag, 1, -1), 2);
         if(
             !empty($explode[0]) &&
             substr($explode[0], 0, 1) == '$' &&
-            stristr($explode[0], '|') === false &&
             count($explode) == 2
         ){
-            $rand = rand(1000, 9999) . '-' . rand(1000, 9999);
-            $anchor = '[' . $random . '-' . $rand .  '][anchor]';
-            /**
-             * it should replace only 1 at a time...
-             *
-             */
             $tmp = explode($tag, $string, 2);
-            if(count($tmp) == 2){
-                $string = implode($anchor, $tmp);
+            if(isset($tmp[1])){
+                $string = implode('', $tmp);
             }
-            $explode = explode("\n", $string);
-            foreach($explode as $nr => $row){
-                $tmp = explode($anchor, $row, 2);
-                if(count($tmp) == 2){
-                    $explode[$nr] = implode('', $tmp);
-                }
-            }
-            $string = implode("\n", $explode);
-            $record['string'] = Newline::replace($string, $random);
-            $record['assign']['tag'] = str_replace($tag,'',$record['assign']['tag']);
+            $record['string'] = Token::newline_replace($string, $random);
             $record['status'] = Assign::STATUS;
         }
         return $record;
     }
 
-    public static function find($input=null, $parser=null){
+    public static function find($record=null, $parser=null){
+        if(isset($record) && isset($record['assign']) && isset($record['assign']['tag'])){
+            $input = $record['assign']['tag'];
+        }
         if(empty($input)){
-            return;
+            return $record;
         }
         $tag = $input;
         $assign = false;
         $parse = array();
         $count = 0;
         $explode = explode('=', substr($tag, 1, -1), 2);
-
         if(
             !empty($explode[0]) &&
             substr($explode[0], 0, 1) == '$' &&
@@ -187,7 +176,7 @@ class Assign extends Core {
                 $attribute = rtrim($attribute,' ');
             }
             //before create_object assign variable needed
-            $create = Token::restore_return($value, $parser->random());
+            $create = Token::newline_restore($value, $parser->random());
             $original = $create;
             $create = Token::all($create);
             $object = Token::create_object($create, $attribute, $parser);
@@ -197,7 +186,7 @@ class Assign extends Core {
                 //is variable data changed?
                 $object = Token::cast($object);
                 $this->data($attribute, $object['value']);
-                return;
+                return $record;
             }
             $array = Token::create_array($create, $parser);
             if(!empty($array)){
@@ -205,19 +194,25 @@ class Assign extends Core {
                 //is variable data changed?
                 $array = Token::cast($array);
                 $this->data($attribute, $array['value']);
-                return;
+                return $record;
             }
             //an equation can be a variable, if it is undefined it will be + 0
             $parse = Token::parse($create);
             $parse = Token::variable($parse, $attribute, $parser);
             $method = array();
             $method['parse'] = $parse;
+            $method['string'] = $record['string'];
+            $method['original'] = $record['original'];
+            $method['assign'] = $record['assign'];
+            $method['key'] = $record['assign']['tag'];
             $method = Token::method($method, $parser);
             $parse = $method['parse'];
             $math = Token::create_equation($parse, $parser);
+            $original = $record;
+            $original['string'] = $method['string'];
             if($math !== null){
                 $parser->data($attribute, $math);
-                return;
+                return $original;
             } else {
                 $item = array();
                 foreach ($parse as $nr => $record){
@@ -246,12 +241,12 @@ class Assign extends Core {
                     //cant use data with value null to set so...
                     $parser->object_delete($attribute, $parser->data()); //for sorting an object
                     $parser->object_set($attribute, null, $parser->data());
-                    return;
+                    return $original;
                 }
                 if(is_string($item['value'])){
-                    $item['value'] = Literal::extra($item['value']);
-                    $item['value'] = Newline::replace($item['value'], $parser->random());
-                    $item['value'] = Literal::replace($item['value'], $parser->random());
+                    $item['value'] = Token::literal_extra($item['value']);
+                    $item['value'] = Token::newline_replace($item['value'], $parser->random());
+                    $item['value'] = Token::literal_replace($item['value'], $parser->random());
                 }
                 switch($assign){
                     case '+=' :
@@ -271,9 +266,20 @@ class Assign extends Core {
                         $parser->data($attribute, $item['value']);
                     break;
                 }
-                return;
+                return $original;
             }
         }
+        return $record;
     }
 
+    public static function list($list=array(), $record=array()){
+        if(isset($record['status']) && $record['status'] == Assign::STATUS){
+            foreach($list as $nr => $attribute){
+                if(isset($attribute[$record['assign']['tag']])){
+                    unset($list[$nr]);
+                }
+            }
+        }
+        return $list;
+    }
 }
