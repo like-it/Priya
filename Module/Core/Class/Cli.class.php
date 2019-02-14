@@ -133,10 +133,18 @@ class Cli extends Result {
     }
 
     public function read($url='', $text='', $read=''){
-        ob_flush();
+        $is_flush = false;
+        if(ob_get_level() > 0){
+            $is_flush =true;
+        }
+        if($is_flush){
+            ob_flush();
+        }
         if($url=='input'){
             echo $text;
-            ob_flush();
+            if($is_flush){
+                ob_flush();
+            }
 //             system('stty -echo');
             $input = trim(fgets(STDIN));
 //             system('stty echo');
@@ -147,7 +155,9 @@ class Cli extends Result {
         }
         elseif($url=='input-hidden'){
             echo $text;
-            ob_flush();
+            if($is_flush){
+                ob_flush();
+            }
             system('stty -echo');
             $input = trim(fgets(STDIN));
             system('stty echo');
