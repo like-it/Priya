@@ -83,14 +83,19 @@ class Cache extends Cli {
                 $result = Cache::clearSmarty($object);
             break;
         }
-        $this->data('delete', 'execute');
+        $object->data('delete', 'execute');
         return $result;
     }
 
     private static function clearApplication($object){
         $url = $object->data('priya.dir.cache');
         $dir = new Dir();
-        return $dir->delete($url);
+        $dir->delete($url);
+
+        $url = $object->data('priya.cache.init.url');
+        if(file_exists($url)){
+            File::delete($url);
+        }
     }
 
     private static function clearAutoload($object){
