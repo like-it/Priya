@@ -128,19 +128,69 @@ class Assign extends Core {
         if(!isset($record['assign'])){
             return $record;
         }
+        if(!isset($record['assign']['tag'])){
+            return $record;
+        }
+        if(substr($record['assign']['tag'], 1, 1) != '$'){
+            return $record;
+        }
         $tag = Token::newline_restore($record['assign']['tag'], $random);
         $explode = explode('=', substr($tag, 1, -1), 2);
         if(
-            !empty($explode[0]) &&
-            substr($explode[0], 0, 1) == '$' &&
             count($explode) == 2
         ){
             $tmp = explode($tag, $string, 2);
             if(isset($tmp[1])){
+                $explode = explode("\n", $tmp[1], 2);
+                if(isset($explode[1])){
+                    $empty = trim($explode[0]);
+                    if(empty($empty)){
+                        $tmp[1] = $explode[1];
+                    }
+                }
                 $string = implode('', $tmp);
             }
             $record['string'] = Token::newline_replace($string, $random);
             $record['status'] = Assign::STATUS;
+            return $record;
+        }
+        $explode = explode('++', substr($tag, 1, -1), 2);
+        if(
+            count($explode) == 2
+        ){
+            $tmp = explode($tag, $string, 2);
+            if(isset($tmp[1])){
+                $explode = explode("\n", $tmp[1], 2);
+                if(isset($explode[1])){
+                    $empty = trim($explode[0]);
+                    if(empty($empty)){
+                        $tmp[1] = $explode[1];
+                    }
+                }
+                $string = implode('', $tmp);
+            }
+            $record['string'] = Token::newline_replace($string, $random);
+            $record['status'] = Assign::STATUS;
+            return $record;
+        }
+        $explode = explode('--', substr($tag, 1, -1), 2);
+        if(
+            count($explode) == 2
+        ){
+            $tmp = explode($tag, $string, 2);
+            if(isset($tmp[1])){
+                $explode = explode("\n", $tmp[1], 2);
+                if(isset($explode[1])){
+                    $empty = trim($explode[0]);
+                    if(empty($empty)){
+                        $tmp[1] = $explode[1];
+                    }
+                }
+                $string = implode('', $tmp);
+            }
+            $record['string'] = Token::newline_replace($string, $random);
+            $record['status'] = Assign::STATUS;
+            return $record;
         }
         return $record;
     }
@@ -181,11 +231,10 @@ class Assign extends Core {
             $create = Token::all($create);
             $object = Token::create_object($create, $attribute, $parser);
             if(!empty($object)){
-                    //
                 $object['value'] = Variable::replace($object['value'], '', false, $parser);
                 //is variable data changed?
                 $object = Token::cast($object);
-                $this->data($attribute, $object['value']);
+                $parser->data($attribute, $object['value']);
                 return $record;
             }
             $array = Token::create_array($create, $parser);
@@ -193,7 +242,7 @@ class Assign extends Core {
                 $array['value'] = Variable::replace($array['value'], '', false, $parser);
                 //is variable data changed?
                 $array = Token::cast($array);
-                $this->data($attribute, $array['value']);
+                $parser->data($attribute, $array['value']);
                 return $record;
             }
             //an equation can be a variable, if it is undefined it will be + 0
@@ -268,8 +317,50 @@ class Assign extends Core {
                 }
                 return $original;
             }
+        } else {
+            Assign::plusPlus($tag, $parser);
+            Assign::minusMinus($tag, $parser);
         }
         return $record;
+    }
+
+    public static function minusMinus($tag='', $parser=null){
+        return Assign::counter($tag,'--', $parser);
+    }
+
+    public static function plusPlus($tag='', $parser=null){
+       return Assign::counter($tag,'++', $parser);
+    }
+
+    public static function counter($tag='', $sign='++', $parser=null){
+        $explode = explode($sign, substr($tag, 1, -1), 2);
+        if(isset($explode[1])){
+            $attribute = substr(rtrim($explode[0]), 1);
+            if(
+                in_array(
+                    $attribute,
+                    [
+                        'delete'
+                    ]
+                    )
+                ){
+                    return $record;
+            }
+            $value = $parser->data($attribute);
+            if($value === null){
+                $value = 0;
+            }
+            switch($sign){
+                case '++' :
+                    $value++;
+                    $parser->data($attribute, $value);
+                    break;
+                case '--' :
+                    $value--;
+                    $parser->data($attribute, $value);
+                    break;
+            }
+        }
     }
 
     public static function list($list=array(), $record=array()){
