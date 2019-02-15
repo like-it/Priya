@@ -2,7 +2,7 @@
     "priya": {
         "autoload": {
             "Host": "{$dir.host}",
-            "Priya": "{$dir.vendor}Priya",
+            "Priya": "{$dir.vendor}Priya"
         }
     }
 }
