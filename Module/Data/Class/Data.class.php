@@ -176,7 +176,7 @@ class Data extends Core {
         return $url;
     }
 
-    public function read($url='', $test=false){
+    public function read($url=''){
         $namespace = '';
         if(empty($url)){
             $url = get_called_class();
