@@ -49,7 +49,7 @@ class Control_Foreach extends Core {
                 isset($function['parameter'][1]) &&
                 isset($function['parameter'][1]['variable'])
             ){
-                $result= $function['parameter'][1]['variable'];
+                $result = $function['parameter'][1]['variable'];
                 $requirement = true;
             }
         }
@@ -132,64 +132,69 @@ class Control_Foreach extends Core {
         return str_replace($search, $replace, $value);
     }
 
-    public static function content($value=''){
-        $explode = explode('{for.each(', $value, 3); //yes 3
-        $string = '';
-        if(isset($explode[1])){
-            if(isset($explode[2])){
-                //we found multiple foreaches in the value, we only need the first one
-                //these for.eaches should not be nested
-            }
-            $foreach = explode('}hcae.rof/{', strrev($explode[1]), 2);
-            $foreach[0] = strrev($foreach[0]);
-            if(isset($foreach[1])){
-                $foreach[1] = strrev($foreach[1]);
-                $string = $foreach[1]; //not 0 (reverse)
-            } else {
-//                 echo '<hr><hr>';
-//                 echo $value;
-                $string = $foreach[0]; //for duplicate for.eaches...
-                throw new Exception('Control_Foreach::content:Missing {/for.each} in {for.each} tag');
-            }
-
-            return $string;
-        } else {
-            return false;
+    public static function content($value='', $parser=null){
+        $result = [];
+        $explode = explode(')}', $value, 2);
+        $result['statement'] = $explode[0] . ')}';
+        $reverse = strrev($explode[1]);
+        $explode = explode('}hcae.rof/{', $reverse, 2);
+        if(!isset($explode[1])){
+            throw new Exception('Cannot find {/for.each}');
         }
+        $result['string'] = strrev($explode[1]);
+        $result['match'] = $result['string'];
+        $explode = explode('[' . $parser->random() .'][newline]', $result['string'], 2);
+        $explode[0] = trim($explode[0]);
+        if(empty($explode[0]) && isset($explode[1])){
+            $result['string'] = $explode[1];
+        }
+        return $result;
     }
 
-    public static function finalize($value='', $function=array()){
-        $search = '{for.each(' . $value . '{/for.each}';
+    public static function finalize($content=array(), $function=array()){
+        $search = $content['statement'] . $content['match'] . '{/for.each}';
         $explode = explode($search, $function['string'], 2);
         if(!isset($explode[1])){
-//             echo __LINE__ . '::' . __FILE__ . ':' . $search;
-//             echo '<hr>';
-//             echo $function['string'];
-//             var_Dump(debug_backtrace(true));
-            var_dump($function);
-            die;
             throw new Exception('Control_Foreach::finalize:Cannot finalize for.each, cannot find origin');
         }
         return implode($function['execute'], $explode);
     }
 
-    public static function find($string='', $list=array(), $key=null, $record=null, $parser=null){
-        $tmp = explode(')}',$string, 2);
-        if(!isset($tmp[1])){
-            var_dump($string);
-            var_dump(debug_backtrace(true));
-            die;
-        }
-        //might add randomizer to be in scope of the foreach only...
-        $internal = '';
-
+    public static function find($function=array(), $string='', $list=array(), $key=null, $record=null, $parser=null){
+        $content = '';
+        $explode = explode($function['key'], $function['string'], 2);
+        $before = Token::LITERAL_OPEN .$explode[0] . Token::LITERAL_CLOSE;
+        $function['string'] = $function['key'] . $explode[1];
         foreach($list as $internal_key => $internal_value){
+            if(!empty($content)){
+                $before .= Token::LITERAL_OPEN . $content . Token::LITERAL_CLOSE;
+                $content = '';
+            }
             $parser->data($key, $internal_key);
             $parser->data($record, $internal_value);
-            $compile = $parser->compile($tmp[1]);
-            $internal .= $compile;
+            $compile = $parser->compile($before . $string);
+            $content .= $compile;
+            $before = '';
+            if($parser->data('priya.parser.break.amount')){
+                $amount = $parser->data('priya.parser.break.amount');
+                $amount--;
+                if($amount < 1){
+                    $parser->data('delete', 'priya.parser.halt');
+                    if(empty($compile)){
+                        $content .= $parser->data('priya.parser.break.before');
+                    }
+                    $parser->data('delete', 'priya.parser.break');
+                } else {
+                    $parser->data('priya.parser.break.amount', $amount);
+                }
+                break;
+            }
         }
-        return $internal;
+        if(!empty($before)){
+            $content .= Token::literal_remove($before);
+        }
+        $function['execute'] =  Token::literal_restore($content, $parser->random());
+        return $function;
     }
 
     public static function get($string=''){
@@ -199,15 +204,17 @@ class Control_Foreach extends Core {
         $explode = explode('{', $string);
         $tag_start = 'for.each';
         $tag_end = '/' . $tag_start;
+        $tag_start_length = strlen($tag_start);
+        $tag_end_length = strlen($tag_end);
         $collect = false;
         $value = '';
         foreach($explode as $nr => $row){
-            if(substr($row,0, strlen($tag_start)) == $tag_start){
+            if(substr($row, 0, $tag_start_length) == $tag_start){
                 $depth++;
                 $record['depth'] = $depth;
                 $collect = true;
             }
-            elseif(substr($row,0, strlen($tag_end)) == $tag_end){
+            elseif(substr($row, 0, $tag_end_length) == $tag_end){
                 $record['depth'] = $depth;
                 $depth--;
                 if($depth == 0){
@@ -222,7 +229,7 @@ class Control_Foreach extends Core {
         if($collect){
             return $value;
         } else {
-            return $string;
+            return '';
         }
     }
 }
