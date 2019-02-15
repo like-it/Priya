@@ -12,17 +12,16 @@ function function_array_push($function=array(), $argumentList=array(), $parser=n
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
-    $reference = array_shift($argumentList);
-    $selector = substr($reference, 2, -1);
-    $array = $parser->data($selector);
-    $val = array_shift($argumentList);
-    $result = array_push($array, $val);
-    $parser->data($selector, $array);
-    if(empty($argumentList)){
-        $function['execute'] = $result;
-    } else {
-        array_unshift($argumentList, $reference);
-        $function['execute'] = function_array_push($function, $argumentList, $parser);
+    $array = array_shift($argumentList);
+
+    $reference = $function['parameter'][0]['variable'];
+    $selector = substr($reference, 1);
+    $parser->data($selector);
+
+    while($value = array_shift($argumentList)){
+        $result = array_push($array, $value);
     }
+    $parser->data($selector, $array);
+    $function['execute'] = $result;
     return $function;
 }
