@@ -55,7 +55,7 @@ class Control_If extends Core {
         return $false;
     }
 
-    public static function depth($raw=''){
+    public static function depth($raw='', $random=''){
         $depth = 0;
         $new_depth = 0;
         $explode = explode('{', $raw);
@@ -75,7 +75,6 @@ class Control_If extends Core {
                 $record['depth'] = $depth;
             }
             $record['string'] = empty($nr) ? $row : '{' . $row;
-
             $result[] = $record;
         }
         $list = array();
@@ -91,65 +90,55 @@ class Control_If extends Core {
         return $list;
     }
 
-    /*
-    public static function depth($inner=''){
-        $depth = 0;
-        $new_depth = 0;
-        $explode = explode('{', $inner);
-        $result = array();
-        foreach($explode as $nr => $row){
-            if(substr($row,0, 2) == 'if'){
-                $depth++;
-                $record['depth'] = $depth;
-            }
-            elseif(substr($row,0, 3) == '/if'){
-                $record['depth'] = $depth;
-                $depth--;
-            }
-            elseif(substr($row,0, 4) == 'else'){
-                $record['depth'] = $depth;
-            } else {
-                $record['depth'] = $depth;
-            }
-            if(substr($row,0, 2) == 'if'){
-                $new_depth++;
-                $record['new_depth'] = $new_depth;
-            }
-            if(substr($row,0, 4) == 'else'){
-//                 $record['new_depth'] = $depth;
-//                 $depth--;
-            }
-            if(substr($row,0, 3) == '/if'){
-                $record['new_depth'] = $new_depth;
-                $new_depth--;
-            }
-            $record['new_depth'] = $new_depth;
-            $record['string'] = empty($nr) ? $row : '{' . $row;
-
-            $result[] = $record;
+    public static function create($list=array(), $record=[], $random=''){
+        if(isset($record['if']) && isset($record['if']['tag'])){
+            $record['key'] = $record['if']['tag'];
         }
-       return $result;
-    }
-    */
-
-    public static function create($list=array(), $string='', $random=''){
-        $result = array();
-        $result['string'] = $string;
+        if(!isset($record['key'])){
+            return $record;
+        }
         $if = Control_If::get($list);
-        $explode = explode($if, $string, 2);
+        $explode = explode($if, $record['string'], 2);
+        if(!isset($explode[1])){
+            throw new Exception('Malformed if tag...');
+        }
         $inner_raw = $explode[1];
-        $depth = Control_If::depth($inner_raw);
+        $depth = Control_If::depth($inner_raw, $random);
         $true = Control_If::true($depth);
         $false = Control_If::false($depth);
+
+        $record['if']['original']['true'] = $true;
         if($false === false){
-            $result['if']['true'] = $true;
-            $result['if']['false'] = null;
+            $record['if']['original']['false'] = null;
         } else {
-            $result['if']['true'] = $true;
-            $result['if']['false'] = $false;
+            $record['if']['original']['false'] = $false;
         }
-        $result['if']['statement'] = $if;
-        return $result;
+        $explode = explode('[' . $random . '][newline]', $true);
+        if(isset($explode[1])){
+            $empty = trim(end($explode));
+            if(empty($empty)){
+                array_pop($explode);
+                $true = implode('[' . $random . '][newline]', $explode);
+            }
+        }
+        if($false !== false){
+            $explode = explode('[' . $random . '][newline]', $false);
+            if(isset($explode[1])){
+                $empty = trim(end($explode));
+                if(empty($empty)){
+                    array_pop($explode);
+                    $false = implode('[' . $random . '][newline]', $explode);
+                }
+            }
+        }
+        $record['if']['true'] = $true;
+        if($false === false){
+            $record['if']['false'] = null;
+        } else {
+            $record['if']['false'] = $false;
+        }
+        $record['if']['statement'] = $if;
+        return $record;
     }
 
     public static function execute($record=array(), $math=null, $random=''){
@@ -184,30 +173,39 @@ class Control_If extends Core {
         return $record;
     }
 
-    public static function replace($record=array()){
+    public static function replace($record=array(), $parser=null){
         if($record['if']['false'] === null){
-            $search = $record['if']['statement'] . $record['if']['true'] . '{/if}';
+            $search = $record['if']['statement'] . $record['if']['original']['true'] . '{/if}';
         } else {
-            $search = $record['if']['statement'] . $record['if']['true'] . '{else}' . $record['if']['false'] . '{/if}';
+            $search = $record['if']['statement'] . $record['if']['original']['true'] . '{else}' . $record['if']['original']['false'] . '{/if}';
         }
         $explode = explode($search, $record['string'], 2);
+        $temp = explode('[' . $parser->random() . '][newline]', $explode[1], 2);
+        if(isset($temp[1])){
+            $empty = trim($temp[0]);
+            if(empty($empty)){
+                $explode[1] = $temp[1];
+            }
+        }
+        $temp = explode('[' . $parser->random() .'][newline]', $record['if']['string'], 2);
+        if(empty(trim($temp[0])) && isset($temp[1])){
+            $record['if']['string'] = $temp[1];
+        }
         $record['string'] = implode($record['if']['string'], $explode);
         return $record;
     }
 
     public static function statement($record=array(), $parser=null){
-        $create = Token::restore_return($record['if']['statement'], $parser->random());
-        $create = str_replace('{if ', '', substr($create, 0, -1));
+        $create = Token::newline_restore($record['if']['statement'], $parser->random());
+        $create = str_replace('{if', '', substr($create, 0, -1));
         $parse = Token::parse($create);
         $parse = Token::variable($parse, '', $parser);
-
-        $method = array();
-        $method['parse'] = $parse;
-        $method = Token::method($method, $parser);
-        $parse = $method['parse'];
+        $record['parse'] = $parse;
+        $record = Token::method($record, $parser);
+        $parse = $record['parse'];
         $math = Token::create_equation($parse, $parser);
         $record = Control_If::execute($record, $math, $parser->random());
-        $record = Control_If::replace($record);
+        $record = Control_If::replace($record, $parser);
         return $record;
     }
 }
