@@ -1084,7 +1084,8 @@ class Core {
     }
 
     public function object_get($attributeList=array(), $object=''){
-        if(empty($object)){
+        $array = (array) $object;
+        if(empty($array)){
             return $object;
         }
         if(is_string($attributeList)){
