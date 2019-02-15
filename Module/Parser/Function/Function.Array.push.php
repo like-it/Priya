@@ -13,10 +13,11 @@ function function_array_push($function=array(), $argumentList=array(), $parser=n
         $argumentList = (array) $argumentList;
     }
     $array = array_shift($argumentList);
-
+    if(!is_array($array)){
+        $array = [];
+    }
     $reference = $function['parameter'][0]['variable'];
     $selector = substr($reference, 1);
-    $parser->data($selector);
 
     while($value = array_shift($argumentList)){
         $result = array_push($array, $value);
