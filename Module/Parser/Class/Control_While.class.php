@@ -79,7 +79,7 @@ class Control_while extends Core {
         return str_replace($search, $replace, $value);
     }
 
-    public static function content($value=''){
+    public static function content($value='', $parser=null){
         $result = [];
         $explode = explode(')}', $value, 2);
         $result['statement'] = $explode[0] . ')}';
@@ -118,7 +118,11 @@ class Control_while extends Core {
                 $amount = $parser->data('priya.parser.break.amount');
                 $amount--;
                 if($amount < 1){
-                    $parser->data('delete', 'priya.parser.break.amount');
+                    $parser->data('delete', 'priya.parser.halt');
+                    if(empty($compile)){
+                        $content .= $parser->data('priya.parser.break.before');
+                    }
+                    $parser->data('delete', 'priya.parser.break');
                 } else {
                     $parser->data('priya.parser.break.amount', $amount);
                 }
