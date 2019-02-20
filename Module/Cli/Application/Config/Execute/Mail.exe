@@ -1,15 +1,36 @@
-{$mail.host = terminal.readline('Host: ')}
-{if !is.empty($mail.host)}
-	{$mail.port = terminal.readline('Port: default:587: ')}
-	{if is.empty($mail.port)}
-		{$mail.port = 587}
-	{/if}
-	{$mail.secure = terminal.readline('Secure: default:tls: ')}
-	{if is.empty($mail.secure)}
-		{$mail.port = 'tls'}
-	{/if}
-	{$mail.username = terminal.readline('Username: ')}
-	{$mail.password = terminal.readline('Password: ', true)}
-	{$mail.from.email = terminal.readline('E-mail: ')}
-	{$mail.from.name = terminal.readline('Name: ')}
+1++12*=2
+
+test+==1?&?/*/!?/**// test ++s**/>
+'dit {$variable}} \' is " literal
+
+2345235235 /**//test test **/
+{$hex = 0XFF25ae2514ab$cde} 0XFF
+{$chmod = 0666}
+
+{$test.123.456.hahaha = 'test'}
+{$test= 'dit is een \'test'}
+{$float = 123456798.123456789}
+
+
+
+{$array = []}
+{$push = array.push($array, 'test')}
+{$push = array.push($array, 'test2', 'test3')}
+{array.push($array, 'test')}
+memory usage: {memory.usage('MB')}
+{$counter=0}
+{for.each( $priya.application.constant as $constant => $value)}
+{$constant} {$counter}
+{if($counter > 3)}
+	{break(25555)}
 {/if}
+{$counter++}
+{/for.each}
+/*
+comment
+*/
+
+
+/**
+doc comment
+**/

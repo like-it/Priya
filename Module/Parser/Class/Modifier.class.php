@@ -226,7 +226,7 @@ class Modifier extends Core {
         }
         $result = array();
         foreach ($argumentList as $argument){
-            $result[] = Literal::restore($argument, $parser->random());
+            $result[] = Token::literal_restore($argument, $parser->random());
         }
         return $result;
     }

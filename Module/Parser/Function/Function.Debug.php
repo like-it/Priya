@@ -22,10 +22,15 @@ function function_debug($function=array(), $argumentList=array(), $parser=null){
     if($debug == 'data'){
         $debug = $parser->data();
     }
+//     var_dump($debug);
     ob_start();
     debug($debug, $title, $is_export, 5);
     $data = ob_get_contents();
     ob_clean();
-    $function['execute'] = $data;
+//     var_dump($data);
+//     var_dump($data);
+//     die;
+    $function['execute'] = '{literal}' . $data . '{/literal}';
+//     var_dump($function['execute']);
     return $function;
 }

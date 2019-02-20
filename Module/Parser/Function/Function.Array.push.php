@@ -23,6 +23,6 @@ function function_array_push($function=array(), $argumentList=array(), $parser=n
         $result = array_push($array, $value);
     }
     $parser->data($selector, $array);
-    $function['execute'] = $result;
+    $function['execute'] = $result . 'shit(1)';
     return $function;
 }

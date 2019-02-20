@@ -9,20 +9,11 @@
 
 namespace Priya\Module;
 
-use Priya\Module\Parser\Core as ParserCore;
-use Priya\Module\Parser\Variable;
-use Priya\Module\Parser\Tag;
-use Priya\Module\Parser\Assign;
-use Priya\Module\Parser\Method;
-use Priya\Module\Parser\Control_If;
-use Priya\Module\Parser\Token;
+use Priya\Module\Parse\Core as Base;
+use Priya\Module\Parse\Token;
 
-class Parser extends ParserCore {
+class Parse extends Base {
     const DIR = __DIR__;
-    const LITERAL = 'literal';
-    const FUNCTION_LIST = 'Function.List.php';
-
-    public $has_list = false;
 
     /**
      *
@@ -34,34 +25,37 @@ class Parser extends ParserCore {
         if($data !== null){
             $this->handler($handler);
             $this->route($route);
-            $this->data(Parser::object_merge($this->data(), $data));
+            $this->data(Parse::object_merge($this->data(), $data));
         } else {
-            if(!$handler instanceof \Priya\Module\Handler){
-                $this->data(Parser::object_merge($this->data(), $handler));
+            if(!$handler instanceof Handler){
+                $this->data(Parse::object_merge($this->data(), $handler));
             } else {
                 $this->handler($handler);
                 $this->route($route);
             }
         }
-        $this->data($this->compile($this->data(), $this->data()));
+//         $this->data($this->compile($this->data(), $this->data()));
     }
 
     public function read($url=''){
-        $file = new File();
-        $ext = $file->extension($url);
-        if($ext == '' || $ext == Autoload::EXT_JSON){
-            $read = parent::read($url);
+        $extension = File::extension($url);
+        if($extension == '' || $extension == Autoload::EXT_JSON){
+            $data = new Data();
+            $read = $data->read($url);
             if(!empty($read)){
-                $read = $this->data(Parser::object_merge($this->data(), ($this->compile($this->data(), $this->data(), false, true))));
+                $read = $data->data($this->compile($data->data()));
             }
         } else {
-            $read = $file->read($url);
-            $read = $this->compile($read, $this->data(), false, true);
+            $read = File::read($url);
+            $read = $this->compile($read);
         }
-        return $read;
     }
 
     public function compile($string, $data=null, $keep=false, $root=true, $debug=false){
+        if($data !== null){
+            $this->data($data);
+            $data = null;
+        }
         if($this->data('priya.parser.halt')){
             return '';
         }
@@ -84,14 +78,38 @@ class Parser extends ParserCore {
             ){
                 return $string;
             }
-            $random = $this->random();
-            if(empty($random)){
+
+            $random = Parser::random_create();
+            while(stristr($string, $random) !== false){
                 $random = Parser::random_create();
-                while(stristr($string, $random) !== false){
-                    $random = Parser::random_create();
-                }
-                $this->random($random);
             }
+            $this->random($random);
+            $token = Token::all($string);
+            var_dump($token);
+            die;
+echo 'shit';
+//             die;
+
+            /*
+            $token = Token::all($string);
+
+            var_dump($token);
+            die;
+*/
+
+//             $string = Token::comment_remove($string);
+
+
+            //comment_remove
+            //literal activate
+            //tag find
+            //list
+               //tokenize tags
+
+
+
+
+            /*
             $string = Token::comment_remove($string);
             $string = Token::literal_extra($string);
             $string = Token::newline_replace($string, $this->random());
@@ -104,9 +122,11 @@ class Parser extends ParserCore {
             $record['string'] = $string;
             $record = $this->list($list, $record, $keep, $root);
             return $record['string'];
+            */
         }
     }
 
+    /*
     public function list($list=array(), $record, $keep, $root){
         $record['original'] = $record['string'];
         //rename to priya.parser.halt
@@ -198,4 +218,5 @@ class Parser extends ParserCore {
         }
         return $list;
     }
+    */
 }

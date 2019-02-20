@@ -59,46 +59,8 @@ function function_require($function=array(), $argumentList=array(), $parser=null
         if(is_dir($url)){
             throw new Exception('File (' . $url . ') is a directory...');
         }
-//         debug($url, __LINE__ . '::' . __FILE__);
-
         $parser->data('compile', true);
         $read = $parser->read($url);
-
-//         $compiler = new Parser($parser->handler(), $parser->route(), $parser->data());
-//         $compiler->data('compile', true);
-//         $read = $compiler->read($url);
-
-
-
-//         $read = $parser->read($url);
-
-//         debug($read, __LINE__ . '::' . __FILE__);
-        /*
-        $read = Literal::extra($read);
-        $read = Newline::replace($read, $parser->random());
-        $read = Literal::replace($read, $parser->random());
-        /*
-        $read = $parser->compile($read, $parser->data(), false, false);
-        $read = str_replace(
-                array('{literal}', '{/literal}'),
-                array('[literal][rand:' .  $parser->random() .']{literal}', '[/literal][rand:' .  $parser->random() .']{/literal}'),
-                $read
-                );
-//         $read = Literal::remove($read);
-        $read= Token::remove_comment($read);
-        $read = Literal::extra($read);
-        $read = Newline::replace($read, $parser->random());
-        $read = Literal::replace($read, $parser->random());
-        */
-        /*
-        $read = str_replace(
-            array('[literal][rand:' .  $parser->random() .']', '[/literal][rand:' .  $parser->random() .']'),
-            array('{literal}', '{/literal}'),
-            $read
-        );
-        */
-//         var_dump($url);
-//         var_dump($read);
     }
     $function['execute'] = $read;
     return $function;

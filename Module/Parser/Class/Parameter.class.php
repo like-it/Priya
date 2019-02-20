@@ -8,12 +8,14 @@ class Parameter extends Core {
     const MAX_ARRAY = 1024;
     const MAX_OBJECT = 1024;
 
-    public static function get($parse=array(), $parser=null){
-//         $debug = debug_backtrace(true);
-//         var_dump($debug[0]);
-//         var_dump($debug[0]['args']);
+    const KEEP = [
+        'while'
+    ];
+
+    public static function get($parse=array(), $parser=null, $keep=false){
         $original = $parse;
-        $parse = Token::variable($parse, '',$parser);
+//         var_dump($parse);
+        $parse = Token::variable($parse, '',$parser, $keep);
         $count_array = 0;
         while(Parameter::has_array($parse)){
             $parse = Parameter::create_array($parse);
@@ -37,6 +39,15 @@ class Parameter extends Core {
                 $parameter_number++;
                 continue;
             }
+            /*
+            if($record['type'] == Token::TYPE_AS){
+                $parameter_number++;
+            }
+            if($record['type'] == Token::TYPE_DOUBLE_ARROW){
+                $parameter_number++;
+                continue;
+            }
+            */
             if($record['type'] == Token::TYPE_WHITESPACE){
                 continue;
             }
@@ -44,11 +55,13 @@ class Parameter extends Core {
             $record = Token::cast($record);
             $parameter_list[$parameter_number][] = $record;
         }
+//         var_dump($parameter_list);
         $result = array();
         /**
          * if is foreach...
          */
         $is_foreach = false;
+
         foreach ($parameter_list as $nr => $parameter){
             if(isset($parameter[1])){ //we have a fast multiple check
                 foreach($parameter as $part){
@@ -74,6 +87,7 @@ class Parameter extends Core {
                     }
                 }
             }
+//             var_dump($result);
             return $result;
         }
 
@@ -84,6 +98,8 @@ class Parameter extends Core {
         foreach($parameter_list as $parameter){
             if(isset($parameter[1])){ //we have a fast multiple check
                 $merge = array();
+//                 var_dump($parameter_list);
+                die;
                 foreach($parameter as $part){
                     if(
                         $part['type'] == Token::TYPE_STRING &&
@@ -110,15 +126,21 @@ class Parameter extends Core {
                             $part['type'] == Token::TYPE_STRING
                     ){
                         $merge['value'] .= $part['value'];
-                    } else {
-                        //int with boolean and string
-                        //float with boolean and string
-                        //int and boolean
-                        //boolean and string
-                        //boolean and string and boolean
-                        //operator and string
-//                         var_dump($merge['type']);
-//                         var_dump($parameter);
+                    }
+                    /*
+                    elseif($merge['value'] === null & $part['value'] === null){
+
+                    }
+                    */
+                    /*
+                    elseif($merge['value'] === null && $part['value'] !== null){
+                        $merge['value'] = $part['value'];
+
+// die;
+                    }
+                    */
+                    else {
+                        var_dump($part);
                         throw new Exception(
                             'Parameter::get:Undefined state detected (' .
                             $merge['type'] .
@@ -133,6 +155,7 @@ class Parameter extends Core {
                 $result[] = $parameter[0];
             }
         }
+//         var_dump($result);
         return $result;
     }
 

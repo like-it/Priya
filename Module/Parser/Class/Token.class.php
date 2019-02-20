@@ -33,6 +33,11 @@ class Token extends Core {
     const TYPE_METHOD = 'method';
     const TYPE_EXCLAMATION = 'exclamation';
     const TYPE_CONTROL = 'control';
+    const TYPE_WHILE = 'while';
+
+    const LITERAL_OPEN = '{literal}';
+    const LITERAL_CLOSE = '{/literal}';
+
 
     public static function all($token=''){
         $tokens = @token_get_all('<?php $variable=' . $token . ';');
@@ -330,7 +335,7 @@ class Token extends Core {
             if(Token::is_square_bracket($token, Token::TYPE_OPEN) && Token::is_square_bracket(end($tokens) ,  Token::TYPE_CLOSE)){
                 $record['type'] = Token::TYPE_ARRAY;
                 if(is_array($value)){
-                    $value = Token::string($value, parser);
+                    $value = Token::string($value, $parser);
                 }
                 if($record['is_cast'] === true){
                     $explode = explode($record['cast'], $value, 2);
@@ -507,12 +512,8 @@ class Token extends Core {
         return $result;
     }
 
-    public static function variable($parse=array(), $attribute=null, $parser=null){
-//         $debug = debug_backtrace(true);
-//         var_dump($debug[0]);
-//         var_dump($debug[0]['args']);
+    public static function variable($parse=array(), $attribute=null, $parser=null, $keep=false){
         $parse = Variable::fix($parse);
-//         var_dump($parse);
         $result = array();
         $is_variable = false;
         $unset = false;
@@ -556,27 +557,20 @@ class Token extends Core {
                 if($attribute !== null){
                     $record['value'] = str_replace('$this.', '$' . $attribute . '.', $record['value']);
                 }
-//                 var_dump($parse);
                 $modifier = Token::modifier($parse, $record);
 
                 $original = $record['value'];
-                if($parser->data('priya.parser.loop') && !in_array($parser->data('priya.parser.method.method'), array('require'))){
-                    $parser->data('priya.parser.loop2', 'for.each');
-                    if($parser->data('priya.parser.loop3')){
-                        echo 'found 5';
-                        var_dump($parser->data('priya.parser.method'));
-                        var_dump($parser->data());
-                        var_dump($record);
-                        die;
+                $record['value'] = Variable::replace($record['value'], $modifier, $keep, $parser);
+                if($original == $record['value'] && $keep){
+                    $record['is_keep'] = true;
+                    if($record['type'] == Token::TYPE_VARIABLE){
+                        $record['is_variable'] = true;
+                        $record['variable'] = $original;
                     }
-//                     echo 'found';
-//                     return array();
+                    $result[$nr] = $record;
+                    $parse[$nr] = $record;
+                    continue;
                 }
-                if($parser->data('priya.parser.loop')){
-//                     var_dump($record);
-//                     die;
-                }
-                $record['value'] = Variable::replace($record['value'], $modifier, false, $parser);
                 if($record['exclamation_count'] % 2 == 1){
                     $record['invert'] = true;
                 } else {
@@ -593,12 +587,10 @@ class Token extends Core {
                 $parse[$nr] = $record;
             }
         }
-//         var_dump($result);
         return $result;
     }
 
     public static function modifier($parse=array(), $record=array()){
-//         var_dump($parse);
         $modifier = array();
         $is_variable = false;
         $is_modifier = false;
@@ -637,7 +629,9 @@ class Token extends Core {
                 $record = reset($parse);
                 if(is_bool($record['value'])){
                     return $record['value'];
-                } else {
+                }
+                elseif(is_numeric($record['value'])){
+                    return $record['value'] + 0;
                 }
             }
             return;
@@ -649,10 +643,6 @@ class Token extends Core {
 //             debug($set, 'set is wrong, need has_exclamation & invert on first?');
             $operator_counter = 0;
             if(empty($statement)){
-                debug(set::has($parse));
-                debug($set, 'set');
-                debug($parse, 'parse empty statement');
-                die;
                 break;
             }
             while (Operator::has($statement)){
@@ -680,7 +670,6 @@ class Token extends Core {
                 break;
             }
         }
-//         var_dump($parse[0]);
         foreach($parse as $nr => $record){
             if($record['type'] == Token::TYPE_WHITESPACE){
                 unset($parse[$nr]);
@@ -1038,9 +1027,13 @@ class Token extends Core {
             case 'T_AT' :
             case 'T_FOREACH' :
             case 'T_FOR' :
+            case 'T_WHILE' :
             case 'T_ELSE' :
             case 'T_PLUS_EQUAL' :
             case 'T_BACKTICK' :
+            case 'T_BREAK' :
+            case 'T_DEC' :
+            case 'T_INC' :
                 return Token::TYPE_STRING;
             break;
             case 'T_LNUMBER' :
@@ -1155,13 +1148,9 @@ class Token extends Core {
         return null;
     }
 
-    public static function remove_comment($string='', $test=false){
+    public static function comment_remove($string='', $test=false){
         $tokens = Token::all($string);
         foreach($tokens as $nr => $token){
-            if(!isset($token[2])){
-                var_dump($token);
-                die;
-            }
             if(
                 in_array(
                     $token[2],
@@ -1185,28 +1174,6 @@ class Token extends Core {
         return $string;
     }
 
-    public static function restore_return($value='', $random=''){
-        if(is_array($value)){
-            foreach($value as $key => $val){
-                $value[$key] = Token::restore_return($val, $random);
-            }
-        }
-        elseif(is_object($value)){
-            foreach($value as $key => $val){
-                $value->{$key} = Token::restore_return($val, $random);
-            }
-        } else {
-            $search = array();
-            $search[] = '[' . $random . '][return]';
-            $search[] = '[' . $random . '][newline]';
-            $replace = array();
-            $replace[] = "\r";
-            $replace[] = "\n";
-            $value = str_replace($search, $replace, $value);
-        }
-        return $value;
-    }
-
     public static function method($record=array(), $parser=null, $depth=0){
         $counter = 0;
         $has_method = false;
@@ -1226,7 +1193,6 @@ class Token extends Core {
             }
         }
         $method = Method::get($record['parse'], $parser);
-
         if($method === false && $parser->data('priya.parser.method')){
             $parser->data('priya.parser.loop', 'init');
         }
@@ -1247,7 +1213,25 @@ class Token extends Core {
                 } else {
                     $method['string'] = $record['string'];
                 }
-                $method = Method::execute($method, $parser);
+//                 var_dump($method['string']);
+                $method['key'] = $record['key'];
+                $method['original'] = $record['original'];
+
+                $debug = false;
+                if($method['method'] == 'string'){
+                    $debug = true;
+                }
+
+                if(!empty($debug)){
+//                     echo $method['string'];
+//                     var_dump($method['key']);
+//                     var_dump('test');
+//                     die;
+                }
+
+
+//                 var_dump($record);
+                $method = Method::execute($method, $parser, $debug);
                 $method = Method::exclamation($record, $method, $parser);
                 $record = Method::remove_exclamation($record);
                 $method = Token::cast($method);
@@ -1256,7 +1240,9 @@ class Token extends Core {
                 $record['parse'][$attribute] = $method;
                 $record['status'] = Method::STATUS;
                 ksort($record['parse']);
+
             }
+            //loses string /status
             $method = Method::get($record['parse'], $parser);
             $counter++;
             if($counter >= Method::MAX){
@@ -1264,5 +1250,192 @@ class Token extends Core {
             }
         }
         return $record;
+    }
+
+    public static function newline_replace($input='',  $random=''){
+        if(is_object($input)){
+            foreach($input as $key => $value){
+                $input->{$key} = Token::newline_replace($value, $random);
+            }
+            return $input;
+        }
+        elseif(is_array($input)){
+            foreach($input as $key => $value){
+                $input[$key] = Token::newline_replace($value, $random);
+            }
+            return $input;
+        } else {
+            $input = str_replace("\r", '[' . $random . '][return]', $input);
+            $input = str_replace("\n", '[' . $random . '][newline]', $input);
+            return $input;
+        }
+
+    }
+
+    public static function newline_restore($input='',  $random=''){
+        if(is_object($input)){
+            foreach($input as $key => $value){
+                $input->{$key} = Token::newline_restore($value, $random);
+            }
+            return $input;
+        }
+        elseif(is_array($input)){
+            foreach($input as $key => $value){
+                $input[$key] = Token::newline_restore($value, $random);
+            }
+            return $input;
+        } else {
+            $search = array();
+            $search[] = '[' . $random . '][return]';
+            $search[] = '[' . $random . '][newline]';
+            $replace = array();
+            $replace[] = "\r";
+            $replace[] = "\n";
+            $input = str_replace($search, $replace, $input);
+            return $input;
+        }
+    }
+
+    /**
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function literal_get($value=''){
+        if(!is_string($value)){
+            return '';
+        }
+        $explode = explode(Token::LITERAL_OPEN, $value, 2);
+        if(count($explode) == 2){
+            $temp = explode(TOKEN::LITERAL_CLOSE, $explode[1], 2);
+            if(count($temp) ==2){
+                return $temp[0];
+            }
+        }
+        return '';
+    }
+
+    /**
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function literal_remove($value=''){
+        if(is_array($value)){
+            foreach($value as $key => $value_value){
+                $value[$key] = Token::literal_remove($value_value);
+            }
+            return $value;
+        }
+        elseif(is_object($value)){
+            foreach($value as $key => $value_value){
+                $value->{$key} = Token::literal_remove($value_value);
+            }
+            return $value;
+        }
+        if(!is_string($value)){
+            return $value;
+        }
+        return str_replace(
+            array(
+                Token::LITERAL_OPEN,
+                Token::LITERAL_CLOSE
+            ),
+            '',
+            $value
+            );
+    }
+
+    /**
+     *
+     * @param string $value
+     * @param string $random
+     * @return string
+     */
+    public static function literal_restore($value='', $random=''){
+        $search = array(
+            '[' . $random . '][literal]',
+            '[' . $random . '][/literal]',
+            '[' . $random . '][curly_open]',
+            '[' . $random . '][curly_close]',
+        );
+        $replace = array(
+            TOKEN::LITERAL_OPEN,
+            TOKEN::LITERAL_CLOSE,
+            '{',
+            '}',
+        );
+        return str_replace($search, $replace, $value);
+    }
+
+    /**
+     *
+     * @param string $value
+     * @param string $random
+     * @return string
+     */
+    public static function literal_replace($value='', $random=''){
+        $literal = Token::literal_get($value);
+        while($literal != ''){
+            $literal = Token::literal_get($value);
+            $search = Token::LITERAL_OPEN . $literal . Token::LITERAL_CLOSE;
+            $literal = str_replace(
+                array(
+                    '{',
+                    '}',
+                ),
+                array(
+                    '[' . $random . '][curly_open]',
+                    '[' . $random . '][curly_close]',
+                ),
+                $literal
+                );
+            $replace = '[' . $random . '][literal]' . $literal . '[' . $random .'][/literal]';
+            $value = str_replace($search, $replace, $value);
+        }
+        return $value;
+    }
+
+    /**
+     * adds extra literal tags around {}
+     * @param string $value
+     */
+    public static function literal_extra($value=''){
+        if(is_object($value)){
+            foreach ($value as $key => $val){
+                $value->{$key} = Token::literal_extra($val);
+            }
+            return $value;
+        }
+        elseif(is_array($value)){
+            foreach ($value as $key => $val){
+                $value[$key] = Token::literal_extra($val);
+            }
+            return $value;
+        } else {
+            $search = array(
+                '{' . "\n",
+                '{' . "\r",
+                '{' . "\r\n",
+                '{' . ' ',
+                '{}',
+                "\n" . '}',
+                "\r" . '}',
+                "\r\n" . '}',
+                ' ' . '}',
+            );
+            $replace = array(
+                Token::LITERAL_OPEN . '{' . Token::LITERAL_CLOSE . "\n",
+                Token::LITERAL_OPEN . '{' . Token::LITERAL_CLOSE . "\r",
+                Token::LITERAL_OPEN . '{' . Token::LITERAL_CLOSE . "\r\n",
+                Token::LITERAL_OPEN . '{' . Token::LITERAL_CLOSE . ' ',
+                Token::LITERAL_OPEN .'{}' . Token::LITERAL_CLOSE,
+                "\n" . Token::LITERAL_OPEN . '}'. Token::LITERAL_CLOSE,
+                "\r" . Token::LITERAL_OPEN . '}'. Token::LITERAL_CLOSE,
+                "\r\n" . Token::LITERAL_OPEN . '}'. Token::LITERAL_CLOSE,
+                ' ' . Token::LITERAL_OPEN .'}'. Token::LITERAL_CLOSE,
+            );
+            return str_replace($search, $replace, $value);
+        }
     }
 }

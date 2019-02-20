@@ -14,34 +14,34 @@ function function_for_each($function=array(), $argumentList=array(), $parser=nul
     if(!is_array($argumentList)){
         $argumentList = (array) $argumentList;
     }
+    $level = (int) $parser->data('priya.parser.break.level');
+    $level++;
+    $parser->data('priya.parser.break.level', $level);
     $list = Control_Foreach::list($function, $parser);
     $key = Control_Foreach::key($function);
     $record = Control_Foreach::record($function);
-    $value = Control_Foreach::lower($function['string']);
-//     echo __LINE__ . '::' . __FILE__ . $value;
+    $value = Control_Foreach::tag_lower($function['string'], 'for.each');
     $value = Control_Foreach::get($value);
-
-//     echo __LINE__ . '::' . __FILE__ . $value;
-    $string = Control_Foreach::content($value);
-    $string = Control_Foreach::literal($string, $parser);
-
-    if($parser->data('priya.debug') === true){
-//         var_Dump($string);
-        //wrong position...
-//         die;
-    }
-
-    if($string == ''){
+    $content = Control_Foreach::content($value, $parser);
+    $content['string'] = Control_Foreach::literal($content['string'], $parser);
+    if($content['string'] == ''){
         //can be caused by multiple foreaches with the same arguments...
         $function['execute'] = '';
     }
-    elseif($string === false){
+    elseif($content['string'] === false){
         $function['execute'] = '';
     } else {
-        $function['execute'] = Control_Foreach::find($string, $list, $key, $record, $parser);
+//         var_dump($content['string']);
+        $function = Control_Foreach::find($function, $content['string'], $list, $key, $record, $parser);
         $function['execute'] = Control_Foreach::replace($function['execute'], $parser);
-        $string = Control_Foreach::replace($string, $parser);
-        $function['string'] = Control_Foreach::finalize($string, $function);
+        $content['string'] = Control_Foreach::replace($content['string'], $parser);
+        $function['string'] = Control_Foreach::finalize($content, $function);
     }
+    $level = (int) $parser->data('priya.parser.break.level');
+    $level--;
+    $parser->data('priya.parser.break.level', $level);
+    $parser->data('delete', 'priya.parser.function.current');
+//     var_dump($function);
+//     die;
     return $function;
 }

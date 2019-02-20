@@ -216,11 +216,13 @@ class Operator extends Core {
         $operator['left_parse'] = $left;
         $method = array();
         $method['parse'] = $left;
+        $method['key']  = '';
         $method = Token::method($method, $parser);
         $operator['left_parse'] = $method['parse'];
 
         $method = array();
         $method['parse'] = $right;
+        $method['key'] = '';
         $method = Token::method($method, $parser);
         $operator['right_parse'] = $method['parse'];
 

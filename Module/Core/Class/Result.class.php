@@ -21,6 +21,8 @@ use Priya\Module\File\Dir;
 use Priya\Module\Core\Parser;
 use Priya\Module\File\Cache;
 
+use Priya\Module\Parse;
+
 class Result extends Parser {
     const DIR = __DIR__;
     const FILE = __FILE__;
@@ -89,7 +91,10 @@ class Result extends Parser {
                     Application::DS
             );
         }
-        $this->data('module.route', $this->route()->item());
+        if(is_object($this->route())){
+            $this->data('module.route', $this->route()->item());
+        }
+
         $ignore = array();
         //add user ?
         $ignore[] = 'users';
@@ -133,10 +138,11 @@ class Result extends Parser {
                 throw new Exception($exception);
             }
         }
-        $parser = new Parser($object->handler(), $object->route(), $object->data());
+        $parser = new Parse($object->handler(), $object->route(), $object->data());
         $execute = $parser->read($url);
+        echo $execute;
         $object->data($parser->data());
-        return $execute;
+//         return $execute;
     }
 
     /*

@@ -8,6 +8,15 @@ class Method extends Core {
     const STATUS = 'is_method';
     const MAX = 1024;
 
+    const MULTI_LINE = [
+        'while',
+        'for.each',
+        'capture',
+        'capture.append',
+        'capture.prepend',
+        'priya'
+    ];
+
     public static function find($record=array(), \Priya\Module\Parser $parser){
         if(
             substr($record['method']['tag'], 0, 1) != '{' &&
@@ -16,14 +25,15 @@ class Method extends Core {
             return $record;
         }
         $method = substr($record['method']['tag'], 1, -1);
-        $method = Token::restore_return($method, $parser->random());
+        $method = Token::newline_restore($method, $parser->random());
         $parse = Token::parse($method);
         $record['parse'] = $parse;
+        $record['key'] = $record['method']['tag'];
         //this has to find the first method in parse & return it!
         $is_method = false;
-
+//         var_dump($record);
+//         var_dump(debug_backtrace(true));
         $record = Token::method($record, $parser);
-
         //fix has_Exclamation
         foreach($record['parse'] as $key => $value){
             if($value['type'] == Token::TYPE_METHOD){
@@ -45,7 +55,10 @@ class Method extends Core {
         ){
             return $record;
         }
+//         var_dump($method);
         $explode = explode($record['method']['tag'], $record['string'], 2);
+//         var_dump($explode);
+//         var_dump($method['value']);
         if(empty($explode[0]) && empty($explode[1])){
             $record['string'] = $method['value'];
         } else {
@@ -146,6 +159,8 @@ class Method extends Core {
         $result = array();
         $parse_method = array();
         $method_has_name = false;
+//         var_dump($parse);
+//         die;
         foreach ($parse as $nr => $record){
             if(
                 $record['type'] == Token::TYPE_METHOD &&
@@ -179,9 +194,18 @@ class Method extends Core {
                     } else {
                         $result['invert'] = false;
                     }
-                    $result['method'] = str_replace('!', '', $result['method']);
+                    $result['method'] = strtolower(str_replace('!', '', $result['method']));
                     $result['set']['depth'] = $method_part['set']['depth'];
-                    $result['parameter'] = Parameter::get($parameter, $parser);
+                    if(
+                        in_array(
+                            $result['method'],
+                            PARAMETER::KEEP
+                        )
+                    ){
+                        $result['parameter'] = Parameter::get($parameter, $parser, true);
+                    } else {
+                        $result['parameter'] = Parameter::get($parameter, $parser);
+                    }
                     $result['parse_method'] = $parse_method; //all records of parse which is used to create the method
                     //maybe extend cast to all parse_method tokens
                     $possible_cast = reset($parse_method);
@@ -264,7 +288,7 @@ class Method extends Core {
         return false;
     }
 
-    public static function execute($function=array(), \Priya\Module\Parser $parser){
+    public static function execute($function=array(), \Priya\Module\Parser $parser, $debug=false){
         $name = str_replace(
             array(
                 '..',
@@ -297,12 +321,32 @@ class Method extends Core {
             }
         }
         $name = 'function_' . str_replace('.', '_', strtolower($name));
+
+        /*
+        if($function_name == 'Array'){
+            var_dump($function);
+            die;
+        }
+        */
+
         if(function_exists($name)){
             $argument = array();
             if(isset($function['parameter'])){
                 foreach ($function['parameter'] as $nr => $parameter){
-                    if(isset($parameter['value']) || $parameter['value'] === null){
-                        $parameter['value'] = $parser->compile($parameter['value'], $parser->data());
+                    if((
+                        isset(
+                            $parameter['value']) ||
+                            $parameter['value'] === null
+                        )
+                    ){
+                        if(
+                            isset($parameter['variable']) &&
+                            substr($parameter['variable'], 0, 6) == '$priya'
+                        ){
+                            //this causes a nesting compile error (max nesting level (255) reached) if compiled here...
+                        } else {
+                            $parameter['value'] = $parser->compile($parameter['value'], $parser->data());
+                        }
                         $parameter = Value::type($parameter);
                         if($parameter['type'] == Token::TYPE_STRING && substr($parameter['value'], 0, 1) == '\'' && substr($parameter['value'], -1) == '\''){
                             $parameter['value'] = substr($parameter['value'], 1, -1);
@@ -330,6 +374,11 @@ class Method extends Core {
             $function['is_executed'] = true;
         } else {
             $function['is_executed'] = false;
+//             var_dump(debug_backtrace(true));
+            if($function_name == ' String'){
+
+                die('no function String');
+            }
             throw new Exception('Method::execute:Function "' . $function_name . '" not found');
         }
         if(is_bool($function['value'])){
@@ -342,4 +391,86 @@ class Method extends Core {
         return $function;
     }
 
+    public static function multiline($name='', $parser=null){
+        if(empty($name)){
+            return $parser->data('priya.parser.method.multiline');
+        }
+        $multi_line = $parser->data('priya.parser.method.multiline');
+        if(!is_array($multi_line)){
+            $multi_line = [];
+        }
+        foreach($multi_line as $line){
+            if($line == $name){
+                return $parser->data('priya.parser.method.multiline');
+            }
+        }
+        if(is_array($name)){
+            foreach ($name as $value){
+                $multi_line[] = $value;
+            }
+        } else {
+            $multi_line[] = $name;
+        }
+        $parser->data('priya.parser.method.multiline', $multi_line);
+        return $parser->data('priya.parser.method.multiline');
+    }
+
+    public static function list($list=array(), $record=array(), $parser=null){
+        $original = $list;
+        $multi_line = Method::multiline(null, $parser);
+        if(!is_array($multi_line)){
+            $multi_line = Method::multiline(Method::MULTI_LINE, $parser);
+        }
+        if(isset($record['status']) && $record['status'] == Method::STATUS){
+            if(
+                isset($record['parse']) &&
+                isset($record['parse'][0]) &&
+                isset($record['parse'][0]['method']) &&
+                in_array(
+                    $record['parse'][0]['method'],
+                    $multi_line
+                )
+            ){
+                $depth = 0;
+                $delete = true;
+                $method = $record['parse'][0]['method'];
+                $tag_open = '{' . $method;
+                $tag_close = '{/' . $method . '}';
+                $tag_open_length = strlen($tag_open);
+                $tag_close_length = strlen($tag_close);
+                foreach($list as $nr => $attribute){
+                    $key = key($attribute);
+                    if(substr($key, 0, $tag_close_length)  == $tag_close){
+                        $list[$nr][$key] = $depth;
+                        $original[$nr][$key] = $depth;
+                        if($depth == 1 && $delete = true){
+                            $delete = false;
+                            unset($list[$nr]);
+                            return $list;
+                        }
+                        $depth--;
+                    }
+                    elseif(substr($key, 0, $tag_open_length) == $tag_open){
+                        $depth++;
+                        $list[$nr][$key] = $depth;
+                        $original[$nr][$key] = $depth;
+                    } else {
+                        $list[$nr][$key] = $depth;
+                        $original[$nr][$key] = $depth;
+                    }
+                    if($delete){
+                        unset($list[$nr]);
+                    }
+                }
+                return $list;
+            }
+            foreach($list as $nr => $attribute){
+                if(isset($attribute[$record['method']['tag']])){
+                    unset($list[$nr]);
+                    break;
+                }
+            }
+        }
+        return $list;
+    }
 }

@@ -3,7 +3,6 @@
 namespace Priya\Module\Parser;
 
 use Exception;
-use Priya\Module\Parser\Tag;
 
 class Variable extends Core {
     CONST STATUS = 'is_variable';
@@ -183,6 +182,7 @@ class Variable extends Core {
             return $record;
         }
         $attribute = substr($record['variable']['tag'], 1, -1);
+//         var_dump($record);
         $tokens = Token::all($attribute);
         foreach($tokens as $nr => $token){
             if(!isset($record['is_cast'])){
@@ -212,7 +212,7 @@ class Variable extends Core {
         $modifier_list = explode('|', $attribute);
         $attribute = trim(array_shift($modifier_list), ' ');
         if(!empty($modifier_list)){
-            $modifier = Token::restore_return(implode('|', $modifier_list), $parser->random());
+            $modifier = Token::newline_restore(implode('|', $modifier_list), $parser->random());
         } else {
             $modifier = '';
         }
@@ -274,9 +274,9 @@ class Variable extends Core {
             $record['string'] = $item['replace'];
         } else {
             $record['string'] = implode($item['replace'], $explode);
-            $record['string'] = Literal::extra($record['string']);
-            $record['string'] = Newline::replace($record['string'], $parser->random());
-            $record['string'] = Literal::replace($record['string'], $parser->random());
+            $record['string'] = Token::literal_extra($record['string']);
+            $record['string'] = Token::newline_replace($record['string'], $parser->random());
+            $record['string'] = Token::literal_replace($record['string'], $parser->random());
         }
         unset($record['cast']);
         unset($record['is_cast']);
@@ -294,30 +294,29 @@ class Variable extends Core {
 
     public static function replace($input=null, $modifier='', $keep=false, $parser=null){
         $original = $input;
-        if(
-            (
-                is_null($input) ||
-                is_bool($input) ||
-                is_float($input) ||
-                is_int($input) ||
-                is_numeric($input)
-            ) &&
-            $modifier = ''
-        ){
-            return $input;
-        }
         if (is_array($input)){
             foreach($input as $nr => $value){
-                $input[$nr] = $this->replace($value, $modifier, $keep);
+                $input[$nr] = Variable::replace($value, $modifier, $keep, $parser);
             }
             return $input;
         }
         elseif(is_object($input)){
             foreach ($input as $key => $value){
-                $input->{$key} = $this->replace($value, $modifier, $keep);
+                $input->{$key} = Variable::replace($value, $modifier, $keep, $parser);
             }
             return $input;
         } else {
+            if(
+                (
+                    !is_string($input)
+                    ||
+                    is_numeric($input)
+                ) &&
+                $modifier = ''
+            ){
+                return $input;
+            }
+
             //remove if statements
             $list = Tag::find($input);
             $output = null;
@@ -332,7 +331,7 @@ class Variable extends Core {
                     } else {
                         $output = $parser->data($attribute);
                         if($output === null && $keep === true){
-                            return $output;
+                            return $input;
                         }
                         $output = Variable::value($output);
                         if(!empty($modifier)){
@@ -349,43 +348,8 @@ class Variable extends Core {
                             //strange bug...
                             //add tag find, if no tag no compile
                             $list = Tag::find($output);
-//                             var_dump($attribute);
-//                             var_Dump($output);
                             if(!empty($list)){
-                                if(isset($list[0]['{for.each($menu as $nr => $record)}'])){
-                                    $parser->data('chimp', true);
-                                }
-                                if($parser->data('priya.parser.loop')){
-                                    if(isset($list[0]['{for.each($menu as $nr => $record)}'])){
-//                                         echo $input;
-//                                         echo $output;
-                                        $parser->data('priya.parser.loop3', 'init');
-                                        var_dump('found 4');
-//                                         die;
-                                    }
-//                                     var_dump($this->parser()->data());
-
-                                    if(is_string($output)){
-//                                         echo $input;
-//                                         echo '<hr>';
-//                                         echo $output;
-                                    }
-//                                     var_Dump($this->parser()->data('priya.parser'));
-//                                     var_dump('found 3');
-//                                     $debug = debug_backtrace(true);
-//                                     var_dump($debug[0]);
-//                                     var_dump($debug[0]['args']);
-                                }
-//                                 var_dump($list);
-//                                 var_dump($this->parser()->Data());
-//                                 var_dump($data);
-                                $output = $parser->compile($output, $parser->data(), false, false);
-                                if(is_string($output)){
-                                    if(isset($list[0]['{$menu.20.name}'])){
-                                        $parser->data('parser.double.menu', true);
-                                    }
-//                                     echo $output;
-                                }
+                                $output = $parser->compile($output, $parser->data(), $keep, false);
                             }
                         }
                     }
@@ -397,5 +361,16 @@ class Variable extends Core {
             }
             return $output;
         }
+    }
+
+    public static function list($list=array(), $record=array()){
+        if(isset($record['status']) && $record['status'] == Variable::STATUS){
+            foreach($list as $nr => $attribute){
+                if(isset($attribute[$record['variable']['tag']])){
+                    unset($list[$nr]);
+                }
+            }
+        }
+        return $list;
     }
 }
