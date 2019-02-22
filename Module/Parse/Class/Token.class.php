@@ -49,6 +49,8 @@ class Token extends Core {
     const TYPE_COMMENT_CLOSE = 'comment-close';
     const TYPE_DOC_COMMENT_OPEN = 'doc-comment-open';
     const TYPE_COMMENT_SINGLE_LINE = 'comment-single-line';
+    const TYPE_COMMENT = 'comment';
+    const TYPE_DOC_COMMENT = 'doc-comment';
     const TYPE_AMPERSAND = 'ampersand';
     const TYPE_QUESTION = 'question';
     const TYPE_PIPE = 'pipe';
@@ -104,6 +106,22 @@ class Token extends Core {
         Token::TYPE_SEMI_COLON
     ];
 
+    const TYPE_ASSIGN = [
+        '=',
+        '+=',
+        '-=',
+        '*=',
+        '%=',
+        '/=',
+        '++',
+        '--',
+        '**',
+        '**=',
+        '^='.
+        '&=',
+        '|='
+    ];
+
     public static function all($string=''){
         $array = Token::split($string);
         $token = array();
@@ -116,6 +134,7 @@ class Token extends Core {
             $record['type'] = $type;
             $record['column'] = $column;
             $record['row'] = $row;
+            $record['is_operator'] = false;
             $token[$nr] = $record;
             $column++;
             if($record['value'] == "\n"){
@@ -123,7 +142,7 @@ class Token extends Core {
                 $column = 1;
             }
         }
-        $count = $nr;
+        $count = $nr + 1;
         $previous_nr = null;
         $skip = 0;
         foreach($token as $nr => $record){
@@ -149,6 +168,7 @@ class Token extends Core {
                 )
             ){
                 //1
+                $previous_nr = $nr;
                 continue;
             }
             elseif(
@@ -157,6 +177,7 @@ class Token extends Core {
                 $record['type'] == $token[$next]['type'] &&
                 $record['type'] == $token[$next_next]['type']
             ){
+                //3
                 if($record['type'] == Token::TYPE_OPERATOR){
                     $operator = $record;
                     $operator['value'] .= $token[$next]['value'] . $token[$next_next]['value'];
@@ -188,7 +209,7 @@ class Token extends Core {
                             } else {
                                 if(
                                     $check['type'] == Token::TYPE_COMMENT_CLOSE &&
-                                    $operator['type'] == Token::TYPE_COMMENT_OPEN
+                                    $operator['type'] == Token::TYPE_COMMENT
                                 ){
                                     $check = $record;
                                     $check['value'] = $token[$next_next]['value'];
@@ -212,6 +233,7 @@ class Token extends Core {
                         $token[$next] = $check;
                         if($check2 === null){
                             unset($token[$next_next]);
+                            $count--;
                             $skip = 2;
                         } else {
                             $token[$next_next] = $check2;
@@ -221,6 +243,7 @@ class Token extends Core {
                         $token[$nr] = $operator;
                         unset($token[$next]);
                         unset($token[$next_next]);
+                        $count -= 2;
                         $skip = 2;
                         continue;
                     }
@@ -231,8 +254,8 @@ class Token extends Core {
                             unset($token[$nr]);
                             unset($token[$next]);
                             unset($token[$next_next]);
+                            $count -= 3;
                             $skip = 2;
-//                             $previous_nr = null;
                             continue;
                         }
                     }
@@ -240,9 +263,9 @@ class Token extends Core {
                     unset($token[$next]);
                     unset($token[$next_next]);
                     $previous_nr = $nr;
+                    $count -= 2;
                     $skip = 2;
                 }
-                //3
             }
             elseif(
                 $next !== null &&
@@ -256,6 +279,7 @@ class Token extends Core {
                         $token[$previous_nr]['value'] .= $record['value'] . $token[$next]['value'];
                         unset($token[$nr]);
                         unset($token[$next]);
+                        $count -= 2;
                         $skip = 1;
                         continue;
                     }
@@ -273,17 +297,20 @@ class Token extends Core {
                 }
                 unset($token[$next]);
                 $previous_nr = $nr;
+                $count--;
                 $skip = 1;
             }
             elseif(
                 $next !== null &&
                 $record['type'] == $token[$next]['type']
             ){
+                //2
                 if($previous_nr !== null){
                     if($token[$previous_nr]['type'] == $record['type']){
                         $token[$previous_nr]['value'] .= $record['value'] . $token[$next]['value'];
                         unset($token[$nr]);
                         unset($token[$next]);
+                        $count -= 2;
                         $skip = 1;
                         continue;
                     }
@@ -301,14 +328,15 @@ class Token extends Core {
                 }
                 unset($token[$next]);
                 $previous_nr = $nr;
+                $count--;
                 $skip = 1;
-                //2
             } else {
                 //1
                 if($previous_nr !== null){
                     if($token[$previous_nr]['type'] == $record['type']){
                         $token[$previous_nr]['value'] .= $record['value'];
                         unset($token[$nr]);
+                        $count--;
                         continue;
                     }
                 }
@@ -318,14 +346,462 @@ class Token extends Core {
                 $previous_nr = $nr;
             }
         }
-        var_dump($token);
-        die;
+        $prepare = [];
+        foreach($token as $nr => $record){
+            $prepare[] = $record;
+            unset($token[$nr]);
+        }
+        unset($token);
+        $prepare = Token::prepare($prepare, $count);
+        return $prepare;
+    }
+
+    public static function prepare($token=array(), $count=0){
+        $hex = null;
+        $start = null;
+        $skip = 0;
+        $skip_unset = 0;
+        $depth = 0;
+        $quote_single = null;
+        $quote_single_toggle = false;
+        $quote_double = null;
+        $quote_double_toggle = false;
+        $variable_nr = null;
+        $comment_open_nr = null;
+        $doc_comment_open_nr = null;
+        $comment_single_line_nr = null;
+        foreach($token as $nr => $record){
+            $token[$nr]['depth']  = $depth;
+            $next = null;
+            $next_next = null;
+            if($skip > 0){
+                $skip--;
+                continue;
+            }
+            if($skip_unset > 0){
+                unset($token[$nr]);
+                $skip_unset--;
+                continue;
+            }
+            if($nr < ($count - 1)){
+                $next = $nr + 1;
+            }
+            if($nr < ($count - 2)){
+                $next_next = $nr + 2;
+            }
+            if(
+                $record['type'] == Token::TYPE_COMMENT_CLOSE &&
+                $quote_single_toggle === false
+            ){
+                if($comment_open_nr !== null){
+                    $token[$comment_open_nr]['value'] .= $record['value'];
+                    $comment_open_nr = null;
+                    unset($token[$nr]);
+                    continue;
+                }
+                elseif($doc_comment_open_nr !== null){
+                    $token[$doc_comment_open_nr]['value'] .= $record['value'];
+                    $doc_comment_open_nr = null;
+                    unset($token[$nr]);
+                    continue;
+                }
+            }
+            elseif($comment_open_nr !== null){
+                $token[$comment_open_nr]['value'] .= $record['value'];
+                unset($token[$nr]);
+                continue;
+            }
+            elseif($doc_comment_open_nr !== null){
+                $token[$doc_comment_open_nr]['value'] .= $record['value'];
+                unset($token[$nr]);
+                continue;
+            }
+            elseif($comment_single_line_nr !== null){
+                if(
+                    $record['type'] == Token::TYPE_WHITESPACE &&
+                    stristr($record['value'], "\n") !== false
+                ){
+                    $comment_single_line_nr = null;
+                } else {
+                    $token[$comment_single_line_nr]['value'] .= $record['value'];
+                    unset($token[$nr]);
+                    continue;
+                }
+            }
+            elseif($variable_nr !== null){
+                if(
+                    $next !== null &&
+                    $token[$next]['is_operator'] === true
+                ){
+                    if($token[$next]['value'] == '|'){
+                        $token[$variable_nr]['variable']['name'] .= $record['value'];
+                        $token[$variable_nr]['variable']['operator'] = $token[$next]['value'];
+                        $token[$variable_nr]['variable']['has_modifier'] = true;
+                        $variable_nr = null;
+                        $skip += 1;
+                        unset($token[$nr]);
+                        continue;
+                    }
+                    elseif(
+                        in_array(
+                            $token[$next]['value'],
+                            Token::TYPE_ASSIGN
+                        )
+                    ){
+                        $token[$variable_nr]['variable']['name'] .= $record['value'];
+                        $token[$variable_nr]['variable']['is_assign'] = true;
+                        $token[$variable_nr]['variable']['has_modifier'] = false;
+                        $token[$variable_nr]['variable']['operator'] = $token[$next]['value'];
+                        $variable_nr = null;
+                        $skip += 1;
+                        unset($token[$nr]);
+                        continue;
+                    }
+                }
+                if(
+                    $next !== null &&
+                    $next_next !== null &&
+                    $token[$next]['type'] === Token::TYPE_WHITESPACE &&
+                    $token[$next_next]['is_operator'] === true
+                ){
+                    if($token[$next_next]['value'] == '|'){
+                        $token[$variable_nr]['variable']['name'] .= $record['value'];
+                        $token[$variable_nr]['variable']['operator'] = $token[$next_next]['value'];
+                        $token[$variable_nr]['variable']['has_modifier'] = true;
+                        $variable_nr = null;
+                        $skip += 1;
+                        unset($token[$nr]);
+                        continue;
+                    }
+                    elseif(
+                        in_array(
+                            $token[$next_next]['value'],
+                            Token::TYPE_ASSIGN
+                        )
+                    ){
+                        $token[$variable_nr]['variable']['name'] .= $record['value'];
+                        $token[$variable_nr]['variable']['is_assign'] = true;
+                        $token[$variable_nr]['variable']['has_modifier'] = false;
+                        $token[$variable_nr]['variable']['operator'] = $token[$next_next]['value'];
+                        $variable_nr = null;
+                        $skip += 2;
+                        unset($token[$nr]);
+                        continue;
+                    }
+                }
+                elseif(
+                    in_array(
+                        $record['type'],
+                        [
+                            Token::TYPE_WHITESPACE,
+                            Token::TYPE_QUOTE_SINGLE,
+                            Token::TYPE_QUOTE_DOUBLE
+                        ]
+                    ) ||
+                    $record['is_operator'] === true
+                ){
+                    $variable_nr = null;
+                } else {
+                    $token[$variable_nr]['variable']['name'] .= $record['value'];
+                    $skip += 1;
+                    unset($token[$nr]);
+                    continue;
+                }
+            }
+            if(
+                $record['type'] == Token::TYPE_VARIABLE &&
+                $quote_single_toggle === false
+            ){
+                $variable_nr = $nr;
+                $token[$variable_nr]['variable']['name'] = $record['value'];
+                $token[$variable_nr]['variable']['is_assign'] = false;
+            }
+            elseif(
+                $record['type'] == Token::TYPE_COMMENT &&
+                $quote_single_toggle === false
+            ){
+                $comment_open_nr = $nr;
+                continue;
+            }
+            elseif(
+                $record['type'] == Token::TYPE_DOC_COMMENT &&
+                $quote_single_toggle === false
+            ){
+                $doc_comment_open_nr = $nr;
+                continue;
+            }
+            elseif(
+                $record['type'] == Token::TYPE_COMMENT_SINGLE_LINE &&
+                $quote_single_toggle === false
+            ){
+                $comment_single_line_nr = $nr;
+                continue;
+            }
+            if($record['value'] == '\'' && $quote_double_toggle === false){
+                if($quote_single_toggle === false){
+                    $quote_single_toggle = true;
+                } else {
+                    $quote_single_toggle = false;
+                }
+            }
+            elseif($record['value'] == '"' && $quote_single_toggle === false){
+                if($quote_double_toggle === false){
+                    $quote_double_toggle = true;
+                } else {
+                    $quote_double_toggle = false;
+                }
+            }
+            if($quote_single_toggle){
+                if($quote_single === null){
+                    $quote_single = $record;
+                    $quote_single['nr'] = $nr;
+                    continue;
+                }
+                if($record['value'] == '\\' && $next !== null && $token[$next]['value'] == '\''){
+                    $quote_single['value'] .= $record['value'] . $token[$next]['value'];
+                    $skip += 1;
+                    continue;
+                } else {
+                    $quote_single['value'] .= $record['value'];
+                    continue;
+                }
+            } else {
+                if($quote_single){
+                    $quote_single['value'] .= $record['value'];
+                    $token[$quote_single['nr']]['type'] = Token::TYPE_STRING;
+                    $token[$quote_single['nr']]['value'] = $quote_single['value'];
+                    for($i = ($quote_single['nr'] + 1); $i <= $nr; $i++){
+                        unset($token[$i]);
+                    }
+                    $token[$quote_single['nr']]['execute'] = str_replace('\\\'','\'', substr($token[$quote_single['nr']]['value'], 1, -1));
+                    $quote_single = null;
+                    continue;
+                }
+            }
+            if($quote_double_toggle){
+                if($quote_double === null){
+                    $quote_double = $record;
+                    $quote_double['nr'] = $nr;
+                    continue;
+                }
+                if($record['value'] == '\\' && $next !== null && $token[$next]['value'] == '"'){
+                    $skip += 1;
+                }
+            } else {
+                if($quote_double){
+                    $quote_double = null;
+                }
+            }
+            if($record['type'] == Token::TYPE_STRING){
+                if($record['value'] == 'null'){
+                    $token[$nr]['execute'] = null;
+                    $token[$nr]['type'] = Token::TYPE_NULL;
+                }
+                elseif($record['value'] == 'true'){
+                    $token[$nr]['execute'] = true;
+                    $token[$nr]['type'] = Token::TYPE_BOOLEAN;
+                }
+                elseif($record['value'] == 'false'){
+                    $token[$nr]['execute'] = false;
+                    $token[$nr]['type'] = Token::TYPE_BOOLEAN;
+                }
+            }
+            elseif($record['type'] == Token::TYPE_PARENTHESE_OPEN){
+                $depth++;
+                $token[$nr]['depth'] = $depth;
+                $parenthese_open = $nr;
+            }
+            elseif($record['type'] == Token::TYPE_PARENTHESE_CLOSE){
+                $depth--;
+                if($parenthese_open !== null){
+                    $before_reverse = [];
+                    $collect = false;
+                    for($i = $parenthese_open - 1; $i >= 0; $i--){
+                        if(isset($token[$i])){
+                            if(
+                                $collect === true &&
+                                (
+                                    $token[$i]['type'] == Token::TYPE_WHITESPACE ||
+                                    $token[$i]['is_operator'] === true
+                                )
+                            ){
+                                $token[$previous_nr]['type'] = Token::TYPE_METHOD;
+                                $token[$previous_nr]['method']['name'] = trim(implode('', array_reverse($before_reverse)));
+                                $before_reverse = [];
+                                $collect = false;
+                                $parenthese_open = null;
+                                break;
+                            }
+                            elseif($token[$i]['type'] != Token::TYPE_WHITESPACE){
+                                if(
+                                    in_array(
+                                        $token[$i]['type'],
+                                        [
+                                            Token::TYPE_PARENTHESE_OPEN,
+                                            Token::TYPE_PARENTHESE_CLOSE,
+                                        ]
+                                    ) ||
+                                    $token[$i]['is_operator'] === true
+                                ){
+                                    $before_reverse = [];
+                                    break;
+                                } else {
+                                    $collect = true;
+                                }
+                            }
+                            $previous_nr = $i;
+                            $before_reverse[] = $token[$i]['value'];
+                        }
+                    }
+                    if($parenthese_open !== null){
+                        $cast = '';
+                        for($i = $parenthese_open + 1; $i < $count; $i++){
+                            if($token[$i]['type'] == Token::TYPE_PARENTHESE_CLOSE){
+                                $cast = strtolower($cast);
+                                switch($cast){
+                                    case 'bool' :
+                                    case 'boolean' :
+                                        $token[$parenthese_open]['cast'] = Token::TYPE_BOOLEAN;
+                                    break;
+                                    case 'float' :
+                                    case 'double' :
+                                        $token[$parenthese_open]['cast'] = Token::TYPE_FLOAT;
+                                    break;
+                                    case 'int' :
+                                    case 'integer' :
+                                        $token[$parenthese_open]['cast'] = Token::TYPE_INT;
+                                    break;
+                                    case 'string' :
+                                        $token[$parenthese_open]['cast'] = Token::TYPE_STRING;
+                                    break;
+                                    case 'array' :
+                                        $token[$parenthese_open]['cast'] = Token::TYPE_ARRAY;
+                                    break;
+                                    case 'object' :
+                                        $token[$parenthese_open]['cast'] = Token::TYPE_OBJECT;
+                                    break;
+                                }
+                                break;
+                            }
+                            elseif($token[$i]['type'] != Token::TYPE_WHITESPACE){
+                                $cast .= $token[$i]['value'];
+                            }
+                        }
+                    }
+                    $parenthese_open = null;
+                }
+            }
+            if($hex){
+                $is_hex = Token::is_hex($record);
+                if($is_hex){
+                    $hex['value'] .= $record['value'];
+                    $hex['execute'] .= strtoupper($record['value']);
+                    unset($token[$nr]);
+                    continue;
+                } else {
+                    $token[$start] = $hex;
+                    $start = null;
+                    $hex = null;
+                }
+            }
+            if(
+                $record['type'] == Token::TYPE_NUMBER &&
+                $next !== null &&
+                $next_next !== null &&
+                $token[$next]['type'] == Token::TYPE_DOT &&
+                $token[$next_next]['type'] == Token::TYPE_NUMBER
+            ){
+                $token[$nr]['value'] .= $token[$next]['value'] . $token[$next_next]['value'];
+                $token[$nr]['type'] = Token::TYPE_FLOAT;
+                $token[$nr]['execute'] = $token[$nr]['value'] + 0;
+                $skip_unset += 2;
+                continue;
+            }
+            elseif(
+                $record['value'] == '0' &&
+                $next !== null &&
+                $token[$next]['type'] == Token::TYPE_STRING &&
+                strtolower(substr($token[$next]['value'], 0, 1)) == 'x'
+            ){
+                $hex = $record;
+                $hex['value'] .= substr($token[$next]['value'], 0, 1);
+                $hex['execute'] = $record['value'] . 'x';
+                $tmp = $token[$next];
+                $tmp['value'] = substr($token[$next]['value'], 1);
+                if(!empty($tmp['value'])){
+                    $is_hex = Token::is_hex($tmp);
+                    if($is_hex){
+                        $hex['value'] .= $tmp['value'];
+                        $hex['execute'] .= strtoupper($tmp['value']);
+                        $hex['type'] = Token::TYPE_HEX;
+                        $skip_unset += 1;
+                        continue;
+                    } else {
+                        $hex = null;
+                    }
+                }
+                if($hex){
+                    $start = $nr;
+                }
+            }
+            elseif(
+                $record['type'] == Token::TYPE_NUMBER &&
+                substr($record['value'], 0, 1) == '0' &&
+                strlen($record['value']) > 1
+            ){
+                //octal
+                $token[$nr]['execute'] = $record['value'];
+                $token[$nr]['type'] = Token::TYPE_OCT;
+            } elseif(
+                $record['type'] == Token::TYPE_NUMBER
+            ) {
+                //int
+                $token[$nr]['execute'] = $record['value'] + 0;
+                $token[$nr]['type'] = Token::TYPE_INT;
+            }
+        }
+        return $token;
+    }
+
+    public static function is_hex($record=array()){
+        if(empty($record['value'])){
+            return false;
+        }
+        $array = Token::split($record['value']);
+        foreach($array as $nr => $char){
+            $is_hex = false;
+            switch ($char){
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'D':
+                case 'E':
+                case 'F':
+                    $is_hex = true;
+                    break;
+            }
+            if(!$is_hex){
+                return false;
+            }
+        }
+        return true;
     }
 
     public static function operator($record=array(), $level=1){
         if($record['type'] != Token::TYPE_OPERATOR){
             return $record;
         }
+        $record['is_operator'] = true;
         switch($level){
             case 1 :
                 switch($record['value']){
@@ -369,6 +845,7 @@ class Token extends Core {
                         $record['type'] = Token::TYPE_PIPE;
                         return $record;
                 }
+                $record['is_operator'] = false;
             break;
             case 2 :
                 switch($record['value']){
@@ -445,30 +922,19 @@ class Token extends Core {
                         $record['type'] = Token::TYPE_COALESCE;
                         return $record;
                     case '//' :
+                        $record['is_operator'] = false;
                         $record['type'] = Token::TYPE_COMMENT_SINGLE_LINE;
                         return $record;
                     case '/*' :
-                        $record['type'] = Token::TYPE_COMMENT_OPEN;
+                        $record['is_operator'] = false;
+                        $record['type'] = Token::TYPE_COMMENT;
                         return $record;
                     case '*/' :
+                        $record['is_operator'] = false;
                         $record['type'] = Token::TYPE_COMMENT_CLOSE;
                         return $record;
                 }
-                /*
-                $current = $record;
-                $current['value'] = substr($record['value'], 0, 1);
-                $current = Token::operator($current, 1);
-                if($current['type'] != Token::TYPE_OPERATOR){
-                    $record['value'] = substr($record['value'], 1);
-                    $record['column'] += 1;
-//                     $record = Token::operator($record, 1);
-                    $current['next'] = $record;
-                } else {
-                    var_dump($current);
-                    die;
-                }
-                return $current;
-                */
+                $record['is_operator'] = false;
             break;
             case 3 :
                 switch($record['value']){
@@ -479,7 +945,8 @@ class Token extends Core {
                         $record['type'] = Token::TYPE_IS_NOT_IDENTICAL;
                         return $record;
                     case '/**' :
-                        $record['type'] = Token::TYPE_DOC_COMMENT_OPEN;
+                        $record['is_operator'] = false;
+                        $record['type'] = Token::TYPE_DOC_COMMENT;
                         return $record;
                     case '<=>' :
                         $record['type'] = Token::TYPE_IS_SPACESHIP;
@@ -500,25 +967,7 @@ class Token extends Core {
                         $record['type'] = Token::TYPE_IS_POWER_EQUAL;
                         return $record;
                 }
-                /*
-                $current = $record;
-                $current['value'] = substr($record['value'], 1, 2);
-                var_dump($current);
-                var_dump($record);
-                die;
-                $current = Token::operator($current, 2);
-                if($current['type'] != Token::TYPE_OPERATOR){
-                    $record['value'] = substr($record['value'], 0, 1);
-                    $record['column'] += 1;
-//                     $record = Token::operator($record, 1);
-                    $current['next'] = $record;
-                } else {
-                    var_dump($current);
-                    die;
-                }
-
-                return $current;
-                */
+                $record['is_operator'] = false;
             break;
         }
         return $record;
