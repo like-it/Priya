@@ -1,36 +1,27 @@
-1++12*=2
+{ if($var && is.empty(is.empty(true))==1) }
+	true
+	{if ("yes" == "yes")}
+		design
+	{elseif ("no" == "no")}
+		asshole
+	{elseif("no1" == "no1")}
+		walla
+	{/if}
+{ elseif(false === true) }
+ yes
+{ elseif(false === false) }
+	{ is.empty(null) }
+	false
+	{if ('pietje' == 'pietje') }
+nice2
+	{/if}
 
-test+==1?&?/*/!?/**// test ++s**/>
-'dit {$variable}} \' is " literal
+{ elseif(true ===  is.empty(null)) }
 
-2345235235 /**//test test **/
-{$hex = 0XFF25ae2514ab$cde} 0XFF
-{$chmod = 0666}
-
-{$test.123.456.hahaha = 'test'}
-{$test= 'dit is een \'test'}
-{$float = 123456798.123456789}
-
-
-
-{$array = []}
-{$push = array.push($array, 'test')}
-{$push = array.push($array, 'test2', 'test3')}
-{array.push($array, 'test')}
-memory usage: {memory.usage('MB')}
-{$counter=0}
-{for.each( $priya.application.constant as $constant => $value)}
-{$constant} {$counter}
-{if($counter > 3)}
-	{break(25555)}
-{/if}
-{$counter++}
-{/for.each}
-/*
-comment
-*/
+	nice
 
 
-/**
-doc comment
-**/
+{ else }
+	else
+{ / if }
+wat is dit dan

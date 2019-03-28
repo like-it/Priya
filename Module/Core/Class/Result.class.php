@@ -139,10 +139,14 @@ class Result extends Parser {
             }
         }
         $parser = new Parse($object->handler(), $object->route(), $object->data());
-        $execute = $parser->read($url);
-        echo $execute;
-        $object->data($parser->data());
-//         return $execute;
+
+        try {
+            $execute = $parser->read($url);
+            $object->data($parser->data());
+            return $execute;
+        } catch (Exception $e) {
+            return $e;
+        }
     }
 
     /*

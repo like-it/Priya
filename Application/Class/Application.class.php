@@ -53,7 +53,7 @@ class Application extends Parser {
     const CACHE_ROUTE = '+ 1 minute'; //rename to OBJECT_ROUTE_CACHE or  OBJECT_ROUTE_INTERVAL
     const CACHE_ROUTE_URL = 'Route.object.php'; //rename to OBJECT_ROUTE
 
-    const OBJECT_INIT_URL = 'Init.object.php';
+    const OBJECT_INIT_URL = 'Init.object.json';
     const OBJECT_INIT_INTERVAL = '+ 1 minute';
 
     const ARRAY_INIT = [
@@ -635,7 +635,12 @@ class Application extends Parser {
 
     public function read($url=''){
         $this->data('time.' . $url . '.start', microtime(true));
-        $read = parent::read($url);
+
+        try {
+            $read = parent::read($url);
+        } catch (Exception $e) {
+            return $e;
+        }
         $this->data('time.' . $url . '.end', microtime(true));
         $this->data('time.' . $url . '.duration', $this->data('time.' . $url . '.end') - $this->data('time.' . $url . '.start'));
         return $read;

@@ -38,7 +38,7 @@ class Data extends Core {
         return $is_empty;
     }
 
-    public function data($attribute=null, $value=null, $type=null){
+    public function data($attribute=null, $value=null){
         if($attribute !== null){
             if($attribute == 'set'){
                 $this->object_delete($value, $this->data()); //for sorting an object

@@ -1,0 +1,17 @@
+{
+	"priya" : {
+		"parse" : {
+			"dir" : {
+				"modifier" : [
+					"{$priya.dir.module}Parse/Modifier/"
+				],
+				"function" : [
+					"{$priya.dir.module}Parse/Function/"
+				]
+			},
+			"translation" : {
+				"url" : "{$priya.dir.module}Parse/Translation/Default.json"
+			}
+		}
+	}
+}

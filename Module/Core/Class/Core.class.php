@@ -1083,14 +1083,27 @@ class Core {
         return $return;
     }
 
+    public static function object_is_empty($object=null){
+        if(!is_object($object)){
+            return true;
+        }
+        $is_empty = true;
+        foreach ($object as $attribute => $value){
+            $is_empty = false;
+            break;
+        }
+        return $is_empty;
+    }
+
     public function object_get($attributeList=array(), $object=''){
-        $array = (array) $object;
-        if(empty($array)){
-            return $object;
+        if(Core::object_is_empty($object)){
+            if(empty($attributeList)){
+                return $object;
+            }
+            return null;
         }
         if(is_string($attributeList)){
             $attributeList = $this->explode_multi(array('.',':', '->'), $attributeList);
-
             foreach($attributeList as $nr => $attribute){
                 if(empty($attribute)){
                     unset($attributeList[$nr]);
