@@ -16,8 +16,7 @@ class Variable extends Core {
             $attribute = substr($variable['value'], 1);
             $variable['execute'] = $parse->data($attribute);
             $variable = Variable::modify($parse, $variable, $token, $keep);
-            var_dump($variable);
-            die;
+            $variable['is_executed'] = true;
         }
         return $variable;
     }

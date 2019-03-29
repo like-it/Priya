@@ -2889,6 +2889,21 @@ class Token extends Core {
         return $record;
     }
 
+    public static function value_string_execute(Parse $parse, $record=[], $token=[]){
+        if(
+            $record['type'] == Token::TYPE_STRING &&
+            substr($record['value'], 0, 1) == '"' &&
+            substr($record['value'], -1, 1) == '"'
+        ){
+            $string = substr($record['value'], 1, -1);
+            $string = $parse->compile($string);
+            $record['execute'] = $string;
+            $record['is_executed'] = true;
+            $token[$record['token']['nr']] = $record;
+        }
+        return $token;
+    }
+
     public static function value_variable_execute(Parse $parse, $record=[]){
         if(!is_array($record)){
             return [];
@@ -2913,11 +2928,6 @@ class Token extends Core {
         if($method['type'] != Token::TYPE_METHOD){
             return $token;
         }
-        var_dump($count);
-        if($count > 10){
-            echo 'yep';
-            die;
-        }
         if(isset($method['method']['is_executed'])){
             var_dump('found');
             die;
@@ -2929,7 +2939,6 @@ class Token extends Core {
         $is_method = false;
         foreach($location as $dir){
             $url = $dir . $file_name;
-            var_dump($url);
             if($parse->data('priya.parse.function.' . $url) === true){
                 $is_method = true;
                 break;
@@ -3086,7 +3095,6 @@ class Token extends Core {
         $is_function = false;
         foreach($location as $dir){
             $url = $dir . $file_name;
-            var_dump($url);
             if($parse->data('priya.parse.function.' . $url) === true){
                 $is_function = true;
                 break;
@@ -3102,6 +3110,11 @@ class Token extends Core {
             }
         }
         if($is_function === true){
+            if(!isset($record['method']['parameter'])){
+                $debug = debug_backtrace(true);
+                var_dump($debug);
+                die;
+            }
             foreach($record['method']['parameter'] as $nr => $parameter){
                 $parameter = Token::set_execute($parse, $parameter, $token);
                 if(isset($parameter[1])){
@@ -3141,6 +3154,8 @@ class Token extends Core {
         $value = $token[$value['token']['nr']];
         $value = Token::value_array_execute($parse, $value);
         $value = Token::value_object_execute($parse, $value);
+        $token = Token::value_string_execute($parse, $value, $token);
+        $value = $token[$value['token']['nr']];
         if(!isset($value['is_executed'])){
             var_dump($value);
             die;
@@ -3503,17 +3518,10 @@ class Token extends Core {
                 $string .= $record['execute'];
                 $remove_whitespace = false;
             }
-            if(!isset($record['execute'])){
+            if(!isset($record['is_executed'])){
                 if(isset($record['value'])){
                     $record['execute'] = $record['value'];
-                } else {
-                    var_dump(debug_backtrace(true));
-                    die;
-                    var_dump($record);
-                    var_dump($token);
-                    die;
                 }
-
             }
             if($record['type'] == Token::TYPE_LITERAL){
                 $string .= $record['tag'];
@@ -3525,6 +3533,11 @@ class Token extends Core {
                 $record['variable']['is_assign'] === true
             ){
                 $remove_whitespace = true;
+            }
+            if(is_object($record['execute'])){
+                var_Dump($string);
+                var_dump($record);
+                die;
             }
             $string .= $record['execute'];
         }

@@ -93,13 +93,6 @@ class Parse extends Base {
                     $tag_open_nr === null
                 ){
                     $tag_open_nr = $nr;
-                    var_dump($nr);
-                    var_Dump($record);
-                    if(!isset($token[$nr])){
-                        var_dump($token);
-                        die;
-                    }
-                    var_Dump($token[$nr]);
                 }
             }
             elseif(
@@ -332,7 +325,6 @@ class Parse extends Base {
                 $tag = Token::tag_find($string);
                 $string = Token::literal_remove($string, $tag);
             }
-            var_dump($string);
             return $string;
         }
     }

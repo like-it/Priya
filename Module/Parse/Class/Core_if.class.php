@@ -399,26 +399,77 @@ class Core_if extends Core {
         return $list;
     }
 
-    /*
-    public static function value($if=[]){
-        $value = $if['value'];
-        if(isset($if['method']['if'])){
-            $value .= Token::string($if['method']['if']);
+    public static function cleanup($if=[], $token=[]){
+        if(!isset($if['token'])){
+            return $token;
         }
-        if(!empty($if['method']['elseif'])){
-            foreach($if['method']['elseif'] as $nr => $elseif){
-                $value .= Token::string($elseif['method']['content']);
+        if(!isset($if['token']['nr'])){
+            return $token;
+        }
+        $previous = null;
+        $previous_previous = null;
+        $previous_previous_previous = null;
+        for($i = $if['token']['nr'] - 1; $i >= 0 ; $i--){
+            if(
+                $previous === null &&
+                isset($token[$i])
+                ){
+                    $previous = $i;
+                    continue;
             }
-            var_dump($value);
-            die;
+            elseif(
+                $previous !== null &&
+                $previous_previous === null &&
+                isset($token[$i])
+                ){
+                    $previous_previous = $i;
+            }
+            elseif(
+                $previous_previous !== null &&
+                isset($token[$i])
+                ){
+                    $previous_previous_previous = $i;
+                    break;
+            }
         }
-        if(!empty($if['method']['else'])){
-            $value .= Token::string($if['method']['else']);
+        if(
+            $previous !== null &&
+            $previous_previous !== null &&
+            $token[$previous]['type'] == Token::TYPE_WHITESPACE &&
+            $token[$previous_previous]['type'] == Token::TYPE_CURLY_OPEN
+        ){
+            unset($token[$previous]);
+            unset($token[$previous_previous]);
+            if(
+                isset($previous_previous_previous) &&
+                isset($token[$previous_previous_previous])
+            ){
+                $explode = explode("\n", $token[$previous_previous_previous]['value']);
+                $count = count($explode);
+                if(trim($explode[$count - 1]) == ''){
+                    $explode[$count - 1] = '';
+                }
+                $token[$previous_previous_previous]['value'] = implode("\n", $explode);
+            }
         }
-        $if['value'] = $value;
-        return $if;
+        elseif(
+            $previous !== null &&
+            $token[$previous]['type'] == Token::TYPE_CURLY_OPEN
+        ){
+            if(
+                isset($previous_previous) &&
+                isset($token[$previous_previous])
+            ){
+                $explode = explode("\n", $token[$previous_previous]['value']);
+                $count = count($explode);
+                if($count > 1 && trim($explode[$count - 1]) == ''){
+                    $explode[$count - 1] = '';
+                }
+                $token[$previous_previous]['value'] = implode("\n", $explode);
+            }
+        }
+        return $token;
     }
-    */
 
     public static function execute(Parse $parse, $if=[], $token=[], $keep=false, $need_tag=true){
         if(!isset($if['type'])){
@@ -434,14 +485,10 @@ class Core_if extends Core {
                 throw new Exception('Parse error: unexpected , in if statement starting at line: ' . $if['row'] . ' column: ' . $if['column'] . ' in: ' . $parse->data('priya.parse.read.url'));
                 // we might do a logical and for this...
             }
-            $count = 0;
             if($parameter[0] === false){
                 if(isset($if['method']['elseif'][0])){
                     $if['method']['elseif'] = Core_if::create_elseif($if['method']['elseif'], $need_tag);
                     foreach($if['method']['elseif'] as $nr => $elseif){
-                        $count++;
-                        var_dump($count);
-                        ob_flush();
                         $parameter = Token::set_execute($parse, $elseif['method']['parameter'][0], $token);
                         if(isset($parameter[1])){
                             throw new Exception('Parse error: unexpected , in if statement starting at line: ' . $elseif['row'] . ' column: ' . $elseif['column'] . ' in: ' . $parse->data('priya.parse.read.url'));
@@ -456,8 +503,25 @@ class Core_if extends Core {
                             $if['is_executed'] = true;
                             $if = Token::value_type($if, 'execute');
                             $token[$if['token']['nr']] = $if;
+                            $token = Core_if::cleanup($if, $token);
                             break;
                         }
+                    }
+                }
+                if(!isset($if['is_executed'])){
+                    if(!empty($if['method']['else'])){
+                        $execute = $parse->execute($if['method']['else'], true);
+                        $if['execute'] = Token::string($execute);
+                        $if['is_executed'] = true;
+                        $if = Token::value_type($if, 'execute');
+                        $token[$if['token']['nr']] = $if;
+                        $token = Core_if::cleanup($if, $token);
+                    } else {
+                        $if['execute'] = null;
+                        $if['is_executed'] = true;
+                        $if = Token::value_type($if, 'execute');
+                        $token[$if['token']['nr']] = $if;
+                        $token = Core_if::cleanup($if, $token);
                     }
                 }
             }
@@ -467,6 +531,7 @@ class Core_if extends Core {
                 $if['is_executed'] = true;
                 $if = Token::value_type($if, 'execute');
                 $token[$if['token']['nr']] = $if;
+                $token = Core_if::cleanup($if, $token);
             } else {
                 throw new Exception('Parameter should have been executed....');
             }

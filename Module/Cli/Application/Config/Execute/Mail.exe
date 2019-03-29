@@ -12,7 +12,7 @@
 { elseif(false === false) }
 	{ is.empty(null) }
 	false
-	{if ('pietje' == 'pietje') }
+	blah {if ("pietje{$priya.parse.read.url}" === "pietje{$priya.parse.read.url}") }
 nice2
 	{/if}
 
@@ -25,3 +25,16 @@ nice2
 	else
 { / if }
 wat is dit dan
+/**
+
+token till foreach, while, can echo & unset
+
+foreach ()
+	xyz
+	foreach()
+		abc
+		terminal.readline('def');
+
+
+
+**/
