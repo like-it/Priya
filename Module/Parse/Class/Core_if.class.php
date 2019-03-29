@@ -193,6 +193,9 @@ class Core_if extends Core {
                 $end['type'] == Token::TYPE_CURLY_OPEN
             ){
                 //do nothing
+                if(isset($end_end)){
+                    $content['if'][$end_end['token']['nr']] = $end_end;
+                }
             } else {
                 if(isset($end_end)){
                     $content['if'][$end_end['token']['nr']] = $end_end;

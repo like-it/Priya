@@ -13,12 +13,11 @@
 	{ is.empty(null) }
 	false
 	blah {if ("pietje{$priya.parse.read.url}" === "pietje{$priya.parse.read.url}") }
-nice2
-	{/if}
+nicer2{/if}
 
 { elseif(true ===  is.empty(null)) }
 
-	nice
+	nice3
 
 
 { else }
