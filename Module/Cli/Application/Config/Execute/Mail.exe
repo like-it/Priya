@@ -1,39 +1,22 @@
-{ if($var && is.empty(is.empty(true))==1) }
-	true
-	{if ("yes" == "yes")}
-		design
-	{elseif ("no" == "no")}
-		asshole
-	{elseif("no1" == "no1")}
-		walla
-	{/if}
-{ elseif(false === true) }
- yes
-{ elseif(false === false) }
-	{ is.empty(null) }
-	false
-	blah {if ("pietje{$priya.parse.read.url}" === "pietje{$priya.parse.read.url}") }
-nicer2{/if}
-
-{ elseif(true ===  is.empty(null)) }
-
-	nice3
-
-
-{ else }
-	else
-{ / if }
-wat is dit dan
-/**
-
-token till foreach, while, can echo & unset
-
-foreach ()
-	xyz
-	foreach()
-		abc
-		terminal.readline('def');
-
-
-
-**/
+{ $count = -10.12 }
+abc
+{if ($shit == true)}
+no
+{elseif(true == false)}
+yeah men
+{else}
+	'nice if elseif else function'
+{/if}{while(true) }a{while(true) }b{ if($count > 3) }{ if (true === true) }yes
+			{ /if }
+			{$test = 1 + 3}
+			aza
+			{$user = terminal.readline("user: ") }
+			shit
+			{break(30)}
+		{ /if }{$count**}a
+{$count}
+{$master = terminal.readline("master: ") }
+	{ /while }
+yo
+{/while}
+abc

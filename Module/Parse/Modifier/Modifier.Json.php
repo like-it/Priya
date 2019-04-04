@@ -13,7 +13,6 @@ function modifier_json(Parse $parse, $variable=[], $parameter=[], $token=[], $ke
     if(!is_array($parameter)){
         $parameter = (array) $parameter;
     }
-
     if(
         is_string($variable['execute']) &&
         (
@@ -41,5 +40,7 @@ function modifier_json(Parse $parse, $variable=[], $parameter=[], $token=[], $ke
     } else {
         $variable['execute'] = json_encode($variable['execute'], JSON_PRETTY_PRINT);
     }
-    return $variable;
+    $variable['is_executed'] = true;
+    $token[$variable['token']['nr']] = $variable;
+    return $token;
 }

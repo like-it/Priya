@@ -26,8 +26,6 @@ class Core_if extends Core {
             'elseif' => [],
             'else' => null
         ];
-        $count_if = 0;
-        $count_else = 0;
         foreach($token as $nr => $record){
             if($skip > 0){
                 $skip--;
@@ -109,9 +107,8 @@ class Core_if extends Core {
                     $is_whitespace === false &&
                     $record['type'] == Token::TYPE_WHITESPACE
                 ){
-                    $record = Token::remove_empty_line($record);
+                    $record = Token::remove_empty_line($record, 'value');
                     $content['if'][$record['token']['nr']] = $record;
-                    $count_if++;
                     $is_whitespace = true;
                     continue;
                 }
@@ -169,11 +166,9 @@ class Core_if extends Core {
                             $else_start_start_start = $record['token']['nr'];
                         }
                     }
-                    $count_else++;
                 }
                 else {
                     $content['if'][$record['token']['nr']] = $record;
-                    $count_if++;
                 }
             }
         }
@@ -192,7 +187,6 @@ class Core_if extends Core {
                 isset($end) &&
                 $end['type'] == Token::TYPE_CURLY_OPEN
             ){
-                //do nothing
                 if(isset($end_end)){
                     $content['if'][$end_end['token']['nr']] = $end_end;
                 }
@@ -213,14 +207,16 @@ class Core_if extends Core {
                         isset($end_end) &&
                         $end['type'] == Token::TYPE_WHITESPACE &&
                         $end_end['type'] == Token::TYPE_CURLY_OPEN
-                        ){
-                            //do nothing
+                    ){
+                        //do nothing
                     }
                     elseif(
                         isset($end) &&
                         $end['type'] == Token::TYPE_CURLY_OPEN
-                        ){
-                            //do nothing
+                    ){
+                        if(isset($end_end)){
+                            $content['elseif'][$nr][$end_end['token']['nr']] = $end_end;
+                        }
                     } else {
                         if(isset($end_end)){
                             $content['elseif'][$nr][$end_end['token']['nr']] = $end_end;
@@ -231,7 +227,7 @@ class Core_if extends Core {
                     }
                 }
             }
-            if($count_else > 0){
+            if(!empty($content['else'])){
                 $end = array_pop($content['else']);
                 $end_end = array_pop($content['else']);
                 if(
@@ -273,7 +269,7 @@ class Core_if extends Core {
                     unset($content['else'][$else_start]);
                     unset($content['else'][$else_start_start]);
                     if($else_start_start_start !== null){
-                        $content['else'][$else_start_start_start] = Token::remove_empty_line($content['else'][$else_start_start_start]);
+                        $content['else'][$else_start_start_start] = Token::remove_empty_line($content['else'][$else_start_start_start], 'value');
                     }
                 }
                 elseif(
@@ -282,7 +278,7 @@ class Core_if extends Core {
                 ){
                     unset($content['else'][$else_start]);
                     if($else_start_start !== null){
-                        $content['else'][$else_start_start] = Token::remove_empty_line($content['else'][$else_start_start]);
+                        $content['else'][$else_start_start] = Token::remove_empty_line($content['else'][$else_start_start], 'value');
                     }
                 }
             }
@@ -372,7 +368,7 @@ class Core_if extends Core {
                 ){
                     unset($content[$nr_1]);
                     if(isset($content[$nr_2])){
-                        $content[$nr_2] = Token::remove_empty_line($content[$nr_2]);
+                        $content[$nr_2] = Token::remove_empty_line($content[$nr_2], 'value');
                     }
                 }
                 elseif(
@@ -384,7 +380,7 @@ class Core_if extends Core {
                     unset($content[$nr_1]);
                     unset($content[$nr_2]);
                     if(isset($content[$nr_3])){
-                        $content[$nr_3] = Token::remove_empty_line($content[$nr_3]);
+                        $content[$nr_3] = Token::remove_empty_line($content[$nr_3], 'value');
                     }
                 }
             }
@@ -400,78 +396,6 @@ class Core_if extends Core {
             }
         }
         return $list;
-    }
-
-    public static function cleanup($if=[], $token=[]){
-        if(!isset($if['token'])){
-            return $token;
-        }
-        if(!isset($if['token']['nr'])){
-            return $token;
-        }
-        $previous = null;
-        $previous_previous = null;
-        $previous_previous_previous = null;
-        for($i = $if['token']['nr'] - 1; $i >= 0 ; $i--){
-            if(
-                $previous === null &&
-                isset($token[$i])
-                ){
-                    $previous = $i;
-                    continue;
-            }
-            elseif(
-                $previous !== null &&
-                $previous_previous === null &&
-                isset($token[$i])
-                ){
-                    $previous_previous = $i;
-            }
-            elseif(
-                $previous_previous !== null &&
-                isset($token[$i])
-                ){
-                    $previous_previous_previous = $i;
-                    break;
-            }
-        }
-        if(
-            $previous !== null &&
-            $previous_previous !== null &&
-            $token[$previous]['type'] == Token::TYPE_WHITESPACE &&
-            $token[$previous_previous]['type'] == Token::TYPE_CURLY_OPEN
-        ){
-            unset($token[$previous]);
-            unset($token[$previous_previous]);
-            if(
-                isset($previous_previous_previous) &&
-                isset($token[$previous_previous_previous])
-            ){
-                $explode = explode("\n", $token[$previous_previous_previous]['value']);
-                $count = count($explode);
-                if(trim($explode[$count - 1]) == ''){
-                    $explode[$count - 1] = '';
-                }
-                $token[$previous_previous_previous]['value'] = implode("\n", $explode);
-            }
-        }
-        elseif(
-            $previous !== null &&
-            $token[$previous]['type'] == Token::TYPE_CURLY_OPEN
-        ){
-            if(
-                isset($previous_previous) &&
-                isset($token[$previous_previous])
-            ){
-                $explode = explode("\n", $token[$previous_previous]['value']);
-                $count = count($explode);
-                if($count > 1 && trim($explode[$count - 1]) == ''){
-                    $explode[$count - 1] = '';
-                }
-                $token[$previous_previous]['value'] = implode("\n", $explode);
-            }
-        }
-        return $token;
     }
 
     public static function execute(Parse $parse, $if=[], $token=[], $keep=false, $need_tag=true){
@@ -492,53 +416,135 @@ class Core_if extends Core {
                 if(isset($if['method']['elseif'][0])){
                     $if['method']['elseif'] = Core_if::create_elseif($if['method']['elseif'], $need_tag);
                     foreach($if['method']['elseif'] as $nr => $elseif){
-                        $parameter = Token::set_execute($parse, $elseif['method']['parameter'][0], $token);
-                        if(isset($parameter[1])){
+                        if(isset($elseif['method']['parameter'][1])){
                             throw new Exception('Parse error: unexpected , in if statement starting at line: ' . $elseif['row'] . ' column: ' . $elseif['column'] . ' in: ' . $parse->data('priya.parse.read.url'));
                             // we might do a logical and for this...
                         }
-                        elseif(
-                            isset($parameter[0]['is_executed']) &&
-                            $parameter[0]['execute'] === true
+                        $execute = current($elseif['method']['parameter'][0]);
+                        $token = Token::set_execute($parse, $elseif['method']['parameter'][0], $execute, $token);
+                        $execute = $token[$execute['token']['nr']];
+                        if(
+                            isset($execute['is_executed']) &&
+                            $execute['execute'] === true
                         ){
-                            $execute = $parse->execute($elseif['method']['content'], true);
+                            $before = [];
+                            foreach($token as $key => $value){
+                                if($key == $if['token']['nr']){
+                                    break;
+                                }
+                                $before[$key] = $value;
+                            }
+                            foreach($elseif['method']['content'] as $key => $value){
+                                $before[$key] = $value;
+                            }
+                            $before = $parse->execute($before, true);
+                            $execute = [];
+                            foreach($elseif['method']['content'] as $key => $value){
+                                $execute[$key] = $before[$key];
+                                unset($before[$key]);
+                            }
+                            foreach($before as $key => $value){
+                                $token[$key] = $value;
+                            }
+                            unset($before);
                             $if['execute'] = Token::string($execute);
                             $if['is_executed'] = true;
                             $if = Token::value_type($if, 'execute');
                             $token[$if['token']['nr']] = $if;
-                            $token = Core_if::cleanup($if, $token);
                             break;
                         }
                     }
                 }
                 if(!isset($if['is_executed'])){
                     if(!empty($if['method']['else'])){
-                        $execute = $parse->execute($if['method']['else'], true);
+                        $before = [];
+                        foreach($token as $key => $value){
+                            if($key == $if['token']['nr']){
+                                break;
+                            }
+                            $before[$key] = $value;
+                        }
+                        foreach($if['method']['else'] as $key => $value){
+                            $before[$key] = $value;
+                        }
+                        $before = $parse->execute($before, true);
+                        $execute = [];
+                        foreach($if['method']['else'] as $key => $value){
+                            $execute[$key] = $before[$key];
+                            unset($before[$key]);
+                        }
+                        foreach($before as $key => $value){
+                            $token[$key] = $value;
+                        }
+                        unset($before);
                         $if['execute'] = Token::string($execute);
                         $if['is_executed'] = true;
                         $if = Token::value_type($if, 'execute');
                         $token[$if['token']['nr']] = $if;
-                        $token = Core_if::cleanup($if, $token);
                     } else {
                         $if['execute'] = null;
                         $if['is_executed'] = true;
                         $if = Token::value_type($if, 'execute');
                         $token[$if['token']['nr']] = $if;
-                        $token = Core_if::cleanup($if, $token);
                     }
                 }
             }
             elseif($parameter[0] === true){
-                $execute = $parse->execute($if['method']['if'], true);
+                $before = [];
+                foreach($token as $key => $value){
+                    if($key == $if['token']['nr']){
+                        break;
+                    }
+                    $before[$key] = $value;
+                }
+                $end = array_pop($before);
+                $end_end = array_pop($before);
+
+                if(
+                    isset($end) &&
+                    isset($end_end) &&
+                    $end['type'] == Token::TYPE_WHITESPACE &&
+                    $end_end['type'] == Token::TYPE_CURLY_OPEN
+                ){
+                    //do nothing
+                }
+                elseif(
+                    isset($end) &&
+                    $end['type'] == Token::TYPE_CURLY_OPEN
+                ){
+                    $before[$end_end['token']['nr']] = $end_end;
+                }
+                foreach($if['method']['if'] as $key => $value){
+                    $before[$key] = $value;
+                }
+                $before = $parse->execute($before, 2);
+                $execute = [];
+                foreach($if['method']['if'] as $key => $value){
+                    if(isset($before[$key])){
+                        $execute[$key] = $before[$key];
+                        unset($before[$key]);
+                    }
+                }
+                foreach($before as $key => $value){
+                    $token[$key] = $value;
+                }
+                $end = array_pop($execute);
+                $end = Token::remove_empty_line($end, 'value', false);
+                $execute[$end['token']['nr']] = $end;
+                unset($before);
                 $if['execute'] = Token::string($execute);
                 $if['is_executed'] = true;
                 $if = Token::value_type($if, 'execute');
                 $token[$if['token']['nr']] = $if;
-                $token = Core_if::cleanup($if, $token);
             } else {
                 throw new Exception('Parameter should have been executed....');
             }
         }
+        /*
+        if(null !== $parse->data('priya.parse.flush.nr')){
+            $parse->data('priya.parse.flush.nr', $if['token']['nr'] - 1);
+        }
+        */
         return $token;
     }
 }

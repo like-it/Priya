@@ -76,13 +76,56 @@ class Parse extends Base {
     }
 
     public function execute($token=[], $is_debug=false){
+        if($this->data('priya.parse.halt')){
+            $break = [];
+            foreach($token as $nr => $record){
+                if(
+                    null !== $this->data('priya.parse.break.nr') &&
+                    $nr > $this->data('priya.parse.break.nr')
+                ){
+                    break;
+                }
+                $break[$nr] = $record;
+            }
+            return $break;
+        }
         $tag_open_nr = null;
         $tag_close_nr = null;
         $depth = 0;
         $keep = false;
         $count = 0;
-//         var_dump($token);
         foreach($token as $nr => $record){
+            if($this->data('priya.parse.halt')){
+                $break = [];
+                foreach($token as $nr => $record){
+                    if(
+                        null !== $this->data('priya.parse.break.nr') &&
+                        $nr > $this->data('priya.parse.break.nr')
+                    ){
+                            break;
+                    }
+                    $break[$nr] = $record;
+                }
+                return $break;
+            }
+            if(
+                isset($token[$nr]['is_parsed']) ||
+                isset($token[$nr]['in_execution'])
+            ){
+                if(
+                    $tag_open_nr !== null &&
+                    $tag_close_nr !== null
+                ){
+                    for($i = $tag_open_nr; $i <= $tag_close_nr; $i++){
+                        if($i == $nr){
+                            continue;
+                        } else {
+                            unset($token[$i]);
+                        }
+                    }
+                }
+                continue;
+            }
             if(
                 isset($token[$nr]) &&
                 $token[$nr]['value'] == '{'
@@ -113,7 +156,7 @@ class Parse extends Base {
             ){
                 $count++;
                 $create = Token::create($token, $tag_open_nr, $tag_close_nr);
-                /*
+
                 if(isset($create[1])){
                     var_dump($create);
                     $source = $this->data('priya.parse.read.url');
@@ -123,41 +166,47 @@ class Parse extends Base {
                         throw new Exception('Multiple expressions found in single expression mode on line: ' . $create[1]['row'] . ' column: ' . $create[1]['column']);
                     }
                 }
-                */
-                if($count >= 10){
-                    var_dump('ww');
-                    die;
-                }
-                if($is_debug === true && $count > 2){
-                    if(empty($create)){
-                        var_dump($token);
-                        var_dump($tag_open_nr);
-                        var_dump($tag_close_nr);
-//                         var_dump(debug_backtrace(true));
-                        die;
-                    }
-                    var_Dump($count);
-                    var_dump($create);
-                    var_dump($tag_open_nr);
-                    var_dump($tag_close_nr);
-                    var_dump($token);
-//                     var_dump($create[0]['method']['parameter'][0]);
-                    die;
-                }
-
-
-//                 var_dump($create);
                 $create = array_shift($create);
                 switch($create['type']){
-                    case 'variable' :
-                        $create = Variable::execute($this, $create, $token, $keep);
-                        break;
-                    case 'method' :
+                    case Token::TYPE_VARIABLE :
+                        if($create['variable']['name'] == '$user'){
+//                             var_dump($token);
+//                             die;
+                        }
+                        $token = Variable::execute($this, $create, $token, $keep);
+                        /*
+                        if($create['variable']['name'] == '$user'){
+                            var_dump($token);
+
+                            die;
+                        }
+                        */
+                        $token = Variable::cleanup($token, $create, $tag_open_nr, $tag_close_nr);
+                        $token[$create['token']['nr']]['is_parsed'] = true;
+                        $token = $this->execute($token);
+                        if($create['variable']['name'] == '$user'){
+//                             var_dump($token);
+//                             die;
+                        }
+
+                        $create = null;
+                    break;
+                    case Token::TYPE_METHOD :
                         //should return token
                         $token = Method::execute($this, $create, $token, $keep, true, $count);
+                        $token[$create['token']['nr']]['is_parsed'] = true;
                         $token = $this->execute($token);
+                        if($create['method']['name'] == 'break'){
+//                             var_Dump($token);
+//                             die;
+                        }
                         $create = null;
-                        break;
+                    break;
+                    case Token::TYPE_TAG_CLOSE :
+                        $create['execute'] = null;
+                        $create['is_executed'] = true;
+                        $create['is_parsed'] = true;
+                    break;
                     default:
                         if(!isset($create['is_executed'])){
                             var_dump($create);
@@ -167,13 +216,11 @@ class Parse extends Base {
                         }
                         break;
                 }
-                if($create !== null){
-                    $token[$tag_open_nr] = $create;
-                    for($i = $tag_open_nr + 1; $i <= $tag_close_nr; $i++){
-                        unset($token[$i]);
-                    }
-                }
 
+                if($create !== null){
+                    var_dump($create);
+                    die;
+                }
                 $tag_open_nr = null;
                 $tag_close_nr = null;
             }
@@ -181,14 +228,10 @@ class Parse extends Base {
         return $token;
     }
 
-
     public function compile($string, $data=null, $keep=false, $root=true){
         if($data !== null){
             $this->data($data);
             $data = null;
-        }
-        if($this->data('priya.parser.halt')){
-            return '';
         }
         if(is_array($string)){
             foreach($string as $nr => $line){
@@ -213,113 +256,13 @@ class Parse extends Base {
             $token = Token::tag_activate($token, Token::TYPE_LITERAL, true, true);
             $token = Token::tag_activate($token, Token::TYPE_REM);
             $token = Token::comment_remove($token);
-            $tag_open_nr = null;
-            $tag_close_nr = null;
+
 
             if($this->data('priya.parse.is.code') === true){
                 var_dump($token);
                 die;
             }
-            $depth = 0;
-
-//             $token = $this->execute($token);
-
-            foreach($token as $nr => $record){
-//                 var_dump($record);
-
-                /*
-                if($record['type'] == Token::TYPE_REM){
-                    $token[$nr] = Code::find($this, $record);
-                    var_dump($token[$nr]);
-                    die;
-                }
-                */
-
-                if(
-                    isset($token[$nr]) &&
-                    $token[$nr]['value'] == '{'
-
-                ){
-                    $depth++;
-                    if(
-                        $depth == 1 &&
-                        $tag_open_nr === null
-                    ){
-                        $tag_open_nr = $nr;
-                    }
-                }
-                elseif(
-                    isset($token[$nr]) &&
-                    $token[$nr]['value'] == '}'){
-                    if(
-                        $depth == 1 &&
-                        $tag_open_nr !== null
-                    ){
-                        $tag_close_nr = $nr;
-                    }
-                    $depth--;
-                }
-
-
-/*
-                if($record['value'] == '{'){
-                    $depth++;
-                    if($depth == 1){
-                        $tag_open_nr = $nr;
-                    }
-                }
-                elseif($record['value'] == '}'){
-                    if($depth == 1){
-                        $tag_close_nr = $nr;
-                    }
-                    $depth--;
-                }
-*/
-                if(
-                    $tag_open_nr !== null &&
-                    $tag_close_nr !== null
-                ){
-                    $create = Token::create($token, $tag_open_nr, $tag_close_nr);
-                    if(isset($create[1])){
-                        var_dump($create);
-                        $source = $this->data('priya.parse.read.url');
-                        if($source !== null){
-                            throw new Exception('Multiple expressions found in single expression mode on line: ' . $create[1]['row'] . ' column: ' . $create[1]['column'] . ' in: ' . $source);
-                        } else {
-                            throw new Exception('Multiple expressions found in single expression mode on line: ' . $create[1]['row'] . ' column: ' . $create[1]['column']);
-                        }
-                    }
-                    if(!isset($create[0])){
-                        var_dump($create);
-                        var_dump($tag_open_nr);
-                        var_dump($tag_close_nr);
-                        var_dump($token);
-                        die;
-                    }
-                    $create = $create[0];
-                    switch($create['type']){
-                        case 'variable' :
-                            $create = Variable::execute($this, $create, $token, $keep);
-                        break;
-                        case 'method' :
-                            //should return token
-                            //see readline function
-                            $token = Method::execute($this, $create, $token, $keep, true);
-                            $create = null;
-                        break;
-                        default:
-                            break;
-                    }
-                    if($create !== null){
-                        $token[$tag_open_nr] = $create;
-                        for($i = $tag_open_nr + 1; $i <= $tag_close_nr; $i++){
-                            unset($token[$i]);
-                        }
-                    }
-                    $tag_open_nr = null;
-                    $tag_close_nr = null;
-                }
-            }
+            $token = $this->execute($token, true);
             $string = Token::string($token);
             if($root === true){
                 $tag = Token::tag_find($string);
