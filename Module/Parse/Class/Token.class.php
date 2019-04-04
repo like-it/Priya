@@ -2361,7 +2361,7 @@ class Token extends Core {
                 $is_set = true;
             }
             if($is_set === true){
-                $set[] = $record;
+                $set[$record['token']['nr']] = $record;
                 if($record['value'] == ')' && $record['depth'] == $highest){
                     break;
                 }
@@ -2748,9 +2748,25 @@ class Token extends Core {
                     isset($replace['token']['left']['token']['nr'])
                 ){
                     //moving replace to the most left parameter instead of operator position (needed somewhere else)
-                    unset($token[$nr]);
+//                     unset($token[$nr]);
+
                     $replace['token']['nr'] = $replace['token']['left']['token']['nr'];
-                    $token[$replace['token']['left']['token']['nr']] = $replace;
+                    $remove = [];
+                    $is_insert = false;
+                    foreach($token as $key => $value){
+                        if($key == $nr){
+                            continue;
+                        }
+                        if(
+                            $is_insert === false &&
+                            $key > $replace['token']['nr']
+                        ){
+                            $remove[$replace['token']['nr']] = $replace;
+                            $s_insert = true;
+                        }
+                        $remove[$key] = $value;
+                    }
+                    $token = $remove;
                 } else {
                     var_Dump('no left hand value???');
                     var_dump($replace);
@@ -2760,7 +2776,7 @@ class Token extends Core {
             }
             if(
                 in_array(
-                        $record['value'],
+                    $record['value'],
                     [
                         '(',
                         ')'
@@ -3569,10 +3585,6 @@ class Token extends Core {
             return $set;
         }
         $count = 0;
-//         var_Dump($record);
-//         $debug = debug_backtrace(true);
-//         var_dump($debug);
-//         die;
         $set = Token::precedence($set);
         $has_operator = false;
         while(Token::set_has($set)){
@@ -3588,11 +3600,6 @@ class Token extends Core {
                         die;
                     }
                     $operator = $token[$operator['token']['nr']];
-                    if(!isset($operator['is_executed'])){
-                        var_Dump($operator);
-                    } else {
-                        var_dump($operator);
-                    }
                     $set_get = Token::operator_remove($set_get, $operator);
                 } catch (Exception $e) {
                     echo $e;
