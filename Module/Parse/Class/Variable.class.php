@@ -13,7 +13,6 @@ class Variable extends Core {
         if($variable['variable']['is_assign'] === true){
             $token = Variable::assign($parse, $variable, $token, $keep);
             $variable = $token[$variable['token']['nr']];
-//             var_dump($token);
         } else {
             $attribute = substr($variable['value'], 1);
             $variable['execute'] = $parse->data($attribute);
@@ -70,56 +69,15 @@ class Variable extends Core {
 
     }
 
-    public static function modify(Parse $parse, $variable=[], $token=[], $keep=false){
-        return Token::modifier_execute($parse, $variable, $token, $keep);
+    public static function modify(Parse $parse, $variable=[], $token=[], $keep=false, $tag_remove=true){
+        return Token::modifier_execute($parse, $variable, $token, $keep, $tag_remove);
     }
 
-    public static function value(Parse $parse, $variable=[], $token=[], $keep=false){
-        /*
-        if(!isset($variable['variable']['value'][1])){
-            $variable['variable']['value'] = $variable['variable']['value'][0];
-            if($variable['variable']['value']['type'] == Token::TYPE_VARIABLE){
-//                 $attribute =
-                var_dump($variable['variable']);
-                var_Dump('is_var');
-            }
-            elseif($variable['variable']['value']['type'] == Token::TYPE_METHOD){
-                var_dump($parse->data());
-                var_Dump('is_met');
-            }
-            die;
-        } else {
-        */
-//         var_dump($token);
-//         var_dump($variable);
-//         die;
-// Token::set_execute($parse)
-            $token = Token::set_execute($parse, $variable['variable']['value'], $variable, $token);
-//             var_dump($token);
-
-
-            /*
-            var_dump($token);
-            die;
-
-
-//             $token = Token::token_set_execute($parse, $value, $token);
-            $list = [];
-            foreach($value as $part){
-                $list[] = $part;
-            }
-            if(!isset($list[1])){
-                $variable['variable']['result'] = $list;
-                $variable['variable']['execute'] = $list[0]['execute'];
-            } else {
-                throw new Exception('Value should be down to 1, multiple left...');
-            }
-            */
-//         }
-        return $token;
+    public static function value(Parse $parse, $variable=[], $token=[], $keep=false, $tag_remove=true){
+        return Token::set_execute($parse, $variable['variable']['value'], $variable, $token, $keep, $tag_remove);
     }
 
-    public static function assign(Parse $parse, $variable=[], $token=[], $keep=false){
+    public static function assign(Parse $parse, $variable=[], $token=[], $keep=false, $tag_remove=true){
         switch($variable['variable']['operator']){
             case '=' :
                 if(!isset($token[$variable['token']['nr']])){
@@ -127,7 +85,7 @@ class Variable extends Core {
                     die;
                 }
 //                 var_dump($token[$variable['token']['nr']]);
-                $token = Variable::value($parse, $variable, $token, $keep);
+                $token = Variable::value($parse, $variable, $token, $keep, $tag_remove);
                 $variable = $token[$variable['token']['nr']];
 
                 /*
@@ -219,6 +177,5 @@ class Variable extends Core {
         }
         $token[$variable['token']['nr']] = $variable;
         return $token;
-//         return $variable;
     }
 }

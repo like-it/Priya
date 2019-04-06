@@ -1,22 +1,4 @@
-{ $count = -10.12 }
-abc
-{if ($shit == true)}
-no
-{elseif(true == false)}
-yeah men
-{else}
-	'nice if elseif else function'
-{/if}{while(true) }a{while(true) }b{ if($count > 3) }{ if (true === true) }yes
-			{ /if }
-			{$test = 1 + 3}
-			aza
-			{$user = terminal.readline("user: ") }
-			shit
-			{break(30)}
-		{ /if }{$count**}a
-{$count}
-{$master = terminal.readline("master: ") }
-	{ /while }
-yo
-{/while}
-abc
+
+{for.each($priya as $attribute | string.uppercase | string.lowercase | string.uppercase.first | string.uppercase.nth : (float) -2 + 1 - 1 | string.lowercase.nth : -2 + 1 - 1 => $value | json)}
+{$attribute}
+{/for.each}

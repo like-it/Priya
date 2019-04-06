@@ -10,7 +10,7 @@ class Core_if extends Core {
     const ELSE_IF = 'elseif';
     const ELSE = 'else';
 
-    public static function select($if=[], $token=[], $need_tag_close=true){
+    public static function select($if=[], $token=[], $tag_remove=true){
         $elseif_nr = -1;
         $skip = 0;
         $depth = null;
@@ -61,7 +61,7 @@ class Core_if extends Core {
                 $is_close === true &&
                 $is_select === false
             ){
-                if($need_tag_close === true){
+                if($tag_remove === true){
                     $end = end($token);
                     $next = null;
                     $next_next = null;
@@ -172,7 +172,7 @@ class Core_if extends Core {
                 }
             }
         }
-        if($need_tag_close === true){
+        if($tag_remove === true){
             $end = array_pop($content['if']);
             $end_end = array_pop($content['if']);
             if(
@@ -293,7 +293,7 @@ class Core_if extends Core {
         }
     }
 
-    public static function create_elseif($list=[], $need_tag_close=true){
+    public static function create_elseif($list=[], $tag_remove=true){
         if(!is_array($list)){
             return [];
         }
@@ -348,7 +348,7 @@ class Core_if extends Core {
                 }
                 elseif($is_content === true){
                     $content[$record['token']['nr']] = $record;
-                    if($need_tag_close === true){
+                    if($tag_remove === true){
                         if($nr_1 === null){
                             $nr_1 = $record['token']['nr'];
                         }
@@ -361,7 +361,7 @@ class Core_if extends Core {
                     }
                 }
             }
-            if($need_tag_close === true){
+            if($tag_remove === true){
                 if(
                     isset($content[$nr_1]) &&
                     $content[$nr_1]['type'] == Token::TYPE_CURLY_CLOSE
@@ -398,7 +398,7 @@ class Core_if extends Core {
         return $list;
     }
 
-    public static function execute(Parse $parse, $if=[], $token=[], $keep=false, $need_tag=true){
+    public static function execute(Parse $parse, $if=[], $token=[], $keep=false, $tag_remove=true){
         if(!isset($if['type'])){
             return $token;
         }
@@ -414,14 +414,14 @@ class Core_if extends Core {
             }
             if($parameter[0] === false){
                 if(isset($if['method']['elseif'][0])){
-                    $if['method']['elseif'] = Core_if::create_elseif($if['method']['elseif'], $need_tag);
+                    $if['method']['elseif'] = Core_if::create_elseif($if['method']['elseif'], $tag_remove);
                     foreach($if['method']['elseif'] as $nr => $elseif){
                         if(isset($elseif['method']['parameter'][1])){
                             throw new Exception('Parse error: unexpected , in if statement starting at line: ' . $elseif['row'] . ' column: ' . $elseif['column'] . ' in: ' . $parse->data('priya.parse.read.url'));
                             // we might do a logical and for this...
                         }
                         $execute = current($elseif['method']['parameter'][0]);
-                        $token = Token::set_execute($parse, $elseif['method']['parameter'][0], $execute, $token);
+                        $token = Token::set_execute($parse, $elseif['method']['parameter'][0], $execute, $token, $keep, $tag_remove);
                         $execute = $token[$execute['token']['nr']];
                         if(
                             isset($execute['is_executed']) &&

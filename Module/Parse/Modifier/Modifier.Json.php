@@ -10,9 +10,6 @@
 use Priya\Module\Parse;
 
 function modifier_json(Parse $parse, $variable=[], $parameter=[], $token=[], $keep=false){
-    if(!is_array($parameter)){
-        $parameter = (array) $parameter;
-    }
     if(
         is_string($variable['execute']) &&
         (

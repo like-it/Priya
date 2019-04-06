@@ -397,6 +397,7 @@ class Token extends Core {
         $comment_open_nr = null;
         $doc_comment_open_nr = null;
         $comment_single_line_nr = null;
+        $is_tag_close_nr = null;
         foreach($token as $nr => $record){
             $record['depth'] = $depth;
             $token[$nr]['depth'] = $depth;
@@ -427,27 +428,27 @@ class Token extends Core {
                     $token[$comment_open_nr]['value'] .= $record['value'];
                     $comment_open_nr = null;
                     unset($token[$nr]);
-                    $previous_nr = $nr;
+                    $previous_nr = $comment_open_nr;
                     continue;
                 }
                 elseif($doc_comment_open_nr !== null){
                     $token[$doc_comment_open_nr]['value'] .= $record['value'];
                     $doc_comment_open_nr = null;
                     unset($token[$nr]);
-                    $previous_nr = $nr;
+                    $previous_nr = $doc_comment_open_nr;
                     continue;
                 }
             }
             elseif($comment_open_nr !== null){
                 $token[$comment_open_nr]['value'] .= $record['value'];
                 unset($token[$nr]);
-                $previous_nr = $nr;
+                $previous_nr = $comment_open_nr;
                 continue;
             }
             elseif($doc_comment_open_nr !== null){
                 $token[$doc_comment_open_nr]['value'] .= $record['value'];
                 unset($token[$nr]);
-                $previous_nr = $nr;
+                $previous_nr = $doc_comment_open_nr;
                 continue;
             }
             elseif($comment_single_line_nr !== null){
@@ -461,6 +462,24 @@ class Token extends Core {
                     unset($token[$nr]);
                     $previous_nr = $nr;
                     continue;
+                }
+            }
+            elseif($is_tag_close_nr !== null){
+                if(
+                    in_array(
+                        $record['type'],
+                        Token::TYPE_NAME_BREAK
+                    )
+                ){
+                    $token[$is_tag_close_nr]['tag']['name'] = strtolower($tag_close);
+                    $is_tag_close_nr = null;
+                } else {
+                    $tag_close .= $record['value'];
+                    $token[$is_tag_close_nr]['value'] .= $record['value'];
+                    unset($token[$nr]);
+                    $previous_nr = $is_tag_close_nr;
+                    continue;
+
                 }
             }
             elseif($variable_nr !== null){
@@ -621,10 +640,9 @@ class Token extends Core {
                 $quote_single_toggle === false &&
                 $quote_double_toggle === false
             ){
-                $is_tag_close = false;
                 $tag_close = $record['value'];
                 if($token[$next]['type'] == Token::TYPE_STRING){
-                    $is_tag_close = true;
+                    $is_tag_close_nr = $nr;
                     $tag_close .= $token[$next]['value'];
                     $token[$nr]['value'] .= $token[$next]['value'];
                     $token[$nr]['type'] = Token::TYPE_TAG_CLOSE;
@@ -637,7 +655,7 @@ class Token extends Core {
                     $token[$next]['type'] == Token::TYPE_WHITESPACE &&
                     $token[$next_next]['type'] == Token::TYPE_STRING
                 ){
-                    $is_tag_close = true;
+                    $is_tag_close_nr = $nr;
                     $tag_close .= $token[$next_next]['value'];
                     $token[$nr]['value'] .=
                         $token[$next]['value'] .
@@ -899,6 +917,70 @@ class Token extends Core {
             $previous_nr = $nr;
         }
         return Token::method_list($token);
+    }
+
+    public static function method_prepare($method=[]){
+        $argument = [];
+        $count = -1;
+        if(!isset($method['method']['parameter'])){
+            $debug = debug_backtrace(true);
+            var_dump($debug);
+            var_dump($method);
+            die;
+        }
+
+        foreach($method['method']['parameter'] as $nr => $parameter){
+            $has_as = false;
+            $has_is_array_operator = false;
+            foreach($parameter as $token_nr => $record){
+                if(
+                    $record['type'] == Token::TYPE_STRING &&
+                    $record['value'] == 'as'
+                ){
+                    $has_as = true;
+                    //reorganize to 3 paramaters
+                }
+                elseif(
+                    $has_is_array_operator === false &&
+                    $record['type'] == Token::TYPE_IS_ARRAY_OPERATOR
+                ){
+                    $has_is_array_operator = true;
+                    $count = $nr;
+                    if($has_as === true){
+                        foreach($parameter as $token_nr => $record){
+                            if(
+                                $record['type'] == Token::TYPE_STRING &&
+                                $record['value'] == 'as'
+                            ){
+                                $count++;
+                                continue;
+                            }
+                            elseif($record['type'] == Token::TYPE_IS_ARRAY_OPERATOR){
+                                $count++;
+                                continue;
+                            }
+                            $record['hold_execute'] = true;
+                            $argument[$count][$token_nr] = $record;
+                        }
+                    } else {
+                        foreach($parameter as $token_nr => $record){
+                            if($record['type'] == Token::TYPE_IS_ARRAY_OPERATOR){
+                                $count++;
+                                continue;
+                            }
+                            $record['hold_execute'] = true;
+                            $argument[$count][$token_nr] = $record;
+                        }
+                    }
+                    continue 2;
+                    //reorganize to 2 or 3 paramaters
+                }
+            }
+            $count++;
+            $argument[$count] = $parameter;
+        }
+        $method['method']['parameter'] = $argument;
+        return $method;
     }
 
     public static function method_list($token=[]){
@@ -1562,6 +1644,17 @@ class Token extends Core {
         return $activate;
     }
 
+    public static function parameter_fix_whitespace($token=[]){
+        return $token;
+        foreach($token as $nr => $parameter){
+            var_dump($parameter);
+            $end = array_pop($parameter);
+            var_Dump($end);
+            die;
+
+        }
+    }
+
     public static function create_array($token=[]){
         if(!is_array($token)){
             return [];
@@ -1805,6 +1898,9 @@ class Token extends Core {
                     $modifier = [];
                     $modifier['name'] = $name;
                     $modifier['parameter'] = $parameter;
+
+
+
                     $token[$has_modifier_nr]['variable']['modifier']['list'][] = $modifier;
 //                     $token[$has_modifier_nr]['variable']['modifier'] = Token::modifier_direction($token[$has_modifier_nr]['variable']['modifier']);
                     for($i = $has_modifier_nr + 1; $i < $nr; $i++){
@@ -1863,11 +1959,8 @@ class Token extends Core {
                     if($has_parameter === false){
                         $name .= $record['value'];
                     } else {
-                        if($record['type'] == Token::TYPE_WHITESPACE){
-                            continue;
-                        }
                         if($record['is_operator'] === true){
-                            $parameter[$counter][] = $record;
+                            $parameter[$counter][$record['token']['nr']] = $record;
                             $is_parameter = true;
                             continue;
                         }
@@ -1877,20 +1970,19 @@ class Token extends Core {
                                 [
                                     Token::TYPE_PARENTHESE_OPEN,
                                     Token::TYPE_PARENTHESE_CLOSE,
-                                    Token::TYPE_EXCLAMATION
+                                    Token::TYPE_EXCLAMATION,
+                                    Token::TYPE_CAST,
+                                    Token::TYPE_WHITESPACE
                                 ]
                             )
                         ){
-                            $parameter[$counter][] = $record;
+                            $parameter[$counter][$record['token']['nr']] = $record;
                             $is_parameter = true;
                             continue;
                         }
                     }
                 } else {
-                    if($record['type'] == Token::TYPE_WHITESPACE){
-                        continue;
-                    }
-                    $parameter[$counter][] = $record;
+                    $parameter[$counter][$record['token']['nr']] = $record;
                     $has_parameter = true;
                     if(
                         in_array(
@@ -1898,7 +1990,9 @@ class Token extends Core {
                             [
                                 Token::TYPE_PARENTHESE_OPEN,
                                 Token::TYPE_PARENTHESE_CLOSE,
-                                Token::TYPE_EXCLAMATION
+                                Token::TYPE_EXCLAMATION,
+                                Token::TYPE_CAST,
+                                Token::TYPE_WHITESPACE
                             ]
                         )
                     ){
@@ -1924,7 +2018,7 @@ class Token extends Core {
         return $token;
     }
 
-    public static function modifier_execute(Parse $parse, $variable=[], $token=[], $keep=false){
+    public static function modifier_execute(Parse $parse, $variable=[], $token=[], $keep=false, $tag_remove=true){
         if($variable['type'] != Token::TYPE_VARIABLE){
             return $token;
         }
@@ -1964,6 +2058,23 @@ class Token extends Core {
                 }
             }
             if($is_modifier === true){
+                $modify['token_parameter'] = $modify['parameter'];
+                foreach($modify['parameter'] as $nr => $parameter){
+                    $execute = current($parameter);
+                    if($execute !== null){
+                        if(Token::hold_execute($parameter) === true){
+
+                        } else {
+                            $token = Token::set_execute($parse, $parameter, $execute, $token, $keep, $tag_remove);
+                            $execute = $token[$execute['token']['nr']];
+                            unset($token[$execute['token']['nr']]);
+                            $modify['parameter'][$nr] = $execute['execute'];
+                        }
+                    } else {
+                        var_dump($parameter);
+                        die;
+                    }
+                }
                 $token = $function_name($parse, $variable, $modify['parameter'], $token, $keep);
                 $variable = $token[$variable['token']['nr']];
             }
@@ -2274,34 +2385,39 @@ class Token extends Core {
         if(!is_array($token)){
             return [];
         }
-        $count = 0;
         $create = [];
         $is_whitespace_before = false;
-        foreach($token as $nr => $record){
-            if(
-                $nr > $tag_open_nr &&
-                $nr < $tag_close_nr
-            ){
+
+        if($tag_open_nr !== null && $tag_close_nr !== null){
+            foreach($token as $nr => $record){
                 if(
-                    $record['type'] == Token::TYPE_WHITESPACE &&
-                    $is_whitespace_before === false &&
-                    empty($create)
-                ){
-                    $is_whitespace_before = true;
-                    continue;
+                    $nr > $tag_open_nr &&
+                    $nr < $tag_close_nr
+                    ){
+                        if(
+                            $record['type'] == Token::TYPE_WHITESPACE &&
+                            $is_whitespace_before === false &&
+                            empty($create)
+                            ){
+                                $is_whitespace_before = true;
+                                continue;
+                        }
+                        $create[$record['token']['nr']] = $record;
                 }
-                $create[$record['token']['nr']] = $record;
-                $count++;
+                elseif($nr >= $tag_close_nr){
+                    break;
+                }
             }
-            elseif($nr >= $tag_close_nr){
-                break;
+        } else {
+            $create = $token;
+            $current = current($create);
+            if($current['type'] == Token::TYPE_WHITESPACE){
+                array_shift($create);
             }
         }
         $end = end($create);
-
         if($end['type'] == Token::TYPE_WHITESPACE){
             array_pop($create);
-            $count--;
         }
         $create = Token::create_string($create);
         $create = Token::create_cast($create);
@@ -2396,6 +2512,7 @@ class Token extends Core {
     }
 
     public static function operator_get($token=[]){
+        $left_start_nr = null;
         $left = [];
         $right = [];
         $operator = [];
@@ -2421,20 +2538,34 @@ class Token extends Core {
                     continue;
             }
             if(empty($operator)){
-                $left[] = $record;
+                $left[$record['token']['nr']] = $record;
+                if($left_start_nr === null){
+                    $left_start_nr = $record['token']['nr'];
+                }
             } else {
-                $right[] = $record;
+                $right[$record['token']['nr']] = $record;
             }
             unset($token[$nr]);
         }
         if(isset($operator['token'])){
+            $end = end($right);
+            if($end['type'] == Token::TYPE_WHITESPACE){
+                array_pop($right);
+            }
             $operator['token']['left'] = $left;
             $operator['token']['right'] = $right;
+
+            $operator['token']['left_token'] = $left;
+            $operator['token']['right_token'] = $right;
+
+        }
+        if($left_start_nr !== null){
+            $operator['token']['nr'] = $left_start_nr;
         }
         return $operator;
     }
 
-    public static function operator_execute($parse, $operator=[], $token=[]){
+    public static function operator_execute($parse, $operator=[], $token=[], $keep=false, $tag_remove=true){
         if(!is_array($operator)){
             return [];
         }
@@ -2443,8 +2574,7 @@ class Token extends Core {
         }
         if(isset($operator['token']['left'])){
             try {
-                $operator['token']['left'] = Token::value_execute($parse, $operator['token']['left'], $token);
-
+                $operator['token']['left'] = Token::value_execute($parse, $operator['token']['left'], $token, $keep, $tag_remove);
                 if(!isset($operator['token']['left']['is_executed'])){
                     throw new Exception('Left hand side isn\'t executed.');
                 }
@@ -2459,7 +2589,7 @@ class Token extends Core {
         }
         if(isset($operator['token']['right'])){
             try {
-                $operator['token']['right'] = Token::value_execute($parse, $operator['token']['right'], $token);
+                $operator['token']['right'] = Token::value_execute($parse, $operator['token']['right'], $token, $keep, $tag_remove);
                 if(!isset($operator['token']['right']['is_executed'])){
                     throw new Exception('Right hand side isn\'t executed.');
                 }
@@ -2583,6 +2713,24 @@ class Token extends Core {
                     )
                 ){
                     throw new Exception('Unsupported operand types');
+                }
+                elseif(
+                    in_array(
+                        $operator['token']['left']['type'],
+                        [
+                            Token::TYPE_INT,
+                            Token::TYPE_FLOAT
+                        ]
+                    ) &&
+                    in_array(
+                        $operator['token']['right']['type'],
+                        [
+                            Token::TYPE_INT,
+                            Token::TYPE_FLOAT
+                        ]
+                    )
+                ){
+                    $operator['execute'] = $operator['token']['left']['execute'] - $operator['token']['right']['execute'];
                 }
                 elseif($operator['token']['left']['type'] == Token::TYPE_NULL){
                     if($operator['token']['right']['type'] == Token::TYPE_ARRAY){
@@ -2725,69 +2873,97 @@ class Token extends Core {
         $operator['is_executed'] = true;
         $operator = Token::value_type($operator);
 
-        $token[$operator['token']['nr']] = $operator;
-        //can't do value type yet...
+        $token = Token::operator_replace($token, $operator);
+        //can't do value type yet... ?
         return $token;
     }
+
+    public static function operator_replace($token=[], $replace=[]){
+        $is_replace = false;
+        $left = $replace['token']['left_token'];
+        $right = $replace['token']['right_token'];
+        foreach($token as $nr => $record){
+            if(
+                $is_replace === false &&
+                $nr == $replace['token']['nr']
+            ){
+                $end = end($replace['token']['right_token']);
+                for($i = $nr + 1; $i <= $end['token']['nr']; $i++){
+                    unset($token[$i]);
+                }
+                $token[$nr] = $replace;
+                $is_replace = true;
+                unset($left[$replace['token']['nr']]);
+            }
+
+            if($is_replace ===true){
+                foreach($left as $key => $value){
+                    unset($left[$key]);
+                    unset($token[$key]);
+                }
+                foreach($right as $key => $value){
+                    unset($right[$key]);
+                    unset($token[$key]);
+                }
+                break;
+            }
+        }
+        return $token;
+    }
+
 
     public static function token_operator_remove($operator=[], $token=[]){
 
     }
 
     public static function operator_remove($token=[], $replace=[]){
-        $operator = [];
-        foreach($token as $nr => $record){
-            if($record['is_operator'] === true){
-                if(!empty($operator)){
-                    break;
-                }
-                $operator = $record;
-                if(
-                    isset($replace['token']['left']) &&
-                    isset($replace['token']['left']['token']) &&
-                    isset($replace['token']['left']['token']['nr'])
-                ){
-                    //moving replace to the most left parameter instead of operator position (needed somewhere else)
-//                     unset($token[$nr]);
+        $is_replace = false;
+        $left = $replace['token']['left_token'];
+        $right = $replace['token']['right_token'];
 
-                    $replace['token']['nr'] = $replace['token']['left']['token']['nr'];
-                    $remove = [];
-                    $is_insert = false;
-                    foreach($token as $key => $value){
-                        if($key == $nr){
-                            continue;
-                        }
-                        if(
-                            $is_insert === false &&
-                            $key > $replace['token']['nr']
-                        ){
-                            $remove[$replace['token']['nr']] = $replace;
-                            $s_insert = true;
-                        }
-                        $remove[$key] = $value;
-                    }
-                    $token = $remove;
-                } else {
-                    var_Dump('no left hand value???');
-                    var_dump($replace);
-                    die;
+
+        $operator = [];
+        $result = [];
+        foreach($token as $nr => $record){
+            foreach($replace['token']['left_token'] as $key => $value){
+                if($nr == $key){
+                    continue 2;
                 }
-                continue;
             }
-            if(
-                in_array(
-                    $record['value'],
-                    [
-                        '(',
-                        ')'
-                    ]
-                )
-            ){
-                continue;
+            foreach($replace['token']['right_token'] as $key => $value){
+                if($nr == $key){
+                    continue 2;
+                }
             }
-            unset($token[$nr]);
+            if($nr == $replace['token']['nr']){
+                var_dump($nr);
+                var_dump($token);
+                var_dump($replace);
+
+                die;
+
+                var_dump($replace['token']['left']['token']);
+//                 die;
+                if(isset($replace['token']['left']['token'])){
+                        //moving replace to the most left parameter instead of operator position (needed somewhere else)
+                        $replace['token']['nr'] = $replace['token']['left']['token']['nr'];
+
+                        if(isset($token[$replace['token']['nr']])){
+                            $result[$replace['token']['nr']] = $replace;
+                        } else {
+                            var_dump($token);
+                            var_dump($replace);
+                            die;
+                        }
+
+
+                        continue;
+
+                }
+            }
+            $result[$nr] = $record;
         }
-        return $token;
+        return $result;
     }
 
     public static function precedence($token=[]){
@@ -2890,6 +3066,12 @@ class Token extends Core {
     }
 
     public static function value_type($record=[], $attribute='execute'){
+        if(!array_key_exists($attribute, $record)){
+            $debug = debug_backtrace(true);
+            var_Dump($debug);
+            var_dump($record);
+            die;
+        }
         $type = strtolower(gettype($record[$attribute]));
         switch($type){
             case 'bool' :
@@ -2947,19 +3129,35 @@ class Token extends Core {
             return [];
         }
         if(isset($record['execute'])){
-            return $record;
+            $token[$record['token']['nr']] = $record;
+            return $token;
         }
         if($record['type'] != Token::TYPE_VARIABLE){
-            return $record;
+            return $token;
         }
         $attribute = substr($record['variable']['name'], 1);
         $record['execute'] = $parse->data($attribute);
         $record['is_executed'] = true;
         $record = Token::value_type($record);
-        return $record;
+
+//         var_dump($record);
+
+        $token[$record['token']['nr']] = $record;
+
+
+//         var_dump($record);
+
+        /*
+        if(!isset($token[$method['token']['nr']]['is_cleaned'])){
+            $token = Token::method_cleanup($token[$method['token']['nr']], $token, $tag_remove);
+        }
+        */
+
+
+        return $token;
     }
 
-    public static function method_execute(Parse $parse, $method=[], $token=[], $keep=false, $tag_remove=true, $count=0){
+    public static function method_execute(Parse $parse, $method=[], $token=[], $keep=false, $tag_remove=true){
         if(!isset($method['type'])){
             return $token;
         }
@@ -2970,6 +3168,16 @@ class Token extends Core {
             var_dump('found');
             die;
             return $token;
+        }
+        if(!isset($token[$method['token']['nr']])){
+            $debug = debug_backtrace(true);
+            var_dump($debug);
+
+//             var_dump($token);
+            var_dump($method);
+            die;
+            var_dump('hey uknown');
+            die;
         }
         $file_name = 'Function.' . ucfirst(strtolower($method['method']['name'])) . '.php';
         $function_name = 'function_' . str_replace('.', '_', $method['method']['name']);
@@ -2992,14 +3200,26 @@ class Token extends Core {
             }
         }
         if($is_method === true){
+            if(!isset($method['method']['parameter'])){
+                var_dump(debug_backtrace(true));
+                var_dump($method);
+                die;
+            }
+//             var_dump($method);
+//             die;
+            $method = Token::method_prepare($method);
             $method['method']['token_parameter'] = $method['method']['parameter'];
             foreach($method['method']['parameter'] as $nr => $parameter){
                 $execute = current($parameter);
                 if($execute !== null){
-                    $token = Token::set_execute($parse, $parameter, $execute, $token);
-                    $execute = $token[$execute['token']['nr']];
-                    unset($token[$execute['token']['nr']]);
-                    $method['method']['parameter'][$nr] = $execute['execute'];
+                    if(Token::hold_execute($parameter) === true){
+
+                    } else {
+                        $token = Token::set_execute($parse, $parameter, $execute, $token);
+                        $execute = $token[$execute['token']['nr']];
+                        unset($token[$execute['token']['nr']]);
+                        $method['method']['parameter'][$nr] = $execute['execute'];
+                    }
                 } else {
                     var_dump($parameter);
                     die;
@@ -3135,14 +3355,21 @@ class Token extends Core {
         return $token;
     }
 
-    public static function value_method_execute(Parse $parse, $record=[], $token=[]){
+    public static function value_method_execute(Parse $parse, $record=[], $token=[], $keep=false, $tag_remove=true){
+        return Token::method_execute($parse, $record, $token, $keep, $tag_remove);
+
+
+
+
+
         if(!is_array($record)){
             return [];
         }
         if(isset($record['is_executed'])){
             if(
                 isset($record['token']) &&
-                isset($record['token']['nr'])
+                isset($record['token']['nr']) &&
+                isset($token[$record['token']['nr']])
             ){
                 $token[$record['token']['nr']] = $record;
             }
@@ -3151,11 +3378,18 @@ class Token extends Core {
         if($record['type'] != Token::TYPE_METHOD){
             if(
                 isset($record['token']) &&
-                isset($record['token']['nr'])
+                isset($record['token']['nr']) &&
+                isset($token[$record['token']['nr']])
             ){
                 $token[$record['token']['nr']] = $record;
             }
             return $token;
+        }
+        if(!isset($token[$record['token']['nr']])){
+            $debug = debug_backtrace(true);
+            var_dump($debug);
+            var_dump('hey uknown');
+            die;
         }
         $keep = false;
         $file_name = 'Function.' . ucfirst(strtolower($record['method']['name'])) . '.php';
@@ -3192,33 +3426,109 @@ class Token extends Core {
         return $token;
     }
 
-    public static function value_execute(Parse $parse, $execute=[], &$token=[]){
+    public static function hold_execute($execute=[]){
+        $hold_execute = false;
+        foreach($execute as $nr => $record){
+            if(!empty($record['hold_execute'])){
+                $hold_execute = true;
+                break;
+            }
+        }
+        return $hold_execute;
+    }
+
+    public static function value_execute(Parse $parse, $execute=[], &$token=[], $keep=false, $tag_remove=true){
         if(!is_array($execute)){
             return [];
         }
         $list = [];
         $string = '';
+
+        /*
+        if(!isset($execute['token'])){
+            var_dump($execute);
+//             die;
+        }
+
+        elseif(!isset($token[$execute['token']['nr']])){
+            $debug = debug_backtrace(true);
+            var_dump($debug);
+            var_dump('hey');
+            die;
+        }
+        */
+//         var_dump($execute);
+
         foreach($execute as $nr => $record){
-            $string .= $record['value'];
-            if($record['type'] == Token::TYPE_WHITESPACE){
-                continue;
+            if(
+                isset($record['token']) &&
+                isset($execute[$record['token']['nr']])
+            ){
+                $string .= $record['value'];
+                if($record['type'] == Token::TYPE_WHITESPACE){
+                    continue;
+                }
+                $list[] = $record;
             }
-            $list[] = $record;
         }
         if(!isset($list[0])){
+            $debug = debug_backtrace(true);
+            var_dump($debug);
+            die;
+            var_dump($execute);
+            var_Dump($string);
+            var_dump($list);
+            die;
+            $debug = debug_backtrace(true);
+            var_dump($debug);
+            die;
             throw new Exception('Need token record...');
             return [];
         }
         $value = array_pop($list);
-        $value = Token::value_variable_execute($parse, $value, $token);
 //         var_dump($token);
-        $token = Token::value_method_execute($parse, $value, $token);
 //         var_dump($value);
-//         var_dump($token);
+//         die;
+        $token = Token::value_variable_execute($parse, $value, $token, $keep, $tag_remove);
+
+        if(!isset($token[$value['token']['nr']])){
+            var_dump($value);
+            var_dump($value['token']['nr']);
+            var_dump($token);
+            die;
+            $debug = debug_Backtrace(true);
+            var_dump($debug);
+            die;
+            var_Dump($token);
+            var_dump($value);
+            die;
+        }
+
+
+
         $value = $token[$value['token']['nr']];
+
+//         var_dump($value['token']['nr']);
+//         var_dump($token[$value['token']['nr']]);
+//         var_dump($token);
+
+
+        $token = Token::value_method_execute($parse, $value, $token, $keep, $tag_remove);
+
+        //value_method_execute adds unwanted token to token
+
+        $value = $token[$value['token']['nr']];
+
+//         var_dump($value);
+
         $value = Token::value_array_execute($parse, $value);
         $value = Token::value_object_execute($parse, $value);
+
+//         var_dump($value);
+
         $token = Token::value_string_execute($parse, $value, $token);
+//         var_dump($token);
+//         die;
         $value = $token[$value['token']['nr']];
         if(!isset($value['is_executed'])){
             var_dump($value);
@@ -3518,9 +3828,11 @@ class Token extends Core {
         return $token;
     }
 
-    public static function token_set_execute(Parse $parse, $record=[], $token=[]){
+    /*
+    public static function token_set_execute(Parse $parse, $record=[], $token=[], $keep=false, $tag_remove=true){
         return $token;
         var_dump($record);
+
         if(!isset($record['token'])){
             var_dump($record);
             die;
@@ -3559,6 +3871,10 @@ class Token extends Core {
             try {
                 $token = Token::operator_execute($parse, $operator, $token);
                 $operator = $token[$operator['token']['nr']];
+
+                var_dump($record);
+                die;
+
                 $record = Token::operator_remove($record, $operator);
             } catch (Exception $e) {
                 echo $e;
@@ -3567,7 +3883,10 @@ class Token extends Core {
         }
         if($has_operator === false){
             //             var_dump($record);
-            $execute = Token::value_execute($parse, $record, $token);
+
+            if(Token::value_hold_execute($record) === true){
+                $execute = Token::value_execute($parse, $record, $token);
+            }
             //             var_Dump($execute);
             //             die;
             $list = [];
@@ -3579,9 +3898,30 @@ class Token extends Core {
             }
         }
     }
+    */
+    public static function whitespace_remove($token=[]){
+        $result = [];
+        foreach($token as $nr => $record){
+            if($record['type'] == Token::TYPE_WHITESPACE){
+                continue;
+            }
+            $result[$nr] = $record;
+        }
+        return $result;
+    }
 
-    public static function set_execute(Parse $parse, $set=[], $record=[], $token=[]){
+
+    public static function set_execute(Parse $parse, $set=[], $record=[], $token=[], $keep=false, $tag_remove=true){
+//         var_dump($set);
+        if(isset($set[0])){
+            $debug = debug_backtrace(true);
+            var_dump($debug);
+            die;
+        }
         if(isset($set['is_executed'])){
+            return $set;
+        }
+        if(Token::hold_execute($set) === true){
             return $set;
         }
         $count = 0;
@@ -3593,14 +3933,14 @@ class Token extends Core {
                 $has_operator = true;
                 $operator = Token::operator_get($set_get);
                 try {
-                    $token = Token::operator_execute($parse, $operator, $token);
+                    $token = Token::operator_execute($parse, $operator, $token, $keep, $tag_remove);
                     if(!isset($token[$operator['token']['nr']])){
                         var_dump($token);
                         var_dump($operator);
                         die;
                     }
                     $operator = $token[$operator['token']['nr']];
-                    $set_get = Token::operator_remove($set_get, $operator);
+                    $set_get = Token::operator_replace($set_get, $operator);
                 } catch (Exception $e) {
                     echo $e;
                     return $token;
@@ -3609,40 +3949,33 @@ class Token extends Core {
             $set = Token::set_remove($set, $set_get);
             $count++;
         }
+        $count = 0;
         while(Token::operator_has($set)){
             $has_operator = true;
+            $count++;
             $operator = Token::operator_get($set);
             try {
-                $token = Token::operator_execute($parse, $operator, $token);
+                $token = Token::operator_execute($parse, $operator, $token, $keep, $tag_remove);
                 $operator = $token[$operator['token']['nr']];
-                $set = Token::operator_remove($set, $operator);
+                $set = Token::operator_replace($set, $operator);
             } catch (Exception $e) {
                 echo $e;
                 return $token;
             }
         }
         if($has_operator === false){
-//             var_dump($record);
-            $execute = Token::value_execute($parse, $set, $token);
-
-//             var_dump($set);
-//             var_dump($execute['token']['nr']);
-//             var_dump($token[$execute['token']['nr']]);
-//             var_Dump($token[112]);
-
+            $execute = Token::value_execute($parse, $set, $token, $keep, $tag_remove);
             if(!empty($record)){
                 if($record['token']['nr'] == $execute['token']['nr']){
                     $token[$execute['token']['nr']] = $execute;
                 } else {
                     $record['execute'] = $execute['execute'];
                     $record['is_executed'] = true;
-                    if(!isset($record['token'])){
-                        var_dump(debug_backtrace(true));
-//                         var_dump($record);
 
-                        die;
-
+                    if(!isset($token[$record['token']['nr']])){
+                        throw new Exception('Parse error: record not available in token, please make sure the record is in the token...');
                     }
+
                     $token[$record['token']['nr']] = $record;
                 }
             } else {
@@ -3651,8 +3984,12 @@ class Token extends Core {
                 die;
             }
         } else {
+            $set = Token::whitespace_remove($set);
             $execute = array_shift($set);
             if(!empty($set)){
+                var_dump($set);
+                var_dump($execute);
+                die;
                 throw new Exception('Set should be empty...');
                 return $token;
             } else {
@@ -3669,6 +4006,10 @@ class Token extends Core {
                     $token[$record['token']['nr']] = $record;
                 }
             }
+        }
+        if(isset($token[42]) && $token[42]['type'] == Token::TYPE_FLOAT){
+            var_dump($token);
+            die;
         }
         return $token;
     }

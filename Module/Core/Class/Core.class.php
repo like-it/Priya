@@ -1208,4 +1208,22 @@ class Core {
     public static function copy($copy=null){
         return unserialize(serialize($copy));
     }
+
+    public static function key_last($record=[]){
+        if(empty($record)){
+            return;
+        }
+        $end = end($record);
+        $key = key($record);
+        return $key;
+    }
+
+    public static function key_first($record=[]){
+        if(empty($record)){
+            return;
+        }
+        $end = reset($record);
+        $key = key($record);
+        return $key;
+    }
 }
