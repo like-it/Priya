@@ -60,14 +60,6 @@ class Core_while extends Core {
                     $next_next = null;
                     $next = null;
                     $next_next = null;
-                    if(!isset($end['token'])){
-                        var_dump($end);
-                        die;
-                    }
-                    if(!isset($end['token']['nr'])){
-                        var_dump($end);
-                        die;
-                    }
                     for($i = $nr + 1; $i <= $end['token']['nr']; $i++){
                         if(
                             $next === null &&
@@ -219,9 +211,6 @@ class Core_while extends Core {
                 }
                 $before[$nr] = $record;
             }
-            foreach($while['method']['content'] as $nr => $record){
-                $before[$nr] = $record;
-            }
             $level = (int) $parse->data('priya.parse.break.level');
             $level++;
             $parse->data('priya.parse.break.level', $level);
@@ -229,26 +218,14 @@ class Core_while extends Core {
             $count = 0;
             while($parameter[0]){
                 $count++;
-                if($count > 4){
+                if(null !== $parse->data('priya.parse.while.count') &&
+                    $count > $parse->data('priya.parse.while.count')){
                     die;
+                }
+                foreach($while['method']['content'] as $nr => $record){
+                    $before[$nr] = $record;
                 }
                 $before = $parse->execute($before, true);
-                /*
-                if(null !== $parse->data('priya.parse.flush.nr')){
-                    var_Dump($parse->data('priya.parse.flush.nr'));
-                    var_dump($before);
-                    die;
-                    //                     $parse->data('priya.parse.flush.nr', $if['token']['nr'] - 1);
-                }
-                */
-
-
-
-
-//                 var_dump($before);
-//                 die;
-//                 var_dump($before);
-//                 die;
                 $execute = [];
                 foreach($while['method']['content'] as $nr => $record){
                     if(isset($before[$nr])){
@@ -256,24 +233,11 @@ class Core_while extends Core {
                         unset($before[$nr]);
                     }
                 }
-                if(!isset($before[$while['token']['nr']])){
-                    var_dump($while['token']['nr']);
-                    var_dump($before);
-//                     die;
-                }
                 unset($before[$while['token']['nr']]['is_parsed']);
                 $before[$while['token']['nr']]['execute'] .= Token::string($execute);
-//                 var_dump($before[$while['token']['nr']]['execute']);
                 $before[$while['token']['nr']]['is_executed'] = true;
                 $before[$while['token']['nr']] = Token::value_type($before[$while['token']['nr']], 'execute');
                 if($parse->data('priya.parse.break.amount')){
-//                     var_dump($before[$while['token']['nr']]);
-                    /*
-                    var_dump($before[$while['token']['nr']]['execute']);
-                    var_dump($execute);
-//                     var_dump($before);
-                    die;
-                    */
                     $amount = $parse->data('priya.parse.break.amount');
                     $amount--;
                     if($amount < 1){
@@ -290,9 +254,6 @@ class Core_while extends Core {
                 $execute = $before[$execute['token']['nr']];
                 unset($before[$execute['token']['nr']]);
                 //need to remove execute from before
-                foreach($while['method']['content'] as $nr => $record){
-                    $before[$nr] = $record;
-                }
                 $parameter[0] = $execute['execute'];
             }
             $level = (int) $parse->data('priya.parse.break.level');
