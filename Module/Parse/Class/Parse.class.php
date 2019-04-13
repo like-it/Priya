@@ -158,6 +158,8 @@ class Parse extends Base {
                 $create = Token::create($token, $tag_open_nr, $tag_close_nr);
 
                 if(isset($create[1])){
+                    var_dump($create[0]['method']['parameter']);
+                    die;
                     var_dump($create);
                     $source = $this->data('priya.parse.read.url');
                     if($source !== null){
@@ -169,26 +171,9 @@ class Parse extends Base {
                 $create = array_shift($create);
                 switch($create['type']){
                     case Token::TYPE_VARIABLE :
-                        if($create['variable']['name'] == '$user'){
-//                             var_dump($token);
-//                             die;
-                        }
                         $token = Variable::execute($this, $create, $token, $keep);
-                        /*
-                        if($create['variable']['name'] == '$user'){
-                            var_dump($token);
-
-                            die;
-                        }
-                        */
-                        $token = Variable::cleanup($token, $create, $tag_open_nr, $tag_close_nr);
                         $token[$create['token']['nr']]['is_parsed'] = true;
                         $token = $this->execute($token);
-                        if($create['variable']['name'] == '$user'){
-//                             var_dump($token);
-//                             die;
-                        }
-
                         $create = null;
                     break;
                     case Token::TYPE_METHOD :

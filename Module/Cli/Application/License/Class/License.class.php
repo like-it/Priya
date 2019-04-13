@@ -40,7 +40,7 @@ class License extends Cli {
     private static function require($object, $execute=''){
         $url = $object->data('priya.dir.root') . strtoupper(License::php_class());
         if(!file_exists($url)){
-            $execute = License::update(License::execute($this, 'url'));
+            $execute = License::update(License::execute($object, 'url'));
             $file = new File();
             $file->write($url, $execute);
         } else {

@@ -8,8 +8,7 @@ use Exception;
 class Variable extends Core {
     CONST STATUS = 'is_variable';
 
-    public static function execute(Parse $parse, $variable=[], $token=[], $keep=false){
-
+    public static function execute(Parse $parse, $variable=[], $token=[], $keep=false, $tag_remove=true){
         if($variable['variable']['is_assign'] === true){
             $token = Variable::assign($parse, $variable, $token, $keep);
             $variable = $token[$variable['token']['nr']];
@@ -21,9 +20,15 @@ class Variable extends Core {
         }
         $variable['is_executed'] = true;
         $token[$variable['token']['nr']] = $variable;
+        $token = Variable::cleanup($variable, $token, $tag_remove);
         return $token;
     }
 
+    public static function cleanup($variable=[], $token=[], $tag_remove=true){
+        return Token::variable_cleanup($variable, $token, $tag_remove);
+    }
+
+    /*
     public static function cleanup($token=[], $variable=[], $tag_open_nr=null, $tag_close_nr=null){
         if(
             $tag_open_nr !== null &&
@@ -68,6 +73,7 @@ class Variable extends Core {
         return $token;
 
     }
+    */
 
     public static function modify(Parse $parse, $variable=[], $token=[], $keep=false, $tag_remove=true){
         return Token::modifier_execute($parse, $variable, $token, $keep, $tag_remove);
@@ -84,17 +90,8 @@ class Variable extends Core {
                     var_dump('found');
                     die;
                 }
-//                 var_dump($token[$variable['token']['nr']]);
                 $token = Variable::value($parse, $variable, $token, $keep, $tag_remove);
                 $variable = $token[$variable['token']['nr']];
-
-                /*
-                if($variable['variable']['name'] == '$user'){
-                    var_dump($token);
-//                     die;
-                }
-                */
-
                 $attribute = substr($variable['variable']['name'], 1 );
                 if(!isset($variable['is_executed'])){
                     var_dump($variable);
@@ -115,10 +112,8 @@ class Variable extends Core {
             case '++' :
                 $attribute = substr($variable['variable']['name'], 1 );
                 $value = $parse->data($attribute);
-
                 if($value === null){
                     $source = $parse->data('priya.parse.read.url');
-
                     if($source === null){
                         throw new Exception('Undefined variable: ' . $variable['variable']['name'] . ' on line: ' . $variable['row'] . ' column: ' . $variable['column']);
                     } else {
@@ -131,10 +126,8 @@ class Variable extends Core {
             case '--' :
                 $attribute = substr($variable['variable']['name'], 1 );
                 $value = $parse->data($attribute);
-
                 if($value === null){
                     $source = $parse->data('priya.parse.read.url');
-
                     if($source === null){
                         throw new Exception('Undefined variable: ' . $variable['variable']['name'] . ' on line: ' . $variable['row'] . ' column: ' . $variable['column']);
                     } else {
@@ -149,7 +142,6 @@ class Variable extends Core {
                 $value = $parse->data($attribute);
                 if($value === null){
                     $source = $parse->data('priya.parse.read.url');
-
                     if($source === null){
                         throw new Exception('Undefined variable: ' . $variable['variable']['name'] . ' on line: ' . $variable['row'] . ' column: ' . $variable['column']);
                     } else {

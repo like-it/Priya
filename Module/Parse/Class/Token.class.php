@@ -398,6 +398,7 @@ class Token extends Core {
         $doc_comment_open_nr = null;
         $comment_single_line_nr = null;
         $is_tag_close_nr = null;
+        $tag_close = '';
         foreach($token as $nr => $record){
             $record['depth'] = $depth;
             $token[$nr]['depth'] = $depth;
@@ -487,12 +488,14 @@ class Token extends Core {
                     in_array(
                         $record['type'],
                         [
-                            Token::TYPE_PARENTHESE_OPEN,
+                            Token::TYPE_PARENTHESE_OPEN, //used by modifier
                             Token::TYPE_PARENTHESE_CLOSE,
                             Token::TYPE_COMMA
                         ]
                     )
                 ){
+                    var_dump($record);
+                    die;
                     $variable_nr = null;
                 }
                 if(
@@ -504,8 +507,25 @@ class Token extends Core {
                         $value .= $record['value'];
                         $token[$variable_nr]['variable']['name'] .= $record['value'];
                         $token[$variable_nr]['variable']['operator'] = $token[$next]['value'];
-                        $token[$variable_nr]['variable']['has_modifier'] = true;
-                        $token[$variable_nr]['value'] = $value; //$token[$variable_nr]['variable']['name'];
+                        $check_1 = $next_next + 1;
+                        $check_2 = $next_next + 2;
+                        if(
+                            isset($token[$check_1]) &&
+                            isset($token[$check_2]) &&
+                            $token[$check_1]['type'] == Token::TYPE_WHITESPACE &&
+                            $token[$check_2]['type'] == Token::TYPE_STRING
+                        ){
+                            $token[$variable_nr]['variable']['has_modifier'] = true;
+                        }
+                        elseif(
+                            isset($token[$check_1]) &&
+                            $token[$check_1]['type'] == Token::TYPE_STRING
+                            ){
+                                $token[$variable_nr]['variable']['has_modifier'] = true;
+                        } else {
+                            $token[$variable_nr]['variable']['has_modifier'] = false;
+                        }
+                        $token[$variable_nr]['value'] = $value;
                         $variable_nr = null;
                         $skip += 1;
                         unset($token[$nr]);
@@ -522,7 +542,7 @@ class Token extends Core {
                         $token[$variable_nr]['variable']['name'] .= $record['value'];
                         $token[$variable_nr]['variable']['is_assign'] = true;
                         $token[$variable_nr]['variable']['operator'] = $token[$next]['value'];
-                        $token[$variable_nr]['value'] = $value; //$token[$variable_nr]['variable']['name'];
+                        $token[$variable_nr]['value'] = $value;
                         unset($token[$variable_nr]['variable']['has_modifier']);
                         $variable_nr = null;
                         $skip += 1;
@@ -542,8 +562,25 @@ class Token extends Core {
                         $value .= $record['value'];
                         $token[$variable_nr]['variable']['name'] .= $record['value'];
                         $token[$variable_nr]['variable']['operator'] = $token[$next_next]['value'];
-                        $token[$variable_nr]['variable']['has_modifier'] = true;
-                        $token[$variable_nr]['value'] = $value; // $token[$variable_nr]['variable']['name'];
+                        $check_1 = $next_next + 1;
+                        $check_2 = $next_next + 2;
+                        if(
+                            isset($token[$check_1]) &&
+                            isset($token[$check_2]) &&
+                            $token[$check_1]['type'] == Token::TYPE_WHITESPACE &&
+                            $token[$check_2]['type'] == Token::TYPE_STRING
+                        ){
+                            $token[$variable_nr]['variable']['has_modifier'] = true;
+                        }
+                        elseif(
+                            isset($token[$check_1]) &&
+                            $token[$check_1]['type'] == Token::TYPE_STRING
+                        ){
+                            $token[$variable_nr]['variable']['has_modifier'] = true;
+                        } else {
+                            $token[$variable_nr]['variable']['has_modifier'] = false;
+                        }
+                        $token[$variable_nr]['value'] = $value;
                         $variable_nr = null;
                         $skip += 1;
                         unset($token[$nr]);
@@ -560,7 +597,7 @@ class Token extends Core {
                         $token[$variable_nr]['variable']['name'] .= $record['value'];
                         $token[$variable_nr]['variable']['is_assign'] = true;
                         $token[$variable_nr]['variable']['operator'] = $token[$next_next]['value'];
-                        $token[$variable_nr]['value'] = $value; // $token[$variable_nr]['variable']['name'];
+                        $token[$variable_nr]['value'] = $value;
                         unset($token[$variable_nr]['variable']['has_modifier']);
                         $variable_nr = null;
                         $skip += 2;
@@ -591,7 +628,7 @@ class Token extends Core {
                 elseif($variable_nr !== null) {
                     $token[$variable_nr]['variable']['name'] .= $record['value'];
                     $value .= $record['value'];
-                    $token[$variable_nr]['value'] = $value; // $token[$variable_nr]['variable']['name'];
+                    $token[$variable_nr]['value'] = $value;
                     unset($token[$nr]);
                     $previous_nr = $nr;
                     continue;
@@ -761,37 +798,38 @@ class Token extends Core {
                 $is_whitespace = false;
                 $before_reverse = [];
                 for($i = $nr; $i >= 0; $i--){
-                    if(
-                        isset($token[$i]) &&
-                        $token[$i]['type'] == Token::TYPE_PARENTHESE_OPEN &&
-                        $token[$i]['depth'] == $token[$nr]['depth']
-                    ){
-                        $is_start_method = true;
-                        continue;
-                    }
-                    if($is_start_method === false){
-                        //catch parameter?
-                    } else {
-                        if(
-                            $is_whitespace === false &&
-                            !isset($before_reverse[0]) &&
-                            $token[$i]['type'] == Token::TYPE_WHITESPACE
+                    if(isset($token[$i])){
+                        if(                        
+                            $token[$i]['type'] == Token::TYPE_PARENTHESE_OPEN &&
+                            $token[$i]['depth'] == $token[$nr]['depth']
                         ){
-                            $is_whitespace = true;
+                            $is_start_method = true;
                             continue;
                         }
-                        elseif(
-                            in_array(
-                                $token[$i]['type'],
-                                Token::TYPE_NAME_BREAK
-                            ) ||
-                            $token[$i]['is_operator'] === true
-
-                        ){
-                            break;
+                        if($is_start_method === false){
+                            //catch parameter?
+                        } else {
+                            if(
+                                $is_whitespace === false &&
+                                !isset($before_reverse[0]) &&
+                                $token[$i]['type'] == Token::TYPE_WHITESPACE
+                            ){
+                                $is_whitespace = true;
+                                continue;
+                            }
+                            elseif(
+                                in_array(
+                                    $token[$i]['type'],
+                                    Token::TYPE_NAME_BREAK
+                                ) ||
+                                $token[$i]['is_operator'] === true
+    
+                            ){
+                                break;
+                            }
+                            $before_reverse[] = $token[$i]['value'];
+                            $method_nr = $i;
                         }
-                        $before_reverse[] = $token[$i]['value'];
-                        $method_nr = $i;
                     }
                 }
                 if(
@@ -879,7 +917,7 @@ class Token extends Core {
                     }
                 }
             }
-            /* wrong interpertation of octal....
+            /* wrong interpertation of octal.... only in string \[0-7]{1,3} or parameter
             elseif(
                 $record['type'] == Token::TYPE_NUMBER &&
                 substr($record['value'], 0, 1) == '0' &&
@@ -922,13 +960,6 @@ class Token extends Core {
     public static function method_prepare($method=[]){
         $argument = [];
         $count = -1;
-        if(!isset($method['method']['parameter'])){
-            $debug = debug_backtrace(true);
-            var_dump($debug);
-            var_dump($method);
-            die;
-        }
-
         foreach($method['method']['parameter'] as $nr => $parameter){
             $has_as = false;
             $has_is_array_operator = false;
@@ -980,6 +1011,10 @@ class Token extends Core {
             $argument[$count] = $parameter;
         }
         $method['method']['parameter'] = $argument;
+
+        foreach($method['method']['parameter'] as $nr => $parameter){
+            $method['method']['parameter'][$nr] = Token::create_modifier($parameter);
+        }
         return $method;
     }
 
@@ -1859,6 +1894,7 @@ class Token extends Core {
         }
         $has_modifier_nr = null;
         $modifier_start_nr = null;
+        $value = [];
         foreach($token as $nr => $record){
             if(
                 $record['type'] == Token::TYPE_VARIABLE &&
@@ -1867,6 +1903,9 @@ class Token extends Core {
             ){
                 $has_modifier_nr = $nr;
                 continue;
+            }
+            if($has_modifier_nr !== null){
+                $value[$nr] = $record;
             }
             if(
                 $has_modifier_nr !== null &&
@@ -1898,11 +1937,11 @@ class Token extends Core {
                     $modifier = [];
                     $modifier['name'] = $name;
                     $modifier['parameter'] = $parameter;
-
-
-
                     $token[$has_modifier_nr]['variable']['modifier']['list'][] = $modifier;
 //                     $token[$has_modifier_nr]['variable']['modifier'] = Token::modifier_direction($token[$has_modifier_nr]['variable']['modifier']);
+                    foreach($value as $key => $item){
+                        $token[$has_modifier_nr]['variable']['value'][$key] = $item;
+                    }
                     for($i = $has_modifier_nr + 1; $i < $nr; $i++){
                         unset($token[$i]);
                     }
@@ -1939,6 +1978,9 @@ class Token extends Core {
 
                     $token[$has_modifier_nr]['variable']['modifier']['list'][] = $modifier;
 //                     $token[$has_modifier_nr]['variable']['modifier'] = Token::modifier_direction($token[$has_modifier_nr]['variable']['modifier']);
+                    foreach($value as $key => $item){
+                        $token[$has_modifier_nr]['variable']['value'][$key] = $item;
+                    }
                     for($i = $has_modifier_nr + 1; $i <= $nr; $i++){
                         unset($token[$i]);
                     }
@@ -1948,6 +1990,7 @@ class Token extends Core {
                     $modifier_start_nr = $nr;
                     $is_parameter = false;
                     $has_parameter = false;
+                    $value = [];
                     continue;
                 }
                 elseif($record['value'] == ':'){
@@ -2010,10 +2053,12 @@ class Token extends Core {
             $modifier['parameter'] = $parameter;
             $token[$has_modifier_nr]['variable']['modifier']['list'][] = $modifier;
 //             $token[$has_modifier_nr]['variable']['modifier'] = Token::modifier_direction($token[$has_modifier_nr]['variable']['modifier']);
+            foreach($value as $key => $item){
+                $token[$has_modifier_nr]['variable']['value'][$key] = $item;
+            }
             for($i = $has_modifier_nr + 1; $i <= $nr; $i++){
                 unset($token[$i]);
             }
-
         }
         return $token;
     }
@@ -2041,8 +2086,10 @@ class Token extends Core {
             $function_name = 'modifier_' . str_replace('.', '_', $modify['name']);
             $location = $parse->data('priya.parse.dir.modifier');
             $is_modifier = false;
+            $search = [];
             foreach($location as $dir){
                 $url = $dir . $file_name;
+                $search[] = $url;
                 if($parse->data('priya.parse.modifier.' . $url) === true){
                     $is_modifier = true;
                     break;
@@ -2077,6 +2124,9 @@ class Token extends Core {
                 }
                 $token = $function_name($parse, $variable, $modify['parameter'], $token, $keep);
                 $variable = $token[$variable['token']['nr']];
+            } else {
+                var_dump($search);
+                throw new Exception('Parse error: Modifier: ' . $modify['name'] . ' not found...');
             }
         }
         $variable['variable']['is_modifier_execute'] = true;
@@ -2139,7 +2189,7 @@ class Token extends Core {
                     elseif($assign[$i]['type'] == Token::TYPE_WHITESPACE){
                         $value .= $assign[$i]['value'];
                         if($assign_start_nr !== null && !empty($variable_value)){
-                            $variable_value[] = $assign[$i];
+                            $variable_value[$assign[$i]['token']['nr']] = $assign[$i];
                         }
                         $to = $i -1;
                         continue;
@@ -2147,7 +2197,7 @@ class Token extends Core {
                     elseif($assign[$i]['type'] == Token::TYPE_CAST){
                         $value .= $assign[$i]['value'];
                         if($assign_start_nr !== null){
-                            $variable_value[] = $assign[$i];
+                            $variable_value[$assign[$i]['token']['nr']] = $assign[$i];
                         }
                         continue;
                     }
@@ -2157,7 +2207,7 @@ class Token extends Core {
                             $need_new_operator === false &&
                             $assign_start_nr !== null
                         ){
-                            $variable_value[] = $assign[$i];
+                            $variable_value[$assign[$i]['token']['nr']] = $assign[$i];
                             $to = $i;
                             $depth++;
                             continue;
@@ -2171,7 +2221,7 @@ class Token extends Core {
                     elseif($assign[$i]['type'] == Token::TYPE_PARENTHESE_CLOSE){
                         $value .= $assign[$i]['value'];
                         if($assign_start_nr !== null){
-                            $variable_value[] = $assign[$i];
+                            $variable_value[$assign[$i]['token']['nr']] = $assign[$i];
                             $to = $i;
                             $depth--;
                             continue;
@@ -2181,7 +2231,7 @@ class Token extends Core {
                     elseif($assign[$i]['type'] == Token::TYPE_EXCLAMATION){
                         $value .= $assign[$i]['value'];
                         if($assign_start_nr !== null){
-                            $variable_value[] = $assign[$i];
+                            $variable_value[$assign[$i]['token']['nr']] = $assign[$i];
                             $to = $i;
                             continue;
                         }
@@ -2209,7 +2259,7 @@ class Token extends Core {
                                 break;
                             }
                             $to = $i;
-                            $variable_value[] = $assign[$i];
+                            $variable_value[$assign[$i]['token']['nr']] = $assign[$i];
                             $value .= $assign[$i]['value'];
                             $operator_nr = $i;
                             if($need_new_operator === true){
@@ -2222,7 +2272,7 @@ class Token extends Core {
                                 break;
                             }
                             $to = $i;
-                            $variable_value[] = $assign[$i];
+                            $variable_value[$assign[$i]['token']['nr']] = $assign[$i];
                             $value .= $assign[$i]['value'];
                             $direction = false;
                             $left_nr = $i;
@@ -2241,7 +2291,7 @@ class Token extends Core {
                                 $operator_nr > $left_nr
                             ){
                                 $to = $i;
-                                $variable_value[] = $assign[$i];
+                                $variable_value[$assign[$i]['token']['nr']] = $assign[$i];
                                 $value .= $assign[$i]['value'];
                                 $right_nr = $i;
                                 $direction = true;
@@ -2294,8 +2344,9 @@ class Token extends Core {
                 if($string_start_nr === null){
                     $string_start_nr = $nr;
                     $string = $record['value'];
+                    $string = '';
                 } else {
-                    $string .= $record['value'];
+                    // $string .= $record['value'];
                     $token[$string_start_nr]['value'] = $string;
                     $token[$string_start_nr]['type'] = Token::TYPE_STRING;
 
@@ -2348,6 +2399,7 @@ class Token extends Core {
                     $depth == $record['depth']
                 ){
                     $count++;
+                    unset($token[$nr]);
                 }
                 elseif(
                     $depth !== null &&
@@ -2516,6 +2568,7 @@ class Token extends Core {
         $left = [];
         $right = [];
         $operator = [];
+//         $close_nr = null;
         foreach($token as $nr => $record){
             if($record['is_operator'] === true){
                 if(!empty($operator)){
@@ -2544,6 +2597,7 @@ class Token extends Core {
                 }
             } else {
                 $right[$record['token']['nr']] = $record;
+//                 $close_nr = $record['token']['nr'];
             }
             unset($token[$nr]);
         }
@@ -2562,6 +2616,12 @@ class Token extends Core {
         if($left_start_nr !== null){
             $operator['token']['nr'] = $left_start_nr;
         }
+        /*
+        if($close_nr !== null){
+            $operator['token']['close_nr'] = $close_nr;
+
+        }
+        */
         return $operator;
     }
 
@@ -2587,21 +2647,32 @@ class Token extends Core {
                 'is_executed' => true
             ];
         }
-        if(isset($operator['token']['right'])){
+        if(isset($operator['token']['right'])){            
             try {
                 $operator['token']['right'] = Token::value_execute($parse, $operator['token']['right'], $token, $keep, $tag_remove);
+                var_dump($operator['token']['right']);
+                die;
                 if(!isset($operator['token']['right']['is_executed'])){
                     throw new Exception('Right hand side isn\'t executed.');
                 }
             } catch (Exception $e) {
                 echo $e;
             }
+            var_Dump('fucking');
+            var_dump($operator);
+            die;
         } else {
             $operator['token']['right'] = [
                 'execute' => null,
                 'is_executed' => true
             ];
         }
+
+if(!isset(  $operator['token']['right']['type'])){
+    var_dump($operator);
+    die;
+}
+
         switch($operator['value']){
             case '+' :
                 if(
@@ -2627,7 +2698,7 @@ class Token extends Core {
                         $operator['token']['right']['type'] == Token::TYPE_ARRAY
                     ){
                         throw new Exception('Unsupported operand types');
-                    } else {
+                    } else {                        
                         $operator['execute'] = $operator['token']['left']['execute'] . $operator['token']['right']['execute'];
                     }
                     break;
@@ -2673,6 +2744,8 @@ class Token extends Core {
                         $operator['token']['right']['type'] == Token::TYPE_INT
                     )
                 ){
+                    var_dump($operator['token']);
+                    die;
                     throw new Exception('Unsupported operand types');
                 }
                 elseif($operator['token']['left']['type'] == Token::TYPE_ARRAY){
@@ -2872,7 +2945,6 @@ class Token extends Core {
         $operator['value'] = $operator['token']['left']['value'] . $operator['value'] . $operator['token']['right']['value'];
         $operator['is_executed'] = true;
         $operator = Token::value_type($operator);
-
         $token = Token::operator_replace($token, $operator);
         //can't do value type yet... ?
         return $token;
@@ -3109,15 +3181,60 @@ class Token extends Core {
         return $record;
     }
 
+    /**
+     * \[0-7]{1,3} 	the sequence of characters matching the regular expression is a character in octal notation, which silently overflows to fit in a byte (e.g. "\400" === "\000")
+     *
+     *
+     *
+     * @param Parse $parse
+     * @param array $record
+     * @param array $token
+     * @return boolean
+     */
+
+    public static function value_string_escape($execute='', $char=''){
+        $search = '\\\\' . $char;
+        $escape = md5($search);
+        $escape = Token::TYPE_REM . '-' . $escape;
+        $execute = str_replace($search, $escape, $execute);
+        $search = '\\' . $char;
+
+        switch($char){
+            case 'f' :
+                $replace = "\f";
+            break;
+            case 'r' :
+                $replace = "\r";
+            break;
+            case 'e' :
+                $replace = "\e";
+            break;
+            case 'n' :
+                $replace = "\n";
+            break;
+            case 't' :
+                $replace = "\t";
+            break;
+        }
+        $execute = str_replace($search, $replace, $execute);
+        $replace = "\\" . $char;
+        $execute = str_replace($escape, $replace, $execute);
+        return $execute;
+    }
+
     public static function value_string_execute(Parse $parse, $record=[], $token=[]){
         if(
             $record['type'] == Token::TYPE_STRING &&
-            substr($record['value'], 0, 1) == '"' &&
-            substr($record['value'], -1, 1) == '"'
+            !isset($record['is_executed'])
         ){
-            $string = substr($record['value'], 1, -1);
-            $string = $parse->compile($string);
-            $record['execute'] = $string;
+            $execute = $record['value'];
+            $execute = Token::value_string_escape($execute, 'f');
+            $execute = Token::value_string_escape($execute, 'r');
+            $execute = Token::value_string_escape($execute, 'e');
+            $execute = Token::value_string_escape($execute, 'n');
+            $execute = Token::value_string_escape($execute, 't');
+            $execute = $parse->compile($execute);
+            $record['execute'] = $execute;
             $record['is_executed'] = true;
             $token[$record['token']['nr']] = $record;
         }
@@ -3133,27 +3250,17 @@ class Token extends Core {
             return $token;
         }
         if($record['type'] != Token::TYPE_VARIABLE){
+            $token[$record['token']['nr']] = $record;
             return $token;
         }
         $attribute = substr($record['variable']['name'], 1);
         $record['execute'] = $parse->data($attribute);
+        $keep = false;
+        $token = Variable::modify($parse, $record, $token, $keep);
+        $record = $token[$record['token']['nr']];
         $record['is_executed'] = true;
         $record = Token::value_type($record);
-
-//         var_dump($record);
-
         $token[$record['token']['nr']] = $record;
-
-
-//         var_dump($record);
-
-        /*
-        if(!isset($token[$method['token']['nr']]['is_cleaned'])){
-            $token = Token::method_cleanup($token[$method['token']['nr']], $token, $tag_remove);
-        }
-        */
-
-
         return $token;
     }
 
@@ -3179,6 +3286,23 @@ class Token extends Core {
             var_dump('hey uknown');
             die;
         }
+        if(substr($method['method']['name'], 0, 1) == '$'){
+            $attribute = substr($method['method']['name'], 1);
+            $method['method']['name'] = $parse->data($attribute);
+            /*
+            $keep = false;
+            $token = Variable::modify($parse, $record, $token, $keep);
+            $record = $token[$record['token']['nr']];
+            $variable = substr($method['method']['name'], 1);
+            */
+        }
+
+
+        if($method['method']['name'] !== 'echo'){
+            var_dump($method);
+            die;
+        }
+        
         $file_name = 'Function.' . ucfirst(strtolower($method['method']['name'])) . '.php';
         $function_name = 'function_' . str_replace('.', '_', $method['method']['name']);
         $location = $parse->data('priya.parse.dir.function');
@@ -3201,14 +3325,19 @@ class Token extends Core {
         }
         if($is_method === true){
             if(!isset($method['method']['parameter'])){
+
+                var_dump($token[$method['token']['nr']]);
+
+
                 var_dump(debug_backtrace(true));
-                var_dump($method);
+//                 var_dump($method);
                 die;
             }
 //             var_dump($method);
 //             die;
             $method = Token::method_prepare($method);
             $method['method']['token_parameter'] = $method['method']['parameter'];
+
             foreach($method['method']['parameter'] as $nr => $parameter){
                 $execute = current($parameter);
                 if($execute !== null){
@@ -3237,6 +3366,122 @@ class Token extends Core {
         }
         if(!isset($token[$method['token']['nr']]['is_cleaned'])){
             $token = Token::method_cleanup($token[$method['token']['nr']], $token, $tag_remove);
+        }
+        return $token;
+    }
+
+    public static function variable_cleanup($variable=[], $token=[], $tag_remove=true){
+        if(!isset($variable['token'])){
+            return $token;
+        }
+        if($tag_remove === true){
+            $before = null;
+            $before_before =null;
+            $before_before_before =null;
+            foreach($token as $nr => $record){
+                if($nr == $variable['token']['nr']){
+                    for($i = $nr - 1; $i >= 0; $i--){
+                        if($before === null){
+                            $before = $i;
+                        }
+                        elseif($before_before === null){
+                            $before_before = $i;
+                        }
+                        elseif($before_before_before === null){
+                            $before_before_before = $i;
+                            break;
+                        }
+                    }
+                }
+            }
+            if(
+                isset($before) &&
+                $token[$before]['type'] == Token::TYPE_CURLY_OPEN
+                ){
+                    unset($token[$before]);
+                    if(
+                        !empty($variable['variable']['is_assign']) &&
+                        isset($before_before) &&
+                        $token[$before_before]['type'] == Token::TYPE_WHITESPACE
+                        ){
+                            //remove whitespace before
+                            $explode = explode("\n", $token[$before_before]['value']);
+                            if(isset($explode[1])){
+                                $end = array_pop($explode);
+                                $end = rtrim($end);
+                                $explode[] = $end;
+                                $token[$before_before]['value'] = implode("\n", $explode);
+                            }
+                    }
+            }
+        }
+        if(
+            !empty($variable['variable']['is_assign']) ||
+            !empty($variable['variable']['has_modifier'])
+        ){
+            $end = end($variable['variable']['value']);
+            for($i = $variable['token']['nr'] + 1; $i <= $end['token']['nr']; $i++){
+                unset($token[$i]);
+            }
+        } else {
+            var_dump($token);
+            var_Dump($variable);
+            die;
+        }
+        if($tag_remove === true){
+            $end = end($token);
+            $current = null;
+            $current_current = null;
+            $current_current_current = null;
+            for($i = $variable['token']['nr'] + 1; $i <= $end['token']['nr']; $i++){
+                if(isset($token[$i])){
+                    if($current === null){
+                        $current = $i;
+                    }
+                    elseif($current_current === null){
+                        $current_current = $i;
+                    }
+                    elseif($current_current_current === null){
+                        $current_current_current = $i;
+                        break;
+                    }
+                }
+            }
+
+            if($current !== null){
+                if($token[$current]['type'] == Token::TYPE_CURLY_CLOSE){
+                    unset($token[$current]);
+                    if(
+                        $current_current !== null &&
+                        $token[$current_current]['type'] == Token::TYPE_WHITESPACE
+                    ){
+                        $explode = explode("\n", $token[$current_current]['value'], 2);
+                        if(isset($explode[1])){
+                            $token[$current_current]['value'] = $explode[1];
+                        }
+                    }
+                    $current_current = null;
+                    $current_current_current = null;
+                }
+            }
+            if($current_current !== null){
+                if(
+                    $token[$current]['type'] == Token::TYPE_WHITESPACE &&
+                    $token[$current_current]['type'] == Token::TYPE_CURLY_CLOSE
+                ){
+                    unset($token[$current]);
+                    unset($token[$current_current]);
+                    if(
+                        $current_current_current !== null &&
+                        $token[$current_current_current]['type'] == Token::TYPE_WHITESPACE
+                    ){
+                        $explode = explode("\n", $token[$current_current_current]['value'], 2);
+                        if(isset($explode[1])){
+                            $token[$current_current_current]['value'] = $explode[1];
+                        }
+                    }
+                }
+            }
         }
         return $token;
     }
@@ -3443,22 +3688,6 @@ class Token extends Core {
         }
         $list = [];
         $string = '';
-
-        /*
-        if(!isset($execute['token'])){
-            var_dump($execute);
-//             die;
-        }
-
-        elseif(!isset($token[$execute['token']['nr']])){
-            $debug = debug_backtrace(true);
-            var_dump($debug);
-            var_dump('hey');
-            die;
-        }
-        */
-//         var_dump($execute);
-
         foreach($execute as $nr => $record){
             if(
                 isset($record['token']) &&
@@ -3472,63 +3701,17 @@ class Token extends Core {
             }
         }
         if(!isset($list[0])){
-            $debug = debug_backtrace(true);
-            var_dump($debug);
-            die;
-            var_dump($execute);
-            var_Dump($string);
-            var_dump($list);
-            die;
-            $debug = debug_backtrace(true);
-            var_dump($debug);
-            die;
             throw new Exception('Need token record...');
             return [];
         }
         $value = array_pop($list);
-//         var_dump($token);
-//         var_dump($value);
-//         die;
-        $token = Token::value_variable_execute($parse, $value, $token, $keep, $tag_remove);
-
-        if(!isset($token[$value['token']['nr']])){
-            var_dump($value);
-            var_dump($value['token']['nr']);
-            var_dump($token);
-            die;
-            $debug = debug_Backtrace(true);
-            var_dump($debug);
-            die;
-            var_Dump($token);
-            var_dump($value);
-            die;
-        }
-
-
-
+        $token = Token::value_variable_execute($parse, $value, $token, $keep, $tag_remove);        
         $value = $token[$value['token']['nr']];
-
-//         var_dump($value['token']['nr']);
-//         var_dump($token[$value['token']['nr']]);
-//         var_dump($token);
-
-
         $token = Token::value_method_execute($parse, $value, $token, $keep, $tag_remove);
-
-        //value_method_execute adds unwanted token to token
-
         $value = $token[$value['token']['nr']];
-
-//         var_dump($value);
-
         $value = Token::value_array_execute($parse, $value);
         $value = Token::value_object_execute($parse, $value);
-
-//         var_dump($value);
-
         $token = Token::value_string_execute($parse, $value, $token);
-//         var_dump($token);
-//         die;
         $value = $token[$value['token']['nr']];
         if(!isset($value['is_executed'])){
             var_dump($value);
@@ -3912,12 +4095,6 @@ class Token extends Core {
 
 
     public static function set_execute(Parse $parse, $set=[], $record=[], $token=[], $keep=false, $tag_remove=true){
-//         var_dump($set);
-        if(isset($set[0])){
-            $debug = debug_backtrace(true);
-            var_dump($debug);
-            die;
-        }
         if(isset($set['is_executed'])){
             return $set;
         }
@@ -3925,11 +4102,15 @@ class Token extends Core {
             return $set;
         }
         $count = 0;
+        $count_set = 0;
+        $count_operator = 0;
         $set = Token::precedence($set);
         $has_operator = false;
         while(Token::set_has($set)){
+            $count_set++;
             $set_get = Token::set_get($set);
             while(Token::operator_has($set_get)){
+                $count_operator++;
                 $has_operator = true;
                 $operator = Token::operator_get($set_get);
                 try {
@@ -3975,7 +4156,6 @@ class Token extends Core {
                     if(!isset($token[$record['token']['nr']])){
                         throw new Exception('Parse error: record not available in token, please make sure the record is in the token...');
                     }
-
                     $token[$record['token']['nr']] = $record;
                 }
             } else {
@@ -3993,11 +4173,6 @@ class Token extends Core {
                 throw new Exception('Set should be empty...');
                 return $token;
             } else {
-                if(!isset($record['token'])){
-                    var_dump(debug_backtrace(true));
-//                     var_dump($record);
-                    die;
-                }
                 if($record['token']['nr'] == $execute['token']['nr']){
                     $token[$execute['token']['nr']] = $execute;
                 } else {
@@ -4006,10 +4181,6 @@ class Token extends Core {
                     $token[$record['token']['nr']] = $record;
                 }
             }
-        }
-        if(isset($token[42]) && $token[42]['type'] == Token::TYPE_FLOAT){
-            var_dump($token);
-            die;
         }
         return $token;
     }

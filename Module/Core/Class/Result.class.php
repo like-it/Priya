@@ -30,9 +30,11 @@ class Result extends Parser {
     const DATA = 'Data';
     const HELP = 'Help';
     const EXECUTE = 'Execute';
+    const VIEW = 'View';
     const TEMPLATE = 'Template';
 
     const EXT_EXECUTE = '.exe';
+    const EXT_VIEW = '.tpl';
 
     const EXCEPTION_EXECUTE = 'Execute file expected in one of these locations: ';
     const EXCEPTION_COMPILE_DIR = 'Unable to create compile dir';
@@ -101,6 +103,52 @@ class Result extends Parser {
         $ignore[] = 'contentType';
 //         $ignore[] = 'autoload';
         $this->data('ignore', $ignore);
+    }
+
+    public static function view($object=null, $template='', $type='response'){
+        $class = get_called_class();
+        //execution cannot be cached, we need a different name -> response?
+        $data = $object->read($class);
+        $object->data($data);
+        $explode = explode('\\', $class);
+        if(empty($template)){
+            $template = array_pop($explode);
+        }
+        //can be outside priya module...
+        $dir = dirname($class::DIR) . Application::DS . Result::VIEW . Application::DS;
+        $url = $dir . $template . Result::EXT_VIEW;
+        if($type == 'url'){
+            return $url;
+        }
+        $location = array();
+        $location[] = $url;
+        if($type == 'location'){
+            $template = array_pop($explode) . '.' . $template;
+            $url = $dir . $template . Result::EXT_VIEW;
+            $location[] = $url;
+            return $location;
+        }
+        if(!file_exists($url)){
+            $template = array_pop($explode) . '.' . $template;
+            $url = $dir . $template . Result::EXT_VIEW;
+            $location[] = $url;
+            if(!file_exists($url)){
+                $exception =  Result::EXCEPTION_VIEW.
+                    "\n" .
+                    implode("\n", $location)
+                ;
+                throw new Exception($exception);
+            }
+        }
+        $parser = new Parse($object->handler(), $object->route(), $object->data());
+
+        try {
+            $execute = $parser->read($url);
+            $object->data($parser->data());
+            return $execute;
+        } catch (Exception $e) {
+            return $e;
+        }
     }
 
     public static function execute($object=null, $type='respond', $template=''){

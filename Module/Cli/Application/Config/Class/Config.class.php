@@ -32,7 +32,7 @@ class Config extends Cli {
             return Config::execute($this);
         }
         if($this->parameter('mail')){
-            return Config::execute($this, null, 'Mail');
+            return Config::view($this, 'Mail');
         }
 
 

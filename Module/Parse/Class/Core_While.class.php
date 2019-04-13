@@ -216,6 +216,7 @@ class Core_while extends Core {
             $parse->data('priya.parse.break.level', $level);
             $before[$while['token']['nr']]['execute'] = '';
             $count = 0;
+
             while($parameter[0]){
                 $count++;
                 if(null !== $parse->data('priya.parse.while.count') &&
