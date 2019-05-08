@@ -38,7 +38,7 @@ class Data extends Core {
         return $is_empty;
     }
 
-    public function data($attribute=null, $value=null){
+    public function data($attribute=null, $value=null, $type=null){
         if($attribute !== null){
             if($attribute == 'set'){
                 $this->object_delete($value, $this->data()); //for sorting an object
@@ -47,6 +47,9 @@ class Data extends Core {
             }
             elseif($attribute == 'get'){
                 return $this->object_get($value, $this->data());
+            }
+            elseif($attribute == 'has'){
+                return $this->object_has($value, $this->data());
             }
             if($value !== null){
                 if(
@@ -100,7 +103,7 @@ class Data extends Core {
         }
     }
 
-    private function getData($attribute=null){
+    protected function getData($attribute=null){
         if($attribute === null){
             if(is_null($this->data)){
                 $this->data = new stdClass();

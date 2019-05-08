@@ -9,14 +9,20 @@
 namespace Priya\Module;
 
 use stdClass;
+use Priya\Module\File\Dir;
 
 class File {
     const CHMOD = 0640;
     const TYPE = 'File';
     const SCHEME_HTTP = 'http';
 
+    public static function is($url=''){
+        $url = rtrim($url, Dir::SEPARATOR);
+        return is_file($url);
+    }
+
     public static function dir($directory=''){
-        return str_replace('\\\/', DIRECTORY_SEPARATOR, rtrim($directory,'\\\/')) . DIRECTORY_SEPARATOR;
+        return str_replace('\\\/', Dir::SEPARATOR, rtrim($directory,'\\\/')) . Dir::SEPARATOR;
     }
 
     public static function mtime($url=''){
@@ -29,7 +35,8 @@ class File {
         exit;
     }
 
-    public static function exist($url){ //File::exist means File has exist and not exists
+    public static function exist($url){ //File::exist means File has exist and not exist
+        $url = rtrim($url, Dir::SEPARATOR);
         return file_exists($url);
     }
 

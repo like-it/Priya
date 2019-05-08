@@ -31,7 +31,7 @@ class Task extends Cli {
         }
         return $execute;
     }
-    public static function execute($object=null, $task=''){
+    public static function execute($object=null, $task='', $type='response'){
         if(!isset($task->execute)){
             throw new Exception('Nothing to execute in task...');
         }

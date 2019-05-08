@@ -9,7 +9,7 @@
 namespace Priya\Module\File;
 
 use stdClass;
-use zipArchive;
+use ZipArchive;
 use Priya\Module\File;
 use Priya\Application;
 

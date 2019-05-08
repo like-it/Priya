@@ -10,23 +10,26 @@
 namespace Priya\Module\File;
 
 use stdClass;
+use Priya\Module\File;
 
 class Dir {
     const CHMOD = 0740;
     const TYPE = 'Dir';
+    const SEPARATOR = DIRECTORY_SEPARATOR;
 
     private $node;
-
+    
     public static function create($url='', $chmod=''){
-        if(file_exists($url) && !is_dir($url)){
-            unlink($url);
+        $url = rtrim($url, '/');        
+        if(File::exist($url) && !Dir::is($url)){
+            unlink($url);            
         }
-        elseif(file_exists($url) && is_dir($url)){
+        if(File::exist($url) && Dir::is($url)){
             return true;
         } else {
             $mkdir = false;
             if(empty($chmod)){
-                $mkdir = @mkdir($url, DIR::CHMOD, true);
+                $mkdir = @mkdir($url, Dir::CHMOD, true);
             } else {
                 $mkdir = @mkdir($url, $chmod, true);
             }
@@ -34,7 +37,19 @@ class Dir {
         }
     }
 
+    public static function exist($url=''){
+        $url = rtrim($url, Dir::SEPARATOR);                        
+        if(
+            File::exist($url) === true && 
+            Dir::is($url) === true
+        ){
+            return true;
+        }                    
+        return false;
+    }
+
     public static function is($url=''){
+        $url = rtrim($url, Dir::SEPARATOR);        
         return is_dir($url);
     }
 
@@ -44,9 +59,12 @@ class Dir {
         } else {
             $levels += 0;
             $name = dirname($url, (int) $levels);
-        }
+        }        
         if($name == '.'){
             return '';
+        }
+        elseif(substr($name, -1, 1) != '/'){
+            $name .= '/';
         }
         return $name;
     }
@@ -70,8 +88,8 @@ class Dir {
                 $node->ignore = $attribute;
             }
             elseif($ignore=='find'){
-                if(substr($attribute,-1) !== DIRECTORY_SEPARATOR){
-                    $attribute .= DIRECTORY_SEPARATOR;
+                if(substr($attribute,-1) !== Dir::SEPARATOR){
+                    $attribute .= Dir::SEPARATOR;
                 }
                 foreach ($node->ignore as $nr => $item){
                     if(stristr($attribute, $item) !== false){
@@ -80,8 +98,8 @@ class Dir {
                 }
                 return false;
             } else {
-                if(substr($ignore,-1) !== DIRECTORY_SEPARATOR){
-                    $ignore .= DIRECTORY_SEPARATOR;
+                if(substr($ignore,-1) !== Dir::SEPARATOR){
+                    $ignore .= Dir::SEPARATOR;
                 }
                 $node->ignore[] = $ignore;
             }
@@ -91,8 +109,8 @@ class Dir {
     }
 
     public function read($url='', $recursive=false, $format='flat'){
-        if(substr($url,-1) !== DIRECTORY_SEPARATOR){
-            $url .= DIRECTORY_SEPARATOR;
+        if(substr($url,-1) !== Dir::SEPARATOR){
+            $url .= Dir::SEPARATOR;
         }
         if($this->ignore('find', $url)){
             return array();
@@ -112,7 +130,7 @@ class Dir {
                 $file = new stdClass();
                 $file->url = $url . $entry;
                 if(is_dir($file->url)){
-                    $file->url .= DIRECTORY_SEPARATOR;
+                    $file->url .= Dir::SEPARATOR;
                     $file->type = Dir::TYPE;
                 }
                 if($this->ignore('find', $file->url)){
@@ -121,7 +139,7 @@ class Dir {
                 $file->name = $entry;
                 if(isset($file->type)){
                     if(!empty($recursive)){
-                        $directory = new dir();
+                        $directory = new Dir();
                         $directory->ignore('list', $this->ignore());
                         $recursiveList = $directory->read($file->url, $recursive, $format);
 

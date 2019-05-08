@@ -19,8 +19,10 @@ use Priya\Module\File\Cache;
 use Priya\Module\File\Dir;
 
 class Application extends Parser {
+    //rename Application::DS to Dir::SEPERATOR 
     const DS = DIRECTORY_SEPARATOR;
     const DIR = __DIR__;
+    // const CLASS = 'Class';
     const PRIYA = 'Priya';
     const ENVIRONMENT = 'development';
     const MODULE = 'Module';
@@ -92,7 +94,7 @@ class Application extends Parser {
         'dir.current'
     ];
 
-    public function __construct($autoload=null, $data=null){
+    public function __construct($autoload=null, $data=null){        
         if($data){
             $data = new Data($this->object($data));
         }
@@ -236,7 +238,7 @@ class Application extends Parser {
             $this->header('Last-Modified: '. $this->request('last-modified'));
             $this->header('Access-Control-Allow-Origin: http://' . $host);
         }
-        $item = $this->route()->run();
+        $item = $this->route()->run();        
 //         $this->cli(); //why twice -> see constructor
         $handler = $this->handler();
         $contentType = $handler->request('contentType');
@@ -604,14 +606,14 @@ class Application extends Parser {
         if($this->data('priya.route.cache.disable')){
             $is_cache = false;
         }
-        if($is_cache){
+        if($is_cache){            
             $cache = Cache::read($url, $this->data('priya.cache.config.' .  $this->data('priya.route.cache.interval')));
             if($cache === Cache::ERROR_EXPIRE){
                 $is_expired = true;
                 $cache = Cache::validate($url, $this->data('priya.cache.config.' .  $this->data('priya.route.cache.interval')));
             }
-        }
-        if($cache){
+        }        
+        if($cache !== false){
             $this->route(new Module\Route(
                 $this->handler(),
                 $this->data(),
@@ -627,6 +629,10 @@ class Application extends Parser {
             ));
             $this->route()->data('priya.route.cache.time.start', $start);
             $this->route()->data('priya.route.cache.time.duration', microtime(true) - $start);
+
+            // var_dump($this->route()->data());
+            // die;
+
             if($is_cache){
                 Cache::write($url,  $this->object($this->route()->data(), 'json'), true);
             }

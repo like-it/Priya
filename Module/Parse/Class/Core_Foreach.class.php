@@ -186,7 +186,7 @@ class Core_foreach extends Core {
             $source = $foreach['method']['parameter'][0];
             $key = null;
             $value = null;
-            $execute = current($source);
+            $execute = reset($source);
             if($execute !== null){
                 $token = Token::set_execute($parse, $source, $execute, $token, $keep, $need_tag);
                 $execute = $token[$execute['token']['nr']];
@@ -203,36 +203,36 @@ class Core_foreach extends Core {
                 if(isset($key[1])){
                     $source = $parse->data('priya.parse.read.url');
                     if($source !== null){
-                        throw new Exception('Parse error: multiple keys found in foreach starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column'] . ' in: ' . $source);
+                        throw new Exception('Parse error: multiple keys found in for.each starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column'] . ' in: ' . $source);
                     } else {
-                        throw new Exception('Parse error: multiple keys found in foreach starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column']);
+                        throw new Exception('Parse error: multiple keys found in for.each starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column']);
                     }
                 }
                 $key = $key[0];
                 if($key['type'] != Token::TYPE_VARIABLE){
                     $source = $parse->data('priya.parse.read.url');
                     if($source !== null){
-                        throw new Exception('Parse error: key is not a variable in foreach starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column'] . ' in: ' . $source);
+                        throw new Exception('Parse error: key is not a variable in for.each starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column'] . ' in: ' . $source);
                     } else {
-                        throw new Exception('Parse error: key is not a variable in foreach starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column']);
+                        throw new Exception('Parse error: key is not a variable in for.each starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column']);
                     }
                 }
                 $value = Token::create($foreach['method']['parameter'][2]);
                 if(isset($value[1])){
                     $source = $parse->data('priya.parse.read.url');
                     if($source !== null){
-                        throw new Exception('Parse error: multiple values found in foreach starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column'] . ' in: ' . $source);
+                        throw new Exception('Parse error: multiple values found in for.each starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column'] . ' in: ' . $source);
                     } else {
-                        throw new Exception('Parse error: multiple values found in foreach starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column']);
+                        throw new Exception('Parse error: multiple values found in for.each starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column']);
                     }
                 }
                 $value = $value[0];
                 if($value['type'] != Token::TYPE_VARIABLE){
                     $source = $parse->data('priya.parse.read.url');
                     if($source !== null){
-                        throw new Exception('Parse error: value is not a variable in foreach starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column'] . ' in: ' . $source);
+                        throw new Exception('Parse error: value is not a variable in for.each starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column'] . ' in: ' . $source);
                     } else {
-                        throw new Exception('Parse error: value is not a variable in foreach starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column']);
+                        throw new Exception('Parse error: value is not a variable in for.each starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column']);
                     }
                 }
             }
@@ -242,9 +242,9 @@ class Core_foreach extends Core {
                 if(isset($value[1])){
                     $source = $parse->data('priya.parse.read.url');
                     if($source !== null){
-                        throw new Exception('Parse error: multiple values found in foreach starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column'] . ' in: ' . $source);
+                        throw new Exception('Parse error: multiple values found in for.each starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column'] . ' in: ' . $source);
                     } else {
-                        throw new Exception('Parse error: multiple values found in foreach starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column']);
+                        throw new Exception('Parse error: multiple values found in for.each starting at line: ' . $foreach['row'] . ' column: ' . $foreach['column']);
                     }
                 }
                 $value = $value[0];

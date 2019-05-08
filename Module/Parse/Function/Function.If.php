@@ -8,19 +8,15 @@
  *
  */
 
-//namespace Priya\Module\Parse;
+namespace Priya\Module\Parse;
 
 use Priya\Module\Parse;
-use Priya\Module\Parse\Core_if;
 
-function function_if(Parse $parse, $method=[], $token=[], $keep=false){
+const IF_TAG_CLOSE = true;
 
-    if(!isset($method['method'])){
-        return $token;
-    }
-    if($method['method']['name'] != 'if'){
-        return $token;
-    }
+function function_if(Parse $parse, $value){
+    var_dump($value);
+    die;
     $method = Core_if::select($method, $token, true);
     $token = Core_if::execute($parse, $method, $token, $keep, true);
     return $token;

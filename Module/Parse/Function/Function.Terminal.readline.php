@@ -215,7 +215,7 @@ function function_terminal_readline(Parse $parse, $method=[], $token=[], $keep=f
 
 //     $parse->data('priya.parse.flush.nr', $to);
     $method['execute'] = $cli->input($string . $input, $hidden, $timeout);
-    $method['type'] = Token::value_type($method, 'execute');
+    $method = Token::value_type($method, 'execute');
     $method['is_debug'] = true;
     $token[$method['token']['nr']] = $method;
 

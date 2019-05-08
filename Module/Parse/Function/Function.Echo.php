@@ -11,26 +11,21 @@
 use Priya\Module\Parse;
 use Priya\Module\Parse\Token;
 
-function function_echo(Parse $parse, $method=[], $token=[], $keep=false, $tag_remove=true){
-
-    if(
-        !isset($method['method']) ||
-        !isset($method['token']) ||
-        !isset($method['token']['nr'])
-    ){
-        return $token;
-    }
-    if($method['method']['name'] != 'echo'){
-        return $token;
-    }
-    $execute = '';
-    if(isset($method['method']['parameter'][0])){
-        foreach($method['method']['parameter'] as $nr => $parameter){
-            $execute .= (string) $parameter;
+function function_echo(
+    Parse $parse,
+    $parameter = [],
+    &$token = [],
+    $method = []
+){      
+    if(!is_array($parameter)) {
+        return;        
+    }       
+    $execute = ''; 
+    if(key_exists(0, $parameter)){
+        foreach($parameter as $nr => $argument){
+            $execute .= (string) $argument;
+            echo ((string) $argument);
         }
-    }
-    $method['execute'] = $execute;
-    $method['type'] = Token::TYPE_STRING;
-    $token[$method['token']['nr']] = $method;
-    return $token;
+    }            
+    return $execute;
 }

@@ -26,10 +26,10 @@ class Route extends Core\Parser{
     public function __construct(Handler $handler, $data='', $read=true){
         $this->handler($handler);
         $this->storage(new Data($data));
-        if($read){
+        if($read === true){
             $this->storage()->data('priya.cache.file', []);
             $data = new Data();
-            $url = $this->storage()->data('priya.route.url');
+            $url = $this->storage()->data('priya.route.url');            
             if(empty($url)){
                 $url == $this->storage()->data('priya.dir.data') . Application::ROUTE;
             }
@@ -56,7 +56,7 @@ class Route extends Core\Parser{
         }
         if(empty($route)){
             $this->error('route', true);
-        }
+        }        
         return $route;
     }
 
@@ -68,7 +68,7 @@ class Route extends Core\Parser{
         }
         if(empty($data)){
             throw new Exception($this->parser('object')->compile(Route::EXCEPTION_ROUTE_CURRUPT, $this->storage()->data()));
-        }
+        }        
         $parser = false;
         foreach($data as $name => $route){
             if(isset($route->resource) && !isset($route->read)){
@@ -149,10 +149,10 @@ class Route extends Core\Parser{
                     $route->method[$key] = strtoupper($method);
                 }
                 $contentType = $this->handler()->contentType();
-                if($contentType == handler::CONTENT_TYPE_CLI && !in_array('CLI', $route->method)){
+                if($contentType == Handler::CONTENT_TYPE_CLI && !in_array('CLI', $route->method)){
                     continue; //skip based on wrong content
                 }
-                if($contentType !== handler::CONTENT_TYPE_CLI){
+                if($contentType !== Handler::CONTENT_TYPE_CLI){
                     $method = $this->handler()->method();
                     if(!in_array($method, $route->method)){
                         continue; //skip based on wrong method

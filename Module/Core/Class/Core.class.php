@@ -16,6 +16,13 @@ use Priya\Application;
 class Core {
     const FILE = __FILE__;
     const DS = Application::DS;
+
+    const ATTRIBUTE_EXPLODE = [
+        '.',
+        ':', 
+        '->'
+    ];
+
     const EXCEPTION_PERMISSION_TYPE = 'unknown permission type.';
     const EXCEPTION_MERGE_ARRAY_OBJECT = 'cannot merge an array with an object.';
     const EXCEPTION_KEY_ARRAY_OBJECT = 'cannot create object from array with empty key.';
@@ -645,6 +652,7 @@ class Core {
         }
         $selector = implode('.', $call);
         $selector = strtolower($selector);
+        //read unavailable here, move...
         $read = $this->read($class);
         if(empty($read)){
             return $this->read_permission(--$count);
@@ -653,7 +661,7 @@ class Core {
     }
 
     private function has_permission($selector=''){
-
+        //data unavailable here, move...
         $rule = $this->data('permission.' . $selector . '.rule');
         $group = $this->data('permission.' . $selector . '.group');
 
@@ -1050,7 +1058,7 @@ class Core {
             }
         }
         if(is_string($attributeList)){
-            $attributeList = $this->explode_multi(array('.', ':', '->'), $attributeList);
+            $attributeList = $this->explode_multi(Core::ATTRIBUTE_EXPLODE, $attributeList);
         }
         if(is_array($attributeList)){
             $attributeList = $this->object_horizontal($attributeList);
@@ -1095,6 +1103,48 @@ class Core {
         return $is_empty;
     }
 
+    public function object_has($attributeList=array(), $object=''){
+        if(Core::object_is_empty($object)){
+            if(empty($attributeList)){
+                return true;
+            }
+            return false;
+        }
+        if(is_string($attributeList)){
+            $attributeList = $this->explode_multi(Core::ATTRIBUTE_EXPLODE, $attributeList);
+            foreach($attributeList as $nr => $attribute){
+                if(empty($attribute)){
+                    unset($attributeList[$nr]);
+                }
+            }
+        }
+        if(is_array($attributeList)){
+            $attributeList = $this->object_horizontal($attributeList);
+        }
+        if(empty($attributeList)){
+            return true;
+        }
+        foreach($attributeList as $key => $attribute){
+            if(empty($key)){
+                continue;
+            }            
+            if(property_exists($object,$key)){
+                
+                var_dump($attributeList);                
+                $get = $this->object_has($attributeList->{$key}, $object->{$key});
+                var_dump($key);
+                var_dump($get);
+
+                if($get === false){
+                    return false;
+                }
+                
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function object_get($attributeList=array(), $object=''){
         if(Core::object_is_empty($object)){
             if(empty($attributeList)){
@@ -1103,7 +1153,7 @@ class Core {
             return null;
         }
         if(is_string($attributeList)){
-            $attributeList = $this->explode_multi(array('.',':', '->'), $attributeList);
+            $attributeList = $this->explode_multi(Core::ATTRIBUTE_EXPLODE, $attributeList);
             foreach($attributeList as $nr => $attribute){
                 if(empty($attribute)){
                     unset($attributeList[$nr]);
@@ -1225,5 +1275,16 @@ class Core {
         $end = reset($record);
         $key = key($record);
         return $key;
+    }
+
+    public static function array_shift(&$array, $preserve_keys=false){
+        if($preserve_keys === true){
+            $reset = reset($array);
+            $key = key($array);
+            unset($array[$key]);
+            return $reset;            
+        } else {
+            return array_shift($array);
+        }
     }
 }

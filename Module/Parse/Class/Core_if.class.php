@@ -26,6 +26,9 @@ class Core_if extends Core {
             'elseif' => [],
             'else' => null
         ];
+        $else_start = null;
+        $else_start_start = null;
+        $else_start_start_start = null;
         foreach($token as $nr => $record){
             if($skip > 0){
                 $skip--;
@@ -155,7 +158,7 @@ class Core_if extends Core {
                 }
                 elseif($is_else === true){
                     $content['else'][$record['token']['nr']] = $record;
-                    if($need_tag_close === true){
+                    if($tag_remove === true){
                         if($else_start === null){
                             $else_start = $record['token']['nr'];
                         }
@@ -420,7 +423,7 @@ class Core_if extends Core {
                             throw new Exception('Parse error: unexpected , in if statement starting at line: ' . $elseif['row'] . ' column: ' . $elseif['column'] . ' in: ' . $parse->data('priya.parse.read.url'));
                             // we might do a logical and for this...
                         }
-                        $execute = current($elseif['method']['parameter'][0]);
+                        $execute = reset($elseif['method']['parameter'][0]);
                         $token = Token::set_execute($parse, $elseif['method']['parameter'][0], $execute, $token, $keep, $tag_remove);
                         $execute = $token[$execute['token']['nr']];
                         if(
@@ -489,7 +492,7 @@ class Core_if extends Core {
                     }
                 }
             }
-            elseif($parameter[0] === true){
+            elseif($parameter[0] === true){                
                 $before = [];
                 foreach($token as $key => $value){
                     if($key == $if['token']['nr']){
@@ -517,14 +520,14 @@ class Core_if extends Core {
                 foreach($if['method']['if'] as $key => $value){
                     $before[$key] = $value;
                 }
-                $before = $parse->execute($before, 2);
+                $before = $parse->execute($before, 3);                
                 $execute = [];
                 foreach($if['method']['if'] as $key => $value){
                     if(isset($before[$key])){
                         $execute[$key] = $before[$key];
                         unset($before[$key]);
                     }
-                }
+                }                
                 foreach($before as $key => $value){
                     $token[$key] = $value;
                 }

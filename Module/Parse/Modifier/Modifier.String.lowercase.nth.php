@@ -9,16 +9,13 @@
 
 use Priya\Module\Parse;
 
-function modifier_string_lowercase_nth(Parse $parse, $variable=[], $parameter=[], $token=[], $keep=false){
-    if(!isset($parameter[0])){
-        throw new Exception('Parse error: modifier.string.uppercase.nth needs a position...');
-    } else {
-        $number = $parameter[0];
-        $variable['execute'] = modifier_string_lowercase_nth_foreach($variable['execute'], $number);
-        $variable['is_executed'] = true;
-        $token[$variable['token']['nr']] = $variable;
+function modifier_string_lowercase_nth(Parse $parse, $value='', $number=null){    
+    if($number === null){
+        throw new Exception('Parse error: modifier.string.lowercase.nth needs a position...');
+    } else {        
+        $value = modifier_string_lowercase_nth_foreach($value, $number);                
     }
-    return $token;
+    return $value;
 }
 
 function modifier_string_lowercase_nth_foreach($data=null, $number=null){

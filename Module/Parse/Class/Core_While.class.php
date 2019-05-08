@@ -250,7 +250,7 @@ class Core_while extends Core {
                         break;
                     }
                 }
-                $execute = current($while['method']['token_parameter'][0]);
+                $execute = reset($while['method']['token_parameter'][0]);
                 $before = Token::set_execute($parse, $while['method']['token_parameter'][0], $execute, $before);
                 $execute = $before[$execute['token']['nr']];
                 unset($before[$execute['token']['nr']]);

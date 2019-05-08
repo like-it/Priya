@@ -6,6 +6,7 @@
  * @changeLog
  *     -    all
  */
+$autoload = null;
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'Autoload.php';
 
 $app = new Priya\Application($autoload);

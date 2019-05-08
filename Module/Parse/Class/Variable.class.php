@@ -9,7 +9,7 @@ class Variable extends Core {
     CONST STATUS = 'is_variable';
 
     public static function execute(Parse $parse, $variable=[], $token=[], $keep=false, $tag_remove=true){
-        if($variable['variable']['is_assign'] === true){
+        if($variable['variable']['is_assign'] === true){            
             $token = Variable::assign($parse, $variable, $token, $keep);
             $variable = $token[$variable['token']['nr']];
         } else {
@@ -17,10 +17,11 @@ class Variable extends Core {
             $variable['execute'] = $parse->data($attribute);
             $token = Variable::modify($parse, $variable, $token, $keep);
             $variable = $token[$variable['token']['nr']];
+            $variable = Token::value_type($variable, 'execute');            
         }
         $variable['is_executed'] = true;
         $token[$variable['token']['nr']] = $variable;
-        $token = Variable::cleanup($variable, $token, $tag_remove);
+        $token = Variable::cleanup($variable, $token, $tag_remove);        
         return $token;
     }
 
@@ -80,6 +81,10 @@ class Variable extends Core {
     }
 
     public static function value(Parse $parse, $variable=[], $token=[], $keep=false, $tag_remove=true){
+        if(!isset($variable['variable']['value'])){
+            var_dump($variable);
+            die;
+        }    
         return Token::set_execute($parse, $variable['variable']['value'], $variable, $token, $keep, $tag_remove);
     }
 
@@ -87,19 +92,30 @@ class Variable extends Core {
         switch($variable['variable']['operator']){
             case '=' :
                 if(!isset($token[$variable['token']['nr']])){
+                    var_dump($token);
+                    var_dump($variable);                    
                     var_dump('found');
                     die;
-                }
-                $token = Variable::value($parse, $variable, $token, $keep, $tag_remove);
-                $variable = $token[$variable['token']['nr']];
+                }                
+                $token = Variable::value($parse, $variable, $token, $keep, $tag_remove);                
+                $variable = $token[$variable['token']['nr']];                
+
                 $attribute = substr($variable['variable']['name'], 1 );
                 if(!isset($variable['is_executed'])){
                     var_dump($variable);
                     die;
-                }
+                }                
                 $parse->data($attribute, $variable['execute']);
+                $variable['variable']['execute'] = $variable['execute'];
             break;
             case '+=' :
+                $attribute = substr($variable['variable']['name'], 1 );            
+                $token = Variable::value($parse, $variable, $token, $keep, $tag_remove);                
+                $variable = $token[$variable['token']['nr']];                
+                $variable['execute'] = $parse->data($attribute) + $variable['execute'];
+                var_dump($variable);                        
+                $parse->data($attribute, $variable['execute']);
+                $variable['variable']['execute'] = $variable['execute'];                
             break;
             case '-=' :
             break;
@@ -111,17 +127,18 @@ class Variable extends Core {
             break;
             case '++' :
                 $attribute = substr($variable['variable']['name'], 1 );
-                $value = $parse->data($attribute);
-                if($value === null){
+                $variable['execute'] = $parse->data($attribute);
+                if($variable['execute'] === null){
                     $source = $parse->data('priya.parse.read.url');
                     if($source === null){
-                        throw new Exception('Undefined variable: ' . $variable['variable']['name'] . ' on line: ' . $variable['row'] . ' column: ' . $variable['column']);
+                        throw new Exception('Parse error: Undefined variable: ' . $variable['variable']['name'] . ' on line: ' . $variable['row'] . ' column: ' . $variable['column']);
                     } else {
-                        throw new Exception('Undefined variable: ' . $variable['variable']['name'] . ' on line: ' . $variable['row'] . ' column: ' . $variable['column']  . ' in file: ' . $source);
+                        throw new Exception('Parse error: Undefined variable: ' . $variable['variable']['name'] . ' on line: ' . $variable['row'] . ' column: ' . $variable['column']  . ' in file: ' . $source);
                     }
                 }
-                $value++;
-                $parse->data($attribute, $value);
+                $variable['execute']++;
+                $variable['variable']['execute'] = $variable['execute'];
+                $parse->data($attribute, $variable['execute']);
             break;
             case '--' :
                 $attribute = substr($variable['variable']['name'], 1 );
@@ -160,13 +177,14 @@ class Variable extends Core {
             break;
             case '|=' :
             break;
-        }
+        }            
         if($keep === true){
             $variable['execute'] = $variable['value'];
         } else {
             $variable['execute'] = null;
             $variable = Token::value_type($variable, 'execute');
         }
+        $variable['is_executed'] = true;
         $token[$variable['token']['nr']] = $variable;
         return $token;
     }

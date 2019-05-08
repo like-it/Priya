@@ -12,7 +12,6 @@ namespace Priya\Module\File;
 use Exception;
 use Priya\Application;
 use Priya\Module\File;
-use Priya\Module\Core;
 use Priya\Module\Data;
 
 class Cache {

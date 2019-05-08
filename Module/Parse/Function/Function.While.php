@@ -11,7 +11,7 @@
 //namespace Priya\Module\Parse;
 
 use Priya\Module\Parse;
-use Priya\Module\Parse\Core_While;
+use Priya\Module\Parse\Core_while;
 
 function function_while(Parse $parse, $method=[], $token=[], $keep=false){
 
@@ -21,7 +21,7 @@ function function_while(Parse $parse, $method=[], $token=[], $keep=false){
     if($method['method']['name'] != 'while'){
         return $token;
     }
-    $method = Core_While::select($method, $token, true);
-    $token = Core_While::execute($parse, $method, $token, $keep, true);
+    $method = Core_while::select($method, $token, true);
+    $token = Core_while::execute($parse, $method, $token, $keep, true);
     return $token;
 }

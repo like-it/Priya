@@ -2,6 +2,7 @@
 	"priya" : {
 		"parse" : {
 			"dir" : {
+				"cache" : "{$priya.dir.module}Parse/Data/Cache/",				
 				"modifier" : [
 					"{$priya.dir.module}Parse/Modifier/"
 				],

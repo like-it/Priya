@@ -161,7 +161,7 @@ class Handler extends \Priya\Module\Core\Data{
     public function file($attribute=null, $value=null){
         if($attribute !== null){
             if($attribute == 'create'){
-                return $this->createFile($value);
+                return $this->createFile();
             }
             if($value !== null){
                 if($attribute=='delete'){
@@ -236,7 +236,7 @@ class Handler extends \Priya\Module\Core\Data{
         return $this->file($nodeList);
     }
 
-    public function lastModified(){
+    public function lastModified($type='create'){
         $this->request('last-modified', gmdate('D, d M Y H:i:s T'));
     }
 
@@ -326,7 +326,7 @@ class Handler extends \Priya\Module\Core\Data{
         return $this->method($method);
     }
 
-    public function input(){
+    public function input($type='create'){
         global $argc, $argv;
 
         $node = array();
