@@ -7,28 +7,38 @@
  *  -    all
  */
 namespace Priya\Module;
-
 use stdClass;
-
+use Priya\Module\File\Dir;
 class File {
-    const CHMOD = 0640; //might be wrong...s recalculate read write read ?
+    const CHMOD = 0640;
     const TYPE = 'File';
     const SCHEME_HTTP = 'http';
-
-    public static function dir($directory=''){
-        return str_replace('\\\/', DIRECTORY_SEPARATOR, rtrim($directory,'\\\/')) . DIRECTORY_SEPARATOR;
+    public static function is($url=''){
+        $url = rtrim($url, Dir::SEPARATOR);
+        return is_file($url);
     }
-
+    public static function dir($directory=''){
+        return str_replace('\\\/', Dir::SEPARATOR, rtrim($directory,'\\\/')) . Dir::SEPARATOR;
+    }
     public static function mtime($url=''){
         return filemtime($url);
     }
-
     public static function diskusage($url=''){
         system('du ' . $url, $usage);
         var_dump($usage);
-        die;
+        exit;
     }
-
+    public static function exist($url){ //File::exist means File has exist and not exist
+        $url = rtrim($url, Dir::SEPARATOR);
+        return file_exists($url);
+    }
+    public static function touch($url='', $time=null, $atime=null){
+        if($atime === null){
+            return @touch($url, $time);
+        } else {
+            return @touch($url, $time, $atime);
+        }
+    }
     public static function info(stdClass $node){
         $rev = strrev($node->name);
         $explode = explode('.', $rev, 2);
@@ -44,7 +54,6 @@ class File {
         $node->size = filesize($node->url);
         return $node;
     }
-
     public static function chown($url='', $owner=null, $group=null, $recursive=false){
         if($owner === null){
             $owner = 'root:root';
@@ -65,14 +74,15 @@ class File {
         }
     }
 
-    public function write($url='', $data=''){
+    public static function write($url='', $data=''){
         $url = (string) $url;
         $data = (string) $data;
         $fwrite = 0;
-        $resource = fopen($url, 'w');
+        $resource = @fopen($url, 'w');
         if($resource === false){
             return $resource;
         }
+        //change to //flock exec see lock / unlock
         $lock = flock($resource, LOCK_EX);
         for ($written = 0; $written < strlen($data); $written += $fwrite) {
             $fwrite = fwrite($resource, substr($data, $written));
@@ -90,31 +100,27 @@ class File {
             return $fwrite;
         }
     }
-
-    public function read($url=''){
+    public static function read($url=''){
         if(strpos($url, File::SCHEME_HTTP) !== false){
-            $http = @file($url);
-            if(empty($http)){
-                //error cannot retrieve read url
-                return false;
-            }
-            return implode('',$http); //surpress network errors & checks
+		  //check network connection first (@) added for that 			 //error
+		 $file = @file($url);
+		 if(!is_array($file)){
+			return false;
+		 }
+            return implode('', $file);
         }
         if(file_exists($url) === false){
             return false;
         }
         return implode('',file($url));
     }
-
-    public function copy($source='', $destination=''){
+    public static function copy($source='', $destination=''){
         return copy($source, $destination);
     }
-
-    public function delete($url=''){
+    public static function delete($url=''){
         return unlink($url);
     }
-
-    public function extension($url=''){
+    public static function extension($url=''){
         $url = basename($url);
         $ext = explode('.', $url);
         if(!isset($ext[1])){
@@ -124,16 +130,14 @@ class File {
         }
         return $extension;
     }
-
-    public function basename($url='', $extension=''){
+    public static function basename($url='', $extension=''){
         $filename = basename($url);
         $explode = explode('?', $filename, 2);
         $filename = $explode[0];
         $filename = basename($filename, $extension);
         return $filename;
     }
-
-    public function removeExtension($filename='', $extension=array()){
+    public static function removeExtension($filename='', $extension=array()){
         if(!is_array($extension)){
             $extension = array($extension);
         }

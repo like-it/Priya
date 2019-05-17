@@ -6,19 +6,14 @@
  * @changeLog
  *     -    all
  */
-
 namespace Priya\Module;
-
 use stdClass;
 use Exception;
 use Priya\Application;
-
 class Data extends Core {
     const DIR = __DIR__;
-
     public $url;
     public $data;
-
     public function __construct($handler=null, $route=null, $data=null){
         if($handler && $route){
             $this->handler($handler);
@@ -28,7 +23,6 @@ class Data extends Core {
             $this->data(Data::object_merge($this->data(), $handler));
         }
     }
-
     public static function is_empty($data = array()){
         $is_empty = true;
         foreach($data as $key => $item){
@@ -37,7 +31,6 @@ class Data extends Core {
         }
         return $is_empty;
     }
-
     public function data($attribute=null, $value=null, $type=null){
         if($attribute !== null){
             if($attribute == 'set'){
@@ -48,8 +41,19 @@ class Data extends Core {
             elseif($attribute == 'get'){
                 return $this->object_get($value, $this->data());
             }
+            elseif($attribute == 'has'){
+                return $this->object_has($value, $this->data());
+            }
             if($value !== null){
-                if($attribute=='delete'){
+                if(
+                    in_array(
+                        $attribute,
+                        [
+                            'delete',
+                            'remove'
+                        ]
+                    )
+                ){
                     return $this->deleteData($value);
                 } else {
                     $this->object_delete($attribute, $this->data()); //for sorting an object
@@ -67,7 +71,6 @@ class Data extends Core {
         }
         return $this->getData();
     }
-
     private function setData($attribute='', $value=null){
         if(is_array($attribute) || is_object($attribute)){
             if(is_object($this->data)){
@@ -91,8 +94,7 @@ class Data extends Core {
             }
         }
     }
-
-    private function getData($attribute=null){
+    protected function getData($attribute=null){
         if($attribute === null){
             if(is_null($this->data)){
                 $this->data = new stdClass();
@@ -105,11 +107,9 @@ class Data extends Core {
             return false;
         }
     }
-
     private function deleteData($attribute=null){
         return $this->object_delete($attribute, $this->data());
     }
-
     public function url($url=null, $attribute=null){
         if($url !== null){
             if($attribute !== null){
@@ -129,15 +129,12 @@ class Data extends Core {
         }
         return $this->getUrl();
     }
-
     private function setUrl($url=''){
         $this->url = $url;
     }
-
     private function getUrl(){
         return $this->url;
     }
-
     private function encodeUrl($url=''){
         $temp = explode('/', $url);
         foreach($temp as $nr => $part){
@@ -152,7 +149,6 @@ class Data extends Core {
         $url = implode('/', $temp);
         return $url;
     }
-
     private function decodeUrl($url=''){
         $temp = explode('/', $url);
         foreach($temp as $nr => $part){
@@ -167,32 +163,41 @@ class Data extends Core {
         $url = implode('/', $temp);
         return $url;
     }
-
-    public function read($url=''){
+    public function read($url=''){        
         $namespace = '';
+        $called = null;
         if(empty($url)){
-            $url = get_called_class();
-        }
-        if(file_exists($url)){
+            $url = get_called_class();     
+            $called = $url;            
+        }        
+        if(
+            $called === null &&            
+            file_exists($url)
+        ){
             $file = new File();
             $read = $file->read($this->url($url));
-            $read = $this->object($read);
-            $data = $this->data();
-            if(empty($data)){
-                $data = new stdClass();
+            if(!empty($read)){                
+                $read = $this->object($read);
+                if(empty($read)){
+                    throw new Exception('Data Error: read url: ' . $url . ' json data corrupted?');
+                }                
+                return $this->data(Data::object_merge($this->data(), $read));
+            } else {
+                return false;
             }
-            if(!empty($read)){
-                if(is_array($read) || is_object($read)){
-                    foreach($read as $attribute => $value){
-                        $this->object_set($attribute, $value, $data);
-                    }
-                }
-            }
-            return $this->data($data);
         } else {
+            $check = explode(Application::DS, $url, 2);
+            if(isset($check[1])){
+                return false;
+            }
+            $check = explode('.', $url, 2);
+            if(isset($check[1])){
+                return false;
+            }            
             $module = $url;
         }
         $autoload = $this->autoload();
+    
         if(empty($autoload) || !$autoload instanceof \Priya\Module\Autoload\Data){
             $tmp = explode('\\', trim(str_replace(Application::DS, '\\',$url),'\\'));
             $class = array_pop($tmp);
@@ -204,7 +209,7 @@ class Data extends Core {
             $directory = implode(Application::DS, $directory) . Application::DS;
             if(empty($namespace)){
                 $namespace = $priya . '\\' . Application::MODULE;
-            }
+            }        
             $directory .= str_replace('\\', Application::DS, $namespace) . Application::DS;
             $data = new \Priya\Module\Autoload\Data();
             $class = get_called_class();
@@ -221,34 +226,22 @@ class Data extends Core {
                 foreach($autoload as $prefix => $directory){
                     $data->addPrefix($prefix, $directory);
                 }
-            }
+            }            
             $autoload = $this->autoload($data);
         }
         $url = $autoload->data_load($url);
         if($url !== false){
             $this->url($url);
         }
-
         $file = new File();
         $read = $file->read($url);
-        if($read !== false){
-            $read = $this->object($read);
-        }
-        $data = $this->data();
-        if(empty($data)){
-            $data = new stdClass();
-        }
-
         if(!empty($read)){
-            foreach($read as $attribute => $value){
-                $this->object_set($attribute, $value, $data);
-            }
+            $read = $this->object($read);
+            return $this->data(Data::object_merge($this->data(), $read));
         } else {
             return false;
         }
-        return $this->data($data);
     }
-
     public function write($url=''){
         if(!empty($url)){
             $this->url($url);
@@ -261,7 +254,6 @@ class Data extends Core {
         $write = $file->write($url, $this->object($this->data(), 'json'));
         return $write;
     }
-
     public function search($list, $find, $attribute=null, $case=false, $not=false){
         $useData = true;
         $output = 'array';
@@ -274,6 +266,10 @@ class Data extends Core {
         if(!is_array($data)){
             $output = 'object';
         }
+        if(empty($find)){
+            throw new Exception('Data Error: Seach: $find should not be empty');
+            return [];
+        }        
         $result = array();
         if(!is_array($attribute) && !is_null($attribute)){
             $attribute = explode(',', $attribute);
@@ -311,6 +307,7 @@ class Data extends Core {
                 }
                 $search = trim($search);
                 $find = trim($find);
+                
                 $levenshtein = levenshtein(substr($search, 0, 255), substr($find, 0, 255), 5, 2, 5);
                 if(!empty($not)){
                     if(strstr($search, $find) === false){
@@ -334,7 +331,7 @@ class Data extends Core {
             foreach($subList as $key => $node){
                 $data[$key] = $node;
             }
-        }
+        }        
         if(empty($useData)){
             return $data;
         } else {
@@ -342,7 +339,6 @@ class Data extends Core {
             return $this->data($list, $data);
         }
     }
-
     public function sort($list, $attribute='sort', $order='ASC', $sort=null, $case=false){
         $useData = true;
         $output = 'array';
@@ -400,7 +396,6 @@ class Data extends Core {
             return $this->data($list, $this->object($data, $output));
         }
     }
-
     public function filter($list='', $attribute=array(), $values=array(), $action='keep'){
         $useData = true;
         $output = 'array';
@@ -476,7 +471,6 @@ class Data extends Core {
             return $this->data($list, $this->object($result, $output));
         }
     }
-
     public function count($nodeList='', $attribute='', $value='', $value_attribute='', $count='count'){
         if(empty($nodeList)){
             return;
@@ -514,11 +508,9 @@ class Data extends Core {
                         }
                     }
                 }
-
             }
         }
     }
-
     public function parent($list='', $attribute='', $value='', $children='nodeList', $parent=null){
         if(is_object($list)){
             foreach($list as $key => $node){
@@ -539,7 +531,6 @@ class Data extends Core {
         }
         return false;
     }
-
     public function recursive($list='', $attribute='', $value='', $children='nodeList'){
         if(is_object($list)){
             foreach($list as $key => $node){
@@ -556,7 +547,6 @@ class Data extends Core {
         }
         return false;
     }
-
     public function recursive_sort($list='', $attribute='sort', $order='ASC', $children='nodeList', $sort=null, $case=false){
         $nodeList = $this->sort($list, $attribute, $order, $sort, $case);
         foreach($nodeList as $key => $node){
@@ -566,7 +556,6 @@ class Data extends Core {
         }
         return $nodeList;
     }
-
     public function recursive_delete($list='', $attribute='', $value='', $children='nodeList'){
         if(is_object($list)){
             foreach($list as $key => $node){
@@ -579,7 +568,6 @@ class Data extends Core {
             }
         }
     }
-
     public function flatten($list='', $children='nodeList'){
         if(is_object($list)){
             foreach($list as $key => $node){
@@ -595,7 +583,6 @@ class Data extends Core {
         }
         return $list;
     }
-
     public function node($attribute='', $node='', $merge=false){
         $url = $this->url();
         if(empty($url)){
@@ -640,7 +627,6 @@ class Data extends Core {
         $this->write($url);
         return $node->jid;
     }
-
     public function jid($list=''){
         if(is_array($list) || is_object($list)){
             $data = $list;
@@ -662,9 +648,4 @@ class Data extends Core {
             return strval($number);
         }
     }
-
-    public function copy($copy=null){
-        return unserialize(serialize($copy));
-    }
-
 }

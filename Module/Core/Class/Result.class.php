@@ -18,25 +18,36 @@ use Priya\Module\Autoload;
 use Priya\Module\Autoload\Tpl;
 use Priya\Module\File;
 use Priya\Module\File\Dir;
-use Priya\Module\Core\Parser;
+use Priya\Module\Parser;
 use Priya\Module\File\Cache;
-use Priya\Module\Parse;
+
+use R3m\Parse;
 
 class Result extends Parser {
     const DIR = __DIR__;
     const FILE = __FILE__;
 
     const DATA = 'Data';
+    const HELP = 'Help';
     const EXECUTE = 'Execute';
+    const VIEW = 'View';
+    const FUNCTION = 'Function';
+    const TRANSLATION = 'Translation';
     const TEMPLATE = 'Template';
 
+    //replace Priya\Module\File\Extension::VIEW
     const EXT_EXECUTE = '.exe';
+    const EXT_VIEW = '.tpl';
 
     const EXCEPTION_EXECUTE = 'Execute file expected in one of these locations: ';
+    const EXCEPTION_VIEW = 'View file expected in one of these locations: ';
     const EXCEPTION_COMPILE_DIR = 'Unable to create compile dir';
     const EXCEPTION_CACHE_DIR = 'Unable to create cache dir';
 
     private $result;
+    private $template;
+    private $cli;
+    private $page;
 
     public function __construct($handler=null, $route=null, $data=null){
         parent::__construct($handler, $route, $data);
@@ -78,12 +89,21 @@ class Result extends Parser {
                 Result::EXECUTE .
                 Application::DS
             );
+            $this->data('module.dir.help',
+                $this->data('module.dir.root') .
+                Result::HELP .
+                Application::DS
+            );
             $this->data('module.dir.public',
                     $this->data('module.dir.root') .
                     $this->data('public_html') .
                     Application::DS
             );
         }
+        if(is_object($this->route())){
+            $this->data('module.route', $this->route()->item());
+        }
+
         $ignore = array();
         //add user ?
         $ignore[] = 'users';
@@ -92,15 +112,97 @@ class Result extends Parser {
         $this->data('ignore', $ignore);
     }
 
-    public static function execute($object=null, $type='respond'){
+    public static function view($object=null, $template='', $type='response'){        
+        $is_url = false;
+        if($object == 'url'){
+            $is_url = true;
+            $type = 'url';
+        }
+        elseif($object == 'location'){
+            $is_url = true;
+            $type = 'location';
+        }
+        if(
+            $is_url === false &&
+            method_exists($object, 'read') === false
+        ){
+            var_dump('fuck');
+            die;
+            return new Exception('read method not found in object, base-class needs to be at least Priya\Module\Core\Data');
+        }
+        $execute = '';
+        $class = get_called_class();
+    
         //execution cannot be cached, we need a different name -> response?
-        $read = get_called_class();
-        $data = $object->read($read);
-        $object->data($data);
-        $explode = explode('\\', $read);
-        $template = array_pop($explode);
+        if($is_url === false){
+            $data = $object->read($class);
+            $object->data($data); //?doesn't read does this ?
+        }            
+        $explode = explode('\\', $class);
+        if(empty($template)){
+            $template = array_pop($explode);
+        }
         //can be outside priya module...
-        $dir = dirname($read::DIR) . Application::DS . Result::EXECUTE . Application::DS;
+        $dir = dirname($class::DIR) . Application::DS . Result::VIEW . Application::DS;
+        $url = $dir . $template . Result::EXT_VIEW;
+            
+        if($type == 'url'){
+            return $url;
+        }        
+        $location = array();
+        $location[] = $url;
+        if($type == 'location'){
+            $template = array_pop($explode) . '.' . $template;
+            $url = $dir . $template . Result::EXT_VIEW;
+            $location[] = $url;
+            return $location;
+        }        
+        if(!file_exists($url)){
+            $template = array_pop($explode) . '.' . $template;
+            $url = $dir . $template . Result::EXT_VIEW;
+            $location[] = $url;
+            if(!file_exists($url)){
+                $exception =  Result::EXCEPTION_VIEW.
+                    "\n" .
+                    implode("\n", $location)
+                ;
+                return new Exception($exception);
+            }
+        }
+        if(method_exists($object, 'handler') === false){
+            return new Exception('handler method not found in object, base-class needs to be at least Priya\Module\Core\Data');
+        }
+        if(method_exists($object, 'route') === false){
+            return new Exception('route method not found in object, base-class needs to be at least Priya\Module\Core\Data');
+        }
+        if(method_exists($object, 'data') === false){
+            return new Exception('data method not found in object, base-class needs to be at least Priya\Module\Core\Data');
+        }        
+        $parse = new Parser($object->handler(), $object->route(), $object->data());        
+        try {            
+            $execute = $parse->read($url);
+            $object->data($parse->data());            
+        } catch (Exception $e) {
+            return $e;
+        }
+        return $execute;
+    }
+
+    /**
+     * @deprecated use view instead     
+     */
+    /*
+    public static function execute($object=null, $type='respond', $template=''){
+        $class = get_called_class();
+        //execution cannot be cached, we need a different name -> response?
+        $data = $object->read($class);
+        $object->data($data);
+        $explode = explode('\\', $class);
+        if(empty($template)){
+            $template = array_pop($explode);
+        }
+        //can be outside priya module...
+        $dir = dirname($class::DIR) . Application::DS . Result::EXECUTE . Application::DS;
         $url = $dir . $template . Result::EXT_EXECUTE;
         if($type == 'url'){
             return $url;
@@ -125,10 +227,17 @@ class Result extends Parser {
                 throw new Exception($exception);
             }
         }
-        $parser = new Parser($object->handler(), $object->route(), $object->data());
-        $execute = $parser->read($url);
-        return $execute;
+        $parser = new Parse($object->handler(), $object->route(), $object->data());
+
+        try {
+            $execute = $parser->read($url);
+            $object->data($parser->data());
+            return $execute;
+        } catch (Exception $e) {
+            return $e;
+        }
     }
+    */
 
     /*
     public function exec($target='', $read=''){
@@ -163,6 +272,7 @@ class Result extends Parser {
     }
     */
 
+    /*
     public function cache($target='', $read=''){
         $dir = dirname($read::DIR)  .
         Application::DS .
@@ -201,6 +311,7 @@ class Result extends Parser {
         }
         return Cache::write($url, $data);
     }
+    */
 
     public function result($type=null, $result=''){
         if($type == 'template'){

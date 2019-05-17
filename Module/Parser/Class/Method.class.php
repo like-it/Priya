@@ -296,13 +296,25 @@ class Method extends Core {
                 $url = __DIR__ . '/../Function/Function.' . $name . '.php';
                 if(file_exists($url)){
                     require_once $url;
-                }
+                }                                
             }
         }
         if($parser->has_list !== true){
             $url = __DIR__ . '/../Function/Function.' . $name . '.php';
             if(file_exists($url)){
                 require_once $url;
+            }
+            $function_dir = $parser->data('priya.parser.function.dir');
+            if(is_array($function_dir)){
+                foreach($function_dir as $dir){
+                    if(substr($dir, -1) != '/'){
+                        $dir .= '/';
+                    }
+                    $url = $dir . 'Function.' . $name . '.php';
+                    if(file_exists($url)){
+                        require_once $url;
+                    }
+                }                    
             }
         }
         $name = 'function_' . str_replace('.', '_', strtolower($name));
@@ -343,7 +355,7 @@ class Method extends Core {
             }
             $function['is_executed'] = true;
         } else {
-            $function['is_executed'] = false;
+            $function['is_executed'] = false;        
             throw new Exception('Method::execute:Function "' . $function_name . '" not found');
         }
         if(is_bool($function['value'])){

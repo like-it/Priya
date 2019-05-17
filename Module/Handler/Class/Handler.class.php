@@ -12,7 +12,7 @@ namespace Priya\Module;
 use stdClass;
 use Priya\Application;
 
-class Handler extends \Priya\Module\Core\Data{
+class Handler extends Data{
     const CONTENT_TYPE_CSS = 'text/css';
     const CONTENT_TYPE_HTML = 'text/html';
     const CONTENT_TYPE_JSON = 'application/json';

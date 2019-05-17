@@ -29,7 +29,7 @@ class Autoload {
     public $prefixList = array();
     public $environment = 'production';
 
-    public function register($method='load', $prepend=false){
+    public function register($method='load', $prepend=false){        
         $functions = spl_autoload_functions();
         if(is_array($functions)){
             foreach($functions as $function){
@@ -179,7 +179,8 @@ class Autoload {
         return $result;
     }
 
-    public function locate($load=null){
+    public function locate($load=null){        
+        // $this->environment($this->data('priya.environment'));
         $dir = dirname(Autoload::DIR) . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;
         $url = $dir . Autoload::FILE;
         $load = ltrim($load, '\\');
@@ -241,7 +242,7 @@ class Autoload {
                     }
                 }
             }
-        }
+        }        
         if($this->environment() == 'development' || !empty($this->expose())){
             $object = new stdClass();
             $object->load = $load;

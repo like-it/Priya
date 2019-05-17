@@ -11,11 +11,13 @@ namespace Priya\Module\Core;
 
 use Priya\Module\Core;
 
+var_Dump(get_included_files());
+die;
 class Parser extends Data {
 
     private $object_parser;
 
-    public function __construct($handler=null, $route=null, $data=null){
+    public function __construct($handler=null, $route=null, $data=null){        
         parent::__construct($handler, $route, $data);
     }
 
