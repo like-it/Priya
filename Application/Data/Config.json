@@ -1,7 +1,7 @@
 {
     "priya": {
         "bin": "priya",
-        "environment": "production",
+        "environment": "development",
         "version": "{$priya.major|default:0}.{$priya.minor|default:0}.{$priya.patch|default:0}",
         "contentType": {
             "txt": "text\/plain",
@@ -42,22 +42,22 @@
             "url": "{$dir.data}Route.json",
             "cache": {
                 "url": "{$priya.dir.cache}60\/Route.json",
-                "interval" : "+ 1 minute"
+                "interval": "+ 1 minute"
             }
         },
-        "bug" : {
-        	"cli" : {
-        		"line" : {
-        			"ending" : 2
-        		}
-        	},
-        	"description" : {
-        		"1" : "bug.cli.line.ending: 0: not adding newline character, 1: adding 1 newline character, 2: adding 2 newline characters. Default: 2. In CLI mode while echoing, newlines at the end don't work. Adding extra newlines work."
-        	}
+        "bug": {
+            "cli": {
+                "line": {
+                    "ending": 2
+                }
+            },
+            "description": {
+                "1": "bug.cli.line.ending: 0: not adding newline character, 1: adding 1 newline character, 2: adding 2 newline characters. Default: 2. In CLI mode while echoing, newlines at the end don't work. Adding extra newlines work."
+            }
         },
-        "major": 0,
-        "minor": 3,
-        "patch": 12,
-        "built": "2018-11-17 23:38:36"
+        "major": 1,
+        "minor": 6,
+        "patch": 15,
+        "built": "2019-06-22 17:23:53"
     }
 }

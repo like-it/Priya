@@ -270,6 +270,9 @@ class Autoload {
         if($this->environment() == 'development' || !empty($this->expose())){
             $object = new stdClass();
             $object->load = $load;
+            $debug = debug_backtrace(true);
+	    $object->debug = $debug;
+	
 
             $attribute = 'Priya\Module\Exception\Error';
             if(!empty($this->expose())){

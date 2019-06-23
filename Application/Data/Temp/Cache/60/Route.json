@@ -4,76 +4,51 @@
             "file": [
                 {
                     "read": true,
-                    "mtime": 1544196397,
-                    "url": "\/mnt\/c\/Library\/Server\/Vendor\/Priya\/Data\/Route.json"
+                    "mtime": 1561224191,
+                    "url": "\/library\/Server\/Vendor\/Priya\/Data\/Route.json"
                 },
                 {
                     "read": true,
-                    "mtime": 1530042025,
-                    "url": "\/mnt\/c\/Library\/Server\/Vendor\/Priya.System\/Data\/Route.json"
+                    "mtime": 1561084382,
+                    "url": "\/library\/Server\/Vendor\/Priya.System\/Data\/Route.json"
                 },
                 {
                     "read": true,
-                    "mtime": 1511708599,
-                    "url": "\/mnt\/c\/Library\/Server\/Vendor\/Priya.Gui\/Data\/Route.json"
+                    "mtime": 1561084368,
+                    "url": "\/library\/Server\/Vendor\/Priya.Gui\/Data\/Route.json"
                 },
                 {
                     "read": true,
-                    "mtime": 1511708796,
-                    "url": "\/mnt\/c\/Library\/Server\/Vendor\/Speak\/Data\/Route.json"
+                    "mtime": 1561084382,
+                    "url": "\/library\/Server\/Vendor\/Speak\/Data\/Route.json"
                 },
                 {
                     "read": true,
-                    "mtime": 1549054126,
-                    "url": "\/mnt\/c\/Library\/Server\/Vendor\/App\/Data\/Route.json"
+                    "mtime": 1561084364,
+                    "url": "\/library\/Server\/Host\/Documentation\/Priya\/Software\/Data\/Route.json"
                 },
                 {
                     "read": true,
-                    "mtime": 1528741202,
-                    "url": "\/mnt\/c\/Library\/Server\/Host\/Documentation\/Priya\/Software\/Data\/Route.json"
+                    "mtime": 1561084365,
+                    "url": "\/library\/Server\/Host\/Priya\/Software\/Data\/Route.json"
                 },
                 {
                     "read": true,
-                    "mtime": 1527717362,
-                    "url": "\/mnt\/c\/Library\/Server\/Host\/Priya\/Software\/Data\/Route.json"
+                    "mtime": 1561223112,
+                    "url": "\/library\/Server\/Host\/Mo2fr\/Com\/Data\/Route.json"
                 },
                 {
                     "read": true,
-                    "mtime": 1557342090,
-                    "url": "\/mnt\/c\/Library\/Server\/Host\/R3m\/Io\/Data\/Route.json"
-                },
-                {
-                    "read": true,
-                    "mtime": 1548679065,
-                    "url": "\/mnt\/c\/Library\/Server\/Host\/Redirect\/Data\/Route.json"
-                },
-                {
-                    "read": true,
-                    "mtime": 1526130244,
-                    "url": "\/mnt\/c\/Library\/Server\/Vendor\/App\/Issue\/Data\/Route.json"
-                },
-                {
-                    "read": true,
-                    "mtime": 1530213576,
-                    "url": "\/mnt\/c\/Library\/Server\/Vendor\/App\/File\/Manager\/Data\/Route.json"
-                },
-                {
-                    "read": true,
-                    "mtime": 1549053330,
-                    "url": "\/mnt\/c\/Library\/Server\/Vendor\/App\/Audio\/Player\/Data\/Route.json"
-                },
-                {
-                    "read": true,
-                    "mtime": 1514416994,
-                    "url": "\/mnt\/c\/Library\/Server\/Vendor\/App\/Youtube\/Data\/Route.json"
+                    "mtime": 1561084365,
+                    "url": "\/library\/Server\/Host\/Redirect\/Data\/Route.json"
                 }
             ]
         },
         "route": {
             "cache": {
                 "time": {
-                    "start": 1557344268.489036,
-                    "duration": 0.07439088821411133
+                    "start": 1561225464.149715,
+                    "duration": 0.01169896125793457
                 }
             }
         }
@@ -489,17 +464,60 @@
                 "POST"
             ]
         },
-        "example-local-main": {
+        "mo2fr-com-main": {
             "path": "",
             "host": [
-                "r3m.io"
+                "mo2fr.com",
+                "*.mo2fr.com"
             ],
             "request": {
-                "document": "Index"
+                "page": "Home"
             },
-            "controller": "Host.R3m.Io.Page.run",
+            "controller": "Host.Mo2fr.Com.Page.run",
             "language": "en",
             "format": "html",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "mo2fr-com-menu": {
+            "path": "Menu\/{$menu}",
+            "host": [
+                "mo2fr.com",
+                "*.mo2fr.com"
+            ],
+            "controller": "Host.Mo2fr.Com.Menu.run",
+            "language": "en",
+            "format": "json",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "mo2fr-com-page": {
+            "path": "Page\/{$page}",
+            "host": [
+                "mo2fr.com",
+                "*.mo2fr.com"
+            ],
+            "controller": "Host.Mo2fr.Com.Page.run",
+            "language": "en",
+            "format": "json",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "mo2fr-com-license": {
+            "path": "License",
+            "host": [
+                "mo2fr.com",
+                "*.mofr.com"
+            ],
+            "url": "{$dir.host}Mo2fr\/Com\/Public\/License",
+            "language": "en",
+            "format": "json",
             "method": [
                 "GET",
                 "POST"
@@ -1226,537 +1244,6 @@
             "controller": "Host.Redirect.run",
             "language": "en",
             "format": "html",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-issue": {
-            "path": "app\/issue",
-            "controller": "App.Issue.Main.run",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-issue-overview-sortable": {
-            "path": "app\/issue\/overview\/sortable",
-            "controller": "App.Issue.Overview.sortable",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "POST"
-            ]
-        },
-        "app-issue-overview-sort-up": {
-            "path": "app\/issue\/overview\/sort-up\/{$page}",
-            "controller": "App.Issue.Overview.sortUp",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "POST"
-            ]
-        },
-        "app-issue-overview-sort-down": {
-            "path": "app\/issue\/overview\/sort-down\/{$page}",
-            "controller": "App.Issue.Overview.sortDown",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "POST"
-            ]
-        },
-        "app-issue-overview-contextmenu": {
-            "path": "app\/issue\/overview\/contextmenu\/{$page}",
-            "controller": "App.Issue.Overview.contextMenu",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-overview": {
-            "path": "app\/issue\/overview\/{$page}",
-            "controller": "App.Issue.Overview.run",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-search": {
-            "path": "app\/issue\/search\/{$page}",
-            "controller": "App.Issue.Overview.run",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-filter": {
-            "path": "app\/issue\/filter\/{$page}",
-            "controller": "App.Issue.Overview.run",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-setting": {
-            "path": "app\/issue\/setting\/",
-            "controller": "App.Issue.Setting.run",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-setting-process": {
-            "path": "app\/issue\/setting\/process\/",
-            "controller": "App.Issue.Process.setting",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-list": {
-            "path": "app\/issue\/list\/",
-            "controller": "App.Issue.NodeList.run",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-detail": {
-            "path": "app\/issue\/detail\/{$jid}\/",
-            "controller": "App.Issue.Detail.run",
-            "format": "json",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-message": {
-            "path": "app\/issue\/message\/{$action}\/",
-            "controller": "App.Issue.Message.run",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-process": {
-            "path": "app\/issue\/process\/",
-            "controller": "App.Issue.Process.run",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "POST"
-            ]
-        },
-        "app-issue-process-close": {
-            "path": "app\/issue\/process\/close\/{$jid}\/{$page}",
-            "controller": "App.Issue.Process.close",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-process-re-open": {
-            "path": "app\/issue\/process\/re-open\/{$jid}",
-            "controller": "App.Issue.Process.reOpen",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-process-delete": {
-            "path": "app\/issue\/process\/delete\/{$jid}",
-            "controller": "App.Issue.Process.delete",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-process-restore": {
-            "path": "app\/issue\/process\/restore\/{$jid}",
-            "controller": "App.Issue.Process.restore",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-delete": {
-            "path": "app\/issue\/delete\/{$jid}\/",
-            "controller": "App.Issue.Delete.run",
-            "language": "en",
-            "format": [
-                "html",
-                " json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-issue-label-detail": {
-            "path": "app\/issue\/label\/detail\/{$jid}\/",
-            "controller": "App.Issue.Label.Detail.run",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-label-process": {
-            "path": "app\/issue\/label\/process\/",
-            "controller": "App.Issue.Label.Process.run",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-label-overview": {
-            "path": "app\/issue\/label\/overview\/",
-            "controller": "App.Issue.Label.Overview.run",
-            "format": "html",
-            "language": "en",
-            "method": [
-                "GET",
-                "POST"
-            ],
-            "translate": false
-        },
-        "app-issue-label-process-delete": {
-            "path": "app\/issue\/label\/delete\/{$jid}\/",
-            "controller": "App.Issue.Label.Process.delete",
-            "language": "en",
-            "format": [
-                "html",
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-file-manager": {
-            "path": "app\/file\/manager",
-            "controller": "App.File.Manager.Main.run",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-file-manager-nodelist": {
-            "path": "app\/file\/manager\/nodelist\/{$dir}",
-            "controller": "App.File.Manager.Nodelist.run",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-file-manager-rename": {
-            "path": "app\/file\/manager\/rename",
-            "controller": "App.File.Manager.Rename.run",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-file-manager-open": {
-            "path": "app\/file\/manager\/open",
-            "controller": "App.File.Manager.Open.run",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-file-manager-process-open": {
-            "path": "app\/file\/manager\/process\/open",
-            "controller": "App.File.Manager.Process.open",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-file-manager-overview": {
-            "path": "app\/file\/manager\/overview",
-            "controller": "App.File.Manager.Overview.run",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-file-manager-tree": {
-            "path": "app\/file\/manager\/tree\/{$dir}",
-            "controller": "App.File.Manager.Tree.run",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-file-manager-expand": {
-            "path": "app\/file\/manager\/expand\/{$dir}",
-            "controller": "App.File.Manager.Expand.run",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-file-manager-upload": {
-            "path": "app\/file\/manager\/upload\/",
-            "controller": "App.File.Manager.Process.upload",
-            "language": "en",
-            "format": [
-                "json"
-            ],
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-audio-player": {
-            "path": "Audio\/Player",
-            "default": {
-                "controller": "App.Audio.Player.Main.run",
-                "language": "en",
-                "format": [
-                    "json"
-                ]
-            },
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-audio-player-run": {
-            "path": "Audio\/Player\/Run\/{$file}",
-            "default": {
-                "controller": "App.Audio.Player.Run.run",
-                "language": "en",
-                "format": [
-                    "json"
-                ]
-            },
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-audio-player-id3": {
-            "path": "Audio\/Player\/Id3\/{$file}",
-            "default": {
-                "controller": "App.Audio.Player.Id3.run",
-                "language": "en",
-                "format": [
-                    "json"
-                ]
-            },
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-youtube": {
-            "path": "Youtube",
-            "default": {
-                "controller": "App.Youtube.Main.run",
-                "language": "en",
-                "format": [
-                    "json"
-                ]
-            },
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-youtube-iframe": {
-            "path": "Youtube\/Iframe",
-            "default": {
-                "controller": "App.Youtube.Iframe.run",
-                "language": "en",
-                "format": [
-                    "json"
-                ]
-            },
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-youtube-download": {
-            "path": "Youtube\/Download",
-            "default": {
-                "controller": "App.Youtube.Download.run",
-                "language": "en",
-                "format": [
-                    "json"
-                ]
-            },
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-youtube-search": {
-            "path": "Youtube\/Search",
-            "default": {
-                "controller": "App.Youtube.Search.run",
-                "language": "en",
-                "format": [
-                    "json"
-                ]
-            },
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-youtube-process-download": {
-            "path": "Youtube\/Process\/download\/{$url}",
-            "default": {
-                "controller": "App.Youtube.Process.download",
-                "language": "en",
-                "format": [
-                    "json"
-                ]
-            },
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-youtube-process-monitor": {
-            "path": "Youtube\/Process\/Monitor\/{$url}",
-            "default": {
-                "controller": "App.Youtube.Process.monitor",
-                "language": "en",
-                "format": [
-                    "json"
-                ]
-            },
-            "translate": "false",
-            "method": [
-                "GET",
-                "POST"
-            ]
-        },
-        "app-youtube-process": {
-            "path": "Youtube\/Process\/{$url}",
-            "default": {
-                "controller": "App.Youtube.Process.run",
-                "language": "en",
-                "format": [
-                    "json"
-                ]
-            },
-            "translate": "false",
             "method": [
                 "GET",
                 "POST"

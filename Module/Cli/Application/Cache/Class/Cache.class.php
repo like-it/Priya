@@ -59,7 +59,7 @@ class Cache extends Cli {
         if(File::exist($object->data('priya.cache.init.url'))){
             File::delete($object->data('priya.cache.init.url'));
         }
-        echo Cache::execute($object);
+        echo Cache::view($object);
         $object->data('delete', 'execute');
     }
 
@@ -67,19 +67,19 @@ class Cache extends Cli {
         $object->data('execute', $type);
         switch ($type){
             case 'application':
-                echo Cache::execute($object);
+                echo Cache::view($object);
                 $result =  Cache::clearApplication($object);
             break;
             case 'autoload':
-                echo Cache::execute($object);
+                echo Cache::view($object);
                 $result = Cache::clearAutoload($object);
             break;
             case 'route':
-                echo Cache::execute($object);
+                echo Cache::view($object);
                 $result = Cache::clearRoute($object);
             break;
             case 'smarty':
-                echo Cache::execute($object);
+                echo Cache::view($object);
                 $result = Cache::clearSmarty($object);
             break;
         }
