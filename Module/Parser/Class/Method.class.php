@@ -18,6 +18,9 @@ class Method extends Core {
     ];
 
     public static function find($record=array(), \Priya\Module\Parser $parser){
+        if(!is_string($record['method']['tag'])){
+            return $record;
+        }
         if(
             substr($record['method']['tag'], 0, 1) != '{' &&
             substr($record['method']['tag'], -1, 1) != '}'

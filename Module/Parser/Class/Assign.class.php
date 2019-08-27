@@ -117,6 +117,10 @@ class Assign extends Core {
 
     public static function row($record=array(), $random=''){
         if(!isset($record['string'])){
+            return $record;
+            var_dump($record);
+            var_dump(debug_backtrace(true));
+            die;
             throw new Exception('Assign:record no string in row');
             return $record;
         }
@@ -131,10 +135,17 @@ class Assign extends Core {
         if(!isset($record['assign']['tag'])){
             return $record;
         }
+        if(!is_string($record['assign']['tag'])){
+            return $record;
+        }
         if(substr($record['assign']['tag'], 1, 1) != '$'){
             return $record;
         }
         $tag = Token::newline_restore($record['assign']['tag'], $random);
+        if(!is_string($tag)){
+            var_dump($tag);
+            die;
+        }
         $explode = explode('=', substr($tag, 1, -1), 2);
         if(
             count($explode) == 2
@@ -172,7 +183,7 @@ class Assign extends Core {
             $record['string'] = Token::newline_replace($string, $random);
             $record['status'] = Assign::STATUS;
             return $record;
-        }
+        }        
         $explode = explode('--', substr($tag, 1, -1), 2);
         if(
             count($explode) == 2
@@ -206,122 +217,129 @@ class Assign extends Core {
         $assign = false;
         $parse = array();
         $count = 0;
-        $explode = explode('=', substr($tag, 1, -1), 2);
-        if(
-            !empty($explode[0]) &&
-            substr($explode[0], 0, 1) == '$' &&
-            stristr($explode[0], '|') === false &&
-            count($explode) == 2
-        ){
-            $attribute = substr(rtrim($explode[0]), 1);
-            $value = trim($explode[1], ' ');
+
+        if(!is_string($tag)){
+           return $record;
+        } else {
+            $explode = explode('=', substr($tag, 1, -1), 2);
             if(
-                substr($attribute,-1) == '-' ||
-                substr($attribute,-1) == '+' ||
-                substr($attribute,-1) == '.' ||
-                substr($attribute,-1) == '!'
+                !empty($explode[0]) &&
+                substr($explode[0], 0, 1) == '$' &&
+                stristr($explode[0], '|') === false &&
+                count($explode) == 2
             ){
-                $assign = substr($attribute, -1) . '=';
-                $attribute = substr($attribute, 0, -1);
-                $attribute = rtrim($attribute,' ');
-            }
-            //before create_object assign variable needed
-            $create = Token::newline_restore($value, $parser->random());
-            $original = $create;
-            $create = Token::all($create);
-            $object = Token::create_object($create, $attribute, $parser);
-            if(!empty($object)){
-                $object['value'] = Variable::replace($object['value'], '', false, $parser);
-                //is variable data changed?
-                $object = Token::cast($object);
-                $parser->data($attribute, $object['value']);
-                return $record;
-            }
-            $array = Token::create_array($create, $parser);
-            if(!empty($array)){
-                $array['value'] = Variable::replace($array['value'], '', false, $parser);
-                //is variable data changed?
-                $array = Token::cast($array);
-                $parser->data($attribute, $array['value']);
-                return $record;
-            }
-            //an equation can be a variable, if it is undefined it will be + 0
-            $parse = Token::parse($create);
-            $parse = Token::variable($parse, $attribute, $parser);
-            $method = array();
-            $method['parse'] = $parse;
-            $method['string'] = $record['string'];
-            $method['original'] = $record['original'];
-            $method['assign'] = $record['assign'];
-            $method['key'] = $record['assign']['tag'];
-            $method = Token::method($method, $parser);
-            $parse = $method['parse'];
-            $math = Token::create_equation($parse, $parser);
-            $original = $record;
-            $original['string'] = $method['string'];
-            if($math !== null){
-                $parser->data($attribute, $math);
-                return $original;
-            } else {
-                $item = array();
-                foreach ($parse as $nr => $record){
-                    if(empty($record['type'])){
-                        continue;
-                    }
-                    if($record['type'] == Token::TYPE_WHITESPACE){
-                        continue;
-                    }
-                    $record = Value::get($record);
-                    if(empty($item)){
-                        $item = $record;
-                        continue;
-                    }
-                    if(!empty($item['type']) && $item['type'] != $record['type']){
-                        $item['type'] = Token::TYPE_MIXED;
-                    }
-                    if(isset($item['value']) && isset($record['value']) && $item['type'] == Token::TYPE_STRING || $item['type'] == Token::TYPE_MIXED){
-                        $item['value'] .= $record['value'];
-                    }
-                    elseif(isset($item['value']) && !empty($record['value'])){
-                        throw new Exception('Assign:find: record & item set AND NOT TYPE_MIXED OR TYPE_STRING ');
-                    }
+                $attribute = substr(rtrim($explode[0]), 1);
+                $value = trim($explode[1], ' ');
+                if(
+                    substr($attribute,-1) == '-' ||
+                    substr($attribute,-1) == '+' ||
+                    substr($attribute,-1) == '.' ||
+                    substr($attribute,-1) == '!'
+                ){
+                    $assign = substr($attribute, -1) . '=';
+                    $attribute = substr($attribute, 0, -1);
+                    $attribute = rtrim($attribute,' ');
                 }
-                if(!isset($item['value'])){
-                    //cant use data with value null to set so...
-                    $parser->object_delete($attribute, $parser->data()); //for sorting an object
-                    $parser->object_set($attribute, null, $parser->data());
+                //before create_object assign variable needed
+                $create = Token::newline_restore($value, $parser->random());
+                $original = $create;
+                $create = Token::all($create);
+                $object = Token::create_object($create, $attribute, $parser);
+                if(!empty($object)){
+                    $object['value'] = Variable::replace($object['value'], '', false, $parser);
+                    //is variable data changed?
+                    $object = Token::cast($object);
+                    $parser->data($attribute, $object['value']);
+                    return $record;
+                }
+                $array = Token::create_array($create, $parser);
+                if(!empty($array)){
+                    $array['value'] = Variable::replace($array['value'], '', false, $parser);
+                    //is variable data changed?
+                    $array = Token::cast($array);
+                    $parser->data($attribute, $array['value']);
+                    return $record;
+                }
+                //an equation can be a variable, if it is undefined it will be + 0
+                $parse = Token::parse($create);
+                $parse = Token::variable($parse, $attribute, $parser);
+                $method = array();
+                $method['parse'] = $parse;
+                $method['string'] = $record['string'];
+                $method['original'] = $record['original'];
+                $method['assign'] = $record['assign'];
+                $method['key'] = $record['assign']['tag'];
+                $method = Token::method($method, $parser);
+                $parse = $method['parse'];
+                $math = Token::create_equation($parse, $parser);
+                $original = $record;
+                $original['string'] = $method['string'];
+                if($math !== null){
+                    $parser->data($attribute, $math);
+                    return $original;
+                } else {
+                    $item = array();
+                    foreach ($parse as $nr => $record){
+                        if(empty($record['type'])){
+                            continue;
+                        }
+                        if($record['type'] == Token::TYPE_WHITESPACE){
+                            continue;
+                        }
+                        $record = Value::get($record);
+                        if(empty($item)){
+                            $item = $record;
+                            continue;
+                        }
+                        if(!empty($item['type']) && $item['type'] != $record['type']){
+                            $item['type'] = Token::TYPE_MIXED;
+                        }
+                        if(isset($item['value']) && isset($record['value']) && $item['type'] == Token::TYPE_STRING || $item['type'] == Token::TYPE_MIXED){
+                            $item['value'] .= $record['value'];
+                        }
+                        elseif(isset($item['value']) && !empty($record['value'])){
+                            throw new Exception('Assign:find: record & item set AND NOT TYPE_MIXED OR TYPE_STRING ');
+                        }
+                    }
+                    if(!isset($item['value'])){
+                        //cant use data with value null to set so...
+                        $parser->object_delete($attribute, $parser->data()); //for sorting an object
+                        $parser->object_set($attribute, null, $parser->data());
+                        return $original;
+                    }
+                    if(is_string($item['value'])){
+                        $item['value'] = Token::literal_extra($item['value']);
+                        $item['value'] = Token::newline_replace($item['value'], $parser->random());
+                        $item['value'] = Token::literal_replace($item['value'], $parser->random());
+                    }
+                    switch($assign){
+                        case '+=' :
+                            $plus = $parser->data($attribute) + 0;
+                            $parser->data($attribute, $plus += $item['value']);
+                        break;
+                        case '-=' :
+                            $min = $parser->data($attribute) + 0;
+                            $parser->data($attribute, $min -= $item['value']);
+                        break;
+                        case '.=' :
+                            $add = $parser->data($attribute);
+                            $parser->data($attribute, $add .= $item['value']);
+                        break;
+                        default :
+                            $item = Token::cast($item);
+                            $parser->data($attribute, $item['value']);
+                        break;
+                    }
                     return $original;
                 }
-                if(is_string($item['value'])){
-                    $item['value'] = Token::literal_extra($item['value']);
-                    $item['value'] = Token::newline_replace($item['value'], $parser->random());
-                    $item['value'] = Token::literal_replace($item['value'], $parser->random());
-                }
-                switch($assign){
-                    case '+=' :
-                        $plus = $parser->data($attribute) + 0;
-                        $parser->data($attribute, $plus += $item['value']);
-                    break;
-                    case '-=' :
-                        $min = $parser->data($attribute) + 0;
-                        $parser->data($attribute, $min -= $item['value']);
-                    break;
-                    case '.=' :
-                        $add = $parser->data($attribute);
-                        $parser->data($attribute, $add .= $item['value']);
-                    break;
-                    default :
-                        $item = Token::cast($item);
-                        $parser->data($attribute, $item['value']);
-                    break;
-                }
-                return $original;
+            } else {
+                Assign::plusPlus($tag, $parser);
+                Assign::minusMinus($tag, $parser);
             }
-        } else {
-            Assign::plusPlus($tag, $parser);
-            Assign::minusMinus($tag, $parser);
+            return $record;
         }
-        return $record;
+
+      
     }
 
     public static function minusMinus($tag='', $parser=null){

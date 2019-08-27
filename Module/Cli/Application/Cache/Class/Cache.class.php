@@ -42,7 +42,7 @@ class Cache extends Cli {
             $data->read($url);
             $data->data('delete', 'priya.cache.disable');
             $data->write();
-            echo Cache::execute($object);
+            echo Cache::view($object);
             $object->data('delete', 'execute');
         }
     }

@@ -21,7 +21,7 @@ use Priya\Module\File\Dir;
 use Priya\Module\Core\Parser;
 use Priya\Module\File\Cache;
 
-use Priya\Module\Parse;
+use R3m\Parse;
 
 class Result extends Parser {
     const DIR = __DIR__;
@@ -111,7 +111,7 @@ class Result extends Parser {
         $this->data('ignore', $ignore);
     }
 
-    public static function view($object=null, $template='', $type='response'){
+    public static function view($object=null, $template='', $type='response'){        
         $is_url = false;
         if($object == 'url'){
             $is_url = true;
@@ -125,10 +125,13 @@ class Result extends Parser {
             $is_url === false &&
             method_exists($object, 'read') === false
         ){
+            var_dump('fuck');
+            die;
             return new Exception('read method not found in object, base-class needs to be at least Priya\Module\Core\Data');
         }
         $execute = '';
         $class = get_called_class();
+    
         //execution cannot be cached, we need a different name -> response?
         if($is_url === false){
             $data = $object->read($class);
@@ -141,6 +144,7 @@ class Result extends Parser {
         //can be outside priya module...
         $dir = dirname($class::DIR) . Application::DS . Result::VIEW . Application::DS;
         $url = $dir . $template . Result::EXT_VIEW;
+            
         if($type == 'url'){
             return $url;
         }        
@@ -151,7 +155,7 @@ class Result extends Parser {
             $url = $dir . $template . Result::EXT_VIEW;
             $location[] = $url;
             return $location;
-        }
+        }        
         if(!file_exists($url)){
             $template = array_pop($explode) . '.' . $template;
             $url = $dir . $template . Result::EXT_VIEW;
@@ -172,7 +176,7 @@ class Result extends Parser {
         }
         if(method_exists($object, 'data') === false){
             return new Exception('data method not found in object, base-class needs to be at least Priya\Module\Core\Data');
-        }
+        }        
         $parse = new Parse($object->handler(), $object->route(), $object->data());        
         try {            
             $execute = $parse->read($url);

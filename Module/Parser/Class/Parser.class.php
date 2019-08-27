@@ -116,6 +116,10 @@ class Parser extends ParserCore {
         }
         foreach($list as $nr => $value){
             $key = key($value);
+            if(!is_string($key)){
+                var_dump($list);
+                die;
+            }
             if(strtolower(substr($key, 0, 3)) == '{if'){
                 $record['if']['tag'] = $key;
                 $record = Control_If::create($list, $record, $this->random());
@@ -144,7 +148,7 @@ class Parser extends ParserCore {
                 if(!empty($record['status'])){
                     $list = Variable::list($list, $record);
                     $next = [];
-                    $next['string'] = $record['string'];
+                    $next['string'] = $record['string'];                    
                     return $this->list($list, $next, $keep, $root);
                 }
             }
@@ -163,7 +167,7 @@ class Parser extends ParserCore {
         if(empty($list)){
             $key = $record['string'];
             if(empty($record['status'])){
-                $record['assign']['tag'] = $key;
+                $record['assign']['tag'] = $key;                
                 Assign::find($record, $this);
                 $record = Assign::row($record, $this->random());
             }

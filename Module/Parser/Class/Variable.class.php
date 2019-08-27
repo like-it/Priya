@@ -175,6 +175,9 @@ class Variable extends Core {
     }
 
     public static function find($record=array(), $keep=false, $parser=null){
+        if(!is_string($record['variable']['tag'])){
+            return $record;
+        }
         if(
             substr($record['variable']['tag'], 0, 1) != '{' &&
             substr($record['variable']['tag'], -1, 1) != '}'

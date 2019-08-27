@@ -184,6 +184,8 @@ class Autoload {
         $data[] = $item['directory'] . $item['baseName'] . '.' . Autoload::EXT_PHP;
         $data[] = '[---]';
 
+        // var_dump($data);
+
         $this->fileList[$item['file']][] = $data;
 
         $result = array();

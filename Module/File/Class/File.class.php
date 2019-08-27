@@ -86,6 +86,8 @@ class File {
 
     public static function write($url='', $data=''){
         $url = (string) $url;
+
+        $data = Core::object($data, 'json');
         $data = (string) $data;
         $fwrite = 0;
         $resource = @fopen($url, 'w');
@@ -112,11 +114,11 @@ class File {
 
     public static function read($url=''){
         if(strpos($url, File::SCHEME_HTTP) !== false){
-		  //check network connection first (@) added for that 			 //error
-		 $file = @file($url);
-		 if(!is_array($file)){
-			return false;
-		 }
+          //check network connection first (@) added for that              //error
+         $file = @file($url);
+         if(!is_array($file)){
+            return false;
+         }
             return implode('', $file);
         }
         if(file_exists($url) === false){
