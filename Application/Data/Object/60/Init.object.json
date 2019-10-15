@@ -1,0 +1,336 @@
+{
+    "module": {
+        "name": "Priya\/Application"
+    },
+    "priya": {
+        "dir": {
+            "application": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/",
+            "data": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/",
+            "temp": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Temp\/",
+            "cache": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Temp\/Cache\/",
+            "processor": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Processor\/",
+            "root": "\/mnt\/c\/Finger\/Vendor\/Priya\/",
+            "module": "\/mnt\/c\/Finger\/Vendor\/Priya\/Module\/",
+            "backup": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Backup\/",
+            "restore": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Restore\/",
+            "update": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Update\/",
+            "public": "\/mnt\/c\/Finger\/Vendor\/Priya\/Public\/"
+        },
+        "cache": {
+            "config": {
+                "+ 1 minute": "60",
+                "+ 2 minutes": "120",
+                "+ 3 minutes": "180",
+                "+ 4 minutes": "240",
+                "+ 5 minutes": "300",
+                "+ 10 minutes": "600",
+                "+ 15 minutes": "900",
+                "+ 20 minutes": "1200",
+                "+ 25 minutes": "1500",
+                "+ 30 minutes": "1800",
+                "+ 35 minutes": "2100",
+                "+ 40 minutes": "2400",
+                "+ 45 minutes": "2700",
+                "+ 50 minutes": "3000",
+                "+ 55 minutes": "3300",
+                "+ 60 minutes": "3600",
+                "+ 1 hour": "3600",
+                "+ 2 hours": "7200",
+                "+ 3 hours": "10800",
+                "+ 6 hours": "21600",
+                "+ 9 hours": "32400",
+                "+ 12 hours": "43200",
+                "+ 15 hours": "54000",
+                "+ 18 hours": "64800",
+                "+ 21 hours": "75600",
+                "+ 24 hours": "86400",
+                "+ 1 day": "86400",
+                "+ 2 days": "172800",
+                "+ 3 days": "259200",
+                "+ 4 days": "345600",
+                "+ 5 days": "432000",
+                "+ 6 days": "518400",
+                "+ 7 days": "604800",
+                "+ 1 week": "604800",
+                "+ 2 weeks": "1209600",
+                "+ 3 weeks": "1814400",
+                "+ 4 weeks": "2419200",
+                "+ 1 month": "2518500",
+                "+ 2 months": "5037000",
+                "+ 3 months": "7555500",
+                "+ 4 months": "10074000",
+                "+ 5 months": "12592500",
+                "+ 6 months": "15111000",
+                "+ 9 months": "22666500",
+                "+ 12 months": "30222000",
+                "+ 1 year": "31536000",
+                "+ 2 years": "63072000",
+                "+ 3 years": "94608000",
+                "+ 4 years": "126144000",
+                "+ 5 years": "157680000"
+            },
+            "init": {
+                "url": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Object\/60\/Init.object.json",
+                "interval": "+ 1 minute",
+                "read": true
+            },
+            "file": []
+        },
+        "application": {
+            "constant": {
+                "DS": "\/",
+                "PRIYA": "Priya",
+                "ENVIRONMENT": "development",
+                "MODULE": "Module",
+                "TEMPLATE": "Template",
+                "PLUGIN": "Plugin",
+                "PAGE": "Page",
+                "CACHE": "Cache",
+                "DATA": "Data",
+                "OBJECT": "Object",
+                "BACKUP": "Backup",
+                "PROCESSOR": "Processor",
+                "RESTORE": "Restore",
+                "UPDATE": "Update",
+                "VENDOR": "Vendor",
+                "TEMP": "Temp",
+                "PUBLIC_HTML": "Public",
+                "HOST": "Host",
+                "CSS": "Css",
+                "JAVASCRIPT": "Javascript",
+                "CONFIG": "Config.json",
+                "CUSTOM": "Custom.json",
+                "ROUTE": "Route.json",
+                "CREDENTIAL": "Credential.json",
+                "URL": "Application",
+                "OBJECT_INIT_URL": "Init.object.json",
+                "OBJECT_INIT_INTERVAL": "+ 1 minute"
+            },
+            "execute": [
+                {
+                    "command": "\/usr\/bin\/fingerspitzengefuhl",
+                    "key": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/www-data\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/bin\/fair",
+                    "key": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/www-data\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/bin\/priya",
+                    "key": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Id.1",
+                    "keycord": {
+                        "size": "200 YottaBytes",
+                        "interval": "+1 nanoseconde"
+                    },
+                    "authorize": "\/etc\/ssh\/authorized-keys\/www-data\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/sbin\/apache2",
+                    "key": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/www-data\/known_hosts\/"
+                }
+            ],
+            "binary": {
+                "user": {
+                    "name": {},
+                    "execute": "priya"
+                },
+                "pid": "0.0",
+                "%cpu": "0.0",
+                "%mem": "10308",
+                "vsz": "652",
+                "rss": "tty1",
+                "tty": "S",
+                "stat": "23:26",
+                "start": "0:00",
+                "time": "\/bin\/sh",
+                "tree": {
+                    "0": "\/usr\/bin\/priya",
+                    "1": "uuid"
+                },
+                "command": "\/usr\/bin\/priya uuid",
+                "execute": "sh"
+            }
+        },
+        "environment": "development",
+        "contentType": {
+            "txt": "text\/plain",
+            "html": "text\/html",
+            "css": "text\/css",
+            "pcss": "text\/css",
+            "js": "application\/javascript",
+            "json": "application\/json",
+            "ico": "image\/x-icon",
+            "png": "image\/png",
+            "jpg": "image\/jpeg",
+            "gif": "image\/gif",
+            "svg": "image\/svg+xml",
+            "woff": "application\/font-woff",
+            "ttf": "font\/ttf",
+            "wav": "audio\/wav",
+            "mp3": "audio\/mp3"
+        },
+        "route": {
+            "cache": {
+                "url": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Temp\/Route\/Route.json"
+            }
+        },
+        "major": "1",
+        "minor": "5",
+        "patch": "16",
+        "version": "1.5.16",
+        "built": "2019-07-07 10:50:55",
+        "parser": {
+            "method": {
+                "type": "method",
+                "value": "",
+                "method": "system.user.name",
+                "exclamation_count": "0",
+                "has_exclamation": "",
+                "invert": "",
+                "set": {
+                    "depth": "0"
+                },
+                "parameter": [],
+                "parse_method": [
+                    {
+                        "is_cast": "",
+                        "parse": "system",
+                        "value": "system",
+                        "type": "string",
+                        "set": {
+                            "depth": "0"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.",
+                        "value": ".",
+                        "type": "dot",
+                        "set": {
+                            "depth": "0"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.user",
+                        "value": "user",
+                        "type": "string",
+                        "set": {
+                            "depth": "0"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.user.",
+                        "value": ".",
+                        "type": "dot",
+                        "set": {
+                            "depth": "0"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.user.name",
+                        "value": "name",
+                        "type": "string",
+                        "set": {
+                            "depth": "0"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.user.name(",
+                        "value": "(",
+                        "type": "parenthese",
+                        "set": {
+                            "depth": "1"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.user.name()",
+                        "value": ")",
+                        "type": "parenthese",
+                        "set": {
+                            "depth": "1"
+                        }
+                    }
+                ]
+            },
+            "loop": "init"
+        },
+        "mysql": {
+            "production": {
+                "host": "127.0.0.1",
+                "database": "example",
+                "user": "root",
+                "password": "^6B4d6eb2527",
+                "charset": "utf8mb4"
+            },
+            "development": {
+                "host": "127.0.0.1",
+                "database": "example",
+                "user": "root",
+                "password": "^6B4d6eb2527",
+                "charset": "utf8mb4"
+            }
+        },
+        "sqlite": {
+            "production": {
+                "driver": "pdo_sqlite",
+                "path": "\/mnt\/c\/Finger\/Data\/Database.sqlite"
+            },
+            "development": {
+                "driver": "pdo_sqlite",
+                "path": "\/mnt\/c\/Finger\/Data\/Database.Development.sqlite"
+            }
+        },
+        "autoload": {
+            "Host": "\/mnt\/c\/Finger\/Host\/",
+            "Priya\\Module": "\/mnt\/c\/Finger\/Module",
+            "Priya": "\/mnt\/c\/Finger\/Vendor\/Priya",
+            "R3m": "\/mnt\/c\/Finger\/Vendor\/R3m",
+            "Doctrine": "\/mnt\/c\/Finger\/Vendor\/Doctrine\/lib\/Doctrine",
+            "PHPMailer\\PHPMailer": "\/mnt\/c\/Finger\/Vendor\/PHPMailer\/src"
+        }
+    },
+    "dir": {
+        "ds": "\/",
+        "vendor": "\/mnt\/c\/Finger\/Vendor\/",
+        "root": "\/mnt\/c\/Finger\/",
+        "data": "\/mnt\/c\/Finger\/Data\/",
+        "host": "\/mnt\/c\/Finger\/Host\/",
+        "mount": {
+            "root": "\/mnt\/c\/Finger\/Mount\/",
+            "A": "\/mnt\/c\/Finger\/Mount\/A\/",
+            "Temp": "\/mnt\/c\/Finger\/Mount\/Temp\/"
+        },
+        "public": "\/mnt\/c\/Finger\/Public\/"
+    },
+    "server": {
+        "url": "https:\/\/mo2fr.com\/",
+        "timeout": "600"
+    },
+    "mail": {
+        "host": "smtp.live.com",
+        "port": "587",
+        "secure": "tls",
+        "username": "like-it.cloud@outlook.com",
+        "from": {
+            "email": "like-it.cloud@outlook.com",
+            "name": "like-it.cloud@outlook.com"
+        },
+        "password": "vanderVelde1983!"
+    },
+    "memory": {
+        "id": "1",
+        "url": "127.0.0.1",
+        "port": "11211",
+        "weight": "1"
+    },
+    "public_html": "Public",
+    "binary": "priya"
+}
