@@ -1,0 +1,24 @@
+{
+"title": "Test.Parser.Function.Require",
+"author": "Remco van der Velde",
+"request" : "{request()}",
+"web" : {
+    "root" : "http:://{$test.variable}/"
+},
+"test" : {
+    "page" : "{require('{dir.cwd()}Template/{$request.require}')}",
+    "loader" : "{$loader}",
+    "footer" : "{$footer}",
+    "missing" : "{$missing}",
+    "head" : "{$head}"
+},
+"output" : {
+    "page" : "{?}",
+    "loader" : "{$loader}",
+    "footer" : "{$footer}",
+    "missing" : "{$missing}",
+    "head" : "{$head}"
+}
+}
+
+

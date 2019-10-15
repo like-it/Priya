@@ -1,0 +1,60 @@
+{
+    "priya": {
+        "environment": "development",
+        "contentType": {
+            "txt": "text\/plain",
+            "html": "text\/html",
+            "css": "text\/css",
+            "pcss": "text\/css",
+            "js": "application\/javascript",
+            "json": "application\/json",
+            "ico": "image\/x-icon",
+            "png": "image\/png",
+            "jpg": "image\/jpeg",
+            "gif": "image\/gif",
+            "svg": "image\/svg+xml",
+            "woff": "application\/font-woff",
+            "ttf": "font\/ttf",
+            "wav": "audio\/wav",
+            "mp3": "audio\/mp3"
+        },
+        "application": {
+            "execute": [
+                {
+                    "command": "\/usr\/bin\/fingerspitzengefuhl",
+                    "key": "{$priya.dir.data}Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/{system.user.name()}\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/bin\/fair",
+                    "key": "{$priya.dir.data}Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/{system.user.name()}\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/bin\/priya",
+                    "key": "{$priya.dir.data}Id.1",
+                    "keycord": {
+                        "size": "200 YottaBytes",
+                        "interval": "+1 nanoseconde"
+                    },
+                    "authorize": "\/etc\/ssh\/authorized-keys\/{system.user.name()}\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/sbin\/apache2",
+                    "key": "{$priya.dir.data}Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/{system.user.name()}\/known_hosts\/"
+                }
+            ]
+        },
+        "route": {
+            "cache": {
+                "url": "{$priya.dir.temp}Route\/Route.json"
+            }
+        },
+        "major": "1",
+        "minor": 5,
+        "patch": 16,
+        "version": "1.5.16",
+        "built": "2019-07-07 10:50:55"
+    }
+}

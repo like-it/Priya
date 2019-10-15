@@ -1,0 +1,95 @@
+{
+    "request" : "{request()}",
+    "session" : "{session()}",
+    "default" : {
+    	"parameter" : {
+			"service" : "service",
+			"import" : "import",
+			"calc" : "calc"
+    	},
+        "command" : "info",
+        "service" : "info"
+    },
+    "config" : {
+        "wget" : {
+            "cache" : {
+                "expire" : "5 sec",
+                "timeout" : "10 sec"
+            }
+        },
+        "ssh" : {
+            "url" : "{$dir.data}Ssh.json"
+        }
+    },
+    "command" : [
+    	"info",
+		"start",
+		"stop",		
+		"kill",
+		"cron"		
+    ],
+    "market" : {
+        "pair" : "{select(\"{$module.dir.data}Currency.json\", \"pair\")}",
+        "info" : {
+            "default" : {
+                "quota" : "1 GB"
+            },
+            "api" :  {
+                "url" : "https://yobit.io/api/3/info",
+                "target" :  {
+                    "url" : "{$module.dir.data}Wget/Input/Info/",
+                    "quota" : "{$market.info.default.quota}"
+                },
+                "timeout" : "10"
+            }
+        },
+        "depth" : {
+            "default" : {
+                "api_limit" : 2000,
+                "quota" : "1 GB"
+            },
+            "api" :  {
+                "url" : "https://yobit.net/api/3/depth/{literal}{$market.depth.current.pair}{/literal}?limit={literal}{$market.depth.current.limit | default: $market.depth.default.api_limit}{/literal}",
+                "target" :  {
+                    "url" : "{$module.dir.data}Wget/Input/Depth/",
+                    "quota" : "{$market.depth.default.quota}"
+                },
+                "timeout" : "10"
+            },
+            "pair" : "{$market.pair}"
+        },
+        "ticker" : {
+            "default" : {
+                "quota" : "1 GB"
+            },
+            "api" :  {
+                "url" : "https://yobit.net/api/3/ticker/{literal}{$market.ticker.current.pair}{/literal}",
+                "target" :  {
+                    "url" : "{$module.dir.data}Wget/Input/Ticker/",
+                    "quota" : "{$market.ticker.default.quota}"
+                },
+                "timeout" : "10"
+            },
+            "pair" : "{$market.pair}"
+        },
+        "trade" : {
+            "default" : {
+                "api_limit" : 2000,
+                "quota" : "1 GB"
+            },
+            "api" :  {
+                "url" : "https://yobit.io/api/3/trades/{literal}{$market.trade.current.pair}{/literal}?limit={literal}{$market.trade.current.limit | default: $market.trade.default.api_limit}{/literal}",
+                "target" :  {
+                    "url" : "{$module.dir.data}Wget/Input/Trade/",
+                    "quota" : "{$market.trade.default.quota}"
+                },
+                "timeout" : "10"
+            },
+            "pair" : "{$market.pair}"
+        }
+    },
+    "wget" : {
+        "input" : "{$module.dir.data}Wget/input/",
+        "output" : "{$module.dir.data}Trade History/"
+    }
+}

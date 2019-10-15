@@ -1,0 +1,3 @@
+{if $execute == 'application'}Clearing application cache...
+{else}{if $execute == 'smarty'}Clearing smarty cache...{else}Cache cleared...{/if}
+{/if}

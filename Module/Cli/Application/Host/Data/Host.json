@@ -1,0 +1,16 @@
+{
+    "request" : "{request()}",
+    "session" : "{session()}",
+    "default" : {
+        "command" : "info"
+    },
+    "config" : {
+    },
+    "command" : [
+        "info",
+        "create",
+        "delete",
+        "backup",
+        "restore"
+    ]
+}

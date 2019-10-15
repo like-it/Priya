@@ -1,0 +1,36 @@
+{
+    "pair" : [
+        {
+            "source" : "btc",
+            "market" : "usd"
+        },
+        {
+            "source" : "rocket",
+            "market" : "btc"
+        },
+        {
+            "source" : "fury",
+            "market" : "btc"
+        },
+        {
+            "source" : "uranix",
+            "market" : "btc"
+        },
+        {
+            "source" : "qubix",
+            "market" : "btc"
+        },
+        {
+            "source" : "pluto",
+            "market" : "btc"
+        },
+        {
+            "source" : "moon",
+            "market" : "btc"
+        },
+        {
+            "source" : "mio",
+            "market" : "btc"
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+.buildpath
+.project
+.settings
+org.*
+Application/Data/Cache/*
+Application/Data/Custom.json
+Application/Data/Pack/
+Module/Autoload/Data/*
+Module/Smarty/Data/*
+Module/Parser/Function/Function.List.php
+*.conf

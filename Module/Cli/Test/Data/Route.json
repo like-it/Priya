@@ -1,0 +1,14 @@
+{
+    "priya-cli-test": {
+        "path": "test",
+        "default": {
+            "controller": "Priya.Module.Cli.Test.run",
+            "format": "html",
+            "language": "en"
+        },
+        "method": [
+            "CLI"
+        ],
+        "translate": false
+    }
+}

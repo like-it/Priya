@@ -1,0 +1,11 @@
+{
+    "request" : "{request()}",
+    "session" : "{session()}",
+    "default" : {
+        "path" : "{$module.route.path} cron"
+    },
+    "command" : [
+    	"info",
+    	"test"
+    ]
+}

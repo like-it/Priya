@@ -1,0 +1,27 @@
+{
+    "request" : "{request()}",
+    "session" : "{session()}",
+    "default" : {
+        "command" : "info"
+    },
+    "config" : {
+        "apache" : {
+            "disabled" : []
+        },
+        "ssh" : {
+            "url" : "{$dir.data}Ssh.json"
+        }
+    },
+    "command" : [
+        "info",
+        "start",
+        "stop",
+        "restart",
+        "create",
+        "delete",
+        "enable",
+        "disable",
+        "backup",
+        "restore"
+    ]
+}
