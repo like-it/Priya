@@ -1,0 +1,24 @@
+{
+    "request" : "{request()}",
+    "session" : "{session()}",
+    "default" : {    	
+        "command" : "info"        
+    },
+    "config" : {       
+        "ssh" : {
+            "url" : "{$dir.data}Ssh.json"
+        }
+    },
+    "command" : [
+    	"info",
+		"start",
+		"stop",		
+		"kill",
+		"schedule"			
+    ],
+    "cron" : {
+    	"path" : "{$dir.data}Cron/.Task/",
+    	"lock" : "{$dir.data}Cron/.Lock",
+    	"dir" : "{dir.read($cron.path)}"
+    }    
+}

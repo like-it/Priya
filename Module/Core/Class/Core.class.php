@@ -10,16 +10,26 @@ namespace Priya\Module;
 use stdClass;
 use Exception;
 use Priya\Application;
+use Priya\Module\File\Dir;
+
 class Core {
     const FILE = __FILE__;
+    const NAMESPACE = __NAMESPACE__;
+    const NAME = __CLASS__;
+    const NAME_DECENDENT = Core::NAME;
+
     const DS = Application::DS;
     const ATTRIBUTE_EXPLODE = [
         '.',
-        ':', 
+        ':',
         '->'
     ];
+    const TEMP =  Application::DS . 'tmp' . Application::DS . 'priya' . Application::DS;
+
     const SHELL_DETACHED = 'detached';
     const SHELL_PROCESS = 'process';
+    const SHELL_PROCESS_END = 'end';
+    const SHELL_PROCESS_DELIMITER = ';';
 
     const EXCEPTION_PERMISSION_TYPE = 'unknown permission type.';
     const EXCEPTION_MERGE_ARRAY_OBJECT = 'cannot merge an array with an object.';
@@ -31,7 +41,7 @@ class Core {
     const OUTPUT_MODE_DEFAULT = CORE::OUTPUT_MODE_EXPLICIT;
 
     const OUTPUT_MODE = [
-        Core::OUTPUT_MODE_IMPLICIT,        
+        Core::OUTPUT_MODE_IMPLICIT,
         Core::OUTPUT_MODE_EXPLICIT,
     ];
 
@@ -134,9 +144,14 @@ class Core {
     }
     public function route($route=null, $attribute=null){
         if($route !== null){
-            if(is_object($route)){
+            if(is_object($route) && is_a($route, 'Priya\Module\Route')){
                 $this->setRoute($route);
                 return $this->getRoute();
+            }
+            elseif(is_object($route)){
+                $debug = debug_backtrace(true);
+                var_dump($debug);
+                die;
             }
         }
         if($route === null){
@@ -165,61 +180,85 @@ class Core {
         }
         return $this->handler()->file($attribute, $value);
     }
+
+    /*
+    public static function is($type='typeof', $subject=null, $value=null){
+        switch(strtolower($type)){
+            case 'typeof' :
+                return is_a($subject, $value);
+        }
+    }
+    */
+
     public function parameter($parameter, $offset=0){
-        $data = $this->request('data');        
+        $data = $this->request('data');
         $result = null;
-        $value = null;        
+        $value = null;
+        if(is_string($parameter) && stristr($parameter, '\\')){
+            //classname adjustment
+            $parameter = basename(str_replace('\\', '//', $parameter));
+        }
         if(is_numeric($parameter)){
             if(isset($data[$parameter])){
                 $param = ltrim($data[$parameter], '-');
-                $result = $param;                
+                $result = $param;
             } else {
                 $result = null;
             }
         } else {
-            foreach($data as $key => $param){
-                $param = ltrim($param, '-');
-                $param = rtrim($param);
-                $tmp = explode('=', $param);
-                if(count($tmp) > 1){
-                    $param = array_shift($tmp);
-                    $value = implode('=', $tmp);
-                }                
-                if(strtolower($param) == strtolower($parameter)){                    
-                    if($offset !== 0){
-                        if(isset($data[($key + $offset)])){
-                            $value = rtrim(ltrim($data[($key + $offset)], '-'));
-                        } else {
-                            $result = null;
-                            break;
-                        }
-                    }                    
-                    if(isset($value) && $value !== null){
-                        $result = $value;
-                    } else {
-                        $result = true;
-                        return $result;                        
+            if(
+                is_array($data) ||
+                is_object($data)
+            ){
+                foreach($data as $key => $param){
+                    $param = ltrim($param, '-');
+                    $param = rtrim($param);
+                    $tmp = explode('=', $param);
+                    if(count($tmp) > 1){
+                        $param = array_shift($tmp);
+                        $value = implode('=', $tmp);
                     }
-                    break;
+                    if(strtolower($param) == strtolower($parameter)){
+                        if($offset !== 0){
+                            if(isset($data[($key + $offset)])){
+                                $value = rtrim(ltrim($data[($key + $offset)], '-'));
+                            } else {
+                                $result = null;
+                                break;
+                            }
+                        }
+                        if(isset($value) && $value !== null){
+                            $result = $value;
+                        } else {
+                            $result = true;
+                            return $result;
+                        }
+                        break;
+                    }
+                    $value = null;
                 }
-                $value = null;
             }
-        }    
+        }
         if($result === null || is_bool($result)){
             return $result;
         }
         return trim($result);
     }
-    
+
     protected function cwd($cwd=''){
         if(!empty($cwd)){
             $this->cwd = $cwd;
         }
         elseif(empty($this->cwd)){
             $this->cwd = getcwd() . Application::DS;
+            if($this->cwd == Application::DS . Application::DS){
+                $this->cwd = Application::DS;
+            }
         }
         return $this->cwd;
     }
+
+    //make static, didnt i do that already somewhere?
     public function csrf(){
         $handler = $this->handler();
         if(empty($handler)){
@@ -241,6 +280,8 @@ class Core {
         }
         return $this->handler()->cookie($attribute, $value);
     }
+
+    //make static
     public function module(){
         $module = explode(__NAMESPACE__, get_called_class(), 2);
         if(count($module) == 2){
@@ -250,12 +291,17 @@ class Core {
         $module = ltrim(str_replace('\\', Application::DS, $module),  Application::DS);
         return $module;
     }
+
+    //make static
     public function dom_class($class=''){
         $class = strtolower($class);
         $class = str_replace(array('\\', '/'), '-', $class);
         return $class;
     }
-    public function refresh($url=''){
+    //make static
+    public static function refresh($object, $url=''){
+        /* disabled error & message */
+        /*
         $error = $this->error();
         if(!empty($error)){
             $this->session('error', $error);
@@ -264,21 +310,26 @@ class Core {
         if(!empty($message)){
             $this->session('message', $message);
         }
+        */
+        /*
         $post = $this->post();
         if(!empty($post)){
             $this->session('post', $post);
         }
-        $contentType = $this->request('contentType');
+        */
+        $contentType = $object->request('contentType');
         if($contentType == Handler::CONTENT_TYPE_JSON){
             $output = new stdClass();
             $output->refresh = $url;
             echo json_encode($output);
             die;
         } else {
-            $this->header('Location: '.$url);
+            $object->header('Location: '.$url);
             die;
         }
     }
+
+    //remove, old method?
     public function post($type=null, $attribute=null, $value=null){
         if($type !== null){
             if($type == 'request' && $attribute === null && $value === null){
@@ -337,6 +388,8 @@ class Core {
         }
         return $this->getPost();
     }
+
+    //remove old method?
     private function setPost($attribute='', $value=null){
         if(is_array($attribute) || is_object($attribute)){
             if(is_object($this->post)){
@@ -360,6 +413,8 @@ class Core {
             }
         }
     }
+
+    //remove old method?
     private function getPost($attribute=null){
         if($attribute === null){
             return $this->post;
@@ -379,9 +434,31 @@ class Core {
             }
         }
     }
+
+    //remove old method ?
     private function deletePost($attribute=null){
         return $this->object_delete($attribute, $this->post());
     }
+
+    public static function error($object, $error){
+        if(is_string($object)){
+            $debug = debug_backtrace(true);
+            var_dump($debug);
+            die;
+        }
+        $list = $object->data('priya.error');
+        if(empty($list)){
+            $list = [];
+        }
+        $list[] = $error;
+        $object->data('priya.error', $list);
+        return $object; //bug in php, converted to stdClass
+    }
+
+    //restore function for input fields
+
+
+    /*
     public function error($type=null, $attribute=null, $value=null){
         if($type !== null){
             if($type == 'add' && $attribute !== null && $value !== null){
@@ -440,6 +517,8 @@ class Core {
         }
         return $this->getError();
     }
+
+    //restore for input fields
     private function setError($attribute='', $value=null){
         if(is_array($attribute) || is_object($attribute)){
             if(is_object($this->error)){
@@ -463,6 +542,8 @@ class Core {
             }
         }
     }
+
+    //restore for input fields
     private function getError($attribute=null){
         if($attribute === null){
             return $this->error;
@@ -482,9 +563,14 @@ class Core {
             }
         }
     }
+
+    //restore for input fields
     private function deleteError($attribute=null){
         return $this->object_delete($attribute, $this->error());
     }
+    */
+
+    //restore for input fields message system, or do i do it different
     public function message($type=null, $attribute=null, $value=null){
         if($type !== null){
             if($type == 'add' && $attribute !== null && $value !== null){
@@ -543,6 +629,8 @@ class Core {
         }
         return $this->getMessage();
     }
+
+    //restore for message
     private function setMessage($attribute='', $value=null){
         if(is_array($attribute) || is_object($attribute)){
             if(is_object($this->message)){
@@ -566,6 +654,7 @@ class Core {
             }
         }
     }
+    //restore for message system
     private function getMessage($attribute=null){
         if($attribute === null){
             return $this->message;
@@ -585,9 +674,13 @@ class Core {
             }
         }
     }
+
+    //restore for message system
     private function deleteMessage($attribute=null){
         return $this->object_delete($attribute, $this->message());
     }
+
+    //restore for permission system
     public function permission($type=null, $permission=null){
         switch($type){
             case 'read':
@@ -637,6 +730,8 @@ class Core {
         }
         return $selector;
     }
+
+
     private function has_permission($selector=''){
         //data unavailable here, move...
         $rule = $this->data('permission.' . $selector . '.rule');
@@ -683,6 +778,8 @@ class Core {
         }
         return $this->mail;
     }
+
+    //object autoload statics ?
     public function autoload($autoload=null){
         if($autoload !== null){
             if($autoload == 'delete' || $autoload == 'remove'){
@@ -714,6 +811,8 @@ class Core {
         }
         return implode('\\', $explode);
     }
+
+    //might still be cheap with object static
     public function header($string='', $http_response_code=null, $replace=true){
         $handler = $this->handler();
         if(empty($handler)){
@@ -853,13 +952,14 @@ class Core {
     }
     public static function is_nested_array($array=array()){
         $array = (array) $array;
-        foreach($array as $key => $value){
+        foreach($array as $value){
             if(is_array($value)){
                 return true;
             }
         }
         return false;
     }
+    //make static
     public function explode_single($delimiter=array(), $string='', $internal=array()){
         $result = array();
         if(is_array($delimiter)){
@@ -912,6 +1012,8 @@ class Core {
         }
         return $result;
     }
+
+    //make static too (still cheap and not re-usable of missing documentation, read code
     public function explode_multi($delimiter=array(), $string='', $limit=array()){
         $result = array();
         if(!is_array($limit)){
@@ -941,6 +1043,8 @@ class Core {
         }
         return $result;
     }
+
+    //make static, still cheap
     public function object_horizontal($verticalArray=array(), $value=null, $return='object'){
         if(empty($verticalArray)){
             return false;
@@ -957,7 +1061,7 @@ class Core {
         } else {
             $last = array_pop($verticalArray);
         }
-        if(empty($last)){
+        if(empty($last) && $last != '0'){
             return false;
         }
         foreach($verticalArray as $key => $attribute){
@@ -1084,17 +1188,17 @@ class Core {
         foreach($attributeList as $key => $attribute){
             if(empty($key)){
                 continue;
-            }            
+            }
             if(property_exists($object,$key)){
-                
-                var_dump($attributeList);                
+
+                var_dump($attributeList);
                 $get = $this->object_has($attributeList->{$key}, $object->{$key});
                 var_dump($key);
                 var_dump($get);
                 if($get === false){
                     return false;
                 }
-                
+
                 return true;
             }
         }
@@ -1110,7 +1214,7 @@ class Core {
         if(is_string($attributeList)){
             $attributeList = $this->explode_multi(Core::ATTRIBUTE_EXPLODE, $attributeList);
             foreach($attributeList as $nr => $attribute){
-                if(empty($attribute)){
+                if(empty($attribute) && $attribute != '0'){
                     unset($attributeList[$nr]);
                 }
             }
@@ -1118,11 +1222,13 @@ class Core {
         if(is_array($attributeList)){
             $attributeList = $this->object_horizontal($attributeList);
         }
+
+        // die;
         if(empty($attributeList)){
             return $object;
         }
         foreach($attributeList as $key => $attribute){
-            if(empty($key)){
+            if(empty($key) && $key != 0){
                 continue;
             }
             if(isset($object->{$key})){
@@ -1183,6 +1289,8 @@ class Core {
         }
         return $main;
     }
+
+    //make static
     public function array_trim($array=array(), $split=',', $trim=null){
         if(is_string($array)){
             $array = explode($split, $array);
@@ -1229,29 +1337,123 @@ class Core {
             $reset = reset($array);
             $key = key($array);
             unset($array[$key]);
-            return $reset;            
+            return $reset;
         } else {
             return array_shift($array);
         }
     }
 
     public static function detach($command){
-        return Core::execute_shell($command, $output, Core::SHELL_DETACHED);
+        return Core::execute($command, $output, Core::SHELL_DETACHED);
     }
 
-    public static function async($command){        
+    public static function async($object, $command){
         if(stristr($command, '&') === false){
             $command .= ' &';
-        }   
-        return Core::execute_shell($command, $output, Core::SHELL_PROCESS);
+        }
+        return Core::execute($object, $command, $output, Core::SHELL_PROCESS);
     }
 
-    public static function execute_shell($command, &$output=[], $type=null){     
+    public static function execute($object, $command, &$output=[], $type=null){
         if($output === null){
-            $output = [];        
+            $output = [];
         }
         $result = [
-            'pid' => getmypid()            
+            'pid' => getmypid()
+        ];
+
+        $hash = $object->data('priya.application.binary.command');
+        /**
+         * hash, currently main thread needs also the command which will be executed
+         *
+         */
+        $hash = $hash . '-' . $command;
+        $hash = sha1($hash);
+
+        $dir_output = Core::TEMP . 'Output' . Application::DS;
+        $dir_pid = Core::TEMP . 'Pid' .  Application::DS;
+        Dir::create($dir_output, Dir::CHMOD);
+        Dir::create($dir_pid, Dir::CHMOD);
+
+        $result['dir_pid'] =  $dir_pid;
+        $result['dir_output'] = $dir_output;
+        if(
+            in_array(
+                $type,
+                [
+                    Core::SHELL_DETACHED,
+                    Core::SHELL_PROCESS
+                ]
+                )
+            ){
+                $pid = pcntl_fork();
+                switch($pid) {
+                    // fork errror
+                    case -1 :
+                        return false;
+                    case 0 :
+                        //in child process
+                        //create a seperate process to execute another process (async);
+
+
+                        $url_output = $dir_output . $hash;
+                        $url_pid = $dir_pid . $hash;
+                        $exec = sprintf("%s > %s 2>&1 & echo $! > %s", $command, $url_output, $url_pid);
+                        exec($exec);
+                        $read = trim(File::read($url_pid));
+                        File::write(
+                            $url_pid,
+                            $read .
+                            Core::SHELL_PROCESS_DELIMITER .
+                            $object->data('time.start') .
+                            Core::SHELL_PROCESS_DELIMITER .
+                            microtime(true) .
+                            Core::SHELL_PROCESS_DELIMITER .
+                            Core::SHELL_PROCESS_END .
+                            PHP_EOL
+                        );
+                        die;
+                        if($type != Core::SHELL_PROCESS){
+                            //                         echo implode(PHP_EOL, $output) . PHP_EOL;
+                        }
+                        $output = [];
+                        exit();
+                    default :
+                        if($type == Core::SHELL_PROCESS){
+                            pcntl_waitpid(0, $status, WNOHANG);
+                            $status = pcntl_wexitstatus($status);
+                            $child = [
+                                'status' => $status,
+                                'pid' => $pid,
+                                'hash' => $hash,
+                            ];
+                            $result['child'] = $child;
+                            return $result;
+                        }
+                        // main process (parent)
+                        while (pcntl_waitpid(0, $status) != -1) {
+                            //add max execution time here / time outs etc..
+                            $status = pcntl_wexitstatus($status);
+                            $child = [
+                                'status' => $status,
+                                'pid' => $pid,
+                                'hash' => $hash
+                            ];
+                            $result['child'] = $child;
+                        }
+                }
+                return $result;
+        } else {
+            return exec($command, $output);
+        }
+    }
+
+    public static function execute_shell($command, &$output=[], $type=null){
+        if($output === null){
+            $output = [];
+        }
+        $result = [
+            'pid' => getmypid()
         ];
         if(
             in_array(
@@ -1261,26 +1463,33 @@ class Core {
                     Core::SHELL_PROCESS
                 ]
             )
-        ){            
+        ){
             $pid = pcntl_fork();
             switch($pid) {
                 // fork errror
-                case -1 : 
+                case -1 :
                     return false;
-                case 0 :         
+                case 0 :
                     //in child process
-                    //create a seperate process to execute another process (async);                         
-                    exec($command, $output);                    
+                    //create a seperate process to execute another process (async);
+                    exec($command, $output);
                     if($type != Core::SHELL_PROCESS){
-                        echo implode(PHP_EOL, $output) . PHP_EOL;                        
-                    }                                  
-                    $output = [];                    
+//                         echo implode(PHP_EOL, $output) . PHP_EOL;
+                    }
+                    $output = [];
                     exit();
                 default :
                     if($type == Core::SHELL_PROCESS){
-                        return $result;            
+                        pcntl_waitpid(0, $status, WNOHANG);
+                        $status = pcntl_wexitstatus($status);
+                        $child = [
+                            'status' => $status,
+                            'pid' => $pid
+                        ];
+                        $result['child'] = $child;
+                        return $result;
                     }
-                    // main process (parent)                                  
+                    // main process (parent)
                     while (pcntl_waitpid(0, $status) != -1) {
                         //add max execution time here / time outs etc..
                         $status = pcntl_wexitstatus($status);
@@ -1289,14 +1498,14 @@ class Core {
                             'pid' => $pid
                         ];
                         $result['child'] = $child;
-                    }                          
+                    }
             }
-            return $result;        
+            return $result;
         } else {
-            return exec($command, $output);            
-        }       
+            return exec($command, $output);
+        }
     }
-        
+
     public static function output_mode($mode = null){
         if(!in_array($mode, Core::OUTPUT_MODE)){
             $mode = Core::OUTPUT_MODE_DEFAULT;
@@ -1317,11 +1526,11 @@ class Core {
     }
 
     public static function interactive(){
-        return Core::output_mode(Core::MODE_INTERACTIVE);    
+        return Core::output_mode(Core::MODE_INTERACTIVE);
     }
 
     public static function passive(){
-        return Core::output_mode(Core::MODE_PASSIVE);    
+        return Core::output_mode(Core::MODE_PASSIVE);
     }
 
     public static function uuid(){
@@ -1332,5 +1541,86 @@ class Core {
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    public static function pid($parent=false){
+        if($parent === true){
+            return posix_getppid();
+        }
+        return getmypid();
+    }
+
+    public static function username(){
+        exec('whoami', $output);
+        return implode(PHP_EOL, $output);
+    }
+
+    public static function binary(){
+        $pid = Core::pid(true);
+        exec('ps -p ' . $pid .' -u', $output);
+
+        if(isset($output[0])){
+            $row_header = $output[0];
+        }
+        if(isset($output[1])){
+            $row = $output[1];
+        } else {
+            var_dump('parent');
+            die;
+        }
+        $row_header = str_replace('     ', '    ', $row_header);
+        $row_header = str_replace('    ', '   ', $row_header);
+        $row_header = str_replace('   ', '  ', $row_header);
+        $row_header = str_replace('  ', ' ', $row_header);
+
+        $row = str_replace('     ', '    ', $row);
+        $row = str_replace('    ', '   ', $row);
+        $row = str_replace('   ', '  ', $row);
+        $row = str_replace('  ', ' ', $row);
+
+        $header = [];
+        $record = [];
+        $explode = explode(' ', $row_header);
+        foreach($explode as $nr => $column){
+            if($column == ''){
+                continue;
+            }
+            $header[$nr] = strtolower($column);
+        }
+        $explode = explode(' ', $row);
+        $record[$header[0]] = $explode[0];
+        $record[$header[2]] = $explode[2];
+        $record[$header[3]] = $explode[3];
+        $record[$header[4]] = $explode[4];
+        $record[$header[5]] = $explode[5];
+        $record[$header[6]] = $explode[6];
+        $record[$header[7]] = $explode[7];
+        $record[$header[9]] = $explode[8];
+        $record[$header[10]] = $explode[9];
+        $record[$header[11]] = $explode[10];
+        $record['tree'] = [];
+        $user_bin = null;
+        $bin = null;
+        for($i = 10; $i < count($explode); $i++){
+            if(!isset($explode[$i])){
+                continue;
+            }
+            if(stristr($explode[$i], '/usr/bin/') !== false){
+                $user_bin = $explode[$i];
+            }
+            elseif(stristr($explode[$i], '/bin/') !== false){
+                $bin = $explode[$i];
+            }
+            if($i > 10){
+                $record['tree'][] = $explode[$i];
+            }
+        }
+        $record[$header[12]] = implode(' ', $record['tree']);
+        $user = $record['user'];
+        $record['user'] = [];
+        $record['user']['name'] = $record['user'];
+        $record['user']['execute'] = File::basename($user_bin);
+        $record['execute'] = File::basename($bin);
+        return Core::object($record);
     }
 }

@@ -33,7 +33,7 @@ class Data extends Autoload {
         if(file_exists($load)){
             $url = $load;
         } else {
-            $url = $this->locate($load);
+            $url = $this->locate($load, true);
         }
         if (!empty($url)) {
             return $url;
@@ -53,17 +53,17 @@ class Data extends Autoload {
         $data[] = '[---]';
         $data[] = $item['directory'] . dirname($item['file']) . Application::DS . Application::DATA . Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
+        // not allowed anymore        $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
         $data[] = $item['directory'] . $item['file'] . Application::DS . Application::DATA . Application::DS . $item['file'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . $item['file'] . '.' . Autoload::EXT_JSON;
+        // not allowed anymore        $data[] = dirname(Application::DIR) . Application::DS . Application::DATA .  Application::DS . $item['file'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
+        // not allowed anymore        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
+        // not allowed anymore        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['baseName'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
-        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['file'] . '.' . Autoload::EXT_JSON;
+        // not allowed anymore        $data[] = dirname(dirname(Application::DIR)) . Application::DS . Application::DATA .  Application::DS . $item['file'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';
         $data[] = $item['directory'] . $item['file'] . Application::DS . $item['file'] . '.' . Autoload::EXT_JSON;
         $data[] = '[---]';

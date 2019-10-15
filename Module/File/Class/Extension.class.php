@@ -11,15 +11,19 @@ namespace Priya\Module\File;
 class Extension {
     const EXECUTE = '.exe';
     const VIEW = '.tpl';
+    const PRIYA_MANIFEST = '.pma';
     const PHP = '.php';
-    const PHP_CLASS = '.class.php';    
+    const PHP_CLASS = '.class.php';
     const PHP_TRAIT = '.trait.php';
     const PHP_CACHE = '.cache.php';
     const HTML = '.html';
     const JAVASCRIPT = '.js';
     const JSON = '.json';
     const CSS = '.css';
-    const ZIP = '.zip'; 
-    const WGET = '.wget';       
-    const TASK = '.task';   
+    const ZIP = '.zip';
+    const WGET = '.wget';
+    const TASK = '.task';
+    const CSV = '.csv';
+    const XLS = '.xls';
+    const PDF = '.pdf';
 }

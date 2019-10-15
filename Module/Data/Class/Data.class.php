@@ -10,8 +10,10 @@ namespace Priya\Module;
 use stdClass;
 use Exception;
 use Priya\Application;
+
 class Data extends Core {
     const DIR = __DIR__;
+    
     public $url;
     public $data;
     public function __construct($handler=null, $route=null, $data=null){
@@ -163,24 +165,24 @@ class Data extends Core {
         $url = implode('/', $temp);
         return $url;
     }
-    public function read($url=''){        
+    public function read($url=''){
         $namespace = '';
         $called = null;
         if(empty($url)){
-            $url = get_called_class();     
-            $called = $url;            
-        }        
+            $url = get_called_class();
+            $called = $url;
+        }
         if(
-            $called === null &&            
+            $called === null &&
             file_exists($url)
         ){
             $file = new File();
             $read = $file->read($this->url($url));
-            if(!empty($read)){                
+            if(!empty($read)){
                 $read = $this->object($read);
                 if(empty($read)){
                     throw new Exception('Data Error: read url: ' . $url . ' json data corrupted?');
-                }                
+                }
                 return $this->data(Data::object_merge($this->data(), $read));
             } else {
                 return false;
@@ -193,11 +195,11 @@ class Data extends Core {
             $check = explode('.', $url, 2);
             if(isset($check[1])){
                 return false;
-            }            
+            }
             $module = $url;
         }
         $autoload = $this->autoload();
-    
+
         if(empty($autoload) || !$autoload instanceof \Priya\Module\Autoload\Data){
             $tmp = explode('\\', trim(str_replace(Application::DS, '\\',$url),'\\'));
             $class = array_pop($tmp);
@@ -209,7 +211,7 @@ class Data extends Core {
             $directory = implode(Application::DS, $directory) . Application::DS;
             if(empty($namespace)){
                 $namespace = $priya . '\\' . Application::MODULE;
-            }        
+            }
             $directory .= str_replace('\\', Application::DS, $namespace) . Application::DS;
             $data = new \Priya\Module\Autoload\Data();
             $class = get_called_class();
@@ -226,7 +228,7 @@ class Data extends Core {
                 foreach($autoload as $prefix => $directory){
                     $data->addPrefix($prefix, $directory);
                 }
-            }            
+            }
             $autoload = $this->autoload($data);
         }
         $url = $autoload->data_load($url);
@@ -251,7 +253,7 @@ class Data extends Core {
             return false;
         }
         $file = new File();
-        $write = $file->write($url, $this->object($this->data(), 'json'));
+        $write = $file->write($url, $this->object($this->data(), 'json'));        
         return $write;
     }
     public function search($list, $find, $attribute=null, $case=false, $not=false){
@@ -269,7 +271,7 @@ class Data extends Core {
         if(empty($find)){
             throw new Exception('Data Error: Seach: $find should not be empty');
             return [];
-        }        
+        }
         $result = array();
         if(!is_array($attribute) && !is_null($attribute)){
             $attribute = explode(',', $attribute);
@@ -307,7 +309,7 @@ class Data extends Core {
                 }
                 $search = trim($search);
                 $find = trim($find);
-                
+
                 $levenshtein = levenshtein(substr($search, 0, 255), substr($find, 0, 255), 5, 2, 5);
                 if(!empty($not)){
                     if(strstr($search, $find) === false){
@@ -331,7 +333,7 @@ class Data extends Core {
             foreach($subList as $key => $node){
                 $data[$key] = $node;
             }
-        }        
+        }
         if(empty($useData)){
             return $data;
         } else {

@@ -22,14 +22,26 @@ function function_route($function=array(), $argumentList=array(), $parser=null){
     } else {
         $attribute = false;
     }
-    if($name === false){
+    if(empty($name)){
         $name = array_shift($argumentList);
     }
-    if($attribute === false){
+    if(empty($attribute)){
         $attribute = array_shift($argumentList);
     }
     if(!is_array($attribute)){
         $attribute = (array) $attribute;
+    }
+    $bug = [];
+    foreach($attribute as $nr => $value){
+        if(empty($value)){
+            continue;
+        }
+        $bug[] = $value;
+    }
+    $attribute = $bug;
+    $include_html = array_shift($argumentList);
+    if($include_html !== false){
+        $include_html = true;
     }
     $route = $parser->route();
     if(empty($route)){

@@ -272,7 +272,7 @@ class Method extends Core {
         return false;
     }
 
-    public static function execute($function=array(), \Priya\Module\Parser $parser){
+    public static function method_execute($function=array(), \Priya\Module\Parser $parser){
         $name = str_replace(
             array(
                 '..',
@@ -296,7 +296,7 @@ class Method extends Core {
                 $url = __DIR__ . '/../Function/Function.' . $name . '.php';
                 if(file_exists($url)){
                     require_once $url;
-                }                                
+                }
             }
         }
         if($parser->has_list !== true){
@@ -314,7 +314,7 @@ class Method extends Core {
                     if(file_exists($url)){
                         require_once $url;
                     }
-                }                    
+                }
             }
         }
         $name = 'function_' . str_replace('.', '_', strtolower($name));
@@ -322,6 +322,9 @@ class Method extends Core {
             $argument = array();
             if(isset($function['parameter'])){
                 foreach ($function['parameter'] as $nr => $parameter){
+                    if(!isset($parameter['value'])){
+                        $parameter['value'] = null;
+                    }
                     if(isset($parameter['value']) || $parameter['value'] === null){
                         $parameter['value'] = $parser->compile($parameter['value'], $parser->data());
                         $parameter = Value::type($parameter);
@@ -355,7 +358,7 @@ class Method extends Core {
             }
             $function['is_executed'] = true;
         } else {
-            $function['is_executed'] = false;        
+            $function['is_executed'] = false;
             throw new Exception('Method::execute:Function "' . $function_name . '" not found');
         }
         if(is_bool($function['value'])){

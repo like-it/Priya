@@ -1,1 +1,0 @@
-{if $execute == 'binary'}{require("{$module.dir.data}Priya.bin")}{/if}{if $execute == 'create'}{require("{$module.dir.response}Create.response")}{/if}

@@ -1,8 +1,8 @@
 <?php
 /**
- * @author         Remco van der Velde
- * @since         19-07-2015
- * @version        1.0
+ * @author          Remco van der Velde
+ * @since           19-07-2015
+ * @version         1.0
  * @changeLog
  *  -    all
  *  -    lowered the l of Autoload
@@ -11,6 +11,7 @@
 namespace Priya\Module;
 
 use stdClass;
+use Exception;
 
 class Autoload {
     const DIR = __DIR__;
@@ -22,14 +23,14 @@ class Autoload {
     const EXT_TRAIT_PHP = 'trait.php';
 
     protected $expose;
-
     protected $read;
     protected $fileList;
+    protected $storage;
 
     public $prefixList = array();
     public $environment = 'production';
 
-    public function register($method='load', $prepend=false){        
+    public function register($method='load', $prepend=false){
         $functions = spl_autoload_functions();
         if(is_array($functions)){
             foreach($functions as $function){
@@ -48,15 +49,21 @@ class Autoload {
 
     public function priority(){
         $functions = spl_autoload_functions();
-        $priority = false;
         foreach($functions as $nr => $function){
             $object = reset($function);
             if(is_object($object) && get_class($object) == get_class($this) && $nr > 0){
-                $priority = $function;
                 spl_autoload_unregister($function);
                 spl_autoload_register($function, null, true); //prepend (prioritize)
             }
         }
+    }
+
+    public function setStorage($data=null){
+        $this->storage = $data;
+    }
+
+    private function getStorage(){
+        return $this->storage;
     }
 
     private function setEnvironment($environment='production'){
@@ -157,7 +164,6 @@ class Autoload {
             $data[] = $item['directory'] . $item['dirName'] . DIRECTORY_SEPARATOR . 'Trait' . DIRECTORY_SEPARATOR . $item['baseName'] . '.' . Autoload::EXT_PHP;
             $data[] =  '[---]';
         }
-
         $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_CLASS_PHP;
         $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_TRAIT_PHP;
         $data[] = $item['directory'] . $item['file'] . '.' . Autoload::EXT_PHP;
@@ -179,14 +185,14 @@ class Autoload {
         return $result;
     }
 
-    public function locate($load=null){        
+    public function locate($load=null, $is_data=false){
         // $this->environment($this->data('priya.environment'));
         $dir = dirname(Autoload::DIR) . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;
         $url = $dir . Autoload::FILE;
         $load = ltrim($load, '\\');
         $prefixList = $this->getPrefixList();
         if(!empty($prefixList)){
-            foreach($prefixList as $nr => $item){
+            foreach($prefixList as $item){
                 if(empty($item['prefix'])){
                     continue;
                 }
@@ -199,13 +205,14 @@ class Autoload {
                         trim(substr($load, strlen($item['prefix'])),'\\');
                     $item['file'] =
                         str_replace('\\', DIRECTORY_SEPARATOR, $item['file']);
-                } else {
+                } elseif($is_data === false) {
                     $tmp = explode('.', $load);
                     if(count($tmp) >= 2){
                         array_pop($tmp);
                     }
                     $item['file'] = implode('.',$tmp);
-
+                } else {
+                    continue;
                 }
                 if(empty($item['file'])){
                     $item['file'] = $load;
@@ -229,23 +236,40 @@ class Autoload {
                     }
                     $fileList = $this->fileList($item, $url);
                     if(is_array($fileList) && empty($this->expose())){
-                        foreach($fileList as $nr => $file){
+                        foreach($fileList as $file){
                             if(substr($file, 0, 5) == '[---]'){
                                 continue;
                             }
+                            if($is_data === true){
+//                                 d($file);
+                            }
                             if(file_exists($file)){
                                 $this->cache($file, $load);
-//                                 $this->write($url, $file, $load);
                                 return $file;
                             }
                         }
                     }
                 }
             }
-        }        
+        }
+        if($is_data === true){
+            d($fileList);
+            throw new Exception('Could not find data file');
+        }
+        $this->environment('development'); //needed, should be gone @ home
         if($this->environment() == 'development' || !empty($this->expose())){
             $object = new stdClass();
             $object->load = $load;
+
+            $debug = debug_backtrace(true);
+            $output = [];
+
+            for($i=0; $i < 5; $i++){
+                if(!isset($debug[$i])){
+                    continue;
+                }
+                $output[$i] = $debug[$i];
+            }
             $attribute = 'Priya\Module\Exception\Error';
             if(!empty($this->expose())){
                 $attribute = $load;
@@ -253,6 +277,7 @@ class Autoload {
             if(isset($this->fileList[$item['baseName']])){
                 $object->{$attribute} = $this->fileList[$item['baseName']];
             }
+            $object->debug = $output;
             if(ob_get_level() !== 0){
                 ob_flush();
             }
@@ -298,17 +323,15 @@ class Autoload {
             return false;
         }
         $fwrite = 0;
-        if(empty($resource)){
-            $dir = dirname($url);
-            if(is_dir($dir) === false){
-                mkdir($dir, 0777, true);
-            }
-            $resource = fopen($url, 'w');
+        $dir = dirname($url);
+        if(is_dir($dir) === false){
+            mkdir($dir, 0777, true);
         }
+        $resource = fopen($url, 'w');
         if($resource === false){
             return $resource;
         }
-        $lock = flock($resource, LOCK_EX);
+        flock($resource, LOCK_EX);
         fseek($resource, 0);
         for ($written = 0; $written < strlen($data); $written += $fwrite) {
             $fwrite = fwrite($resource, substr($data, $written));
@@ -337,7 +360,6 @@ class Autoload {
             $this->read = new stdClass();
         }
         return $this->read;
-
     }
 
     private function removeExtension($filename='', $extension=array()){

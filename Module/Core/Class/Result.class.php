@@ -1,8 +1,8 @@
 <?php
 /**
- * @author         Remco van der Velde
- * @since         2016-10-19
- * @version        1.0
+ * @author              Remco van der Velde
+ * @since               2016-10-19
+ * @version             1.0
  * @changeLog
  *     -    all
  */
@@ -19,6 +19,7 @@ use Priya\Module\Autoload\Tpl;
 use Priya\Module\File;
 use Priya\Module\File\Dir;
 use Priya\Module\Parser;
+//use Priya\Module\Parse;
 use Priya\Module\File\Cache;
 
 use R3m\Parse;
@@ -28,6 +29,8 @@ class Result extends Parser {
     const FILE = __FILE__;
 
     const DATA = 'Data';
+    const TEMP = 'Temp';
+    const MODEL = 'Model';
     const HELP = 'Help';
     const EXECUTE = 'Execute';
     const VIEW = 'View';
@@ -112,7 +115,115 @@ class Result extends Parser {
         $this->data('ignore', $ignore);
     }
 
-    public static function view($object=null, $template='', $type='response'){        
+    public static function viewR3m($object=null, $template='', $type='response'){
+        $is_url = false;
+        if($object == 'url'){
+            $is_url = true;
+            $type = 'url';
+        }
+        elseif($object == 'location'){
+            $is_url = true;
+            $type = 'location';
+        }
+        if(
+            $is_url === false &&
+            method_exists($object, 'read') === false
+            ){
+                return new Exception('read method not found in object, base-class needs to be at least Priya\Module\Core\Data');
+        }
+        $execute = '';
+        $class = get_called_class();
+        if($is_url === false){
+            $data = $object->read($class);
+            //             $object->data($data); //?doesn't read does this, it does or should ?
+        }
+        $explode = explode('\\', $class);
+        if(empty($template)){
+            $template = array_pop($explode);
+        }
+        //can be outside priya module...
+        $dir = Dir::name($class::DIR) . Result::VIEW . Application::DS;
+        $template = str_replace('_', '.', $template);
+        $url = $dir . $template . Result::EXT_VIEW;
+        $url2 = '';
+        if($type == 'url'){
+            return $url;
+        }
+        $location = array();
+        $location[] = $url;
+        $temp = explode('.', $url, 2);
+        if(isset($temp[1])){
+            $temp[0] = Dir::name($temp[0]);
+            $temp[1] = ucfirst($temp[1]);
+            $url2 = implode('', $temp);
+            if(strstr($url2, '.') !== false){
+                $location[] = $url2;
+            }
+        }
+        if($type == 'location'){
+            $template = array_pop($explode) . '.' . $template;
+            $template = str_replace('_', '.', $template);
+            $explode = explode('.', $template);
+            foreach($explode as $nr => $part){
+                $explode[$nr] = ucfirst($part);
+            }
+            $template = implode('.', $explode);
+            $url = $dir . $template . Result::EXT_VIEW;
+            $location[] = $url;
+            return $location;
+        }
+        if(
+            strstr($url2, '.') !== false &&
+            file_exists($url2)
+            ){
+                $url = $url2;
+        }
+        elseif(!file_exists($url)){
+            $template = array_pop($explode) . '.' . $template;
+            $template = str_replace('_', '.', $template);
+            $explode = explode('.', $template);
+            foreach($explode as $nr => $part){
+                $explode[$nr] = ucfirst($part);
+            }
+            $template = implode('.', $explode);
+            $url = $dir . $template . Result::EXT_VIEW;
+            $location[] = $url;
+            if(!file_exists($url)){
+                if($object->handler()->method() == Handler::METHOD_CLI){
+                    $exception =  Result::EXCEPTION_VIEW.
+                    "\n" .
+                    implode("\n", $location)
+                    ;
+                } else {
+                    $exception =  Result::EXCEPTION_VIEW.
+                    "\n" .
+                    implode("\n<br>", $location)
+                    ;
+                }
+                dd($exception);
+                return new Exception($exception);
+            }
+        }
+        if(method_exists($object, 'handler') === false){
+            return new Exception('handler method not found in object, base-class needs to be at least Priya\Module\Core\Data');
+        }
+        if(method_exists($object, 'route') === false){
+            return new Exception('route method not found in object, base-class needs to be at least Priya\Module\Core\Data');
+        }
+        if(method_exists($object, 'data') === false){
+            return new Exception('data method not found in object, base-class needs to be at least Priya\Module\Core\Data');
+        }
+        $parse = new Parse($object->handler(), $object->route(), $object->data());
+        try {
+            $execute = $parse->read($url);
+            $object->data($parse->data());
+        } catch (Exception $e) {
+            return $e;
+        }
+        return $execute;
+    }
+
+    public static function view($object=null, $template='', $type='response'){
         $is_url = false;
         if($object == 'url'){
             $is_url = true;
@@ -126,46 +237,83 @@ class Result extends Parser {
             $is_url === false &&
             method_exists($object, 'read') === false
         ){
-            var_dump('fuck');
-            die;
             return new Exception('read method not found in object, base-class needs to be at least Priya\Module\Core\Data');
         }
         $execute = '';
         $class = get_called_class();
-    
-        //execution cannot be cached, we need a different name -> response?
         if($is_url === false){
-            $data = $object->read($class);
-            $object->data($data); //?doesn't read does this ?
-        }            
+            /**
+             * should not read here, should read before in the controller...
+             * @var unknown $data
+             */
+//             $data = $object->read($class);
+//             $object->data($data); //?doesn't read does this, it does or should ?
+        }
         $explode = explode('\\', $class);
         if(empty($template)){
             $template = array_pop($explode);
         }
         //can be outside priya module...
-        $dir = dirname($class::DIR) . Application::DS . Result::VIEW . Application::DS;
+        $dir = Dir::name($class::DIR) . Result::VIEW . Application::DS;
+        $template = str_replace('_', '.', $template);
         $url = $dir . $template . Result::EXT_VIEW;
-            
+        $url2 = '';
         if($type == 'url'){
             return $url;
-        }        
+        }
         $location = array();
         $location[] = $url;
+        $temp = explode('.', $url, 2);
+        if(isset($temp[1])){
+            $temp[0] = Dir::name($temp[0]);
+            $temp[1] = ucfirst($temp[1]);
+            $url2 = implode('', $temp);
+            if(strstr($url2, '.') !== false){
+                $location[] = $url2;
+            }
+        }
         if($type == 'location'){
             $template = array_pop($explode) . '.' . $template;
+            $template = str_replace('_', '.', $template);
+            $explode = explode('.', $template);
+            foreach($explode as $nr => $part){
+                $explode[$nr] = ucfirst($part);
+            }
+            $template = implode('.', $explode);
             $url = $dir . $template . Result::EXT_VIEW;
             $location[] = $url;
             return $location;
-        }        
-        if(!file_exists($url)){
+        }
+        if(
+            strstr($url2, '.') !== false &&
+            file_exists($url2)
+        ){
+            $url = $url2;
+        }
+        elseif(!file_exists($url)){
             $template = array_pop($explode) . '.' . $template;
+            $template = str_replace('_', '.', $template);
+            $explode = explode('.', $template);
+            foreach($explode as $nr => $part){
+                $explode[$nr] = ucfirst($part);
+            }
+            $template = implode('.', $explode);
             $url = $dir . $template . Result::EXT_VIEW;
             $location[] = $url;
             if(!file_exists($url)){
-                $exception =  Result::EXCEPTION_VIEW.
+                //change to constant see debug function...
+                if($object->handler()->method() == Handler::METHOD_CLI){
+                    $exception =  Result::EXCEPTION_VIEW.
                     "\n" .
                     implode("\n", $location)
-                ;
+                    ;
+                } else {
+                    $exception =  Result::EXCEPTION_VIEW.
+                    "\n" .
+                    implode("\n<br>", $location)
+                    ;
+                }
+                dd($exception);
                 return new Exception($exception);
             }
         }
@@ -177,11 +325,47 @@ class Result extends Parser {
         }
         if(method_exists($object, 'data') === false){
             return new Exception('data method not found in object, base-class needs to be at least Priya\Module\Core\Data');
-        }        
-        $parse = new Parser($object->handler(), $object->route(), $object->data());        
-        try {            
+        }
+        $parse = new Parser($object->handler(), $object->route(), $object->data());
+        try {
             $execute = $parse->read($url);
-            $object->data($parse->data());            
+            $object->data($parse->data());
+
+//             d($object->data('content.type'));
+
+            if($object->data('content.type') == Handler::CONTENT_TYPE_JSON){
+                $object->header('Content-Type: application/json', 200, true);
+                $method = $object->data('content.method');
+                if(empty($method)){
+                    $method = $object->data('method');
+                    $target = $object->data('target');
+                    $script = $object->data('script') !== null ? $object->data('script') : [];
+                    $link = $object->data('link') !== null ? $object->data('link') : [];
+                } else {
+                    $target = $object->data('content.target');
+                    $script = $object->data('content.script');
+                    $link = $object->data('content.link');
+                }
+                if(empty($method)){
+                    throw new Exception('Json error, content.method not set');
+                }
+                if(empty($target)){
+                    throw new Exception('Json error, content.target not set');
+                }
+                if(empty($script)){
+                    $script = [];
+                }
+                if(empty($link)){
+                    $link = [];
+                }
+                return Result::object([
+                    'method' => $method,
+                    'target' => $target,
+                    'html' => $execute,
+                    'link' => $link,
+                    'script' => $script
+                ], 'json');
+            }
         } catch (Exception $e) {
             return $e;
         }
@@ -189,7 +373,9 @@ class Result extends Parser {
     }
 
     /**
-     * @deprecated use view instead     
+     * @deprecated use view instead
+     *
+     *  @notice move to core for bash execute on cli (interactive & async & normal)
      */
     /*
     public static function execute($object=null, $type='respond', $template=''){
@@ -313,6 +499,12 @@ class Result extends Parser {
     }
     */
 
+    /**
+     * not deprecated !!!
+     * @param $type
+     * @param string $result
+     * @return string
+     */
     public function result($type=null, $result=''){
         if($type == 'template'){
             return $this->result($this->template('create', $result));
@@ -429,10 +621,11 @@ class Result extends Parser {
         chdir($dir);
 
         $functions = spl_autoload_functions();
-
+/*
         $smarty = new \Smarty();
         \Smarty_Autoloader::register(true);
-
+*/
+        return;
         $dir_template = '';
         $class = get_called_class();
         if($class::DIR){
@@ -493,9 +686,9 @@ class Result extends Parser {
         $route = $this->route();
         if(get_class($route) == 'Priya\Module\Route'){
             $smarty->assign('route', $this->object($route->data(), 'array'));
-            $error = Result::object_merge($error, $this->object_merge($this->object($this->error(), 'array'), $this->object($route->error(), 'array')));
+//             $error = Result::object_merge($error, $this->object_merge($this->object($this->error(), 'array'), $this->object($route->error(), 'array')));
         } else {
-            $error = Result::object_merge($error, $this->object($this->error(), 'array'));
+//             $error = Result::object_merge($error, $this->object($this->error(), 'array'));
         }
         $smarty->assign('error', $error);
         $message = array();

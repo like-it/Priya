@@ -152,7 +152,7 @@ class Control_If extends Core {
         return $result;
     }
 
-    public static function execute($record=array(), $math=null, $random=''){
+    public static function if_execute($record=array(), $math=null, $random=''){
         $record['if']['result'] = $math;
         if($math === true){
             if(
@@ -206,7 +206,7 @@ class Control_If extends Core {
         $method = Token::method($method, $parser);
         $parse = $method['parse'];
         $math = Token::create_equation($parse, $parser);
-        $record = Control_If::execute($record, $math, $parser->random());
+        $record = Control_If::if_execute($record, $math, $parser->random());
         $record = Control_If::replace($record);
         return $record;
     }

@@ -4,17 +4,17 @@
     },
     "priya": {
         "dir": {
-            "application": "\/mnt\/c\/Trade\/Vendor\/Priya\/Application\/",
-            "data": "\/mnt\/c\/Trade\/Vendor\/Priya\/Application\/Data\/",
-            "temp": "\/mnt\/c\/Trade\/Vendor\/Priya\/Application\/Data\/Temp\/",
-            "cache": "\/mnt\/c\/Trade\/Vendor\/Priya\/Application\/Data\/Temp\/Cache\/",
-            "processor": "\/mnt\/c\/Trade\/Vendor\/Priya\/Application\/Data\/Processor\/",
-            "root": "\/mnt\/c\/Trade\/Vendor\/Priya\/",
-            "module": "\/mnt\/c\/Trade\/Vendor\/Priya\/Module\/",
-            "backup": "\/mnt\/c\/Trade\/Vendor\/Priya\/Application\/Data\/Backup\/",
-            "restore": "\/mnt\/c\/Trade\/Vendor\/Priya\/Application\/Data\/Restore\/",
-            "update": "\/mnt\/c\/Trade\/Vendor\/Priya\/Application\/Data\/Update\/",
-            "public": "\/mnt\/c\/Trade\/Vendor\/Priya\/Public\/"
+            "application": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/",
+            "data": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/",
+            "temp": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Temp\/",
+            "cache": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Temp\/Cache\/",
+            "processor": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Processor\/",
+            "root": "\/mnt\/c\/Finger\/Vendor\/Priya\/",
+            "module": "\/mnt\/c\/Finger\/Vendor\/Priya\/Module\/",
+            "backup": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Backup\/",
+            "restore": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Restore\/",
+            "update": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Update\/",
+            "public": "\/mnt\/c\/Finger\/Vendor\/Priya\/Public\/"
         },
         "cache": {
             "config": {
@@ -70,7 +70,7 @@
                 "+ 5 years": "157680000"
             },
             "init": {
-                "url": "\/mnt\/c\/Trade\/Vendor\/Priya\/Application\/Data\/Object\/60\/Init.object.json",
+                "url": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Object\/60\/Init.object.json",
                 "interval": "+ 1 minute",
                 "read": true
             },
@@ -105,10 +105,56 @@
                 "URL": "Application",
                 "OBJECT_INIT_URL": "Init.object.json",
                 "OBJECT_INIT_INTERVAL": "+ 1 minute"
+            },
+            "execute": [
+                {
+                    "command": "\/usr\/bin\/fingerspitzengefuhl",
+                    "key": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/www-data\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/bin\/fair",
+                    "key": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/www-data\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/bin\/priya",
+                    "key": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Id.1",
+                    "keycord": {
+                        "size": "200 YottaBytes",
+                        "interval": "+1 nanoseconde"
+                    },
+                    "authorize": "\/etc\/ssh\/authorized-keys\/www-data\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/sbin\/apache2",
+                    "key": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/www-data\/known_hosts\/"
+                }
+            ],
+            "binary": {
+                "user": {
+                    "name": {},
+                    "execute": "priya"
+                },
+                "pid": "0.0",
+                "%cpu": "0.0",
+                "%mem": "10308",
+                "vsz": "652",
+                "rss": "tty1",
+                "tty": "S",
+                "stat": "23:26",
+                "start": "0:00",
+                "time": "\/bin\/sh",
+                "tree": {
+                    "0": "\/usr\/bin\/priya",
+                    "1": "uuid"
+                },
+                "command": "\/usr\/bin\/priya uuid",
+                "execute": "sh"
             }
         },
         "environment": "development",
-        "version": "0.4.3",
         "contentType": {
             "txt": "text\/plain",
             "html": "text\/html",
@@ -126,29 +172,146 @@
             "wav": "audio\/wav",
             "mp3": "audio\/mp3"
         },
-        "major": "0",
-        "minor": "4",
-        "patch": "3",
-        "built": "2018-11-08 20:46:47",
+        "route": {
+            "cache": {
+                "url": "\/mnt\/c\/Finger\/Vendor\/Priya\/Application\/Data\/Temp\/Route\/Route.json"
+            }
+        },
+        "major": "1",
+        "minor": "5",
+        "patch": "16",
+        "version": "1.5.16",
+        "built": "2019-07-07 10:50:55",
+        "parser": {
+            "method": {
+                "type": "method",
+                "value": "",
+                "method": "system.user.name",
+                "exclamation_count": "0",
+                "has_exclamation": "",
+                "invert": "",
+                "set": {
+                    "depth": "0"
+                },
+                "parameter": [],
+                "parse_method": [
+                    {
+                        "is_cast": "",
+                        "parse": "system",
+                        "value": "system",
+                        "type": "string",
+                        "set": {
+                            "depth": "0"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.",
+                        "value": ".",
+                        "type": "dot",
+                        "set": {
+                            "depth": "0"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.user",
+                        "value": "user",
+                        "type": "string",
+                        "set": {
+                            "depth": "0"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.user.",
+                        "value": ".",
+                        "type": "dot",
+                        "set": {
+                            "depth": "0"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.user.name",
+                        "value": "name",
+                        "type": "string",
+                        "set": {
+                            "depth": "0"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.user.name(",
+                        "value": "(",
+                        "type": "parenthese",
+                        "set": {
+                            "depth": "1"
+                        }
+                    },
+                    {
+                        "is_cast": "",
+                        "parse": "system.user.name()",
+                        "value": ")",
+                        "type": "parenthese",
+                        "set": {
+                            "depth": "1"
+                        }
+                    }
+                ]
+            },
+            "loop": "init"
+        },
+        "mysql": {
+            "production": {
+                "host": "127.0.0.1",
+                "database": "example",
+                "user": "root",
+                "password": "^6B4d6eb2527",
+                "charset": "utf8mb4"
+            },
+            "development": {
+                "host": "127.0.0.1",
+                "database": "example",
+                "user": "root",
+                "password": "^6B4d6eb2527",
+                "charset": "utf8mb4"
+            }
+        },
+        "sqlite": {
+            "production": {
+                "driver": "pdo_sqlite",
+                "path": "\/mnt\/c\/Finger\/Data\/Database.sqlite"
+            },
+            "development": {
+                "driver": "pdo_sqlite",
+                "path": "\/mnt\/c\/Finger\/Data\/Database.Development.sqlite"
+            }
+        },
         "autoload": {
-            "Host": "\/mnt\/c\/Trade\/Host\/",
-            "Priya": "\/mnt\/c\/Trade\/Vendor\/Priya",
-            "yobit": "\/mnt\/c\/Trade\/Vendor\/Yobit\/src"
+            "Host": "\/mnt\/c\/Finger\/Host\/",
+            "Priya\\Module": "\/mnt\/c\/Finger\/Module",
+            "Priya": "\/mnt\/c\/Finger\/Vendor\/Priya",
+            "R3m": "\/mnt\/c\/Finger\/Vendor\/R3m",
+            "Doctrine": "\/mnt\/c\/Finger\/Vendor\/Doctrine\/lib\/Doctrine",
+            "PHPMailer\\PHPMailer": "\/mnt\/c\/Finger\/Vendor\/PHPMailer\/src"
         }
     },
     "dir": {
         "ds": "\/",
-        "vendor": "\/mnt\/c\/Trade\/Vendor\/",
-        "root": "\/mnt\/c\/Trade\/",
-        "data": "\/mnt\/c\/Trade\/Data\/",
-        "host": "\/mnt\/c\/Trade\/Host\/",
+        "vendor": "\/mnt\/c\/Finger\/Vendor\/",
+        "root": "\/mnt\/c\/Finger\/",
+        "data": "\/mnt\/c\/Finger\/Data\/",
+        "host": "\/mnt\/c\/Finger\/Host\/",
         "mount": {
-            "root": "\/mnt\/c\/Trade\/Mount\/"
+            "root": "\/mnt\/c\/Finger\/Mount\/",
+            "A": "\/mnt\/c\/Finger\/Mount\/A\/",
+            "Temp": "\/mnt\/c\/Finger\/Mount\/Temp\/"
         },
-        "public": "\/mnt\/c\/Trade\/Public\/"
+        "public": "\/mnt\/c\/Finger\/Public\/"
     },
     "server": {
-        "url": "http:\/\/trade.local\/",
+        "url": "https:\/\/mo2fr.com\/",
         "timeout": "600"
     },
     "mail": {
@@ -160,7 +323,7 @@
             "email": "like-it.cloud@outlook.com",
             "name": "like-it.cloud@outlook.com"
         },
-        "password": "RaXon111"
+        "password": "vanderVelde1983!"
     },
     "memory": {
         "id": "1",
@@ -168,5 +331,6 @@
         "port": "11211",
         "weight": "1"
     },
-    "public_html": "Public"
+    "public_html": "Public",
+    "binary": "priya"
 }

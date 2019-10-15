@@ -106,7 +106,6 @@ class Tpl extends Autoload {
             $data[] = $item['directory'] . $item['file'] . '.' . $item['extension'];
             $data[] = '[---]';
         }
-
         $this->fileList[$item['baseName']][] = $data;
         return $data;
     }

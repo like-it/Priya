@@ -1,4 +1,12 @@
 {
+ 	"Info": {
+        "path": "",
+        "controller": "Priya.Module.Cli.Application.Info.run",
+        "method": [
+            "CLI"
+        ],
+	    "translate": false
+    },
     "Indent": {
         "path": "Priya/Module/Indent/Public/Css/Indent.css",
         "controller": "Priya.Module.Indent.css",

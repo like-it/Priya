@@ -231,7 +231,7 @@ class Modifier extends Core {
         return $result;
     }
 
-    public static function execute($operator=array(), $parser=null){
+    public static function modifier_execute($operator=array(), $parser=null){
         $modifier = Modifier::get($operator['right_parse']);
         $name = str_replace(
             array(

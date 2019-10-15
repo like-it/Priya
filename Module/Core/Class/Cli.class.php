@@ -90,9 +90,9 @@ class Cli extends Result {
 
     public function bold($bold = null){
         //make bold
-        //make unbold with false... 
+        //make unbold with false...
     }
-    
+
     public function color($color='', $background=''){
         $result = '';
         if(!empty($color) || ($color === (0 || '0'))){
@@ -109,10 +109,15 @@ class Cli extends Result {
     }
 
     public function read($url='', $text='', $read=''){
-        ob_flush();
-        if($url=='input'){
-            echo $text;
+        if(ob_get_length() > 0){
             ob_flush();
+        }
+        if($url=='input'){
+
+            echo $text;
+            if(ob_get_length() > 0){
+                ob_flush();
+            }
 //             system('stty -echo');
             $input = trim(fgets(STDIN));
 //             system('stty echo');
@@ -123,7 +128,9 @@ class Cli extends Result {
         }
         elseif($url=='input-hidden'){
             echo $text;
-            ob_flush();
+            if(ob_get_length() > 0){
+                ob_flush();
+            }
             system('stty -echo');
             $input = trim(fgets(STDIN));
             system('stty echo');
@@ -142,7 +149,9 @@ class Cli extends Result {
                 $this->color($color, $background);
             }
             echo $text;
-            ob_flush();
+            if(ob_get_length() > 0){
+                ob_flush();
+            }
         } else {
             return parent::write($url);
         }
@@ -204,6 +213,10 @@ class Cli extends Result {
         }
         $this->data('priya.terminal.screen.grid.content', $grid);
         return $grid;
+    }
+
+    public function gotoXY($x=0, $y=0){
+        return $this->tput('position', [$x, $y]);
     }
 
     public function screen($grid=array(), $timeout=null){

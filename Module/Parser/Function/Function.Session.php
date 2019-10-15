@@ -14,6 +14,6 @@ function function_session($function=array(), $argumentList=array(), $parser=null
     }
     $attribute = array_shift($argumentList);
     $value = array_shift($argumentList);
-    $function['execute'] = $parser->session($attribute, $value);
+    $function['execute'] = $parser->session($attribute, $value);    
     return $function;
 }

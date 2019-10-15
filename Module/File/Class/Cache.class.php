@@ -195,6 +195,10 @@ class Cache {
         if(!File::exist($url)){
             return false;
         }
+        $debug = debug_backtrace(true);
+
+        var_dump($debug);
+        die;
         $mtime = File::mtime($url);
         if(is_numeric($expiration)){
             if($expiration == 0){

@@ -1,7 +1,6 @@
 {
     "priya": {
-        "environment": "production",
-        "version": "{$priya.major|default:0}.{$priya.minor|default:0}.{$priya.patch|default:0}",
+        "environment": "development",
         "contentType": {
             "txt": "text\/plain",
             "html": "text\/html",
@@ -19,9 +18,43 @@
             "wav": "audio\/wav",
             "mp3": "audio\/mp3"
         },
-        "major": 0,
-        "minor": 4,
-        "patch": 3,
-        "built": "2018-11-08 20:46:47"
+        "application": {
+            "execute": [
+                {
+                    "command": "\/usr\/bin\/fingerspitzengefuhl",
+                    "key": "{$priya.dir.data}Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/{system.user.name()}\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/bin\/fair",
+                    "key": "{$priya.dir.data}Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/{system.user.name()}\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/bin\/priya",
+                    "key": "{$priya.dir.data}Id.1",
+                    "keycord": {
+                        "size": "200 YottaBytes",
+                        "interval": "+1 nanoseconde"
+                    },
+                    "authorize": "\/etc\/ssh\/authorized-keys\/{system.user.name()}\/known_hosts\/"
+                },
+                {
+                    "command": "\/usr\/sbin\/apache2",
+                    "key": "{$priya.dir.data}Id.1",
+                    "authorize": "\/etc\/ssh\/authorized-keys\/{system.user.name()}\/known_hosts\/"
+                }
+            ]
+        },
+        "route": {
+            "cache": {
+                "url": "{$priya.dir.temp}Route\/Route.json"
+            }
+        },
+        "major": "1",
+        "minor": 5,
+        "patch": 16,
+        "version": "1.5.16",
+        "built": "2019-07-07 10:50:55"
     }
 }

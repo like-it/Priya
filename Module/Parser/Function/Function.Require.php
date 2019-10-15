@@ -24,6 +24,11 @@ function function_require($function=array(), $argumentList=array(), $parser=null
     }
     $original = $data;
     $url = array_shift($argumentList);
+    if(stristr($url, 'null.tpl')){
+        throw new Exception('File not found');
+    }
+    
+    
     if($data === null){
         $data = $parser->data();
     }

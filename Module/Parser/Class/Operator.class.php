@@ -79,7 +79,7 @@ class Operator extends Core {
         );
     }
 
-    public static function execute($operator=array(), $parser=null){
+    public static function operator_execute($operator=array(), $parser=null){
         if(!isset($operator['type']) || $operator['type'] != 'operator'){
             return $operator;
         }
@@ -145,7 +145,7 @@ class Operator extends Core {
             case '|' :
                 $modifier = reset($operator['right_parse']);
                 if(is_string($modifier['value'])){
-                    $operator = Modifier::execute($operator, $parser);
+                    $operator = Modifier::modifier_execute($operator, $parser);
                     unset($operator['left']);
                     unset($operator['right']);
                     $operator['modified_is_executed'] = true;
@@ -268,7 +268,7 @@ class Operator extends Core {
             $operator['right'] = $right_statement[0]['value'];
             $statement = array();
         }
-        $operator = Operator::execute($operator, $parser);
+        $operator = Operator::operator_execute($operator, $parser);
         array_unshift($statement, $operator);
         return $statement;
     }

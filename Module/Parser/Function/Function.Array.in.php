@@ -14,6 +14,12 @@ function function_array_in($function=array(),$argumentList=array(), $parser=null
     }
     $needle = array_shift($argumentList);
     $haystack = array_shift($argumentList);
+    if($haystack === null){
+        $haystack = [];
+    }
+    elseif(is_string($haystack) && $haystack == ''){
+        $haystack = [];
+    }
     $strict = array_shift($argumentList);
     if(!empty($strict)){
         $function['execute'] = in_array($needle, $haystack, true);

@@ -14,12 +14,13 @@ use Exception;
 use Priya\Module\File;
 use Priya\Module\Handler;
 use Priya\Module\Parser;
+use Priya\Module\Core;
 use Priya\Module\Data;
 use Priya\Module\File\Cache;
 use Priya\Module\File\Dir;
 
 class Application extends Parser {
-    //rename Application::DS to Dir::SEPERATOR 
+    //rename Application::DS to Dir::SEPERATOR
     const DS = DIRECTORY_SEPARATOR;
     const DIR = __DIR__;
     // const CLASS = 'Class';
@@ -47,9 +48,13 @@ class Application extends Parser {
     const ROUTE = 'Route.json';
     const CREDENTIAL = 'Credential.json';
     const URL = 'Application';
+    const BINARY = 'Binary';
+    const VERIFY = 'Verify';
 
     const EXCEPTION_DIR_APPLICATION = 'No application directory defined.';
     const EXCEPTION_REQUEST = 'cannot route to SELF';
+    const EXCEPTION_AUTHORIZATION_ERROR = 'Access denied.';
+    const EXCEPTION_CHECK_TYPE = 'Wrong type defined.';
     const EXCEPTION_APPLICATION_ERROR = 'cannot route to Application/Error/';
 
     const CACHE_ROUTE = '+ 1 minute'; //rename to OBJECT_ROUTE_CACHE or  OBJECT_ROUTE_INTERVAL
@@ -94,7 +99,21 @@ class Application extends Parser {
         'dir.current'
     ];
 
-    public function __construct($autoload=null, $data=null){        
+    const ROUTE_DEFAULT = [
+        'Application.Info',
+        'Application.Help',
+        'Application.Version',
+        'Application.License',
+        'Application.Cache',
+        'Application.Service',
+        'Application.Mail',
+        'Application.Bin',
+        'Application.Apache',
+        'Application.Host',
+        'Application.Uuid'
+    ];
+
+    public function __construct($autoload=null, $data=null){
         if($data){
             $data = new Data($this->object($data));
         }
@@ -112,7 +131,6 @@ class Application extends Parser {
             $this->read($url);
             $url = dirname(Application::DIR) . Application::DS . Application::DATA . Application::DS . Application::CUSTOM;
             $this->read($url);
-            $this->cli();
             $url = $this->data('dir.data') . Application::CONFIG;
             if(file_exists($url)){
                 $this->read($url);
@@ -121,16 +139,91 @@ class Application extends Parser {
                 $this->data('public_html', $this->data('priya.application.constant.PUBLIC_HTML'));
                 $this->data('dir.public', $this->data('dir.root') . $this->data('public_html') . $this->data('dir.ds'));
             }
+            $this->cli();
         } else {
+            $this->dir();
             $this->cli();
         }
         $this->handler(new Module\Handler($this->data()));
         $this->data('web.root', $this->handler()->web());
+
+        $autoload->setStorage($this->data());
         $this->autoload($autoload);
         $this->router($this->data('priya.route.cache.url'));
     }
 
+    public static function check(Core $core, $type=null){
+        //scramble this one...
+        //with 200 yota bytes...
+        $binary = $core->data('priya.application.binary');
+//         $binary = $core->data('priya.application.binary', Application::binary());
+        $type = ucfirst($type);
+        switch($type){
+            case Application::BINARY :
+                $execute = $core->data('priya.application.execute');
+
+                if(empty($execute)){
+                    throw new Exception(Application::EXCEPTION_AUTHORIZATION_ERROR);
+                    return;
+                }
+                if(!is_array($execute) && !is_object($execute)){
+                    throw new Exception(Application::EXCEPTION_AUTHORIZATION_ERROR);
+                    return;
+                }
+                foreach($execute as $nr => $record){
+                    if(!isset($record->command)){
+                        continue;
+                    }
+                    if(!isset($record->key)){
+                        continue;
+                    }
+                    if(!isset($record->authorize)){
+                        //add default location
+                        continue;
+                    }
+                    $match = null;
+                    if($core->data('priya.application.binary.tree.0') == '/bin/sh'){
+                        $match = $core->data('priya.application.binary.tree.1');
+                    } else {
+                        $match = $core->data('priya.application.binary.tree.0');
+                    }
+                    if(
+                        $match !== null &&
+                        $record->command == $match
+                    ){
+                        $url = $record->key;
+                        $key = File::read($url);
+                        $check = Application::ssh($core, Application::VERIFY, $record->authorize);
+
+                        if($check === false){
+                            continue;
+                        }
+                        break;  //found 1
+                    }
+                    /*
+                    else {
+                        throw new Exception(Application::EXCEPTION_AUTHORIZATION_ERROR);
+                        return;
+                    }
+                    */
+                }
+                if(empty($check)){
+                    throw new Exception(Application::EXCEPTION_AUTHORIZATION_ERROR);
+                    return;
+                }
+            break;
+            default :
+                throw new Exception(Application::EXCEPTION_CHECK_TYPE);
+            break;
+        }
+    }
+
     public function run(){
+        //only for cli for the moment...
+        if($this->handler()->method() == Handler::METHOD_CLI){
+            //buggy
+//             Application::check($this, Application::BINARY);
+        }
         $this->data('time.application.run', microtime(true));
         $this->data('time.application.duration', $this->data('time.application.run') - $this->data('time.start'));
         Application::cache('write', $this);
@@ -206,6 +299,7 @@ class Application extends Parser {
                     $this->header('ETag: ' . $etag . '-' . $gm);
                     $this->header('Cache-Control: public');
                     $this->header('Access-Control-Allow-Origin: http://' . $host);
+                    //add https too...
                 }
                 if($ext == 'pcss'){
                     $read = str_replace('/', Application::DS, $request);
@@ -237,9 +331,20 @@ class Application extends Parser {
         if(!headers_sent()){
             $this->header('Last-Modified: '. $this->request('last-modified'));
             $this->header('Access-Control-Allow-Origin: http://' . $host);
+            //add https....
         }
-        $item = $this->route()->run();        
-//         $this->cli(); //why twice -> see constructor
+        /**
+         * route get
+         */
+        $item = $this->route()->run();
+        if(empty($item)){
+            //add develop mode...
+            throw new Exception('File or route not found');
+        }
+        if($this->parameter('route.current')){
+            var_dump($item);
+            return $item;
+        }
         $handler = $this->handler();
         $contentType = $handler->request('contentType');
         $result = '';
@@ -258,6 +363,7 @@ class Application extends Parser {
                     $controller->parser('object')->random($this->parser('object')->random());
                 }
                 $result = $controller->{$item->function}();
+                /* turn of old systems (message / error)
                 if(method_exists($controller, 'message')){
                     $this->message($controller->message());
                     if(!empty($random)){
@@ -273,7 +379,7 @@ class Application extends Parser {
                 }
                 if(method_exists($controller, 'error')){
                     $this->error($controller->error());
-                }
+                }*/
                 $contentType = $handler->request('contentType'); //can change in the view
             }
         }
@@ -305,31 +411,6 @@ class Application extends Parser {
                     }
             } else {
                 //404
-            }
-        }
-        else {
-            if($contentType == Handler::CONTENT_TYPE_CLI){
-                if($request == 'Application/Error/'){
-                    //                     var_dump($handler->request('route'));
-                    //                     die;
-                    throw new Exception(Application::EXCEPTION_APPLICATION_ERROR);
-                    //bug when dir.data = empty ?
-                }
-                if($this->route()->error('read')){
-                    $handler->request('request', 'Application/Error/');
-                    $handler->request('id', 2);
-                    $result = $this->run();
-                } else {
-                    if(empty($request)){
-                        $handler->request('request', 'Application/Help/');
-                        $result = $this->run();
-                    } else {
-                        $handler->request('route', $handler->request('request'));
-                        $handler->request('request', 'Application/Error/');
-                        $handler->request('id', 1);
-                        $result = $this->run();
-                    }
-                }
             }
         }
         if(is_object($result)){
@@ -391,6 +472,13 @@ class Application extends Parser {
                 Application::DATA .
                 Application::DS
             );
+        }
+        if(!($this->data('priya.dir.temp'))){
+            $this->data('priya.dir.temp',
+                    $this->data('priya.dir.data') .
+                    Application::TEMP .
+                    Application::DS
+                    );
         }
         //can change priya.dir.backup
         //local priya.dir.backup : priya.dir.data/BACKUP constant
@@ -479,7 +567,7 @@ class Application extends Parser {
         }
         $this->data('time.init.start', microtime(true));
         $cache = Application::cache('read', $this);
-        if($cache){
+        if(!empty($cache)){
             $this->data(Application::object_merge($this->data(), $this->object($cache)));
         } else {
             $parser = new Parser();
@@ -517,7 +605,6 @@ class Application extends Parser {
                     Application::DS
                 );
             }
-
             //can change priya.dir.temp
             //local priya.dir.temp is priya.dir.data/TEMP constant
             if(!$this->data('priya.dir.temp')){
@@ -595,24 +682,45 @@ class Application extends Parser {
         if(empty($url)){
             $url = $this->data('priya.route.cache.url');
         }
+        if(empty($url)){
+            throw new Exception('url is empty in Application in router...');
+        }
+        $dir = Dir::name($url);
+        $file = File::basename($url);
+
+        $gitignore = [];
+        $gitignore['url'] = $dir . '.gitignore';
+        $gitignore['data'] = Application::DS . $file;
+
         $start = microtime(true);
         $duration = $start - $this->data('time.start');
         $cache = false;
         $is_cache = true;
         $is_expired = false;
         if($this->data('priya.cache.disable')){
+            //buggy
             $is_cache = false;
+            var_dump('fuck1');
         }
         if($this->data('priya.route.cache.disable')){
+            //buggy
             $is_cache = false;
+            var_dump('fuck2');
         }
-        if($is_cache){            
-            $cache = Cache::read($url, $this->data('priya.cache.config.' .  $this->data('priya.route.cache.interval')));
+        if($is_cache){
+            $interval = $this->data('priya.route.cache.interval');
+            $config = $this->data('priya.cache.config');
+            if($config === null){
+                throw new Exception('Priya cache config is empty');
+            }
+            if($interval !== null){
+                $interval = $this->data('priya.cache.config.' .  $this->data('priya.route.cache.interval'));
+            }
             if($cache === Cache::ERROR_EXPIRE){
                 $is_expired = true;
-                $cache = Cache::validate($url, $this->data('priya.cache.config.' .  $this->data('priya.route.cache.interval')));
+                $cache = Cache::validate($url, $interval);
             }
-        }        
+        }
         if($cache !== false){
             $this->route(new Module\Route(
                 $this->handler(),
@@ -622,6 +730,8 @@ class Application extends Parser {
             $this->route()->data($cache);
             $this->route()->data('priya.route.cache.time.start', $start);
             $this->route()->data('priya.route.cache.time.duration', microtime(true) - $start);
+
+            Application::route_default($this);
         } else {
             $this->route(new Module\Route(
                 $this->handler(),
@@ -629,13 +739,31 @@ class Application extends Parser {
             ));
             $this->route()->data('priya.route.cache.time.start', $start);
             $this->route()->data('priya.route.cache.time.duration', microtime(true) - $start);
+            Application::route_default($this);
+            $write = 0;
 
-            // var_dump($this->route()->data());
-            // die;
 
             if($is_cache){
-                Cache::write($url,  $this->object($this->route()->data(), 'json'), true);
+                $write = Cache::write($url,  $this->object($this->route()->data(), 'json'), true);
             }
+            if($write > 0){
+                if($this->data('priya.config.git') !== false){
+                    File::write($gitignore['url'], $gitignore['data']);
+                }
+                //succesfull
+            } else {
+                throw new Exception('Cache write error in route cache...');
+            }
+        }
+    }
+
+    private static function route_default(Application $object){
+        $list = Application::ROUTE_DEFAULT;
+        if(!is_array($list)){
+//          Bombard::target();
+        }
+        foreach($list as $route){
+            $object->route()->create($route);
         }
     }
 
@@ -733,9 +861,125 @@ class Application extends Parser {
         }
     }
 
+    private static function ssh(Core $object, $type=null, $data=''){
+        return true;
+        //ssh-keygen -t rsa -b 4096 -C "my@emailaddress.com" -f /path/to/key
+
+        /**
+         * Unix host key change instructions
+
+    Run this command, replacing HOSTNAME with the name of the host you are connecting to:
+
+    ssh-keygen -R HOSTNAME
+
+    This will remove the old key entry for HOSTNAME from your ${HOME}/.ssh/known_hosts file.
+    Add the new key to your known hosts with the command:
+
+    ssh HOSTNAME
+
+And then, to make ssh look for the file at the custom location, use the -i flag:
+
+ssh -i /path/to/key -vT git@github.com
+         */
+
+         /**
+
+
+    PS>ssh-keygen -t rsa -b 4096 -C "my@emailaddress.com"
+    Generating public/private rsa key pair.
+    Enter file in which to save the key (//.ssh/id_rsa):
+    Could not create directory '//.ssh': Read-only file system
+    Enter passphrase (empty for no passphrase):
+    Enter same passphrase again:
+    Saving key "//.ssh/id_rsa" failed: No such file or directory
+
+The command could not save your key. Specify a file, at a location where you have write access:
+
+ssh-keygen -t rsa -b 4096 -C "my@emailaddress.com" -f /path/to/key
+
+This will save your private key in /path/to/key and the public key in /path/to/key.pub. When successful, instead of an error message, you will see something like:
+
+    Your identification has been saved in /path/to/key.
+    Your public key has been saved in /path/to/key.pub.
+    The key fingerprint is:
+    76:f7:82:04:1e:64:eb:9c:df:dc:0a:6b:26:73:1b:2c
+    The key's randomart image is:
+    +--[ RSA 2048]----+
+    |        o        |
+    |       o .       |
+    |        +        |
+    |       + +       |
+    |        S o .    |
+    |       . = = o   |
+    |        E * + o  |
+    |        o.++ o   |
+    |         *o..    |
+    +-----------------+
+
+And then, to make ssh look for the file at the custom location, use the -i flag:
+
+ssh -i /path/to/key -vT git@github.com
+
+Alternatively, if you have an authentication agent running, you can add your key to the agent with:
+-> Could not open a connection to your authentication agent. -> ssh-agent -s
+
+ sudo -u remco ssh-agent -s
+SSH_AUTH_SOCK=/tmp/ssh-fl1c6GwyMXGO/agent.14039; export SSH_AUTH_SOCK;
+SSH_AGENT_PID=14040; export SSH_AGENT_PID;
+echo Agent pid 14040;
+
+eval "$(ssh-agent)" # needed this variable for ssh-agent
+
+#   IdentityFile ~/.ssh/identity
+#   IdentityFile ~/.ssh/id_rsa
+#   IdentityFile ~/.ssh/id_dsa
+#   IdentityFile ~/.ssh/id_ecdsa
+#   IdentityFile ~/.ssh/id_ed25519
+ssh-add /path/to/key
+
+Once your key is stored by the agent, you can simply do:
+
+ssh -T git@github.com
+ssh -T remco.pc@bitbucket.org
+or sudo -u remco ssh -T remco.pc@bitbucket.org
+
+
+
+The response should look something like:
+
+    Hi USER! You've successfully authenticated, but GitHub does not provide shell access.
+
+And you can go ahead and clone your repository with:
+         */
+
+        $type = ucfirst($type);
+
+        switch($type){
+            case Application::VERIFY :
+                $key = explode(PHP_EOL, $data);
+
+                $check = Application::
+
+                var_dump($output);
+                die;
+
+                // ssh-keygen -F server3.example.com
+
+                var_dump($key);
+                die;
+
+                var_dump($data);
+                var_dump('fart');
+                die;
+            break;
+        }
+    }
+
     private function cli(){
         $request = $this->request('data');
         if(!empty($request)){
+            $this->data('priya.application.binary', Application::binary());
+            $this->data('binary', $this->data('priya.application.binary.user.execute'));
             if(is_array($request) || is_object($request)){
                 foreach($request as $attribute){
                     $attribute = explode('=', $attribute, 2);

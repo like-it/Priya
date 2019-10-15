@@ -119,6 +119,12 @@ class Parameter extends Core {
                         //operator and string
 //                         var_dump($merge['type']);
 //                         var_dump($parameter);
+                        debug('Parameter::get:Undefined state detected (' .
+                            $merge['type'] .
+                            '->' .
+                            $part['type'] .
+                            '), implementation undefined error...');
+                        die;
                         throw new Exception(
                             'Parameter::get:Undefined state detected (' .
                             $merge['type'] .

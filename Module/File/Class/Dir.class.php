@@ -16,15 +16,15 @@ class Dir {
     const CHMOD = 0740;
     const TYPE = 'Dir';
     const SEPARATOR = DIRECTORY_SEPARATOR;
-    
+
     const FORMAT_FLAT = 'flat';
-    
+
     private $node;
-    
+
     public static function create($url='', $chmod=''){
-        $url = rtrim($url, '/');        
+        $url = rtrim($url, '/');
         if(File::exist($url) && !Dir::is($url)){
-            unlink($url);            
+            unlink($url);
         }
         if(File::exist($url) && Dir::is($url)){
             return true;
@@ -39,17 +39,17 @@ class Dir {
         }
     }
     public static function exist($url=''){
-        $url = rtrim($url, Dir::SEPARATOR);                        
+        $url = rtrim($url, Dir::SEPARATOR);
         if(
-            File::exist($url) === true && 
+            File::exist($url) === true &&
             Dir::is($url) === true
         ){
             return true;
-        }                    
+        }
         return false;
     }
     public static function is($url=''){
-        $url = rtrim($url, Dir::SEPARATOR);        
+        $url = rtrim($url, Dir::SEPARATOR);
         return is_dir($url);
     }
 
@@ -64,22 +64,30 @@ class Dir {
         foreach($read as $file){
             $size = filesize($file->url);
             $total += $size;
-        }       
-        return $total;    
+        }
+        return $total;
     }
 
     public static function name($url='', $levels=null){
+        $is_backslash = false;
+        if(stristr($url, '\\') !== false){
+            $url = str_replace('\\', '/', $url);
+            $is_backslash = true;
+        }
         if(is_null($levels)){
             $name = dirname($url);
         } else {
             $levels += 0;
             $name = dirname($url, (int) $levels);
-        }        
+        }
         if($name == '.'){
             return '';
         }
         elseif(substr($name, -1, 1) != '/'){
             $name .= '/';
+        }
+        if($is_backslash === true){
+            $name = str_replace('/', '\\', $name);
         }
         return $name;
     }
@@ -183,6 +191,11 @@ class Dir {
         exec('cp ' . $source . ' ' . $target . ' -R');
         return true;
     }
+
+    public static function move($source='', $destination='', $overwrite=false){
+        return File::move($source, $destination, $overwrite);
+    }
+
     public static function remove($dir=''){
         if(is_dir($dir) === false){
             return true;
@@ -222,5 +235,17 @@ class Dir {
     }
     private function getNode(){
         return $this->node;
+    }
+
+    public static function ucfirst($dir=''){
+        $explode = explode('/', $dir);
+        $result = '';
+        foreach($explode as $part){
+            if(empty($part)){
+                continue;
+            }
+            $result .= ucfirst($part) . '/';
+        }
+        return $result;
     }
 }

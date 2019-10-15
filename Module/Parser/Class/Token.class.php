@@ -1267,7 +1267,7 @@ class Token extends Core {
                     $method['string'] = $record['string'];
                 }
 //                     echo __LINE__ . '::' . __FILE__ . PHP_EOL . '<br>';
-                $method = Method::execute($method, $parser);
+                $method = Method::method_execute($method, $parser);
                 $method = Method::exclamation($record, $method, $parser);
                 $record = Method::remove_exclamation($record);
                 $method = Token::cast($method);

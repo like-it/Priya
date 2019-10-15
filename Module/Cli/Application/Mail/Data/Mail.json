@@ -1,0 +1,17 @@
+{
+    "request" : "{request()}",
+    "session" : "{session()}",
+    "default" : {    	
+        "command" : "info"        
+    },
+    "config" : {       
+        "ssh" : {
+            "url" : "{$dir.data}Ssh.json"
+        }
+    },
+    "command" : [
+    	"send",
+    	"config",
+		"info"			
+    ]    
+}

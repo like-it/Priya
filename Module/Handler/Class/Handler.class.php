@@ -10,6 +10,7 @@
 namespace Priya\Module;
 
 use stdClass;
+use Exception;
 use Priya\Application;
 
 class Handler extends Data{
@@ -25,6 +26,7 @@ class Handler extends Data{
     const METHOD_POST = 'POST';
     const METHOD_PUT = 'PUT';
     const METHOD_DELETE = 'DELETE';
+    const METHOD_PATCH = 'PATCH';
 
     const SCHEME_HTTP = 'http';
     const SCHEME_HTTPS = 'https';
@@ -55,7 +57,6 @@ class Handler extends Data{
             $this->request('key', $key);
         }
     }
-
 
     public function microtime($attribute=null){
            if($attribute == 'create'){
@@ -129,7 +130,7 @@ class Handler extends Data{
     }
 
     private function createRequest($data=''){
-        foreach($data as $attribute =>$post){
+        foreach($data as $attribute => $post){
             if(isset($post->name) && isset($post->value)){
                 $this->request($post->name, $post->value);
             } elseif($attribute !== 'nodeList') {
@@ -161,7 +162,7 @@ class Handler extends Data{
     public function file($attribute=null, $value=null){
         if($attribute !== null){
             if($attribute == 'create'){
-                return $this->createFile($value);
+                return $this->createFile();
             }
             if($value !== null){
                 if($attribute=='delete'){
@@ -190,7 +191,6 @@ class Handler extends Data{
             } else {
                 $this->file[$attribute] = $value;
             }
-
         }
     }
 
@@ -236,7 +236,7 @@ class Handler extends Data{
         return $this->file($nodeList);
     }
 
-    public function lastModified(){
+    public function lastModified($type='create'){
         $this->request('last-modified', gmdate('D, d M Y H:i:s T'));
     }
 
@@ -273,6 +273,8 @@ class Handler extends Data{
         $host = $this->host();
         if(empty($host) || $host == 'http:///'){
             $contentType = Handler::CONTENT_TYPE_CLI;
+            $this->request('contentType',$contentType);
+            return $this->contentType($contentType);
         }
         $ct = $this->request('contentType');
         if($ct){
@@ -317,6 +319,9 @@ class Handler extends Data{
             $contentType = $this->contentType();
             if(stristr($contentType, strtolower(Handler::METHOD_CLI))){
                 $method = Handler::METHOD_CLI;
+                if(!defined('IS_CLI')){
+                    define('IS_CLI', true);
+                }
             } else {
                 $method = Handler::METHOD_GET;
             }
@@ -324,7 +329,7 @@ class Handler extends Data{
         return $this->method($method);
     }
 
-    public function input(){
+    public function input($type='create'){
         global $argc, $argv;
 
         $node = array();
@@ -440,7 +445,8 @@ class Handler extends Data{
                     unset($attribute[$nr]);
                     continue;
                 }
-                $attribute[$nr] = trim(escapeshellarg($value), '\'');
+                $attribute[$nr] = trim($value);
+//                 $attribute[$nr] = trim(escapeshellarg($value), '\''); //causes error
             }
             $data = new stdClass();
             $data->nodeList = array();
@@ -474,24 +480,33 @@ class Handler extends Data{
         );
     }
 
-    public function web(){
-        $scheme = $this->scheme();
-        if(empty($_SERVER['HTTP_HOST'])){
+    public static function web($host=''){
+        if(empty($host)){
+            if(isset($_SERVER['HTTP_HOST'])){
+                $host = $_SERVER['HTTP_HOST'];
+            }
+        }
+        if(empty($host)){
             return false;
         }
+        $scheme = Handler::scheme();
         return
             $scheme .
             '://' .
-            $_SERVER['HTTP_HOST'] .
+            $host .
             '/'
         ;
     }
 
-    public function domain(){
-        if(empty($_SERVER['HTTP_HOST'])){
+    public static function domain($host=''){
+        if(empty($host)){
+            if(isset($_SERVER['HTTP_HOST'])){
+                $host = $_SERVER['HTTP_HOST'];
+            }
+        }
+        if(empty($host)){
             return false;
         }
-        $host = $_SERVER['HTTP_HOST'];
         $explode = explode('.', $host);
         if(count($explode) >= 2){
             array_pop($explode);
@@ -500,11 +515,15 @@ class Handler extends Data{
         return false;
     }
 
-    public function subdomain(){
-        if(empty($_SERVER['HTTP_HOST'])){
+    public static function subdomain($host=''){
+        if(empty($host)){
+            if(isset($_SERVER['HTTP_HOST'])){
+                $host = $_SERVER['HTTP_HOST'];
+            }
+        }
+        if(empty($host)){
             return false;
         }
-        $host = $_SERVER['HTTP_HOST'];
         $explode = explode('.', $host);
         if(count($explode) > 2){
             array_pop($explode);
@@ -514,19 +533,24 @@ class Handler extends Data{
         return false;
     }
 
-    public function extension(){
-        if(empty($_SERVER['HTTP_HOST'])){
+    public static function extension($host=''){
+        if(empty($host)){
+            if(isset($_SERVER['HTTP_HOST'])){
+                $host = $_SERVER['HTTP_HOST'];
+            }
+        }
+        if(empty($host)){
             return false;
         }
-        $host = $_SERVER['HTTP_HOST'];
         $explode = explode('.', $host);
         if(count($explode) > 1){
-            return array_pop($explode);
+            $extension =  array_pop($explode);
+            return rtrim($extension, '/');
         }
         return false;
     }
 
-    public function scheme(){
+    public static function scheme(){
         $scheme = Handler::SCHEME_HTTP;
         if(!empty($_SERVER['REQUEST_SCHEME'])){
             $scheme = $_SERVER['REQUEST_SCHEME'];
@@ -539,7 +563,7 @@ class Handler extends Data{
     }
 
     public function url($url=null, $attribute=null){
-        $scheme = $this->scheme();
+        $scheme = Handler::scheme();
         if(empty($scheme)){
             return false;
         }
@@ -567,6 +591,7 @@ class Handler extends Data{
             return $session['csrf'];
         }
     }
+
     public function session($attribute=null, $value=null){
         if($attribute == 'has'){
             return isset($_SESSION);
@@ -604,7 +629,14 @@ class Handler extends Data{
             $tmp = explode('.', $attribute);
             if($value !== null){
                 if($attribute == 'delete' && $value == 'session'){
-                    return session_destroy();
+                    $unset = session_unset();
+                    if($unset === false){
+                        throw new Exception('Could not unset session');
+                    }
+                    $destroy = session_destroy();
+                    if($destroy === false){
+                        throw new Exception('Could not destroy session');
+                    }
                 }
                 elseif($attribute == 'delete'){
                     $tmp = explode('.', $value);
@@ -1006,7 +1038,7 @@ class Handler extends Data{
         return false;
     }
 
-    public function host($include_scheme = true){
+    public static function host($include_scheme = true){
         if(isset($_SERVER['HTTP_HOST'])){
             $domain = $_SERVER['HTTP_HOST'];
         }
@@ -1016,7 +1048,7 @@ class Handler extends Data{
             $domain = '';
         }
         if($include_scheme) {
-            $scheme = $this->scheme();
+            $scheme = Handler::scheme();
             $host = '';
             if(isset($scheme) && isset($domain)){
                 $host = $scheme . '://' . $domain . '/';
@@ -1027,8 +1059,8 @@ class Handler extends Data{
         return $host;
     }
 
-    public function removeHost($value=''){
-        $host = $this->host();
+    public static function removeHost($value=''){
+        $host = Handler::host();
         if(empty($host)){
             return $value;
         }

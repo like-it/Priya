@@ -17,23 +17,31 @@ use Priya\Module\File;
 class License extends Cli {
     const DIR = __DIR__;
     const URL = 'https://priya.software/update/license';
+    const FILE = 'LICENSE';
 
     public function run(){
         $update = $this->parameter('update');
         if($update){
-            License::update(License::execute($this, 'url'));
+            License::update($this);
         }
-        $execute = License::execute($this);
-        $execute = License::require($this, $execute);
-        return $execute;
+        $list = License::view('location');
+        foreach($list as $url){
+            if(File::exist($url)){
+                return File::read($url);
+            }
+        }
     }
 
-    private static function update($target=''){
-        $file = new File();
-        $execute = $file->read(License::URL);
-        if(!empty($execute)){
-            $file->write($target, $execute);
-            return $execute;
+    private static function update($object){
+        $url = $object->data('priya.dir.root') . License::FILE;
+
+        $read = File::read($url);
+
+        $list = License::view('location');
+        foreach($list as $url){
+            if(File::exist($url)){
+                return File::write($url, $read);
+            }
         }
     }
 

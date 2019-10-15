@@ -9,8 +9,9 @@
 
 namespace Priya\Module;
 
-use Priya\Module\Core\Data;
+use Priya\Module\Data;
 use PHPMailer\PHPMailer\PHPMailer;
+use Exception;
 
 class Mail extends Data{
     private $mailer;
@@ -49,23 +50,23 @@ class Mail extends Data{
         $from = $this->data('mail.from.email');
         $name = $this->data('mail.from.name');
         if(empty($host)){
-            $this->error('host', true);
+            throw new Exception('Empty host');
             return false;
         }
         if(empty($port)){
-            $this->error('port', true);
+            throw new Exception('Empty port');
             return false;
         }
         if(empty($secure)){
-            $this->error('secure', true);
+            throw new Exception('Empty secure');
             return false;
         }
         if(empty($username)){
-            $this->error('username', true);
+            throw new Exception('Empty username');
             return false;
         }
         if(empty($password)){
-            $this->error('password', true);
+            throw new Exception('Empty password');
             return false;
         }
         $this->setMailer(new PHPMailer());
@@ -205,10 +206,9 @@ class Mail extends Data{
 
     public function send(){
         if(!$this->mailer()->send()) {
-            $this->error('mail', $this->mailer()->ErrorInfo);
+            throw new Exception($this->mailer()->ErrorInfo);
             return false;
         } else {
-            $this->message('mail', true);
             return true;
         }
     }

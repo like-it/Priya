@@ -6,6 +6,9 @@ _('prototype').request = function (url, data, script){
 
     if(typeof url == 'object' && url !== null){
         data = url;
+        console.log(url);
+        console.log(typeof null);
+        console.log(typeof url);
         url = '';
         if (typeof data.altKey != "undefined") {//event
             priya.debug('event');
@@ -44,10 +47,12 @@ _('prototype').request = function (url, data, script){
     //priya.collect.require.toLoad = priya.collect.require.toLoad ? priya.collect.require.toLoad : 0;
     //priya.collect.require.toLoad++;
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
+    xhttp.onreadystatechange = function() {    	
         if (xhttp.readyState == 4 && xhttp.status == 200) {
-            if(xhttp.responseText.substr(0, 1) == '{' && xhttp.responseText.substr(-1) == '}'){
-                var data = JSON.parse(xhttp.responseText);
+        	//xhttp.responseText = readonly
+        	var text = priya.trim(xhttp.responseText);        	
+            if(text.substr(0, 1) == '{' && text.substr(-1) == '}'){            	
+                var data = JSON.parse(text);                
                 priya.link(data);
                 priya.styler(data);
                 priya.script(data);
@@ -58,7 +63,7 @@ _('prototype').request = function (url, data, script){
                     script(url, data);
                 }
             } else {
-                priya.debug(xhttp.responseText);
+                priya.debug(text);
             }
             setTimeout(function(){
                 priya.loader('remove');
@@ -83,10 +88,13 @@ _('prototype').request = function (url, data, script){
                 if(time > (start + offset)){
                     priya.loader();
                 }
+
             }
             if (xhttp.readyState == 4 ){
                 //status !- 200
                 console.log(xhttp);
+                //priya.collect.require.loaded = priya.collect.require.loaded ? priya.collect.require.loaded : 0;
+                //priya.collect.require.loaded++;
             }
         }
     };
@@ -94,6 +102,7 @@ _('prototype').request = function (url, data, script){
         priya.collection('request.microtime', microtime(true));
         xhttp.open("GET", url, true);
         xhttp.setRequestHeader("Content-Type", "application/json");
+
         xhttp.send();
     } else {
         priya.collection('request.microtime', microtime(true));
@@ -104,7 +113,19 @@ _('prototype').request = function (url, data, script){
         }
         var send = JSON.stringify(data);
         xhttp.send(send);
+
     }
+    /*
+     * requires:
+     * - data
+     * - empty
+     * link
+     * script,
+     * content
+     * refresh
+     * exception
+     * debug
+     */
 }
 
 priya.request = _('prototype').request;

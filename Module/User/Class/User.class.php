@@ -10,9 +10,8 @@
 namespace Priya\Module;
 
 use Priya\Application;
-use Priya\Module\Core;
 
-class User extends \Priya\Module\Core\Data {
+class User extends Data {
 
     public function validate($username, $password){
         $data = new Data();
@@ -24,11 +23,11 @@ class User extends \Priya\Module\Core\Data {
                     if(isset($user->password)){
                         $verify = password_verify($password, $user->password);
                     } else {
-                        $this->error('pasword-lost', true);
+//                         $this->error('pasword-lost', true);
                         return false;
                     }
                     if(empty($verify)){
-                        $this->error('password', true);
+//                         $this->error('password', true);
                         return false;
                     }
                     unset($user->password);
@@ -38,12 +37,12 @@ class User extends \Priya\Module\Core\Data {
                     if(isset($user->password)){
                         $verify = password_verify($password, $user->password);
                     } else {
-                        $this->error('pasword-lost', true);
+//                         $this->error('pasword-lost', true);
                         return false;
                     }
 
                     if(empty($verify)){
-                        $this->error('password', true);
+//                         $this->error('password', true);
                         return false;
                     }
                     unset($user->password);
@@ -51,7 +50,7 @@ class User extends \Priya\Module\Core\Data {
                 }
             }
         }
-        $this->error('username', true);
+//         $this->error('username', true);
         return false;
     }
 }
