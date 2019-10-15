@@ -1,1 +1,0 @@
-<p><img src="{$web.root}Public/Image/Loader-256.png" title="" class="hidden fade-in spin"/></p>

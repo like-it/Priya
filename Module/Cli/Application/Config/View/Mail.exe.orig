@@ -1,4 +1,0 @@
-
-{for.each($priya as $attribute | string.uppercase | string.lowercase | string.uppercase.first | string.uppercase.nth : (float) -2 + 1 - 1 | string.lowercase.nth : -2 + 1 - 1 => $value | json)}
-{$attribute}
-{/for.each}
