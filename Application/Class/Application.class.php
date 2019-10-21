@@ -96,7 +96,7 @@ class Application extends Parser {
     const NO_CACHE = [
         'time',
         'web',
-        'dir.current'
+        'dir.current'        
     ];
 
     const ROUTE_DEFAULT = [

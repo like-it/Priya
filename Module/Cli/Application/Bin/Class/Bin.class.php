@@ -26,11 +26,11 @@ class Bin extends Cli {
         if($checkname === false){
             throw new Exception('Name is not a valid name');
         }
-        $bin = Bin::view($this, 'Create');
+        $bin = Bin::view($this, 'Create');        
         $target = '/usr/bin/' . $name;
         $bytes = File::write($target, $bin);
         if($bytes > 0){
-            Bin::execute('chmod +x ' . $target);
+            Bin::execute($this, 'chmod +x ' . $target);
             return Bin::view($this);
         }
         throw new Exception('Could not create binary');
