@@ -1,0 +1,370 @@
+{
+    "priya": {
+        "cache": {
+            "file": [
+                {
+                    "read": true,
+                    "mtime": 1571666108,
+                    "url": "\/mnt\/c\/Repository\/finger\/Vendor\/Priya\/Data\/Route.json"
+                },
+                {
+                    "read": false,
+                    "url": "\/mnt\/c\/Repository\/finger\/Module\/Data\/Route.json"
+                },
+                {
+                    "read": false,
+                    "url": "\/mnt\/c\/Repository\/finger\/Vendor\/R3m\/Data\/Route.json"
+                },
+                {
+                    "read": false,
+                    "url": "\/mnt\/c\/Repository\/finger\/Vendor\/Speak\/Data\/Route.json"
+                },
+                {
+                    "read": false,
+                    "url": "\/mnt\/c\/Repository\/finger\/Host\/Documentation\/Priya\/Software\/Data\/Route.json"
+                },
+                {
+                    "read": true,
+                    "mtime": 1571675763,
+                    "url": "\/mnt\/c\/Repository\/finger\/Host\/Priya\/Software\/Data\/Route.json"
+                },
+                {
+                    "read": false,
+                    "url": "\/mnt\/c\/Repository\/finger\/Host\/Redirect\/Data\/Route.json"
+                }
+            ]
+        },
+        "route": {
+            "cache": {
+                "time": {
+                    "start": 1571684150.22074,
+                    "duration": 0.028625965118408203
+                }
+            }
+        }
+    },
+    "route": {
+        "Info": {
+            "path": "",
+            "controller": "Priya.Module.Cli.Application.Info.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "Indent": {
+            "path": "Priya\/Module\/Indent\/Public\/Css\/Indent.css",
+            "controller": "Priya.Module.Indent.css",
+            "format": "html",
+            "language": "en",
+            "method": [
+                "GET",
+                "POST"
+            ],
+            "translate": false
+        },
+        "Javascript": {
+            "path": "Priya\/Javascript",
+            "controller": "Priya.Module.Javascript.run",
+            "format": "html",
+            "language": "en",
+            "method": [
+                "GET",
+                "POST"
+            ],
+            "translate": false
+        },
+        "Javascript-CLi": {
+            "path": "Javascript",
+            "controller": "Priya.Module.Javascript.Cli.run",
+            "format": "html",
+            "language": "en",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "Memory-CLi": {
+            "path": "Memory",
+            "controller": "Priya.Module.Memory.Cli.run",
+            "format": "html",
+            "language": "en",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "priya-software-main": {
+            "path": "",
+            "host": [
+                "priya.software",
+                "*.priya.software",
+                "!documentation.priya.software"
+            ],
+            "request": {
+                "page": "Home"
+            },
+            "controller": "Host.Priya.Software.Page.run",
+            "language": "en",
+            "format": "html",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "priya-software-menu": {
+            "path": "Menu\/{$menu}",
+            "host": [
+                "priya.software",
+                "*.priya.software",
+                "!documentation.priya.software"
+            ],
+            "controller": "Host.Priya.Software.Menu.run",
+            "language": "en",
+            "format": "json",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "priya-software-page": {
+            "path": "Page\/{$page}",
+            "host": [
+                "priya.software",
+                "*.priya.software",
+                "!documentation.priya.software"
+            ],
+            "controller": "Host.Priya.Software.Page.run",
+            "language": "en",
+            "format": "json",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "priya-software-download-url": {
+            "path": "Download\/{$download}",
+            "host": [
+                "priya.software",
+                "*.priya.software",
+                "!documentation.priya.software"
+            ],
+            "url": "{$dir.host}Priya\/Software\/Public\/Download\/{$request.download}",
+            "language": "en",
+            "format": "json",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "priya-software-download": {
+            "path": "Downloads",
+            "host": [
+                "priya.software",
+                "*.priya.software",
+                "!documentation.priya.software"
+            ],
+            "request": {
+                "page": "Download"
+            },
+            "controller": "Host.Priya.Software.Page.run",
+            "language": "en",
+            "format": "json",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "priya-software-license": {
+            "path": "License",
+            "host": [
+                "priya.software",
+                "*.priya.software",
+                "!documentation.priya.software"
+            ],
+            "url": "{$dir.host}Priya\/Software\/Public\/License",
+            "language": "en",
+            "format": "json",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "application-info": {
+            "path": "Application Info",
+            "controller": "Priya.Module.Cli.Application.Info.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "info-shorthand": {
+            "path": "Info",
+            "controller": "Priya.Module.Cli.Application.Info.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "application-help": {
+            "path": "Application Help",
+            "controller": "Priya.Module.Cli.Application.Help.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "help-shorthand": {
+            "path": "Help",
+            "controller": "Priya.Module.Cli.Application.Help.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "application-version": {
+            "path": "Application Version",
+            "controller": "Priya.Module.Cli.Application.Version.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "version-shorthand": {
+            "path": "Version",
+            "controller": "Priya.Module.Cli.Application.Version.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "application-license": {
+            "path": "Application License",
+            "controller": "Priya.Module.Cli.Application.License.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "license-shorthand": {
+            "path": "License",
+            "controller": "Priya.Module.Cli.Application.License.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "application-cache": {
+            "path": "Application Cache",
+            "controller": "Priya.Module.Cli.Application.Cache.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "cache-shorthand": {
+            "path": "Cache",
+            "controller": "Priya.Module.Cli.Application.Cache.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "application-service": {
+            "path": "Application Service",
+            "controller": "Priya.Module.Cli.Application.Service.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "service-shorthand": {
+            "path": "Service",
+            "controller": "Priya.Module.Cli.Application.Service.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "application-mail": {
+            "path": "Application Mail",
+            "controller": "Priya.Module.Cli.Application.Mail.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "mail-shorthand": {
+            "path": "Mail",
+            "controller": "Priya.Module.Cli.Application.Mail.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "application-bin": {
+            "path": "Application Bin",
+            "controller": "Priya.Module.Cli.Application.Bin.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "bin-shorthand": {
+            "path": "Bin",
+            "controller": "Priya.Module.Cli.Application.Bin.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "application-apache": {
+            "path": "Application Apache",
+            "controller": "Priya.Module.Cli.Application.Apache.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "apache-shorthand": {
+            "path": "Apache",
+            "controller": "Priya.Module.Cli.Application.Apache.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "application-host": {
+            "path": "Application Host",
+            "controller": "Priya.Module.Cli.Application.Host.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "host-shorthand": {
+            "path": "Host",
+            "controller": "Priya.Module.Cli.Application.Host.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "application-uuid": {
+            "path": "Application Uuid",
+            "controller": "Priya.Module.Cli.Application.Uuid.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "uuid-shorthand": {
+            "path": "Uuid",
+            "controller": "Priya.Module.Cli.Application.Uuid.run",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        }
+    }
+}
