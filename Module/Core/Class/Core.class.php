@@ -293,7 +293,7 @@ class Core {
     }
 
     //make static
-    public function dom_class($class=''){
+    public static function dom_class($class=''){
         $class = strtolower($class);
         $class = str_replace(array('\\', '/'), '-', $class);
         return $class;
@@ -960,14 +960,14 @@ class Core {
         return false;
     }
     //make static
-    public function explode_single($delimiter=array(), $string='', $internal=array()){
+    public static function explode_single($delimiter=array(), $string='', $internal=array()){
         $result = array();
         if(is_array($delimiter)){
             foreach($delimiter as $nr => $delim){
                 if(strpos($string, $delim) === false){
                     continue; //speed... & always >=2
                 }
-                $tmp = $this->explode_single($delim, $string, $result);
+                $tmp = Core::explode_single($delim, $string, $result);
                 foreach ($tmp as $tmp_nr => $tmp_value){
                     $result[] = $tmp_value;
                 }
@@ -1014,7 +1014,7 @@ class Core {
     }
 
     //make static too (still cheap and not re-usable of missing documentation, read code
-    public function explode_multi($delimiter=array(), $string='', $limit=array()){
+    public static function explode_multi($delimiter=array(), $string='', $limit=array()){
         $result = array();
         if(!is_array($limit)){
             $limit = explode(',', $limit);
@@ -1044,8 +1044,7 @@ class Core {
         return $result;
     }
 
-    //make static, still cheap
-    public function object_horizontal($verticalArray=array(), $value=null, $return='object'){
+    public static function object_horizontal($verticalArray=array(), $value=null, $return='object'){
         if(empty($verticalArray)){
             return false;
         }
@@ -1088,17 +1087,17 @@ class Core {
             return $object;
         }
     }
-    public function object_delete($attributeList=array(), $object='', $parent='', $key=null){
+    public static function object_delete($attributeList=array(), $object='', $parent='', $key=null){
         if(is_string($attributeList)){
-            $attributeList = $this->explode_multi(array('.', ':', '->'), $attributeList);
+            $attributeList = Core::explode_multi(array('.', ':', '->'), $attributeList);
         }
         if(is_array($attributeList)){
-            $attributeList = $this->object_horizontal($attributeList);
+            $attributeList = Core::object_horizontal($attributeList);
         }
         if(!empty($attributeList) && is_object($attributeList)){
             foreach($attributeList as $key => $attribute){
                 if(isset($object->{$key})){
-                    return $this->object_delete($attribute, $object->{$key}, $object, $key);
+                    return Core::object_delete($attribute, $object->{$key}, $object, $key);
                 } else {
                     unset($object->{$key}); //to delete nulls
                     return false;
@@ -1109,7 +1108,7 @@ class Core {
             return true;
         }
     }
-    public function object_set($attributeList=array(), $value=null, $object='', $return='child'){
+    public static function object_set($attributeList=array(), $value=null, $object='', $return='child'){
         if(empty($object)){
             return;
         }
@@ -1121,10 +1120,10 @@ class Core {
             }
         }
         if(is_string($attributeList)){
-            $attributeList = $this->explode_multi(Core::ATTRIBUTE_EXPLODE, $attributeList);
+            $attributeList = Core::explode_multi(Core::ATTRIBUTE_EXPLODE, $attributeList);
         }
         if(is_array($attributeList)){
-            $attributeList = $this->object_horizontal($attributeList);
+            $attributeList = Core::object_horizontal($attributeList);
         }
         if(!empty($attributeList)){
             foreach($attributeList as $key => $attribute){
@@ -1138,11 +1137,11 @@ class Core {
                         }
                         return $object->{$key};
                     }
-                    return $this->object_set($attribute, $value, $object->{$key}, $return);
+                    return Core::object_set($attribute, $value, $object->{$key}, $return);
                 }
                 elseif(is_object($attribute)){
                     $object->{$key} = new stdClass();
-                    return $this->object_set($attribute, $value, $object->{$key}, $return);
+                    return Core::object_set($attribute, $value, $object->{$key}, $return);
                 } else {
                     $object->{$key} = $value;
                 }
@@ -1164,7 +1163,7 @@ class Core {
         }
         return $is_empty;
     }
-    public function object_has($attributeList=array(), $object=''){
+    public static function object_has($attributeList=array(), $object=''){
         if(Core::object_is_empty($object)){
             if(empty($attributeList)){
                 return true;
@@ -1172,7 +1171,7 @@ class Core {
             return false;
         }
         if(is_string($attributeList)){
-            $attributeList = $this->explode_multi(Core::ATTRIBUTE_EXPLODE, $attributeList);
+            $attributeList = Core::explode_multi(Core::ATTRIBUTE_EXPLODE, $attributeList);
             foreach($attributeList as $nr => $attribute){
                 if(empty($attribute)){
                     unset($attributeList[$nr]);
@@ -1180,7 +1179,7 @@ class Core {
             }
         }
         if(is_array($attributeList)){
-            $attributeList = $this->object_horizontal($attributeList);
+            $attributeList = Core::object_horizontal($attributeList);
         }
         if(empty($attributeList)){
             return true;
@@ -1192,7 +1191,7 @@ class Core {
             if(property_exists($object,$key)){
 
                 var_dump($attributeList);
-                $get = $this->object_has($attributeList->{$key}, $object->{$key});
+                $get = Core::object_has($attributeList->{$key}, $object->{$key});
                 var_dump($key);
                 var_dump($get);
                 if($get === false){
@@ -1204,7 +1203,7 @@ class Core {
         }
         return false;
     }
-    public function object_get($attributeList=array(), $object=''){
+    public static function object_get($attributeList=array(), $object=''){
         if(Core::object_is_empty($object)){
             if(empty($attributeList)){
                 return $object;
@@ -1212,7 +1211,7 @@ class Core {
             return null;
         }
         if(is_string($attributeList)){
-            $attributeList = $this->explode_multi(Core::ATTRIBUTE_EXPLODE, $attributeList);
+            $attributeList = Core::explode_multi(Core::ATTRIBUTE_EXPLODE, $attributeList);
             foreach($attributeList as $nr => $attribute){
                 if(empty($attribute) && $attribute != '0'){
                     unset($attributeList[$nr]);
@@ -1220,7 +1219,7 @@ class Core {
             }
         }
         if(is_array($attributeList)){
-            $attributeList = $this->object_horizontal($attributeList);
+            $attributeList = Core::object_horizontal($attributeList);
         }
 
         // die;
@@ -1232,7 +1231,7 @@ class Core {
                 continue;
             }
             if(isset($object->{$key})){
-                return $this->object_get($attributeList->{$key}, $object->{$key});
+                return Core::object_get($attributeList->{$key}, $object->{$key});
             }
         }
         return null;
@@ -1291,13 +1290,13 @@ class Core {
     }
 
     //make static
-    public function array_trim($array=array(), $split=',', $trim=null){
+    public static function array_trim($array=array(), $split=',', $trim=null){
         if(is_string($array)){
             $array = explode($split, $array);
         }
         foreach($array as $key => $value){
             if(is_array($value)){
-                $array[$key] = $this->array_trim($value, $split, $trim);
+                $array[$key] = Core::array_trim($value, $split, $trim);
             } else {
                 if($trim === null){
                     $value = trim($value);

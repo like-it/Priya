@@ -36,15 +36,15 @@ class Data extends Core {
     public function data($attribute=null, $value=null, $type=null){
         if($attribute !== null){
             if($attribute == 'set'){
-                $this->object_delete($value, $this->data()); //for sorting an object
-                $this->object_set($value, $type, $this->data());
-                return $this->object_get($value, $this->data());
+                Core::object_delete($value, $this->data()); //for sorting an object
+                Core::object_set($value, $type, $this->data());
+                return Core::object_get($value, $this->data());
             }
             elseif($attribute == 'get'){
-                return $this->object_get($value, $this->data());
+                return Core::object_get($value, $this->data());
             }
             elseif($attribute == 'has'){
-                return $this->object_has($value, $this->data());
+                return Core::object_has($value, $this->data());
             }
             if($value !== null){
                 if(
@@ -58,13 +58,13 @@ class Data extends Core {
                 ){
                     return $this->deleteData($value);
                 } else {
-                    $this->object_delete($attribute, $this->data()); //for sorting an object
-                    $this->object_set($attribute, $value, $this->data());
-                    return $this->object_get($attribute, $this->data());
+                    Core::object_delete($attribute, $this->data()); //for sorting an object
+                    Core::object_set($attribute, $value, $this->data());
+                    return Core::object_get($attribute, $this->data());
                 }
             } else {
                 if(is_string($attribute)){
-                    return $this->object_get($attribute, $this->data());
+                    return Core::object_get($attribute, $this->data());
                 } else {
                     $this->setData($attribute);
                     return $this->getData();
@@ -110,7 +110,7 @@ class Data extends Core {
         }
     }
     private function deleteData($attribute=null){
-        return $this->object_delete($attribute, $this->data());
+        return Core::object_delete($attribute, $this->data());
     }
     public function url($url=null, $attribute=null){
         if($url !== null){

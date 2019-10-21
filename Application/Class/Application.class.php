@@ -688,10 +688,6 @@ class Application extends Parser {
         $dir = Dir::name($url);
         $file = File::basename($url);
 
-        $gitignore = [];
-        $gitignore['url'] = $dir . '.gitignore';
-        $gitignore['data'] = Application::DS . $file;
-
         $start = microtime(true);
         $duration = $start - $this->data('time.start');
         $cache = false;
@@ -740,16 +736,11 @@ class Application extends Parser {
             $this->route()->data('priya.route.cache.time.start', $start);
             $this->route()->data('priya.route.cache.time.duration', microtime(true) - $start);
             Application::route_default($this);
-            $write = 0;
-
-
+            $write = 0;         
             if($is_cache){
                 $write = Cache::write($url,  $this->object($this->route()->data(), 'json'), true);
             }
-            if($write > 0){
-                if($this->data('priya.config.git') !== false){
-                    File::write($gitignore['url'], $gitignore['data']);
-                }
+            if($write > 0){                
                 //succesfull
             } else {
                 throw new Exception('Cache write error in route cache...');
