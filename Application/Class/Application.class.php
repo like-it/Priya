@@ -145,9 +145,7 @@ class Application extends Parser {
             $this->cli();
         }
         $this->handler(new Module\Handler($this->data()));
-        $this->data('web.root', $this->handler()->web());
-
-        $autoload->setStorage($this->data());
+        $this->data('web.root', $this->handler()->web());        
         $this->autoload($autoload);
         $this->router($this->data('priya.route.cache.url'));
     }
@@ -336,10 +334,20 @@ class Application extends Parser {
         /**
          * route get
          */
-        $item = $this->route()->run();
+        $item = $this->route()->run();                                    
         if(empty($item)){
             //add develop mode...
-            throw new Exception('File or route not found');
+//             dd($this->data('priya.application.constant.ENVIRONMENT'));
+            
+            $mode = $this->data('priya.environment');
+            if($mode == $this->data('priya.application.constant.ENVIRONMENT')){
+                header("HTTP/1.0 404 Not Found");
+                throw new Exception('File or route not found');
+                die;
+            } else {
+                header("HTTP/1.0 404 Not Found");
+                die;
+            }                        
         }
         if($this->parameter('route.current')){
             var_dump($item);

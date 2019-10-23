@@ -22,8 +22,6 @@ use Priya\Module\Parser;
 //use Priya\Module\Parse;
 use Priya\Module\File\Cache;
 
-use R3m\Parse;
-
 class Result extends Parser {
     const DIR = __DIR__;
     const FILE = __FILE__;
@@ -61,12 +59,10 @@ class Result extends Parser {
             $class = array_pop($namespace);
             $this->data('web.public', $this->data('web.root') . $this->data('public_html') . '/');
             if(empty($namespace)){
-                $this->data('module.web.root', $this->data('web.root') . $class . '/');
+                $this->data('module.web.root', $this->data('web.root') . $class . '/' . $this->data('public_html') . '/');
             } else {
-                $this->data('module.web.root', $this->data('web.root') . implode('/', $namespace) . '/');
-            }
-            $this->data('module.web.public', $this->data('module.web.root') . $this->data('public_html') . '/');
-            $this->data('module.web.class', $this->data('module.web.root') . $class . '/');
+                $this->data('module.web.root', $this->data('web.root') . implode('/', $namespace) . '/' . $this->data('public_html') . '/');
+            }      
             $this->data('url', $this->handler()->url());
             $this->data('dir.public', $this->handler()->webRoot());
         } else {
@@ -87,16 +83,18 @@ class Result extends Parser {
                     Application::DATA .
                     Application::DS
             );
-            $this->data('module.dir.execute',
+            $this->data('module.dir.view',
                 $this->data('module.dir.root') .
-                Result::EXECUTE .
+                Result::VIEW .
                 Application::DS
             );
+            /*
             $this->data('module.dir.help',
                 $this->data('module.dir.root') .
                 Result::HELP .
                 Application::DS
             );
+            */
             $this->data('module.dir.public',
                     $this->data('module.dir.root') .
                     $this->data('public_html') .
@@ -213,6 +211,7 @@ class Result extends Parser {
         if(method_exists($object, 'data') === false){
             return new Exception('data method not found in object, base-class needs to be at least Priya\Module\Core\Data');
         }
+        /*
         $parse = new Parse($object->handler(), $object->route(), $object->data());
         try {
             $execute = $parse->read($url);
@@ -220,6 +219,7 @@ class Result extends Parser {
         } catch (Exception $e) {
             return $e;
         }
+        */
         return $execute;
     }
 

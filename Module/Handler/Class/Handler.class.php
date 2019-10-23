@@ -71,11 +71,40 @@ class Handler extends Data{
            }
     }
 
+    private static function request_header(){      
+        if(defined('IS_CLI')){
+            return new stdClass();
+        } else {
+            //In Cli mode apache functions aren't defined
+            return Core::array_object(apache_request_headers());
+        }
+    }
+    
+    private static function request_key_group($data){
+        if(empty($data)){
+            return $data;
+        }
+        $result = new stdClass();
+        foreach($data as $key => $value){
+            $explode = explode('_', $key, 4);
+            if(!isset($explode[1])){
+                $result->{$key} = $value;
+                continue;
+            }
+            $temp = Core::object_horizontal($explode, $value);
+            $result = Core::object_merge($result, $temp);
+        }
+        return $result;
+    }
+    
     public function request($attribute=null, $value=null){
         if($attribute !== null){
             if($value !== null){
                 if($attribute == 'create'){
                     return $this->createRequest($value);
+                }
+                elseif($attribute=='header'){
+                    return Handler::request_header();
                 }
                 elseif($attribute=='delete'){
                     return $this->deleteRequest($value);
@@ -374,9 +403,10 @@ class Handler extends Data{
                 if(!isset($request[$key]) && isset($value)){
                     $request[$key] = $value;
                 }
-            }
-        }
-        if(empty($input) && !empty($request)){
+            }            
+        }        
+        $request =  Handler::request_key_group($request);        
+        if(empty($input) && !empty($request)){           
             $input =
                 htmlspecialchars(
                     json_encode(
@@ -406,14 +436,14 @@ class Handler extends Data{
                             }
                         } else {
                             $object->{$key} = $node;
-                        }
+                        }                        
                         $input->nodeList[] = $object;
                     }
                 }
                 $input->nodeList[] = $request;
                 $input = json_encode($input);
             } else {
-                $input = $old;
+                $input = $old;                
                 $input->nodeList = $this->object($old->nodeList, 'array');
                 if(!is_array($input->nodeList)){
                     $input->nodeList = (array) $input->nodeList;
@@ -466,6 +496,13 @@ class Handler extends Data{
                 $data->nodeList[] = $object;
             }
         }
+        /*
+        if(property_exists($data, 'nodeList')){
+            foreach($data->nodeList as $nr => $node){
+                $data->nodelist[$nr] = Handler::request_key_group($node);                
+            }
+        } 
+        */               
         $this->request('create',$data);
     }
 

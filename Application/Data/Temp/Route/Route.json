@@ -8,7 +8,8 @@
                     "url": "\/mnt\/c\/Repository\/finger\/Vendor\/Priya\/Data\/Route.json"
                 },
                 {
-                    "read": false,
+                    "read": true,
+                    "mtime": 1568636012,
                     "url": "\/mnt\/c\/Repository\/finger\/Module\/Data\/Route.json"
                 },
                 {
@@ -25,11 +26,17 @@
                 },
                 {
                     "read": true,
-                    "mtime": 1571675763,
+                    "mtime": 1571848767,
+                    "url": "\/mnt\/c\/Repository\/finger\/Host\/Admin\/Priya\/Software\/Data\/Route.json"
+                },
+                {
+                    "read": true,
+                    "mtime": 1571776912,
                     "url": "\/mnt\/c\/Repository\/finger\/Host\/Priya\/Software\/Data\/Route.json"
                 },
                 {
-                    "read": false,
+                    "read": true,
+                    "mtime": 1571769814,
                     "url": "\/mnt\/c\/Repository\/finger\/Host\/Redirect\/Data\/Route.json"
                 }
             ]
@@ -37,8 +44,8 @@
         "route": {
             "cache": {
                 "time": {
-                    "start": 1571684150.22074,
-                    "duration": 0.028625965118408203
+                    "start": 1571854128.14805,
+                    "duration": 0.07135701179504395
                 }
             }
         }
@@ -94,12 +101,53 @@
             ],
             "translate": false
         },
+        "priya-module-mysql": {
+            "path": "mysql",
+            "request": {
+                "page": "Page",
+                "document": "Cli"
+            },
+            "controller": "Priya.Module.Mysql.run",
+            "language": "en",
+            "method": [
+                "CLI"
+            ]
+        },
+        "admin-priya-software-entrance": {
+            "path": "",
+            "host": [
+                "admin.priya.software"
+            ],
+            "request": {
+                "page": "Home"
+            },
+            "controller": "Host.Admin.Priya.Software.Entrance.run",
+            "language": "en",
+            "format": "html",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "admin-priya-software-api": {
+            "path": "api\/{$module}\/{$action}\/",
+            "host": [
+                "admin.priya.software"
+            ],
+            "controller": "Host.Admin.Priya.Software.Api.Run",
+            "language": "en",
+            "format": "html",
+            "method": [
+                "POST"
+            ]
+        },
         "priya-software-main": {
             "path": "",
             "host": [
                 "priya.software",
                 "*.priya.software",
-                "!documentation.priya.software"
+                "!documentation.priya.software",
+                "!admin.priya.software"
             ],
             "request": {
                 "page": "Home"
@@ -117,7 +165,8 @@
             "host": [
                 "priya.software",
                 "*.priya.software",
-                "!documentation.priya.software"
+                "!documentation.priya.software",
+                "!admin.priya.software"
             ],
             "controller": "Host.Priya.Software.Menu.run",
             "language": "en",
@@ -132,7 +181,8 @@
             "host": [
                 "priya.software",
                 "*.priya.software",
-                "!documentation.priya.software"
+                "!documentation.priya.software",
+                "!admin.priya.software"
             ],
             "controller": "Host.Priya.Software.Page.run",
             "language": "en",
@@ -147,7 +197,8 @@
             "host": [
                 "priya.software",
                 "*.priya.software",
-                "!documentation.priya.software"
+                "!documentation.priya.software",
+                "!admin.priya.software"
             ],
             "url": "{$dir.host}Priya\/Software\/Public\/Download\/{$request.download}",
             "language": "en",
@@ -162,7 +213,8 @@
             "host": [
                 "priya.software",
                 "*.priya.software",
-                "!documentation.priya.software"
+                "!documentation.priya.software",
+                "!admin.priya.software"
             ],
             "request": {
                 "page": "Download"
@@ -180,11 +232,158 @@
             "host": [
                 "priya.software",
                 "*.priya.software",
-                "!documentation.priya.software"
+                "!documentation.priya.software",
+                "!admin.priya.software"
             ],
             "url": "{$dir.host}Priya\/Software\/Public\/License",
             "language": "en",
             "format": "json",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "Host-Redirect-CLi": {
+            "path": "Host\/Redirect",
+            "controller": "Host.Redirect.Cli.run",
+            "format": "html",
+            "language": "en",
+            "method": [
+                "CLI"
+            ],
+            "translate": false
+        },
+        "lunchroom-app": {
+            "path": "",
+            "host": [
+                "lunchroom.app",
+                "*.lunchroom.app"
+            ],
+            "request": {
+                "host": "lunchroom.app"
+            },
+            "controller": "Host.Redirect.run",
+            "language": "en",
+            "format": "html",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "lunchroom-app-page": {
+            "path": "\/{$page}",
+            "host": [
+                "lunchroom.app",
+                "*.lunchroom.app"
+            ],
+            "request": {
+                "host": "lunchroom.app"
+            },
+            "controller": "Host.Redirect.run",
+            "language": "en",
+            "format": "html",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "funda-world": {
+            "path": "",
+            "host": [
+                "funda.world",
+                "*.funda.world"
+            ],
+            "request": {
+                "host": "funda.world"
+            },
+            "controller": "Host.Redirect.run",
+            "language": "en",
+            "format": "html",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "funda-world-page": {
+            "path": "\/{$page}",
+            "host": [
+                "funda.world",
+                "*.funda.world"
+            ],
+            "request": {
+                "host": "funda.world"
+            },
+            "controller": "Host.Redirect.run",
+            "language": "en",
+            "format": "html",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "enquete-app": {
+            "request": {
+                "host": "enquete.app"
+            },
+            "path": "",
+            "host": [
+                "enquete.app",
+                "*.enquete.app"
+            ],
+            "controller": "Host.Redirect.run",
+            "language": "en",
+            "format": "html",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "enquete-app-page": {
+            "request": {
+                "host": "enquete.app"
+            },
+            "path": "\/{$page}",
+            "host": [
+                "enquete.app",
+                "*.enquete.app"
+            ],
+            "controller": "Host.Redirect.run",
+            "language": "en",
+            "format": "html",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "mydate-world": {
+            "path": "",
+            "host": [
+                "mydate.world",
+                "*.mydate.world"
+            ],
+            "request": {
+                "host": "mydate.world"
+            },
+            "controller": "Host.Redirect.run",
+            "language": "en",
+            "format": "html",
+            "method": [
+                "GET",
+                "POST"
+            ]
+        },
+        "mydate-world-page": {
+            "path": "\/{$page}",
+            "host": [
+                "mydate.world",
+                "*.mydate.world"
+            ],
+            "request": {
+                "host": "mydate.world"
+            },
+            "controller": "Host.Redirect.run",
+            "language": "en",
+            "format": "html",
             "method": [
                 "GET",
                 "POST"

@@ -24,8 +24,7 @@ class Autoload {
 
     protected $expose;
     protected $read;
-    protected $fileList;
-    protected $storage;
+    protected $fileList;    
 
     public $prefixList = array();
     public $environment = 'production';
@@ -56,15 +55,7 @@ class Autoload {
                 spl_autoload_register($function, null, true); //prepend (prioritize)
             }
         }
-    }
-
-    public function setStorage($data=null){
-        $this->storage = $data;
-    }
-
-    private function getStorage(){
-        return $this->storage;
-    }
+    } 
 
     private function setEnvironment($environment='production'){
         $this->environment = $environment;
